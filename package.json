@@ -11,15 +11,31 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [
+        "configuration": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "title": "",
+                "properties": {
+                    "vsnote.dbpath": {
+                        "type": "string",
+                        "default": "~/.vscode-note",
+                        "description": ""
+                    },
+                    "vsnote.updateStrategy": {
+                        "type": "string",
+                        "enum": [
+                            "LATEST",
+                            "SEMVER"
+                        ],
+                        "default": "LATEST",
+                        "description": "what strategy you want to use to update your package.json"
+                    }
+                }
             }
+        ],
+        "commands": [
         ]
     },
     "scripts": {
@@ -27,13 +43,15 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "jest"
     },
     "devDependencies": {
-        "@types/mocha": "^2.2.42",
+        "@types/jest": "^23.3.11",
         "@types/node": "^8.10.25",
         "@types/object-path": "^0.11.0",
         "@types/untildify": "^3.0.0",
+        "jest": "^23.6.0",
+        "ts-jest": "^23.10.5",
         "tslint": "^5.8.0",
         "typescript": "^2.6.1",
         "vscode": "^1.1.21"
