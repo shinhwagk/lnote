@@ -30,7 +30,6 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "@types/jest": "^23.3.11",
         "@types/mocha": "^2.2.42",
         "@types/node": "^8.10.25",
         "@types/object-path": "^0.11.0",
