@@ -1,7 +1,11 @@
 import * as db from '../src/database';
 
-import * as vscode from "vscode";
+const vscodeDB = new db.VSNoteDatabase("./test");
 
-test('adds 1 + 2 to equal 3', () => {
-    expect(3).toBe(3);
+test('true', () => {
+    expect(vscodeDB.existChildDomain("/powershell")).toBe(true);
+});
+
+test('false', () => {
+    expect(vscodeDB.existChildDomain("/oracle")).toBe(false);
 });
