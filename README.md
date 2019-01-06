@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/shinhwagk/vscode-note.svg?branch=master)](https://travis-ci.org/shinhwagk/vscode-note)
+
 # vscode-note README
 
 This is the README for your extension "vscode-note". After writing up a brief description, we recommend including the following sections.
