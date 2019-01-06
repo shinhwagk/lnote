@@ -10,7 +10,7 @@ function updateWebviewPanel(i: vscode.Uri) {
     }
 }
 
-const domain = [{ name: "00000000", notes: [{ id: 11, contents: ["ccc", "kkk"] }] },
+const domain = [{ name: "00000000", notes: [{ id: 11, contents: [{"content":"dfdf","type":"text"}, "kkk"] }] },
 { name: "00000001", notes: [{ id: 11, contents: ["ccc", "kkk"] }] }];
 
 function getWebviewContent(context: vscode.ExtensionContext) {

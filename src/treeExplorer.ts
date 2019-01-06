@@ -1,46 +1,39 @@
-// import * as path from "path";
+import * as path from "path";
 
 import * as vscode from "vscode";
 
-// import * as db from "./database";
+import * as db from "./database";
 
-export interface NoteNode {
-	uri: vscode.Uri;
+export interface VSNoteNode {
+    uri: vscode.Uri;
 }
 
-export class NoteExplorer {
-	// private ftpViewer: vscode.TreeView<NoteNode>;
-
-	constructor(context: vscode.ExtensionContext) {
-
-		// const treeDataProvider = new NoteTreeDataProvider();
-		// context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider('ftp', treeDataProvider));
-
-		// this.ftpViewer = 
-		// vscode.window.createTreeView('noteExplorer', { treeDataProvider });
-		// vscode.commands.registerCommand('ftpExplorer.refresh', () => treeDataProvider.refresh());
-		// vscode.commands.registerCommand('ftpExplorer.openFtpResource', folder => this.openResource(folder));
-		// vscode.commands.registerCommand('ftpExplorer.revealResource', () => this.reveal());
-	}
+export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
+    const treeDataProvider = new NoteTreeDataProvider(new db.VSNoteDatabase("s"));
+    vscode.window.createTreeView('noteExplorer', { treeDataProvider });
 }
 
-// export class NoteTreeDataProvider implements vscode.TreeDataProvider<NoteNode>{
 
-// 	// onDidChangeTreeData?: vscode.Event<NoteNode>;
-// 	async getTreeItem(element: NoteNode): Promise<vscode.TreeItem> {
-// 		return {
-// 			collapsibleState: db.existChildDomain(element.uri) ? 1 : 0, // vscode.TreeItemCollapsibleState
-// 			command: {
-// 				arguments: [element.uri],
-// 				command: "updateOrCreateWebview",
-// 				title: "Show Vscode Note",
-// 			},
-// 			label: path.basename(element.uri.toString())
-// 		};
-// 	}
+export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNoteNode>{
 
-// 	// getChildren(element?: NoteNode): Thenable<NoteNode[]> {
-// 	// 	const vsnUri = element ? element.uri : vscode.Uri.parse("notes://vscode-note/");
-// 	// 	return Promise.resolve(db.readChildDomain(vsnUri).map(uri => { return { uri: uri }; }));
-// 	// }
-// }
+    // onDidChangeTreeData?: vscode.Event<NoteNode>;
+    db: db.VSNoteDatabase;
+    constructor(db: db.VSNoteDatabase) { this.db = db; }
+    async getTreeItem(element: VSNoteNode): Promise<vscode.TreeItem> {
+        return {
+            collapsibleState: this.db.existChildDomain(element.uri.path) ? 1 : 0, // vscode.TreeItemCollapsibleState
+            command: {
+                arguments: [element.uri],
+                command: "updateOrCreateWebview",
+                title: "Show Vscode Note",
+            },
+            label: path.basename(element.uri.toString())
+        };
+    }
+
+    getChildren(element?: VSNoteNode): Thenable<VSNoteNode[]> {
+        const vsnUri = element ? element.uri : vscode.Uri.parse("notes://vscode-note/");
+        return Promise.resolve(this.db.readChildDomain(vsnUri.path)
+            .map(uri => { return { uri: vscode.Uri.parse("notes://vscode-note/") }; }));
+    }
+}

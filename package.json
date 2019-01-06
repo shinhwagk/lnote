@@ -10,8 +10,7 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-    ],
+    "activationEvents": [],
     "main": "./out/extension",
     "contributes": {
         "configuration": [
@@ -35,8 +34,7 @@
                 }
             }
         ],
-        "commands": [
-        ]
+        "commands": []
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -47,17 +45,19 @@
     },
     "devDependencies": {
         "@types/jest": "^23.3.11",
-        "@types/node": "^8.10.25",
+        "@types/node": "^10.12.18",
         "@types/object-path": "^0.11.0",
+        "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
         "jest": "^23.6.0",
         "ts-jest": "^23.10.5",
-        "tslint": "^5.8.0",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.21"
+        "tslint": "^5.12.0",
+        "typescript": "^3.2.2",
+        "vscode": "^1.1.26"
     },
     "dependencies": {
         "object-path": "^0.11.4",
+        "rimraf": "^2.6.3",
         "untildify": "^3.0.3"
     }
 }
