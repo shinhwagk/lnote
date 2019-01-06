@@ -29,7 +29,7 @@ const tdl: TestFileStructure[] = [
     { path: `notes/${testDataNote.id}`, kind: "d" },
     { path: `notes/${testDataNote.id}/1.txt`, kind: "f", content: testDataNote.contents[0] },
     { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] }
-]
+];
 
 function createTestFileAndDirectory(tdl: TestFileStructure[]) {
     for (const f of tdl) {
