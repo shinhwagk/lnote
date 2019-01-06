@@ -45,8 +45,8 @@ function removeTestData() {
 }
 
 beforeAll(() => {
-    createTestFileAndDirectory(tdl)
-    vscodeDB = new db.VSNoteDatabase(`./${testDataDir}`);
+    createTestFileAndDirectory(tdl);
+    vscodeDB = new db.VSNoteDatabase(testDataDir);
 });
 
 afterAll(() => removeTestData());

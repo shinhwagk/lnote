@@ -48,7 +48,7 @@ export class VSNoteDatabase {
 
     constructor(dbPath: string) {
         this.dbPath = dbPath || os.homedir();
-        this.notesPath = path.join(this.dbPath, "notes")
+        this.notesPath = path.join(this.dbPath, "notes");
         this.domainsFile = path.join(this.dbPath, "domains.json");
         this.cacheDomains = JSON.parse(fs.readFileSync(this.domainsFile, { encoding: "utf-8" }));
         this.createDBIfNotExist();
@@ -70,7 +70,7 @@ export class VSNoteDatabase {
     }
 
     public readNotesIdOfDomain(dPath: string): number[] {
-        const p = path.join(dPath, ".notes").split("/").filter(n => !!n)
+        const p = path.join(dPath, ".notes").split("/").filter(n => !!n);
         return objectPath.get<number[]>(this.cacheDomains, p, []);
     }
 
@@ -87,11 +87,11 @@ export class VSNoteDatabase {
     }
 
     public readNoteById(id: number): VSNNote {
-        const dList = fs.readdirSync(path.join(this.notesPath, id.toString())).filter(d => !d.startsWith("."))
+        const dList = fs.readdirSync(path.join(this.notesPath, id.toString())).filter(d => !d.startsWith("."));
         const nregex = /^[0-9]\.[a-z]*$/;
         const contents: string[] = [];
         for (const d of dList) {
-            console.info(d)
+            console.info(d);
             const fpath = path.join(this.notesPath, id.toString(), d);
             const fstat = fs.statSync(fpath);
             if (fstat.isFile && nregex.test(d)) {
