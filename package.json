@@ -37,14 +37,15 @@
         "commands": []
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "vscode:prepublish": "npm run tslint-check && npm run compile",
+        "compile": "webpack --mode development --config webpack.config.ts",
+        "watch": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && jest",
+        "test": "rimraf ./out/test && npm run compile && jest --coverage",
         "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts"
     },
     "devDependencies": {
+        "@types/clean-webpack-plugin": "^0.1.2",
         "@types/fs-extra": "^5.0.4",
         "@types/jest": "^23.3.11",
         "@types/node": "^10.12.18",
@@ -52,6 +53,7 @@
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
         "@types/webpack": "^4.4.22",
+        "clean-webpack-plugin": "^1.0.0",
         "jest": "^23.6.0",
         "ts-jest": "^23.10.5",
         "ts-loader": "^5.3.3",

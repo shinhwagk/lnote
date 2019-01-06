@@ -20,7 +20,7 @@ const testDataDomains = {
     }
 };
 
-const testDataNote = { id: 1, contents: ["test", "select * from dual;"] };
+const testDataNote: db.VSNNote = { id: 1, contents: ["test", "select * from dual;"], category: "test" };
 
 const tdl: TestFileStructure[] = [
     { path: '', kind: "d" },
@@ -28,7 +28,8 @@ const tdl: TestFileStructure[] = [
     { path: 'notes', kind: "d" },
     { path: `notes/${testDataNote.id}`, kind: "d" },
     { path: `notes/${testDataNote.id}/1.txt`, kind: "f", content: testDataNote.contents[0] },
-    { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] }
+    { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] },
+    { path: `notes/${testDataNote.id}/.n.json`, kind: "f", content: JSON.stringify({ category: testDataNote.category }) },
 ];
 
 function createTestFileAndDirectory(tdl: TestFileStructure[]) {
@@ -63,6 +64,14 @@ test('dqual powershell notes', () => {
     expect(vscodeDB!.readNotesIdOfDomain('/powershell')).toEqual(testDataDomains.powershell[".notes"]);
 });
 
-test('dqual powershell notes', () => {
+test('test read note', () => {
     expect(vscodeDB!.readNoteById(1)).toEqual(testDataNote);
+});
+
+test('fusion notes', () => {
+    const cname = testDataNote.category;
+    const nid: number = testDataNote.id;
+    const ncontents: string[] = testDataNote.contents;
+    expect(vscodeDB!.fusionNote([testDataNote]))
+        .toEqual([{ name: cname, notes: [{ id: nid, contents: ncontents }] }]);
 });

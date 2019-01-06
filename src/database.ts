@@ -16,7 +16,22 @@ interface VSNDomain {
 // enum VSNoteKind {
 //     SQL
 // }
-interface VSNNote {
+export interface VSNNote {
+    id: number;
+    category: string;
+    contents: string[];
+}
+
+interface VSNNoteMeta {
+    category: string;
+}
+
+interface VSNoteCateory {
+    name: string;
+    notes: VSNoteCateoryNote[];
+}
+
+interface VSNoteCateoryNote {
     id: number;
     contents: string[];
 }
@@ -87,20 +102,38 @@ export class VSNoteDatabase {
     }
 
     public readNoteById(id: number): VSNNote {
-        const dList = fs.readdirSync(path.join(this.notesPath, id.toString())).filter(d => !d.startsWith("."));
+        const notePath = path.join(this.notesPath, id.toString());
+        const noteMetaPath = path.join(notePath, ".n.json");
+        const flist = fs.readdirSync(notePath).filter(d => !d.startsWith("."));
         const nregex = /^[0-9]\.[a-z]*$/;
         const contents: string[] = [];
-        for (const d of dList) {
-            console.info(d);
-            const fpath = path.join(this.notesPath, id.toString(), d);
+        for (const f of flist) {
+            const fpath = path.join(this.notesPath, id.toString(), f);
             const fstat = fs.statSync(fpath);
-            if (fstat.isFile && nregex.test(d)) {
+            if (fstat.isFile && nregex.test(f)) {
                 const content = fs.readFileSync(fpath, { encoding: "utf-8" });
                 contents.push(content);
             }
         }
-        return { id, contents };
+        const meta: VSNNoteMeta = JSON.parse(fs.readFileSync(noteMetaPath, { encoding: "utf-8" }));
+        return { id, contents, category: meta.category };
     }
+
+    public fusionNote(ns: VSNNote[]): VSNoteCateory[] {
+        const categorys: { name: string, notes: any[] }[] = [];
+        function testCategoryExist(name: string): boolean {
+            return categorys.filter(c => c.name === name).length >= 1 ? true : false;
+        }
+        for (const n of ns) {
+            if (!testCategoryExist(n.category)) {
+                categorys.push({ name: n.category, notes: [] });
+            }
+            categorys.filter(c => c.name === n.category)[0].notes.push({ id: n.id, contents: n.contents });
+
+        }
+        return categorys;
+    }
+
 
 }
 

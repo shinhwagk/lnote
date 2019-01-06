@@ -6,5 +6,4 @@ export function activate(context: vscode.ExtensionContext) {
     tree.activateVSNoteTreeViewExplorer(context);
 }
 
-export function deactivate() {
-}
+export function deactivate() { }
