@@ -1,8 +1,14 @@
 import * as fs from "fs";
-import * as db from '../src/database';
+import * as path from "path";
+
 import rimraf = require("rimraf");
 
+import * as db from '../src/database';
+import { TestFileStructure } from "./lib";
+
 let vscodeDB: db.VSNoteDatabase | undefined = undefined;
+
+const testDataDir = "./.vscode-note";
 
 const testDataDomains = {
     powershell: {
@@ -12,26 +18,38 @@ const testDataDomains = {
     oracle: {
         ".notes": []
     }
+};
+
+const testDataNote = { id: 1, contents: ["test", "select * from dual;"] };
+
+const tdl: TestFileStructure[] = [
+    { path: '', kind: "d" },
+    { path: 'domains.json', kind: "f", content: JSON.stringify(testDataDomains) },
+    { path: 'notes', kind: "d" },
+    { path: `notes/${testDataNote.id}`, kind: "d" },
+    { path: `notes/${testDataNote.id}/1.txt`, kind: "f", content: testDataNote.contents[0] },
+    { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] }
+]
+
+function createTestFileAndDirectory(tdl: TestFileStructure[]) {
+    for (const f of tdl) {
+        const p = path.join(testDataDir, f.path);
+        switch (f.kind) {
+            case "d": fs.mkdirSync(p); break;
+            case "f": fs.writeFileSync(p, f.content, { encoding: "utf-8" }); break;
+        }
+    }
 }
-const testDataNote = {
-    id: 1,
-    contents: ["test", "select * from dual;"]
+function removeTestData() {
+    rimraf.sync(testDataDir);
 }
 
 beforeAll(() => {
-    fs.writeFileSync("./test/domains.json", JSON.stringify(testDataDomains), { encoding: "utf-8" });
-    vscodeDB = new db.VSNoteDatabase("./test");
-
-    fs.mkdirSync("./test/notes");
-    fs.mkdirSync(`./test/notes/${testDataNote.id}`);
-    fs.writeFileSync(`./test/notes/${testDataNote.id}/1.txt`, testDataNote.contents[0], { encoding: "utf-8" });
-    fs.writeFileSync(`./test/notes/${testDataNote.id}/2.sql`, testDataNote.contents[1], { encoding: "utf-8" });
+    createTestFileAndDirectory(tdl)
+    vscodeDB = new db.VSNoteDatabase(`./${testDataDir}`);
 });
 
-afterAll(() => {
-    fs.unlinkSync("./test/domains.json");
-    rimraf.sync("./test/notes");
-});
+afterAll(() => removeTestData());
 
 test('true', () => {
     expect(vscodeDB!.existChildDomain("/powershell")).toBe(true);
