@@ -1,9 +1,9 @@
 {
     "powershell": {
         "install": {},
-        "notes": []
+        ".notes": []
     },
     "oracle": {
-        "notes": []
+        ".notes": []
     }
 }
