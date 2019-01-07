@@ -10,7 +10,7 @@ let vscodeDB: db.VSNoteDatabase | undefined = undefined;
 
 const testDataDir = "./.vscode-note";
 
-const testDataDomains = {
+const testDataDomains: { [domain: string]: any } = {
     powershell: {
         install: {},
         ".notes": [1, 2, 3]
@@ -54,6 +54,16 @@ afterAll(() => removeTestData());
 
 test('true', () => {
     expect(vscodeDB!.existChildDomain("/powershell")).toBe(true);
+});
+
+test('child domain', () => {
+    const name1: string = Object.keys(testDataDomains)[0];
+    const name2: string = Object.keys(testDataDomains)[1];
+    const expectData: db.VSNDomain[] = [
+        { name: name1, notes: testDataDomains[name1][".notes"] },
+        { name: name2, notes: testDataDomains[name2][".notes"] }
+    ]
+    expect(vscodeDB!.readChildDomain("/")).toEqual(expectData);
 });
 
 test('false', () => {

@@ -4,36 +4,37 @@ import * as vscode from "vscode";
 
 import * as db from "./database";
 
-export interface VSNoteNode {
-    uri: vscode.Uri;
+export interface VSNDomainNode {
+    dpath: string;
 }
 
-export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
-    const treeDataProvider = new NoteTreeDataProvider(new db.VSNoteDatabase("s"));
-    vscode.window.createTreeView('noteExplorer', { treeDataProvider });
-}
+// export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
+ 
+// }
 
 
-export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNoteNode>{
+export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNode>{
 
     // onDidChangeTreeData?: vscode.Event<NoteNode>;
     db: db.VSNoteDatabase;
     constructor(db: db.VSNoteDatabase) { this.db = db; }
-    async getTreeItem(element: VSNoteNode): Promise<vscode.TreeItem> {
+    async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         return {
-            collapsibleState: this.db.existChildDomain(element.uri.path) ? 1 : 0, // vscode.TreeItemCollapsibleState
-            command: {
-                arguments: [element.uri],
-                command: "updateOrCreateWebview",
-                title: "Show Vscode Note",
-            },
-            label: path.basename(element.uri.toString())
+            collapsibleState: this.db.existChildDomain(element.dpath) ? 1 : 0, // vscode.TreeItemCollapsibleState
+            // command: {
+            //     arguments: [element.path],
+            //     command: "updateOrCreateWebview",
+            //     title: "Show Vscode Note",
+            // },
+            label: path.basename(element.dpath)
         };
     }
 
-    getChildren(element?: VSNoteNode): Thenable<VSNoteNode[]> {
-        const vsnUri = element ? element.uri : vscode.Uri.parse("notes://vscode-note/");
-        return Promise.resolve(this.db.readChildDomain(vsnUri.path)
-            .map(uri => { return { uri: vscode.Uri.parse("notes://vscode-note/") }; }));
+    getChildren(element?: VSNDomainNode): Thenable<VSNDomainNode[]> {
+        console.info(element)
+        vscode.window.showInformationMessage("111");
+        const dpath: string = element ? element.dpath : "/";
+        return Promise.resolve(this.db.readChildDomain(dpath)
+            .map(domain => { return { dpath: path.join(dpath, domain.name) }; }));
     }
 }

@@ -11,11 +11,11 @@
         "Other"
     ],
     "activationEvents": [],
-    "main": "./out/extension",
+    "main": "./out/extension.js",
     "contributes": {
         "configuration": [
             {
-                "title": "",
+                "title": "VScode Note",
                 "properties": {
                     "vsnote.dbpath": {
                         "type": "string",
@@ -41,7 +41,7 @@
         "compile": "webpack --mode development --config webpack.config.ts",
         "watch": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "rimraf ./out/test && npm run compile && jest --coverage",
+        "test": "rimraf ./out/test && tsc -p ./ && jest --coverage",
         "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts"
     },
     "devDependencies": {

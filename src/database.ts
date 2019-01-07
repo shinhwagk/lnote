@@ -8,7 +8,7 @@ import * as objectPath from "object-path";
 // import untildify = require('untildify');
 
 
-interface VSNDomain {
+export interface VSNDomain {
     name: string;
     notes: number[];
 }
@@ -61,7 +61,7 @@ export class VSNoteDatabase {
     private readonly domainsFile: string;
     private readonly cacheDomains: any;
 
-    constructor(dbPath: string) {
+    constructor(dbPath?: string) {
         this.dbPath = dbPath || os.homedir();
         this.notesPath = path.join(this.dbPath, "notes");
         this.domainsFile = path.join(this.dbPath, "domains.json");
@@ -69,15 +69,16 @@ export class VSNoteDatabase {
         this.createDBIfNotExist();
     }
 
-    public readChildDomain(dpath?: string): VSNDomain[] {
+    public readChildDomain(dpath: string): VSNDomain[] {
+        console.info(dpath,2);
         let tmpDomains = this.cacheDomains;
-        const domainPath: string = dpath || "/";
-        for (const domain of domainPath.split("/").filter(p => !!p)) {
+        // const domainPath: string = dpath || "/";
+        for (const domain of dpath.split("/").filter(p => !!p)) {
             tmpDomains = tmpDomains[domain];
         }
         return Object.keys(tmpDomains)
             .filter(name => name !== ".notes")
-            .map(name => { return { name: name, notes: tmpDomains[name].notes }; });
+            .map(name => { return { name: name, notes: tmpDomains[name][".notes"] }; });
     }
 
     public existChildDomain(dpath: string): Boolean {
