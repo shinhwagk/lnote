@@ -66,7 +66,7 @@ test('select domain, dpath: /', () => {
     expect(vscodeDB!.selectDomain("/")).toEqual(expectData);
 });
 
-test('select domain length', () => {
+test('select domain childs length', () => {
     expect(vscodeDB!.selectDomain("/oracle").childs.length >= 1 ? true : false).toBe(false);
 });
 
@@ -74,7 +74,7 @@ test('select domain length', () => {
 //     expect(vscodeDB!.readNotesIdOfDomain('/powershell')).toEqual(testDataDomains.powershell[".notes"]);
 // });
 
-test('test read note', () => {
+test('test select note', () => {
     expect(vscodeDB!.selectNote(1)).toEqual(testDataNote);
 });
 

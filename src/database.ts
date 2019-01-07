@@ -115,11 +115,10 @@ export class VSNoteDatabase {
         fs.writeFileSync(this.domainsFile, "{}", { encoding: 'utf-8' });
     }
 
-    // public selectNotes(dpath: string): VSNNote[] {
-    //     const domain = objectPath.get(this.cacheDomains, dpath.split("/").filter(n => !!n));
-    //     const noteIds = domain[".notes"]
-    //     return noteIds.map(this.selectNote);
-    // }
+    public selectNotes(dpath: string): VSNNote[] {
+        console.log(this.selectDomain(dpath));
+        return this.selectDomain(dpath).notes.map(id=>this.selectNote(id));
+    }
 
     public selectNote(id: number): VSNNote {
         const notePath = path.join(this.notesPath, id.toString());

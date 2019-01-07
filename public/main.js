@@ -1,24 +1,29 @@
 
 window.addEventListener('message', event => {
-    const categorys = event.data;
+    const vsndomain = event.data;
     const rootElement = document.getElementById('root')
 
     while (rootElement.firstChild) {
         rootElement.removeChild(rootElement.firstChild);
     }
 
-    rootElement.appendChild(renderDomain(categorys))
+    rootElement.appendChild(renderDomain(vsndomain))
 })
 
-function renderDomain(categorys) {
+function renderDomain(vsndomain) {
     const domainElement = document.createElement("div");
-    categorys.forEach(category => domainElement.appendChild(renderCategory(category)));
+
+    const domainNameElement = document.createElement("h1")
+    domainNameElement.innerText = vsndomain.name
+
+    domainElement.appendChild(domainNameElement)
+    vsndomain.categorys.forEach(category => domainElement.appendChild(renderCategory(category)));
     return domainElement
 }
 
 function renderCategory(category) {
     const categoryElement = document.createElement("div");
-    const e = document.createElement("h1");
+    const e = document.createElement("h3");
     e.innerText = category.name;
 
     const tableElement = document.createElement("table")

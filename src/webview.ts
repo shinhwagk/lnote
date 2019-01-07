@@ -4,6 +4,10 @@ import * as vscode from 'vscode';
 
 import { VSNoteDatabase, VSNNote } from "./database";
 
+interface VSNWVDomain {
+    name: string;
+    categorys: VSNWVCategory[];
+}
 export interface VSNWVCategory {
     name: string;
     notes: VSNWVNote[];
@@ -38,7 +42,6 @@ function getWebviewContent(context: vscode.ExtensionContext) {
 export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
     context.subscriptions.push(
         vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
-            console.info(panel);
             if (!panel) {
                 panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One,
                     {
@@ -51,17 +54,18 @@ export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
                 panel.onDidDispose(() => { panel = undefined; console.log("vsnote webview closed."); }, null, context.subscriptions);
                 panel.webview.html = getWebviewContent(context);
             }
-            const renderData: VSNNote[] = [];//db.fusionNote([]);
-            updateWebviewPanel(renderData);
+            const notes: VSNNote[] = db.selectNotes(dpath);
+            const categorys: VSNWVCategory[] = fusionNote(notes);
+
+
+            const domain: VSNWVDomain = { name: path.basename(dpath), categorys }
+            updateWebviewPanel(domain);
         })
     );
 }
 
-function updateWebviewPanel(cs: VSNNote[]) {
-    if (panel) {
-        const category = fusionNote(cs);
-        panel.webview.postMessage(category);
-    }
+function updateWebviewPanel(domain: VSNWVDomain) {
+    panel!.webview.postMessage(domain);
 }
 
 function fusionNote(ns: VSNNote[]): VSNWVCategory[] {
