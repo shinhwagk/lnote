@@ -62,7 +62,7 @@ test('child domain', () => {
     const expectData: db.VSNDomain[] = [
         { name: name1, notes: testDataDomains[name1][".notes"] },
         { name: name2, notes: testDataDomains[name2][".notes"] }
-    ]
+    ];
     expect(vscodeDB!.readChildDomain("/")).toEqual(expectData);
 });
 

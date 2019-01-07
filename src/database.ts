@@ -26,7 +26,7 @@ interface VSNNoteMeta {
     category: string;
 }
 
-interface VSNoteCateory {
+export interface VSNoteCateory {
     name: string;
     notes: VSNoteCateoryNote[];
 }
@@ -62,7 +62,7 @@ export class VSNoteDatabase {
     private readonly cacheDomains: any;
 
     constructor(dbPath?: string) {
-        this.dbPath = dbPath || os.homedir();
+        this.dbPath = path.join((dbPath || os.homedir()), ".vscode-note");
         this.notesPath = path.join(this.dbPath, "notes");
         this.domainsFile = path.join(this.dbPath, "domains.json");
         this.cacheDomains = JSON.parse(fs.readFileSync(this.domainsFile, { encoding: "utf-8" }));
@@ -70,7 +70,7 @@ export class VSNoteDatabase {
     }
 
     public readChildDomain(dpath: string): VSNDomain[] {
-        console.info(dpath,2);
+        console.info(dpath, 2);
         let tmpDomains = this.cacheDomains;
         // const domainPath: string = dpath || "/";
         for (const domain of dpath.split("/").filter(p => !!p)) {

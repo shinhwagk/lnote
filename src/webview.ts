@@ -2,16 +2,9 @@ import * as path from "path";
 
 import * as vscode from 'vscode';
 
+import { VSNoteDatabase, VSNoteCateory } from "./database";
+
 let panel: vscode.WebviewPanel | undefined = undefined;
-
-function updateWebviewPanel(i: vscode.Uri) {
-    if (panel) {
-        panel.webview.postMessage(domain);
-    }
-}
-
-const domain = [{ name: "00000000", notes: [{ id: 11, contents: [{"content":"dfdf","type":"text"}, "kkk"] }] },
-{ name: "00000001", notes: [{ id: 11, contents: ["ccc", "kkk"] }] }];
 
 function getWebviewContent(context: vscode.ExtensionContext) {
     const scriptPathOnDisk = vscode.Uri.file(path.join(context.extensionPath, 'public', 'main.js'));
@@ -30,10 +23,9 @@ function getWebviewContent(context: vscode.ExtensionContext) {
 	</html>`;
 }
 
-
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('updateOrCreateWebview', (i: vscode.Uri) => {
+        vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
             if (!panel) {
                 panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One,
                     {
@@ -42,17 +34,20 @@ export function activate(context: vscode.ExtensionContext) {
                             vscode.Uri.file(path.join(context.extensionPath, "public"))
                         ]
                     },
-
                 );
                 panel.webview.html = getWebviewContent(context);
             }
-            // vscode.window.showInformationMessage(i.path);
-            updateWebviewPanel(i);
+            const categorys = db.fusionNote([]);
+            updateWebviewPanel(categorys);
         })
     );
 }
 
-
+function updateWebviewPanel(cs: VSNoteCateory[]) {
+    if (panel) {
+        panel.webview.postMessage(cs);
+    }
+}
 // export class CatCodingSerializer {
 // 	private panel: vscode.WebviewPanel | undefined = undefined;
 // 	constructor() {

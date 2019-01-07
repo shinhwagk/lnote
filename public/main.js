@@ -1,18 +1,18 @@
 
 window.addEventListener('message', event => {
-    const domain = event.data;
+    const categorys = event.data;
     const rootElement = document.getElementById('root')
 
     while (rootElement.firstChild) {
         rootElement.removeChild(rootElement.firstChild);
     }
-    rootElement.appendChild(renderDoamin(domain))
 
+    rootElement.appendChild(renderDomain(categorys))
 })
 
-function renderDoamin(domain) {
+function renderDomain(categorys) {
     const domainElement = document.createElement("div");
-    domain.categorys.forEach(category => domainElement.appendChild(renderCategory(category)));
+    categorys.forEach(category => domainElement.appendChild(renderCategory(category)));
     return domainElement
 }
 
