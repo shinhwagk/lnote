@@ -20,7 +20,7 @@ export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNo
     constructor(db: db.VSNoteDatabase) { this.db = db; }
     async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         return {
-            collapsibleState: this.db.existChildDomain(element.dpath) ? 1 : 0, // vscode.TreeItemCollapsibleState
+            collapsibleState: (this.db.selectDomain(element.dpath).childs.length >= 1 ? true : false) ? 1 : 0, // vscode.TreeItemCollapsibleState
             command: {
                 arguments: [element.dpath],
                 command: "updateOrCreateWebview",
@@ -32,7 +32,7 @@ export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNo
 
     getChildren(element?: VSNDomainNode): Thenable<VSNDomainNode[]> {
         const dpath: string = element ? element.dpath : "/";
-        return Promise.resolve(this.db.readChildDomain(dpath)
-            .map(domain => { return { dpath: path.join(dpath, domain.name) }; }));
+        return Promise.resolve(this.db.selectDomain(dpath).childs
+            .map(childDomainName => { return { dpath: path.join(dpath, childDomainName) }; }));
     }
 }

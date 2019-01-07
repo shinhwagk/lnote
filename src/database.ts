@@ -9,7 +9,7 @@ import * as objectPath from "object-path";
 
 
 export interface VSNDomain {
-    name: string;
+    childs: string[];
     notes: number[];
 }
 
@@ -18,7 +18,7 @@ export interface VSNDomain {
 // }
 export interface VSNNote {
     id: number;
-    category: string;
+    meta: VSNNoteMeta;
     contents: string[];
 }
 
@@ -26,15 +26,6 @@ interface VSNNoteMeta {
     category: string;
 }
 
-export interface VSNoteCateory {
-    name: string;
-    notes: VSNoteCateoryNote[];
-}
-
-interface VSNoteCateoryNote {
-    id: number;
-    contents: string[];
-}
 
 
 // // class Database
@@ -59,36 +50,59 @@ export class VSNoteDatabase {
     private readonly dbPath: string;
     private readonly notesPath: string;
     private readonly domainsFile: string;
-    private readonly cacheDomains: any;
+    private cacheDomains: any;
+    private readonly noteMatchRegex = /^[0-9]\.[a-z]*$/;
 
-    constructor(dbPath?: string) {
-        this.dbPath = path.join((dbPath || os.homedir()), ".vscode-note");
+    constructor(dbRootPath?: string) {
+        this.dbPath = path.join(dbRootPath || os.homedir(), ".vscode-note");
         this.notesPath = path.join(this.dbPath, "notes");
         this.domainsFile = path.join(this.dbPath, "domains.json");
-        this.cacheDomains = JSON.parse(fs.readFileSync(this.domainsFile, { encoding: "utf-8" }));
         this.createDBIfNotExist();
+        this.open();
     }
 
-    public readChildDomain(dpath: string): VSNDomain[] {
-        console.info(dpath, 2);
-        let tmpDomains = this.cacheDomains;
-        // const domainPath: string = dpath || "/";
-        for (const domain of dpath.split("/").filter(p => !!p)) {
-            tmpDomains = tmpDomains[domain];
-        }
-        return Object.keys(tmpDomains)
-            .filter(name => name !== ".notes")
-            .map(name => { return { name: name, notes: tmpDomains[name][".notes"] }; });
+    public open() {
+        this.cacheDomains = JSON.parse(fs.readFileSync(this.domainsFile, { encoding: "utf-8" }));
     }
 
-    public existChildDomain(dpath: string): Boolean {
-        return this.readChildDomain(dpath).length >= 1 ? true : false;
+    public close() {
+        this.cacheDomains = undefined;
     }
 
-    public readNotesIdOfDomain(dPath: string): number[] {
-        const p = path.join(dPath, ".notes").split("/").filter(n => !!n);
-        return objectPath.get<number[]>(this.cacheDomains, p, []);
+    // public selectDomainChild(dpath: string): VSNDomain[] {
+    //     let tmpDomains = this.cacheDomains;
+    //     for (const domain of dpath.split("/").filter(p => !!p)) {
+    //         tmpDomains = tmpDomains[domain];
+    //     }
+    //     return Object.keys(tmpDomains)
+    //         .filter(name => name !== ".notes")
+    //         .map(name => { return { name: name, notes: tmpDomains[name][".notes"] }; });
+    // }
+
+    public selectDomain(dPath: string): VSNDomain {
+        const domain = objectPath.get(this.cacheDomains, dPath.split("/").filter(n => !!n));
+        const childs: string[] = Object.keys(domain).filter(name => name !== ".notes");
+        return { childs, notes: domain[".notes"] };
     }
+
+
+
+    // public selectCategorys(dpath: string) {
+    //     this.selectDomainChild(dpath)
+    // }
+
+    // public deleteNote(id: string, dpath: string): void {
+
+    // }
+
+    // public existChildDomain(dpath: string): Boolean {
+    //     return this.selectDomain(dpath).length >= 1 ? true : false;
+    // }
+
+    // public readNotesIdOfDomain(dPath: string): number[] {
+    //     const p = path.join(dPath, ".notes").split("/").filter(n => !!n);
+    //     return objectPath.get<number[]>(this.cacheDomains, p, []);
+    // }
 
     // private checkoutDB(): void {
     //     fs.writeFileSync(this.domainsFile, JSON.stringify(this.cacheDomains), { encoding: "utf-8" });
@@ -98,44 +112,32 @@ export class VSNoteDatabase {
         if (fs.existsSync(this.dbPath)) { return; }
         fs.mkdirSync(this.dbPath);
         fs.mkdirSync(this.notesPath);
-
         fs.writeFileSync(this.domainsFile, "{}", { encoding: 'utf-8' });
     }
 
-    public readNoteById(id: number): VSNNote {
+    // public selectNotes(dpath: string): VSNNote[] {
+    //     const domain = objectPath.get(this.cacheDomains, dpath.split("/").filter(n => !!n));
+    //     const noteIds = domain[".notes"]
+    //     return noteIds.map(this.selectNote);
+    // }
+
+    public selectNote(id: number): VSNNote {
         const notePath = path.join(this.notesPath, id.toString());
         const noteMetaPath = path.join(notePath, ".n.json");
         const flist = fs.readdirSync(notePath).filter(d => !d.startsWith("."));
-        const nregex = /^[0-9]\.[a-z]*$/;
+
         const contents: string[] = [];
         for (const f of flist) {
             const fpath = path.join(this.notesPath, id.toString(), f);
             const fstat = fs.statSync(fpath);
-            if (fstat.isFile && nregex.test(f)) {
+            if (fstat.isFile && this.noteMatchRegex.test(f)) {
                 const content = fs.readFileSync(fpath, { encoding: "utf-8" });
                 contents.push(content);
             }
         }
         const meta: VSNNoteMeta = JSON.parse(fs.readFileSync(noteMetaPath, { encoding: "utf-8" }));
-        return { id, contents, category: meta.category };
+        return { id, contents, meta: { category: meta.category } };
     }
-
-    public fusionNote(ns: VSNNote[]): VSNoteCateory[] {
-        const categorys: { name: string, notes: any[] }[] = [];
-        function testCategoryExist(name: string): boolean {
-            return categorys.filter(c => c.name === name).length >= 1 ? true : false;
-        }
-        for (const n of ns) {
-            if (!testCategoryExist(n.category)) {
-                categorys.push({ name: n.category, notes: [] });
-            }
-            categorys.filter(c => c.name === n.category)[0].notes.push({ id: n.id, contents: n.contents });
-
-        }
-        return categorys;
-    }
-
-
 }
 
 

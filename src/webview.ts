@@ -2,7 +2,19 @@ import * as path from "path";
 
 import * as vscode from 'vscode';
 
-import { VSNoteDatabase, VSNoteCateory } from "./database";
+import { VSNoteDatabase, VSNNote } from "./database";
+
+export interface VSNWVCategory {
+    name: string;
+    notes: VSNWVNote[];
+}
+
+// vscode note web view note
+interface VSNWVNote {
+    id: number;
+    contents: string[];
+}
+
 
 let panel: vscode.WebviewPanel | undefined = undefined;
 
@@ -26,6 +38,7 @@ function getWebviewContent(context: vscode.ExtensionContext) {
 export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
     context.subscriptions.push(
         vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
+            console.info(panel);
             if (!panel) {
                 panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One,
                     {
@@ -35,37 +48,36 @@ export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
                         ]
                     },
                 );
+                panel.onDidDispose(() => { panel = undefined; console.log("vsnote webview closed."); }, null, context.subscriptions);
                 panel.webview.html = getWebviewContent(context);
             }
-            const categorys = db.fusionNote([]);
-            updateWebviewPanel(categorys);
+            const renderData: VSNNote[] = [];//db.fusionNote([]);
+            updateWebviewPanel(renderData);
         })
     );
 }
 
-function updateWebviewPanel(cs: VSNoteCateory[]) {
+function updateWebviewPanel(cs: VSNNote[]) {
     if (panel) {
-        panel.webview.postMessage(cs);
+        const category = fusionNote(cs);
+        panel.webview.postMessage(category);
     }
 }
-// export class CatCodingSerializer {
-// 	private panel: vscode.WebviewPanel | undefined = undefined;
-// 	constructor() {
-// 		this.panel = vscode.window.createWebviewPanel(
-// 			'catCoding',
-// 			'vs notes',
-// 			vscode.ViewColumn.One,
-// 			{ enableScripts: true }
-// 		);
 
-// 		this.panel.webview.html = getWebviewContent();
-// 	}
-// 	public update(i: vscode.Uri) {
-// 		this.panel.webview.postMessage({ command: { a: 1 } });
-// 	}
-// }
+function fusionNote(ns: VSNNote[]): VSNWVCategory[] {
+    const categorys: VSNWVCategory[] = [];
+    function testCategoryExist(name: string): boolean {
+        return categorys.filter(c => c.name === name).length >= 1 ? true : false;
+    }
+    for (const n of ns) {
+        if (!testCategoryExist(n.meta.category)) {
+            categorys.push({ name: n.meta.category, notes: [] });
+        }
+        categorys.filter(c => c.name === n.meta.category)[0].notes.push({ id: n.id, contents: n.contents });
 
-
+    }
+    return categorys;
+}
 
 
 
