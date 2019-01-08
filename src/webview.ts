@@ -5,8 +5,7 @@ import * as vscode from 'vscode';
 import { VSNoteDatabase, VSNNote } from "./database";
 
 interface VSNWVDomain {
-    name: string;
-    categorys: VSNWVCategory[];
+    [n: string]: VSNWVCategory[];
 }
 export interface VSNWVCategory {
     name: string;
@@ -58,7 +57,7 @@ export function activate(context: vscode.ExtensionContext, db: VSNoteDatabase) {
             const categorys: VSNWVCategory[] = fusionNote(notes);
 
 
-            const domain: VSNWVDomain = { name: path.basename(dpath), categorys }
+            const domain: VSNWVDomain = Object.defineProperty({}, path.basename(dpath), categorys);
             updateWebviewPanel(domain);
         })
     );
