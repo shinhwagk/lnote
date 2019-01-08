@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 
 import { VSNDatabase, VSNNote } from "./database";
 
-interface VSNWVDomain {
+export interface VSNWVDomain {
     name: string;
     categorys: VSNWVCategory[];
 }
@@ -33,7 +33,7 @@ function getWebviewContent(context: vscode.ExtensionContext) {
 		<title>Cat Coding</title>
 	</head>
 	<body>
-		<div id="root"></div>
+        <div id="root"></div>
 		<script src="${scriptUri}"></script>
 	</body>
 	</html>`;

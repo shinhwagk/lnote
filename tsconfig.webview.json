@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "outDir": "./out-webview/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "esnext",
+        "jsx": "preserve",
+        "lib": [
+            "es6",
+            "dom"
+        ]
+    },
+    "include": [
+        "webview"
+    ]
+}

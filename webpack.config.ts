@@ -9,11 +9,10 @@ const config: webpack.Configuration = {
   entry: "./src/extension.ts",
   output: {
     filename: "extension.js",
-    libraryTarget: "commonjs2",
     path: path.resolve(__dirname, "out"),
   },
   resolve: { extensions: [".ts", ".js"] },
-  module: { rules: [{ test: /\.ts$/, exclude: /node_modules/, loader: "ts-loader" }] },
+  module: { rules: [{ test: /\.ts$/, loader: "ts-loader" }] },
   externals: { vscode: "vscode" },
   devtool: "source-map",
   plugins: [new CleanWebpackPlugin(["out"])]
