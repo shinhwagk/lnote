@@ -9,15 +9,15 @@ export interface VSNDomainNode {
 }
 
 export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
-    const treeDataProvider = new NoteTreeDataProvider(new db.VSNoteDatabase());
+    const treeDataProvider = new NoteTreeDataProvider(new db.VSNDatabase());
     vscode.window.createTreeView('vsnoteExplorer', { treeDataProvider });
 }
 
 export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNode>{
 
     // onDidChangeTreeData?: vscode.Event<NoteNode>;
-    db: db.VSNoteDatabase;
-    constructor(db: db.VSNoteDatabase) { this.db = db; }
+    db: db.VSNDatabase;
+    constructor(db: db.VSNDatabase) { this.db = db; }
     async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         return {
             collapsibleState: (this.db.selectDomain(element.dpath).childs.length >= 1 ? true : false) ? 1 : 0, // vscode.TreeItemCollapsibleState

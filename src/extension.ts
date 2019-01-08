@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 
-import * as tree from "./treeExplorer";
+import * as tree from "./treeview";
 import { activate as webview } from './webview';
 import * as db from "./database";
 
 export function activate(context: vscode.ExtensionContext) {
-    const vsnoteDB = new db.VSNoteDatabase();
+    const vsnoteDB = new db.VSNDatabase();
     tree.activateVSNoteTreeViewExplorer(context);
     webview(context, vsnoteDB);
 }

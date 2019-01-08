@@ -40,10 +40,17 @@ function renderCategory(category) {
 
 function renderNote(note) {
     const rowElement = document.createElement("tr");
+    const noteIdElement = document.createElement("td");
+    noteIdElement.innerText = note.id;
+    rowElement.appendChild(noteIdElement);
     for (const content of note.contents) {
         const e = document.createElement("td");
         e.innerText = content
         rowElement.appendChild(e)
     }
     return rowElement;
+}
+
+function createNote() {
+
 }

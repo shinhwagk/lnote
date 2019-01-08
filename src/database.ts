@@ -3,6 +3,8 @@ import * as os from "os";
 import * as path from "path";
 
 import * as objectPath from "object-path";
+
+import { vfs } from './lib';
 // import * as vscode from "vscode";
 
 // import untildify = require('untildify');
@@ -43,10 +45,11 @@ interface VSNNoteMeta {
 //     }
 //     return common(dpath, f) as VSNDomain;
 // }
-export class VSNoteDatabase {
+export class VSNDatabase {
     private readonly dbPath: string;
     private readonly notesPath: string;
     private readonly domainsFile: string;
+    private readonly notesSeqFile: string;
     private cacheDomains: any;
     private readonly noteMatchRegex = /^[0-9]\.[a-z]+$/;
 
@@ -54,6 +57,7 @@ export class VSNoteDatabase {
         this.dbPath = path.join(dbRootPath || os.homedir(), ".vscode-note");
         this.notesPath = path.join(this.dbPath, "notes");
         this.domainsFile = path.join(this.dbPath, "domains.json");
+        this.notesSeqFile = path.join(this.dbPath, "notes.seq");
         this.createDBIfNotExist();
         this.open();
     }
@@ -99,5 +103,29 @@ export class VSNoteDatabase {
         }
         const meta: VSNNoteMeta = JSON.parse(fs.readFileSync(noteMetaPath, { encoding: "utf-8" }));
         return { id, contents, meta: { category: meta.category } };
+    }
+
+
+    public createNote(dpath: string): void {
+        const noteid: number = this.incNoteSeq();
+        const notepath = path.join(dpath, ".notes")
+        const notes = objectPath.get<number[]>(this.cacheDomains, notepath.split("/").filter(p => !!p), []);
+        notes.push(noteid);
+        objectPath.set(this.cacheDomains, notepath.split("/").filter(p => !!p), notes);
+        this.checkout();
+    }
+
+    public selectNoteSeq(): number {
+        return Number(vfs.readFileSync(this.notesSeqFile));
+    }
+
+    public incNoteSeq(): number {
+        const seq = this.selectNoteSeq() + 1;
+        vfs.writeFileSync(this.notesSeqFile, seq.toString());
+        return seq;
+    }
+
+    private checkout() {
+        vfs.writeFileSync(this.domainsFile, JSON.stringify(this.cacheDomains));
     }
 }

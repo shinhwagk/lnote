@@ -6,7 +6,7 @@ import rimraf = require("rimraf");
 import * as db from '../src/database';
 import { TestFileStructure } from "./lib";
 
-let vscodeDB: db.VSNoteDatabase | undefined = undefined;
+let vscodeDB: db.VSNDatabase | undefined = undefined;
 
 const testDataRootPath = "./";
 const testDataPath = path.join(testDataRootPath, ".vscode-note");
@@ -49,7 +49,7 @@ function removeTestData() {
 
 beforeAll(() => {
     createTestFileAndDirectory(tdl);
-    vscodeDB = new db.VSNoteDatabase(testDataRootPath);
+    vscodeDB = new db.VSNDatabase(testDataRootPath);
 });
 
 afterAll(() => removeTestData());
