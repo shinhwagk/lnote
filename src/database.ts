@@ -80,7 +80,6 @@ export class VSNoteDatabase {
     }
 
     public selectNotes(dpath: string): VSNNote[] {
-        console.log(this.selectDomain(dpath));
         return this.selectDomain(dpath).notes.map(id => this.selectNote(id));
     }
 
