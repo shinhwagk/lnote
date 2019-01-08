@@ -60,7 +60,7 @@
         "compile": "webpack --mode production --config webpack.config.ts",
         "watch": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "rimraf ./out && tsc -p ./ && jest --coverage",
+        "test": "jest",
         "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts",
         "watch-webview": "webpack --mode development --config webpack.config.webview.ts --watch"
     },
@@ -90,7 +90,7 @@
         "tslint": "^5.12.0",
         "typescript": "^3.2.2",
         "vscode": "^1.1.26",
-        "webpack": "^4.28.3",
+        "webpack": "^4.28.1",
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {

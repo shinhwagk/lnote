@@ -62,7 +62,7 @@ test('select domain, dpath: /', () => {
     const child: string[] = Object.keys(testDataDomains);
     // const child2: string[] = Object.keys(testDataDomains["oracle"]);
     const expectData: db.VSNDomain =
-        { childs: child, notes: testDataDomains[".notes"] }
+        { childs: child, notes: testDataDomains[".notes"] };
     expect(vscodeDB!.selectDomain("/")).toEqual(expectData);
 });
 

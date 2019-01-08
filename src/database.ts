@@ -105,10 +105,9 @@ export class VSNDatabase {
         return { id, contents, meta: { category: meta.category } };
     }
 
-
     public createNote(dpath: string): void {
         const noteid: number = this.incNoteSeq();
-        const notepath = path.join(dpath, ".notes")
+        const notepath = path.join(dpath, ".notes");
         const notes = objectPath.get<number[]>(this.cacheDomains, notepath.split("/").filter(p => !!p), []);
         notes.push(noteid);
         objectPath.set(this.cacheDomains, notepath.split("/").filter(p => !!p), notes);

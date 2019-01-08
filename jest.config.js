@@ -1,3 +1,7 @@
 module.exports = {
-    verbose: true,
+  preset: 'ts-jest',
+  testMatch: ['**/*.test.ts'],
+  testEnvironment: 'node',
+  collectCoverage: true,
+  verbose: true
 };

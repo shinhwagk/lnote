@@ -16,12 +16,11 @@
         // "noUnusedParameters": true,  /* Report errors on unused parameters. */
         "noImplicitAny": true,
         "rootDirs": [
-            "src",
+
             "test"
         ]
     },
     "include": [
-        "src",
         "test"
     ]
 }
