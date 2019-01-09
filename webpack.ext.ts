@@ -9,6 +9,7 @@ const config: webpack.Configuration = {
     entry: "./src/extension.ts",
     output: {
         filename: "extension.js",
+        libraryTarget:"commonjs2",
         path: path.resolve(__dirname, "out"),
     },
     resolve: { extensions: [".ts", ".js"] },
