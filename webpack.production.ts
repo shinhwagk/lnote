@@ -1,4 +1,5 @@
 
-import webviewConfig from "./webpack.config.webview";
-import extConfig from "./webpack.config.ext";
-export =[webviewConfig, extConfig];
+import webviewConfig from "./webpack.webview";
+import extConfig from "./webpack.ext";
+
+export default [webviewConfig, extConfig];

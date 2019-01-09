@@ -10,6 +10,7 @@ let vscodeDB: db.VSNDatabase | undefined = undefined;
 
 const testDataRootPath = "./";
 const testDataPath = path.join(testDataRootPath, ".vscode-note");
+const testNotesSeq = path.join(testDataPath, "notes.seq");
 
 const testDataDomains: { [domain: string]: any } = {
     powershell: {
@@ -31,6 +32,7 @@ const tdl: TestFileStructure[] = [
     { path: `notes/${testDataNote.id}/1.txt`, kind: "f", content: testDataNote.contents[0] },
     { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] },
     { path: `notes/${testDataNote.id}/.n.json`, kind: "f", content: JSON.stringify({ category: testDataNote.meta.category }) },
+    { path: `notes.seq`, kind: "f", content: '3' }
 ];
 
 function createTestFileAndDirectory(tdl: TestFileStructure[]) {
@@ -76,6 +78,24 @@ test('select domain childs length', () => {
 
 test('test select note', () => {
     expect(vscodeDB!.selectNote(1)).toEqual(testDataNote);
+});
+
+test('inc seq', () => {
+    const id = vscodeDB!.incNoteSeq();
+    const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
+    expect(id).toEqual(noteseq);
+});
+
+test('select seq', () => {
+    const id = vscodeDB!.selectNoteSeq();
+    const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
+    expect(id).toEqual(noteseq);
+});
+
+test('create note', () => {
+    vscodeDB!.createNote('/powershell');
+    const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
+    expect(fs.existsSync(path.join(testDataPath, "notes", noteseq.toString()))).toEqual(true);
 });
 
 // test('fusion notes', () => {

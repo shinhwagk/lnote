@@ -15,9 +15,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onView:vsnoteExplorer"
+        "onCommand:extension.helloWorld"
     ],
-    "main": "./out/extension.js",
+    "main": "./out/extension",
     "contributes": {
         "viewsContainers": {
             "activitybar": [
@@ -57,12 +57,18 @@
                 }
             }
         ],
-        "commands": []
+        "commands": [
+            {
+                "command": "extension.helloWorld",
+                "title": "Show Vscode Note1"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "yarn tslint-check && yarn compile",
         "compile": "webpack --mode production --config webpack.production.ts",
         "watch": "webpack --mode development --config webpack.production.ts --watch",
+        "watch:ext": "webpack --mode development --config webpack.ext.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest",
         "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts",

@@ -39,7 +39,7 @@ function getWebviewContent(context: vscode.ExtensionContext) {
 	</html>`;
 }
 
-export function activate(context: vscode.ExtensionContext, db: VSNDatabase) {
+export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase) {
     context.subscriptions.push(
         vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
             if (!panel) {

@@ -9,8 +9,8 @@ const config: webpack.Configuration = {
     target: "web",
     entry: "./webview/src/index.tsx",
     output: {
-        filename: "[name].js",
-        path: path.resolve(__dirname, "out", "webview"),
+        filename: "[name].wv.js",
+        path: path.resolve(__dirname, "out"),
     },
     resolve: {
         extensions: [".js", ".ts", ".tsx"],
@@ -25,7 +25,7 @@ const config: webpack.Configuration = {
     plugins: [
         new CleanWebpackPlugin("out"),
         new HtmlWebpackPlugin({
-            filename: "index.html",
+            filename: "index.wv.html",
             template: "webview/assets/template.html"
         })
         

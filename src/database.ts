@@ -15,9 +15,6 @@ export interface VSNDomain {
     notes: number[];
 }
 
-// enum VSNoteKind {
-//     SQL
-// }
 export interface VSNNote {
     id: number;
     meta: VSNNoteMeta;
@@ -28,23 +25,17 @@ interface VSNNoteMeta {
     category: string;
 }
 
-// function createDatabase(dbPath: string) {
-//     const cachedb = {}
-//     return (dPath: string, f: any) => f(dPath, cachedb);
-// }
-
-// // function database
-
-// const common = createDatabase("ggg");
-
-// export const selectDomaintest = (dpath: string) => {
-//     function f(dPath: string, cacheDomains: any): VSNDomain {
-//         const domain = objectPath.get(cacheDomains, dPath.split("/").filter(n => !!n));
-//         const childs: string[] = Object.keys(domain).filter(name => name !== ".notes");
-//         return { childs, notes: domain[".notes"] };
+// export class VSNDatabaseNote {
+//     public createNote(dpath: string): void {
+//         const noteid: number = this.incNoteSeq();
+//         const notepath = path.join(dpath, ".notes");
+//         const notes = objectPath.get<number[]>(this.cacheDomains, notepath.split("/").filter(p => !!p), []);
+//         notes.push(noteid);
+//         objectPath.set(this.cacheDomains, notepath.split("/").filter(p => !!p), notes);
+//         this.checkout();
 //     }
-//     return common(dpath, f) as VSNDomain;
 // }
+
 export class VSNDatabase {
     private readonly dbPath: string;
     private readonly notesPath: string;
@@ -111,6 +102,7 @@ export class VSNDatabase {
         const notes = objectPath.get<number[]>(this.cacheDomains, notepath.split("/").filter(p => !!p), []);
         notes.push(noteid);
         objectPath.set(this.cacheDomains, notepath.split("/").filter(p => !!p), notes);
+        fs.mkdirSync(path.join(this.notesPath, noteid.toString()));
         this.checkout();
     }
 
