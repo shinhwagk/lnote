@@ -7,6 +7,10 @@
     "engines": {
         "vscode": "^1.30.0"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shinhwagk/vscode-note"
+    },
     "categories": [
         "Other"
     ],
@@ -56,9 +60,9 @@
         "commands": []
     },
     "scripts": {
-        "vscode:prepublish": "npm run tslint-check && npm run compile",
-        "compile": "webpack --mode production --config webpack.config.ts",
-        "watch": "webpack --mode development --config webpack.config.ts --watch",
+        "vscode:prepublish": "yarn tslint-check && yarn compile",
+        "compile": "webpack --mode production --config webpack.production.ts",
+        "watch": "webpack --mode development --config webpack.production.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest",
         "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts",
