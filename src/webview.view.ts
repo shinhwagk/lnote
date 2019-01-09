@@ -23,7 +23,7 @@ interface VSNWVNote {
 let panel: vscode.WebviewPanel | undefined = undefined;
 
 function getWebviewContent(context: vscode.ExtensionContext) {
-    const scriptPathOnDisk = vscode.Uri.file(path.join(context.extensionPath, 'public', 'main.js'));
+    const scriptPathOnDisk = vscode.Uri.file(path.join(context.extensionPath, 'assets', 'main.js'));
     const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
     return `<!DOCTYPE html>
 	<html lang="en">
@@ -47,7 +47,7 @@ export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase
                     {
                         enableScripts: true,
                         localResourceRoots: [
-                            vscode.Uri.file(path.join(context.extensionPath, "public"))
+                            vscode.Uri.file(path.join(context.extensionPath, "assets"))
                         ]
                     },
                 );

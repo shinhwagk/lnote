@@ -46,8 +46,6 @@ export class VSNWebviewForm {
     }
 }
 
-  
-
 function getWebviewContent(extensionPath: string) {
     const scriptPathOnDisk = vscode.Uri.file(path.join(extensionPath, 'public', 'main.js'));
     const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });

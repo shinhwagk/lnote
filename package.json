@@ -15,7 +15,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.helloWorld"
+        "onView:vsnoteExplorer"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -24,7 +24,7 @@
                 {
                     "id": "vsnote-explorer",
                     "title": "VSNote",
-                    "icon": "public/note.svg"
+                    "icon": "assets/note.svg"
                 }
             ]
         },
@@ -33,6 +33,14 @@
                 {
                     "id": "vsnoteExplorer",
                     "name": "exporer"
+                },
+                {
+                    "id": "vsnoteExplorer22",
+                    "name": "files"
+                },
+                {
+                    "id": "vsnoteExplorer221",
+                    "name": "doc"
                 }
             ]
         },
@@ -59,7 +67,7 @@
         ],
         "commands": [
             {
-                "command": "extension.helloWorld",
+                "command": "extension.note.create",
                 "title": "Show Vscode Note1"
             }
         ]
