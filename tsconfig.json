@@ -8,19 +8,11 @@
         ],
         "sourceMap": true,
         "strict": true, 
-
         "noUnusedLocals": true, 
         "noImplicitReturns": true,
-
         "noFallthroughCasesInSwitch": true,
-
         "noUnusedParameters": true, 
-
         "noImplicitAny": true,
-        "rootDirs": [
-
-            "test"
-        ]
     },
     "plugins": [
         {
@@ -28,6 +20,6 @@
         }
       ],
     "include": [
-        "test"
+        "src"
     ]
 }
