@@ -1,4 +1,11 @@
 {
+	"extends": [
+		"tslint-config-prettier"
+	],
+	"rulesDirectory": [
+		"node_modules/tslint-react/rules",
+		"node_modules/tslint-microsoft-contrib/"
+	],
 	"rules": {
 		"no-string-throw": true,
 		"no-unused-expression": true,
