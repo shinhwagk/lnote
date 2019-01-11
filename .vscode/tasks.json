@@ -5,8 +5,7 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "watch:ext",
-            "problemMatcher": "$tsc-watch",
+            "script": "watch:dev",
             "isBackground": true,
             "presentation": {
                 "reveal": "never"

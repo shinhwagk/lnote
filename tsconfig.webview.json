@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "outDir": "./out-webview/",
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "commonjs",
@@ -12,6 +11,6 @@
         ]
     },
     "include": [
-        "webview"
+        "webview-src"
     ]
 }

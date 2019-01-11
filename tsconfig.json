@@ -4,22 +4,20 @@
         "target": "es6",
         "outDir": "out",
         "lib": [
-            "es6"
+            "es6",
+            "dom"
         ],
         "sourceMap": true,
-        "strict": true, 
-        "noUnusedLocals": true, 
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": true, 
-        "noImplicitAny": true,
+        "strict": false,
+        "jsx": "react"
     },
     "plugins": [
         {
-          "name": "typescript-tslint-plugin"
+            "name": "typescript-tslint-plugin"
         }
-      ],
+    ],
     "include": [
-        "src"
+        "src",
+        "webview-src"
     ]
 }

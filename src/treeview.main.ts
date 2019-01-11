@@ -8,9 +8,7 @@ export interface VSNDomainNode {
     dpath: string;
 }
 
-export function activateVSNoteTreeViewExplorer(
-    context: vscode.ExtensionContext
-) {
+export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
     const treeDataProvider = new NoteTreeDataProvider(new db.VSNDatabase());
     vscode.window.createTreeView('vsnoteExplorer', { treeDataProvider });
 }
@@ -26,8 +24,8 @@ export class NoteTreeDataProvider
         return {
             collapsibleState: (this.db.selectDomain(element.dpath).childs
                 .length >= 1
-              ? true
-              : false)
+                ? true
+                : false)
                 ? 1
                 : 0, // vscode.TreeItemCollapsibleState
             command: {
