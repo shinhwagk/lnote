@@ -9,19 +9,20 @@ import './index.scss';
 const vscode = acquireVsCodeApi();
 
 function VSNNotes(props: VSNWVNote) {
+    const contents = props.contents.map(c => <td>{c}</td>);
     return (
         <tr>
             <td>{props.id}</td>
-            <td>{props.contents[0]}</td>
+            {contents}
         </tr>
     );
 }
 
 function VSNCategory(props: VSNWVCategory) {
-    const listnote = props.notes.map((note: any) => <VSNNotes id={1} contents={['111', '222']} />);
+    const listnote = props.notes.map((note: any) => <VSNNotes id={note.id} contents={note.contents} />);
     return (
         <div>
-            <h1>222</h1>
+            <h1>{props.name}</h1>
             <table>{listnote}</table>
         </div>
     );
@@ -44,9 +45,9 @@ function VNSDomain(props: VSNWVDomain) {
 window.addEventListener('message', event => {
     const message: VSNWVDomain = event.data;
     const name = message.name;
-    console.log(`name ${name}`)
+    console.log(`name ${name}`);
     const categorys = message.categorys;
-    console.log(`categosy ${JSON.stringify(categorys)}`)
+    console.log(`categosy ${JSON.stringify(categorys)}`);
     ReactDOM.render(<VNSDomain name={name} categorys={categorys} />, document.getElementById('root'));
 });
 

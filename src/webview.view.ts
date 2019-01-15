@@ -2,58 +2,81 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { VSNDatabase, VSNNote } from './database';
+import { VSNDatabase, VSNNote, VSNDomain } from './database';
 import { VSNWVCategory, VSNWVDomain, VSNWVNote } from './webview/lib';
 
-function assetsFile(extensionPath: string, name: string): string {
-    const file = path.join(extensionPath, 'out', name);
+const assetsFile = (extPath: string) => (name: string) => {
+    const file = path.join(extPath, 'out', name);
     return vscode.Uri.file(file)
         .with({
             scheme: 'vscode-resource'
         })
         .toString();
-}
+};
 
 function getWebviewContent(extPath: string) {
-    const scriptPath = assetsFile(extPath, 'main.wv.js');
-    const reactPath = assetsFile(extPath, 'react.production.min.js');
-    const reactDompath = assetsFile(extPath, 'react-dom.production.min.js');
+    const wFile = assetsFile(extPath);
     return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Cat Coding</title>
-        <script src="${reactPath}" crossorigin></script>
-        <script src="${reactDompath}" crossorigin></script>
+        <script src="${wFile('react.production.min.js')}" crossorigin></script>
+        <script src="${wFile('react-dom.production.min.js')}" crossorigin></script>
 	</head>
     <body>
         <div id="root"></div>
-        <script src="${scriptPath}"></script>
+        <script src="${wFile('main.wv.js')}"></script>
 	</body>
 	</html>`;
 }
 
-class PanelState {
+class VSNWebviewPanel {
     public panel: vscode.WebviewPanel | undefined = undefined;
     private state: boolean = false;
     private trayCnt: number = 0;
-    private extensionPath: string;
+    private extPath: string;
+    private context: vscode.ExtensionContext;
 
-    constructor(extensionPath: string) {
-        this.extensionPath = extensionPath;
+    constructor(context: vscode.ExtensionContext) {
+        this.extPath = context.extensionPath;
+        this.context = context;
     }
 
-    listener = () => {
-        this.panel = undefined;
-        this.state = false;
-        console.log('vsnote webview closed.');
-    };
+    initIfNeed() {
+        if (!this.state) {
+            this.init();
+        }
+    }
 
-    createPanel() {
+    private init() {
+        this.createPanel();
+        this.panel.onDidDispose(
+            () => {
+                this.panel = undefined;
+                this.state = false;
+                console.log('vsnote webview closed.');
+            },
+            null,
+            this.context.subscriptions
+        );
+        this.panel.webview.onDidReceiveMessage(
+            message => {
+                if (message.state) {
+                    this.state = true;
+                }
+            },
+            undefined,
+            this.context.subscriptions
+        );
+        this.panel.webview.html = getWebviewContent(this.extPath);
+    }
+
+    private createPanel() {
         this.panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(this.extensionPath, 'out'))]
+            localResourceRoots: [vscode.Uri.file(path.join(this.extPath, 'out'))]
         });
     }
 
@@ -73,47 +96,21 @@ class PanelState {
             this.panel!.webview.postMessage(domain);
         }
     }
-
-    didReceiveMessage(context) {
-        this.panel.webview.onDidReceiveMessage(
-            message => {
-                if (message.state) {
-                    this.state = true;
-                }
-            },
-            undefined,
-            context.subscriptions
-        );
-    }
-
-    html() {
-        this.panel.webview.html = getWebviewContent(this.extensionPath);
-    }
 }
 
 export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase) {
-    const panelState = new PanelState(context.extensionPath);
+    const vsnPanel = new VSNWebviewPanel(context);
     context.subscriptions.push(
         vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
-            if (!panelState.panel) {
-                panelState.createPanel();
-                panelState.panel.onDidDispose(panelState.listener, null, context.subscriptions);
-                panelState.didReceiveMessage(context);
-                panelState.html();
-            }
-
+            vsnPanel.initIfNeed();
             const notes: VSNNote[] = db.selectNotes(dpath);
-            const categorys: VSNWVCategory[] = fusionNote(notes);
-            const domain: VSNWVDomain = {
-                name: dpath,
-                categorys: [{ name: 'install', notes: [{ id: 1, contents: ['dfdf', 'dfd'] }] }]
-            };
-            panelState.updateWebviewContent(domain);
+            const vsnDomain = fusionNotes(path.basename(dpath), notes);
+            vsnPanel.updateWebviewContent(vsnDomain);
         })
     );
 }
 
-function fusionNote(ns: VSNNote[]): VSNWVCategory[] {
+function fusionNotes(name: string, ns: VSNNote[]): VSNWVDomain {
     const categorys: VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;
@@ -124,5 +121,5 @@ function fusionNote(ns: VSNNote[]): VSNWVCategory[] {
         }
         categorys.filter(c => c.name === n.meta.category)[0].notes.push({ id: n.id, contents: n.contents });
     }
-    return categorys;
+    return { name, categorys };
 }
