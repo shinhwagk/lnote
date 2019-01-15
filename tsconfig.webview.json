@@ -11,6 +11,6 @@
         ]
     },
     "include": [
-        "webview-src"
+        "src/webview"
     ]
 }

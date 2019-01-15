@@ -3,42 +3,46 @@ import * as path from 'path';
 import * as webpack from 'webpack';
 
 const extConfig: webpack.Configuration = {
-    target: "node",
-    entry: "./src/extension.ts",
+    target: 'node',
+    entry: './src/extension.ts',
     output: {
-        filename: "extension.js",
-        libraryTarget: "commonjs2",
-        path: path.resolve(__dirname, "out"),
+        filename: 'extension.js',
+        libraryTarget: 'commonjs2',
+        path: path.resolve(__dirname, 'out')
     },
-    resolve: { extensions: [".ts", ".js"] },
-    module: { rules: [{ test: /\.ts$/, loader: "ts-loader" }] },
-    externals: { vscode: "vscode" },
-
+    resolve: { extensions: ['.ts', '.js'] },
+    module: { rules: [{ test: /\.ts$/, loader: 'ts-loader' }] },
+    externals: { vscode: 'vscode' }
 };
 
-
 const webviewConfig: webpack.Configuration = {
-    target: "web",
-    entry: "./webview-src/index.tsx",
+    target: 'web',
+    entry: './src/webview/index.tsx',
     output: {
-        filename: "[name].wv.js",
-        path: path.resolve(__dirname, "out"),
+        filename: '[name].wv.js',
+        path: path.resolve(__dirname, 'out')
     },
     resolve: {
-        extensions: [".js", ".ts", ".tsx"],
+        extensions: ['.js', '.ts', '.tsx']
     },
     module: {
-        rules: [{
-            test: /\.tsx?$/, use: [
-                { loader: "babel-loader" },
-                {
-                    loader: 'ts-loader', options: { configFile: "tsconfig.webview.json", transpileOnly: true }
-                }],
-        }]
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: [
+                    { loader: 'babel-loader' },
+                    {
+                        loader: 'ts-loader',
+                        options: { configFile: 'tsconfig.webview.json', transpileOnly: true }
+                    }
+                ]
+            },
+            { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] }
+        ]
     },
     externals: {
-        "react": "React",
-        "react-dom": "ReactDOM"
+        react: 'React',
+        'react-dom': 'ReactDOM'
     }
 };
 export default [webviewConfig, extConfig];

@@ -95,8 +95,12 @@
         "babel-loader": "^8.0.5",
         "clean-webpack-plugin": "^1.0.0",
         "copy-webpack-plugin": "^4.6.0",
+        "css-loader": "^2.1.0",
         "jest": "^23.6.0",
+        "node-sass": "^4.11.0",
         "prettier": "^1.15.3",
+        "sass-loader": "^7.1.0",
+        "style-loader": "^0.23.1",
         "ts-jest": "^23.10.5",
         "ts-loader": "^5.3.3",
         "ts-node": "^7.0.1",
@@ -106,7 +110,7 @@
         "tslint-react": "^3.6.0",
         "typescript": "^3.2.2",
         "vscode": "^1.1.26",
-        "webpack": "^4.28.1",
+        "webpack": "^4.28.4",
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {

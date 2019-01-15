@@ -70,33 +70,25 @@ namespace _ {
 
     export function stat(path: string): Promise<fs.Stats> {
         return new Promise<fs.Stats>((resolve, reject) => {
-            fs.stat(path, (error, stat) =>
-                handleResult(resolve, reject, error, stat)
-            );
+            fs.stat(path, (error, stat) => handleResult(resolve, reject, error, stat));
         });
     }
 
     export function readfile(path: string): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
-            fs.readFile(path, (error, buffer) =>
-                handleResult(resolve, reject, error, buffer)
-            );
+            fs.readFile(path, (error, buffer) => handleResult(resolve, reject, error, buffer));
         });
     }
 
     export function writefile(path: string, content: Buffer): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            fs.writeFile(path, content, error =>
-                handleResult(resolve, reject, error, void 0)
-            );
+            fs.writeFile(path, content, error => handleResult(resolve, reject, error, void 0));
         });
     }
 
     export function exists(path: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            fs.exists(path, exists =>
-                handleResult(resolve, reject, null, exists)
-            );
+            fs.exists(path, exists => handleResult(resolve, reject, null, exists));
         });
     }
 
@@ -114,17 +106,13 @@ namespace _ {
 
     export function rename(oldPath: string, newPath: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            fs.rename(oldPath, newPath, error =>
-                handleResult(resolve, reject, error, void 0)
-            );
+            fs.rename(oldPath, newPath, error => handleResult(resolve, reject, error, void 0));
         });
     }
 
     export function unlink(path: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            fs.unlink(path, error =>
-                handleResult(resolve, reject, error, void 0)
-            );
+            fs.unlink(path, error => handleResult(resolve, reject, error, void 0));
         });
     }
 }
@@ -174,32 +162,23 @@ interface Entry {
 
 //#endregion
 
-export class FileSystemProvider
-    implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
+export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
     private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
 
     constructor() {
-        this._onDidChangeFile = new vscode.EventEmitter<
-            vscode.FileChangeEvent[]
-        >();
+        this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     }
 
     get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
         return this._onDidChangeFile.event;
     }
 
-    watch(
-        uri: vscode.Uri,
-        options: { recursive: boolean; excludes: string[] }
-    ): vscode.Disposable {
+    watch(uri: vscode.Uri, options: { recursive: boolean; excludes: string[] }): vscode.Disposable {
         const watcher = fs.watch(
             uri.fsPath,
             { recursive: options.recursive },
             async (event: string, filename: string | Buffer) => {
-                const filepath = path.join(
-                    uri.fsPath,
-                    _.normalizeNFC(filename.toString())
-                );
+                const filepath = path.join(uri.fsPath, _.normalizeNFC(filename.toString()));
 
                 // TODO support excludes (using minimatch library?)
 
@@ -228,15 +207,11 @@ export class FileSystemProvider
         return new FileStat(await _.stat(path));
     }
 
-    readDirectory(
-        uri: vscode.Uri
-    ): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
+    readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
         return this._readDirectory(uri);
     }
 
-    async _readDirectory(
-        uri: vscode.Uri
-    ): Promise<[string, vscode.FileType][]> {
+    async _readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
         const children = await _.readdir(uri.fsPath);
 
         const result: [string, vscode.FileType][] = [];
@@ -286,10 +261,7 @@ export class FileSystemProvider
         return _.writefile(uri.fsPath, content as Buffer);
     }
 
-    delete(
-        uri: vscode.Uri,
-        options: { recursive: boolean }
-    ): void | Thenable<void> {
+    delete(uri: vscode.Uri, options: { recursive: boolean }): void | Thenable<void> {
         if (options.recursive) {
             return _.rmrf(uri.fsPath);
         }
@@ -297,19 +269,11 @@ export class FileSystemProvider
         return _.unlink(uri.fsPath);
     }
 
-    rename(
-        oldUri: vscode.Uri,
-        newUri: vscode.Uri,
-        options: { overwrite: boolean }
-    ): void | Thenable<void> {
+    rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): void | Thenable<void> {
         return this._rename(oldUri, newUri, options);
     }
 
-    async _rename(
-        oldUri: vscode.Uri,
-        newUri: vscode.Uri,
-        options: { overwrite: boolean }
-    ): Promise<void> {
+    async _rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): Promise<void> {
         const exists = await _.exists(newUri.fsPath);
         if (exists) {
             if (!options.overwrite) {
@@ -350,9 +314,7 @@ export class FileSystemProvider
                 return a[1] === vscode.FileType.Directory ? -1 : 1;
             });
             return children.map(([name, type]) => ({
-                uri: vscode.Uri.file(
-                    path.join(workspaceFolder.uri.fsPath, name)
-                ),
+                uri: vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)),
                 type
             }));
         }
@@ -387,9 +349,7 @@ export class TreeviewNoteEdit {
         this.fileExplorer = vscode.window.createTreeView('fileExplorer', {
             treeDataProvider
         });
-        vscode.commands.registerCommand('fileExplorer.openFile', resource =>
-            this.openResource(resource)
-        );
+        vscode.commands.registerCommand('fileExplorer.openFile', resource => this.openResource(resource));
     }
 
     private openResource(resource: vscode.Uri): void {

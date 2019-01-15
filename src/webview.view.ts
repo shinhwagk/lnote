@@ -3,128 +3,126 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { VSNDatabase, VSNNote } from './database';
+import { VSNWVCategory, VSNWVDomain, VSNWVNote } from './webview/lib';
 
-export interface VSNWVDomain {
-    name: string;
-    categorys: VSNWVCategory[];
+function assetsFile(extensionPath: string, name: string): string {
+    const file = path.join(extensionPath, 'out', name);
+    return vscode.Uri.file(file)
+        .with({
+            scheme: 'vscode-resource'
+        })
+        .toString();
 }
 
-export interface VSNWVCategory {
-    name: string;
-    notes: VSNWVNote[];
-}
-
-interface VSNWVNote {
-    id: number;
-    contents: string[];
-}
-
-let panel: vscode.WebviewPanel | undefined = undefined;
-
-function getWebviewContent(context: vscode.ExtensionContext) {
-    const scriptPathOnDisk = vscode.Uri.file(
-        path.join(context.extensionPath, 'out', 'main.wv.js')
-    );
-    const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
-    const reactUrl = vscode.Uri.file(path.join(context.extensionPath, 'out', 'react.production.min.js')).with({ scheme: 'vscode-resource' });
-    const reactDomUrl = vscode.Uri.file(path.join(context.extensionPath, 'out', 'react-dom.production.min.js')).with({ scheme: 'vscode-resource' });
+function getWebviewContent(extPath: string) {
+    const scriptPath = assetsFile(extPath, 'main.wv.js');
+    const reactPath = assetsFile(extPath, 'react.production.min.js');
+    const reactDompath = assetsFile(extPath, 'react-dom.production.min.js');
     return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Cat Coding</title>
-        <script src="${reactUrl}" crossorigin></script>
-        <script src="${reactDomUrl}" crossorigin></script>
+        <script src="${reactPath}" crossorigin></script>
+        <script src="${reactDompath}" crossorigin></script>
 	</head>
     <body>
-    2
         <div id="root"></div>
-        <script src="${scriptUri.toString()}"></script>
+        <script src="${scriptPath}"></script>
 	</body>
 	</html>`;
 }
 
-let statss = false;
-export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase) {
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'updateOrCreateWebview',
-            (dpath: string) => {
-                vscode.window.showInformationMessage("update web view")
-                if (!panel) {
-                    vscode.window.showInformationMessage("create web view panel.")
-                    panel = vscode.window.createWebviewPanel(
-                        'catCoding',
-                        'vs notes',
-                        vscode.ViewColumn.One,
-                        {
-                            enableScripts: true,
-                            localResourceRoots: [
-                                vscode.Uri.file(
-                                    path.join(context.extensionPath, 'out')
-                                )
-                            ]
-                        }
-                    );
+class PanelState {
+    public panel: vscode.WebviewPanel | undefined = undefined;
+    private state: boolean = false;
+    private trayCnt: number = 0;
+    private extensionPath: string;
 
-                    panel.onDidDispose(
-                        () => {
-                            panel = undefined;
-                            statss = false;
-                            console.log('vsnote webview closed.');
-                        },
-                        null,
-                        context.subscriptions
-                    );
-                    panel.webview.onDidReceiveMessage(message => {
-                        vscode.window.showInformationMessage(message.status)
-                        if (message.status === "ready") { vscode.window.showInformationMessage("web ok."); statss = true; }
-                    },
-                        undefined,
-                        context.subscriptions
-                    );
-                    panel.webview.html = getWebviewContent(context);
+    constructor(extensionPath: string) {
+        this.extensionPath = extensionPath;
+    }
+
+    listener = () => {
+        this.panel = undefined;
+        this.state = false;
+        console.log('vsnote webview closed.');
+    };
+
+    createPanel() {
+        this.panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One, {
+            enableScripts: true,
+            localResourceRoots: [vscode.Uri.file(path.join(this.extensionPath, 'out'))]
+        });
+    }
+
+    updateWebviewContent(domain: VSNWVDomain): void {
+        if (this.trayCnt >= 50) {
+            vscode.window.showErrorMessage('webview update failse 50 times.');
+            return;
+        }
+        if (!this.state) {
+            setTimeout(() => this.updateWebviewContent(domain), 100);
+            this.trayCnt += 1;
+            return;
+        }
+        if (this.panel) {
+            vscode.window.showInformationMessage(`success ${this.trayCnt}`);
+            vscode.window.showInformationMessage('post message.');
+            this.panel!.webview.postMessage(domain);
+        }
+    }
+
+    didReceiveMessage(context) {
+        this.panel.webview.onDidReceiveMessage(
+            message => {
+                if (message.state) {
+                    this.state = true;
                 }
-                const notes: VSNNote[] = db.selectNotes(dpath);
-                const categorys: VSNWVCategory[] = fusionNote(notes);
+            },
+            undefined,
+            context.subscriptions
+        );
+    }
 
-                const domain: VSNWVDomain = {
-                    name: dpath,
-                    categorys: []
-                };
-
-                vscode.window.showInformationMessage("222" + panel!.visible.toString());
-                vscode.window.showInformationMessage("fff" + panel!.active.toString());
-                updateWebviewPanel(domain);
-            }
-        )
-    );
+    html() {
+        this.panel.webview.html = getWebviewContent(this.extensionPath);
+    }
 }
 
-function updateWebviewPanel(domain: VSNWVDomain): void {
-    if (!statss) {
-        setTimeout(() => updateWebviewPanel(domain), 10);
-        return;
-    }
-    vscode.window.showInformationMessage("post message.");
-    panel!.webview.postMessage(domain)
+export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase) {
+    const panelState = new PanelState(context.extensionPath);
+    context.subscriptions.push(
+        vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
+            if (!panelState.panel) {
+                panelState.createPanel();
+                panelState.panel.onDidDispose(panelState.listener, null, context.subscriptions);
+                panelState.didReceiveMessage(context);
+                panelState.html();
+            }
+
+            const notes: VSNNote[] = db.selectNotes(dpath);
+            const categorys: VSNWVCategory[] = fusionNote(notes);
+            const domain: VSNWVDomain = {
+                name: dpath,
+                categorys: [{ name: 'install', notes: [{ id: 1, contents: ['dfdf', 'dfd'] }] }]
+            };
+            panelState.updateWebviewContent(domain);
+        })
+    );
 }
 
 function fusionNote(ns: VSNNote[]): VSNWVCategory[] {
     const categorys: VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
-        return categorys.filter(c => c.name === name).length >= 1
-            ? true
-            : false;
+        return categorys.filter(c => c.name === name).length >= 1 ? true : false;
     }
     for (const n of ns) {
         if (!testCategoryExist(n.meta.category)) {
             categorys.push({ name: n.meta.category, notes: [] });
         }
-        categorys
-            .filter(c => c.name === n.meta.category)[0]
-            .notes.push({ id: n.id, contents: n.contents });
+        categorys.filter(c => c.name === n.meta.category)[0].notes.push({ id: n.id, contents: n.contents });
     }
     return categorys;
 }

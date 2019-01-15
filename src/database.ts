@@ -53,9 +53,7 @@ export class VSNDatabase {
     }
 
     public open() {
-        this.cacheDomains = JSON.parse(
-            fs.readFileSync(this.domainsFile, { encoding: 'utf-8' })
-        );
+        this.cacheDomains = JSON.parse(fs.readFileSync(this.domainsFile, { encoding: 'utf-8' }));
     }
 
     public close() {
@@ -63,13 +61,8 @@ export class VSNDatabase {
     }
 
     public selectDomain(dPath: string): VSNDomain {
-        const domain = objectPath.get(
-            this.cacheDomains,
-            dPath.split('/').filter(n => !!n)
-        );
-        const childs: string[] = Object.keys(domain).filter(
-            name => name !== '.notes'
-        );
+        const domain = objectPath.get(this.cacheDomains, dPath.split('/').filter(n => !!n));
+        const childs: string[] = Object.keys(domain).filter(name => name !== '.notes');
         return { childs, notes: domain['.notes'] };
     }
 
@@ -100,26 +93,16 @@ export class VSNDatabase {
                 contents.push(content);
             }
         }
-        const meta: VSNNoteMeta = JSON.parse(
-            fs.readFileSync(noteMetaPath, { encoding: 'utf-8' })
-        );
+        const meta: VSNNoteMeta = JSON.parse(fs.readFileSync(noteMetaPath, { encoding: 'utf-8' }));
         return { id, contents, meta: { category: meta.category } };
     }
 
     public createNote(dpath: string): void {
         const noteid: number = this.incNoteSeq();
         const notepath = path.join(dpath, '.notes');
-        const notes = objectPath.get<number[]>(
-            this.cacheDomains,
-            notepath.split('/').filter(p => !!p),
-            []
-        );
+        const notes = objectPath.get<number[]>(this.cacheDomains, notepath.split('/').filter(p => !!p), []);
         notes.push(noteid);
-        objectPath.set(
-            this.cacheDomains,
-            notepath.split('/').filter(p => !!p),
-            notes
-        );
+        objectPath.set(this.cacheDomains, notepath.split('/').filter(p => !!p), notes);
         fs.mkdirSync(path.join(this.notesPath, noteid.toString()));
         this.checkout();
     }

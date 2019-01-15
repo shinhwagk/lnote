@@ -8,13 +8,12 @@ export interface VSNDomainNode {
     dpath: string;
 }
 
-export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext) {
-    const treeDataProvider = new NoteTreeDataProvider(new db.VSNDatabase());
+export function activateVSNoteTreeViewExplorer(context: vscode.ExtensionContext, db: db.VSNDatabase) {
+    const treeDataProvider = new NoteTreeDataProvider(db);
     vscode.window.createTreeView('vsnoteExplorer', { treeDataProvider });
 }
 
-export class NoteTreeDataProvider
-    implements vscode.TreeDataProvider<VSNDomainNode> {
+export class NoteTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNode> {
     // onDidChangeTreeData?: vscode.Event<NoteNode>;
     db: db.VSNDatabase;
     constructor(db: db.VSNDatabase) {
@@ -22,12 +21,7 @@ export class NoteTreeDataProvider
     }
     async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         return {
-            collapsibleState: (this.db.selectDomain(element.dpath).childs
-                .length >= 1
-                ? true
-                : false)
-                ? 1
-                : 0, // vscode.TreeItemCollapsibleState
+            collapsibleState: (this.db.selectDomain(element.dpath).childs.length >= 1 ? true : false) ? 1 : 0, // vscode.TreeItemCollapsibleState
             command: {
                 arguments: [element.dpath],
                 command: 'updateOrCreateWebview',

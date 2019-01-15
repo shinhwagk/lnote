@@ -5,9 +5,11 @@ import { VSNWebviewView } from './webview.view';
 import * as db from './database';
 
 export function activate(context: vscode.ExtensionContext) {
-    const vsnoteDB = new db.VSNDatabase();
-    tree.activateVSNoteTreeViewExplorer(context);
-    VSNWebviewView(context, vsnoteDB);
+    const vsndb = new db.VSNDatabase();
+
+    tree.activateVSNoteTreeViewExplorer(context,vsndb);
+    VSNWebviewView(context, vsndb);
+
 }
 
 export function deactivate() {}
