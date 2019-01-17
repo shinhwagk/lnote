@@ -4,6 +4,7 @@
     "description": "a simple note extension. note data is saved in file.",
     "version": "0.2.1",
     "publisher": "shinhwagk",
+    "preview": true,
     "engines": {
         "vscode": "^1.30.0"
     },
@@ -16,23 +17,23 @@
     ],
     "license": "MIT",
     "activationEvents": [
-        "onView:vsnoteExplorer"
+        "onView:vsnoteDomainExplorer"
     ],
-    "main": "./out/extension",
+    "main": "./out/extension.js",
     "contributes": {
         "viewsContainers": {
             "activitybar": [
                 {
                     "id": "vsnote-explorer",
                     "title": "VSNote",
-                    "icon": "assets/note.svg"
+                    "icon": "images/note.svg"
                 }
             ]
         },
         "views": {
             "vsnote-explorer": [
                 {
-                    "id": "vsnoteExplorer",
+                    "id": "vsnDomainExplorer",
                     "name": "domain"
                 },
                 {
@@ -46,7 +47,7 @@
                     "when": "extension.docs"
                 },
                 {
-                    "id": "vsnoteNoteEditExplorer",
+                    "id": "vsnoteEditExplorer",
                     "name": "note edit",
                     "when": "extension.note.edit"
                 }
@@ -54,23 +55,31 @@
         },
         "menus": {
             "view/title": [
-        
+                {
+                    "command": "vsnoteEditExplorer.openFileResource",
+                    "group": "navigation"
+                },
+                {
+                    "command": "vscode-note.edit-explorer.close",
+                    "group": "navigation",
+                    "when": "view == vsnoteEditExplorer"
+                }
             ],
             "view/item/context": [
                 {
                     "command": "vscode-note.note.create",
-                    "when": "view == vsnoteExplorer",
-                    "group": "new"
+                    "when": "view == vsnoteDomainExplorer",
+                    "group": "note"
                 },
                 {
                     "command": "vscode-note.domain.create",
-                    "when": "view == vsnoteExplorer",
-                    "group": "new"
+                    "when": "view == vsnoteDomainExplorer",
+                    "group": "domain"
                 },
                 {
                     "command": "vscode-note.domain.rename",
                     "title": "New Domain",
-                    "group": "edit"
+                    "group": "domain"
                 }
             ]
         },
@@ -94,9 +103,30 @@
             {
                 "command": "vscode-note.domain.create",
                 "title": "New Domain"
-            },{
+            },
+            {
                 "command": "vscode-note.domain.rename",
-                "title": "Rname"
+                "title": "Rname Domain"
+            },
+            {
+                "command": "vsnoteEditExplorer.openFtpResource",
+                "title": "Open FTP Resource"
+            },
+            {
+                "command": "vsnoteEditExplorer.openFileResource",
+                "title": "Refresh",
+                "icon": {
+                    "light": "images/light/refresh.svg",
+                    "dark": "images/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "vscode-note.edit-explorer.close",
+                "title": "Close",
+                "icon": {
+                    "light": "images/light/close.svg",
+                    "dark": "images/dark/close.svg"
+                }
             }
         ]
     },
@@ -125,11 +155,11 @@
         "@types/js-yaml": "^3.11.4",
         "@types/node": "^10.12.18",
         "@types/object-path": "^0.11.0",
-        "@types/react": "^16.7.18",
+        "@types/react": "^16.7.20",
         "@types/react-dom": "^16.0.11",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
-        "@types/webpack": "^4.4.22",
+        "@types/webpack": "^4.4.23",
         "babel-loader": "^8.0.5",
         "clean-webpack-plugin": "^1.0.0",
         "copy-webpack-plugin": "^4.6.0",
@@ -142,7 +172,7 @@
         "ts-jest": "^23.10.5",
         "ts-loader": "^5.3.3",
         "ts-node": "^7.0.1",
-        "tslint": "^5.12.0",
+        "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.17.0",
         "tslint-microsoft-contrib": "^6.0.0",
         "tslint-react": "^3.6.0",

@@ -60,6 +60,10 @@ export class VSNDatabase {
         return this.selectDomain(dpath).notes.map(id => this.selectNote(id));
     }
 
+    public selectNoteFsPath(id: number): string {
+        return path.join(this.notesPath, id.toString());
+    }
+
     public selectNote(id: number): VSNNote {
         const notePath = path.join(this.notesPath, id.toString());
         const noteMetaPath = path.join(notePath, '.n.json');

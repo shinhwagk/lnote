@@ -1,3 +1,4 @@
+
 export namespace ToWebView {
     export interface VSNWVDomain {
         name: string;

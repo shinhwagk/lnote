@@ -9,7 +9,7 @@
         ],
         "sourceMap": true,
         "strict": false,
-        "jsx": "react"
+        "jsx": "preserve"
     },
     "plugins": [
         {
@@ -17,7 +17,6 @@
         }
     ],
     "include": [
-        "src",
-        "webview-src"
+        "src"
     ]
 }

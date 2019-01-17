@@ -2,23 +2,23 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { VSNDatabase } from './database';
+import { VSNDatabase } from '../database';
 
 export interface VSNDomainNode extends vscode.TreeItem {
     dpath: string;
 }
 
-export function VSNDomainExplorer(db: VSNDatabase): VSNDomainTreeDataProvider {
-    const treeDataProvider = new VSNDomainTreeDataProvider(db);
-    vscode.window.createTreeView('vsnoteExplorer', { treeDataProvider });
+export function VSNDomainExplorer(db: VSNDatabase): VSNDomainExplorerProvider {
+    const treeDataProvider = new VSNDomainExplorerProvider(db);
+    vscode.window.createTreeView('vsnoteDomainExplorer', { treeDataProvider });
     return treeDataProvider;
 }
 
-export class VSNDomainTreeDataProvider implements vscode.TreeDataProvider<VSNDomainNode> {
+export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDomainNode> {
     private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
     readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
 
-    db: VSNDatabase;
+    private readonly db: VSNDatabase;
 
     constructor(db: VSNDatabase) {
         this.db = db;
@@ -44,12 +44,10 @@ export class VSNDomainTreeDataProvider implements vscode.TreeDataProvider<VSNDom
         };
     }
 
-    getChildren(element?: VSNDomainNode): Thenable<VSNDomainNode[]> {
+    async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {
         const dpath: string = element ? element.dpath : '/';
-        return Promise.resolve(
-            this.db.selectDomain(dpath).domains.map(name => {
-                return { dpath: path.join(dpath, name) };
-            })
-        );
+        return this.db.selectDomain(dpath).domains.map(name => {
+            return { dpath: path.join(dpath, name) };
+        });
     }
 }

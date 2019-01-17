@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { ToWebView as twv } from '../webview.message';
+import { ToWebView as twv } from '../panel/message';
 
 import './index.scss';
 /// <reference path ="api.d.ts">

@@ -2,8 +2,8 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { VSNDatabase, VSNNote } from './database';
-import { ToExtension as te, ToWebView as twv} from './webview.message';
+import { VSNDatabase, VSNNote } from '../database';
+import { ToWebView as twv } from './message';
 
 const assetsFile = (extPath: string) => (name: string) => {
     const file = path.join(extPath, 'out', name);
@@ -74,7 +74,7 @@ class VSNWebviewPanel {
     }
 
     private createPanel() {
-        this.panel = vscode.window.createWebviewPanel('catCoding', 'vs notes', vscode.ViewColumn.One, {
+        this.panel = vscode.window.createWebviewPanel('catCoding', 'vscode-note', vscode.ViewColumn.One, {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.file(path.join(this.extPath, 'out'))]
         });

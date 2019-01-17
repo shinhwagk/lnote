@@ -283,10 +283,18 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^16.7.18":
+"@types/react@*":
   version "16.7.18"
   resolved "http://registry.npm.taobao.org/@types/react/download/@types/react-16.7.18.tgz#f4ce0d539a893dd61e36cd11ae3a5e54f5a48337"
   integrity sha1-9M4NU5qJPdYeNs0RrjpeVPWkgzc=
+  dependencies:
+    "@types/prop-types" "*"
+    csstype "^2.2.0"
+
+"@types/react@^16.7.20":
+  version "16.7.20"
+  resolved "http://registry.npm.taobao.org/@types/react/download/@types/react-16.7.20.tgz#13ae752c012710d0fa800985ca809814b51d3b58"
+  integrity sha1-E651LAEnEND6gAmFyoCYFLUdO1g=
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -321,10 +329,21 @@
   resolved "http://registry.npm.taobao.org/@types/untildify/download/@types/untildify-3.0.0.tgz#cd3e6624e46ccf292d3823fb48fa90dda0deaec0"
   integrity sha1-zT5mJORszyktOCP7SPqQ3aDersA=
 
-"@types/webpack@*", "@types/webpack@^4.4.22":
+"@types/webpack@*":
   version "4.4.22"
   resolved "http://registry.npm.taobao.org/@types/webpack/download/@types/webpack-4.4.22.tgz#c4a5ea8b74a31b579537515bcfe86d2b2a34382c"
   integrity sha1-xKXqi3SjG1eVN1Fbz+htKyo0OCw=
+  dependencies:
+    "@types/anymatch" "*"
+    "@types/node" "*"
+    "@types/tapable" "*"
+    "@types/uglify-js" "*"
+    source-map "^0.6.0"
+
+"@types/webpack@^4.4.23":
+  version "4.4.23"
+  resolved "http://registry.npm.taobao.org/@types/webpack/download/@types/webpack-4.4.23.tgz#059d6f4598cfd65ddee0e2db38317ef989696712"
+  integrity sha1-BZ1vRZjP1l3e4OLbODF++YlpZxI=
   dependencies:
     "@types/anymatch" "*"
     "@types/node" "*"
@@ -6415,10 +6434,10 @@ tslint-react@^3.6.0:
   dependencies:
     tsutils "^2.13.1"
 
-tslint@^5.12.0:
-  version "5.12.0"
-  resolved "http://registry.npm.taobao.org/tslint/download/tslint-5.12.0.tgz#47f2dba291ed3d580752d109866fb640768fca36"
-  integrity sha1-R/LbopHtPVgHUtEJhm+2QHaPyjY=
+tslint@^5.12.1:
+  version "5.12.1"
+  resolved "http://registry.npm.taobao.org/tslint/download/tslint-5.12.1.tgz#8cec9d454cf8a1de9b0a26d7bdbad6de362e52c1"
+  integrity sha1-jOydRUz4od6bCibXvbrW3jYuUsE=
   dependencies:
     babel-code-frame "^6.22.0"
     builtin-modules "^1.1.1"
