@@ -1,46 +1,58 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-import rimraf = require("rimraf");
+import rimraf = require('rimraf');
 
 import * as db from '../src/database';
-import { TestFileStructure } from "./lib";
+import { TestFileStructure } from './lib';
 
 let vscodeDB: db.VSNDatabase | undefined = undefined;
 
-const testDataRootPath = "./";
-const testDataPath = path.join(testDataRootPath, ".vscode-note");
-const testNotesSeq = path.join(testDataPath, "notes.seq");
+const testDataRootPath = './';
+const testDataPath = path.join(testDataRootPath, '.vscode-note');
+const testNotesSeq = path.join(testDataPath, 'seq');
 
-const testDataDomains: { [domain: string]: any } = {
+const exampleDataDomains: { [domain: string]: any } = {
     powershell: {
         install: {},
-        ".notes": [1, 2, 3]
+        '.notes': [1, 2, 3]
     },
     oracle: {
-        ".notes": []
+        '.notes': []
     }
 };
 
-const testDataNote: db.VSNNote = { id: 1, contents: ["test", "select * from dual;"], meta: { category: "test" } };
+const exampleDataNote: db.VSNNote = {
+    id: 1,
+    contents: ['test', 'select * from dual;'],
+    meta: { category: 'test' }
+};
 
 const tdl: TestFileStructure[] = [
-    { path: '', kind: "d" },
-    { path: 'domains.json', kind: "f", content: JSON.stringify(testDataDomains) },
-    { path: 'notes', kind: "d" },
-    { path: `notes/${testDataNote.id}`, kind: "d" },
-    { path: `notes/${testDataNote.id}/1.txt`, kind: "f", content: testDataNote.contents[0] },
-    { path: `notes/${testDataNote.id}/2.sql`, kind: "f", content: testDataNote.contents[1] },
-    { path: `notes/${testDataNote.id}/.n.json`, kind: "f", content: JSON.stringify({ category: testDataNote.meta.category }) },
-    { path: `notes.seq`, kind: "f", content: '3' }
+    { path: '', kind: 'd' },
+    { path: 'domains.json', kind: 'f', content: JSON.stringify(exampleDataDomains) },
+    { path: 'notes', kind: 'd' },
+    { path: `notes/${exampleDataNote.id}`, kind: 'd' },
+    { path: `notes/${exampleDataNote.id}/1.txt`, kind: 'f', content: exampleDataNote.contents[0] },
+    { path: `notes/${exampleDataNote.id}/2.sql`, kind: 'f', content: exampleDataNote.contents[1] },
+    {
+        path: `notes/${exampleDataNote.id}/.n.json`,
+        kind: 'f',
+        content: JSON.stringify({ category: exampleDataNote.meta.category })
+    },
+    { path: `seq`, kind: 'f', content: '3' }
 ];
 
 function createTestFileAndDirectory(tdl: TestFileStructure[]) {
     for (const f of tdl) {
-        const p = path.join(testDataRootPath, ".vscode-note", f.path);
+        const p = path.join(testDataRootPath, '.vscode-note', f.path);
         switch (f.kind) {
-            case "d": fs.mkdirSync(p); break;
-            case "f": fs.writeFileSync(p, f.content, { encoding: "utf-8" }); break;
+            case 'd':
+                fs.mkdirSync(p);
+                break;
+            case 'f':
+                fs.writeFileSync(p, f.content, { encoding: 'utf-8' });
+                break;
         }
     }
 }
@@ -57,37 +69,35 @@ beforeAll(() => {
 afterAll(() => removeTestData());
 
 test('true', () => {
-    expect(vscodeDB!.selectDomain("/powershell").childs.length >= 1 ? true : false).toBe(true);
+    expect(vscodeDB!.selectDomain('/powershell').domains.length >= 1 ? true : false).toBe(true);
 });
 
 test('select domain, dpath: /', () => {
-    const child: string[] = Object.keys(testDataDomains);
-    // const child2: string[] = Object.keys(testDataDomains["oracle"]);
-    const expectData: db.VSNDomain =
-        { childs: child, notes: testDataDomains[".notes"] };
-    expect(vscodeDB!.selectDomain("/")).toEqual(expectData);
+    const domains: string[] = Object.keys(exampleDataDomains);
+    const expectData: db.VSNDomain = { domains: domains, notes: exampleDataDomains['.notes'] };
+    expect(vscodeDB!.selectDomain('/')).toEqual(expectData);
 });
 
 test('select domain childs length', () => {
-    expect(vscodeDB!.selectDomain("/oracle").childs.length >= 1 ? true : false).toBe(false);
+    expect(vscodeDB!.selectDomain('/oracle').domains.length >= 1 ? true : false).toBe(false);
 });
 
 // test('dqual powershell notes', () => {
 //     expect(vscodeDB!.readNotesIdOfDomain('/powershell')).toEqual(testDataDomains.powershell[".notes"]);
 // });
 
-test('test select note', () => {
-    expect(vscodeDB!.selectNote(1)).toEqual(testDataNote);
+test('select note', () => {
+    expect(vscodeDB!.selectNote(1)).toEqual(exampleDataNote);
 });
 
 test('inc seq', () => {
-    const id = vscodeDB!.incNoteSeq();
+    const id = vscodeDB!.incSeq();
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
     expect(id).toEqual(noteseq);
 });
 
 test('select seq', () => {
-    const id = vscodeDB!.selectNoteSeq();
+    const id = vscodeDB!.selectSeq();
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
     expect(id).toEqual(noteseq);
 });
@@ -95,7 +105,7 @@ test('select seq', () => {
 test('create note', () => {
     vscodeDB!.createNote('/powershell');
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
-    expect(fs.existsSync(path.join(testDataPath, "notes", noteseq.toString()))).toEqual(true);
+    expect(fs.existsSync(path.join(testDataPath, 'notes', noteseq.toString()))).toEqual(true);
 });
 
 // test('fusion notes', () => {

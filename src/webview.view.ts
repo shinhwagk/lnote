@@ -2,8 +2,8 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { VSNDatabase, VSNNote, VSNDomain } from './database';
-import { VSNWVCategory, VSNWVDomain, VSNWVNote } from './webview/lib';
+import { VSNDatabase, VSNNote } from './database';
+import { ToExtension as te, ToWebView as twv} from './webview.message';
 
 const assetsFile = (extPath: string) => (name: string) => {
     const file = path.join(extPath, 'out', name);
@@ -63,7 +63,7 @@ class VSNWebviewPanel {
         );
         this.panel.webview.onDidReceiveMessage(
             message => {
-                if (message.state) {
+                if (message) {
                     this.state = true;
                 }
             },
@@ -80,7 +80,7 @@ class VSNWebviewPanel {
         });
     }
 
-    updateWebviewContent(domain: VSNWVDomain): void {
+    updateWebviewContent(domain: twv.VSNWVDomain): void {
         if (this.trayCnt >= 50) {
             vscode.window.showErrorMessage('webview update failse 50 times.');
             return;
@@ -91,14 +91,12 @@ class VSNWebviewPanel {
             return;
         }
         if (this.panel) {
-            vscode.window.showInformationMessage(`success ${this.trayCnt}`);
-            vscode.window.showInformationMessage('post message.');
             this.panel!.webview.postMessage(domain);
         }
     }
 }
 
-export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase) {
+export function VSNWebviewExplorer(context: vscode.ExtensionContext, db: VSNDatabase) {
     const vsnPanel = new VSNWebviewPanel(context);
     context.subscriptions.push(
         vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
@@ -108,10 +106,11 @@ export function VSNWebviewView(context: vscode.ExtensionContext, db: VSNDatabase
             vsnPanel.updateWebviewContent(vsnDomain);
         })
     );
+    return vsnPanel;
 }
 
-function fusionNotes(name: string, ns: VSNNote[]): VSNWVDomain {
-    const categorys: VSNWVCategory[] = [];
+function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
+    const categorys: twv.VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;
     }

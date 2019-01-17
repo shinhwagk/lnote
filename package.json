@@ -1,8 +1,8 @@
 {
     "name": "vscode-note",
     "displayName": "vscode-note",
-    "description": "",
-    "version": "0.0.1",
+    "description": "a simple note extension. note data is saved in file.",
+    "version": "0.2.1",
     "publisher": "shinhwagk",
     "engines": {
         "vscode": "^1.30.0"
@@ -33,7 +33,44 @@
             "vsnote-explorer": [
                 {
                     "id": "vsnoteExplorer",
-                    "name": "notes"
+                    "name": "domain"
+                },
+                {
+                    "id": "vsnoteFilesExplorer",
+                    "name": "files",
+                    "when": "extension.files"
+                },
+                {
+                    "id": "vsnoteDocsExplorer",
+                    "name": "docs",
+                    "when": "extension.docs"
+                },
+                {
+                    "id": "vsnoteNoteEditExplorer",
+                    "name": "note edit",
+                    "when": "extension.note.edit"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+        
+            ],
+            "view/item/context": [
+                {
+                    "command": "vscode-note.note.create",
+                    "when": "view == vsnoteExplorer",
+                    "group": "new"
+                },
+                {
+                    "command": "vscode-note.domain.create",
+                    "when": "view == vsnoteExplorer",
+                    "group": "new"
+                },
+                {
+                    "command": "vscode-note.domain.rename",
+                    "title": "New Domain",
+                    "group": "edit"
                 }
             ]
         },
@@ -44,38 +81,38 @@
                     "vsnote.dbpath": {
                         "type": "string",
                         "default": "~/.vscode-note",
-                        "description": ""
-                    },
-                    "vsnote.updateStrategy": {
-                        "type": "string",
-                        "enum": [
-                            "LATEST",
-                            "SEMVER"
-                        ],
-                        "default": "LATEST",
-                        "description": "what strategy you want to use to update your package.json"
+                        "description": "data location"
                     }
                 }
             }
         ],
         "commands": [
             {
-                "command": "extension.note.create",
-                "title": "Show Vscode Note1"
+                "command": "vscode-note.note.create",
+                "title": "New Note"
+            },
+            {
+                "command": "vscode-note.domain.create",
+                "title": "New Domain"
+            },{
+                "command": "vscode-note.domain.rename",
+                "title": "Rname"
             }
         ]
     },
     "scripts": {
-        "vscode:prepublish": "yarn tslint-check && yarn compile",
-        "compile": "webpack --mode production --config webpack.production.ts",
+        "vscode:prepublish": "yarn lint:all && yarn compile",
+        "compile": "webpack --mode production --config webpack.config.ts",
         "compile:web": "webpack --mode development --config webpack.webview.ts",
-        "watch": "webpack --mode development --config webpack.production.ts --watch",
-        "watch:dev": "webpack --mode development --config webpack.dev.ts --watch",
+        "watch": "webpack --mode development --config webpack.config.ts --watch",
+        "watch:dev": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest",
-        "tslint-check": "tslint -c ./tslint.json ./src/**/*.ts",
+        "tslint:check": "tslint -c ./tslint.json ./src/**/*.ts",
         "watch-webview": "webpack --mode development --config webpack.config.webview.ts --watch",
-        "tslint": "tslint -p ."
+        "tslint": "tslint -p .",
+        "lint:prettier": "prettier --write src/** test/**",
+        "lint:all": "yarn tslint && yarn lint:prettier && yarn tslint:check"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",
@@ -85,6 +122,7 @@
         "@types/fs-extra": "^5.0.4",
         "@types/html-webpack-plugin": "^3.2.0",
         "@types/jest": "^23.3.12",
+        "@types/js-yaml": "^3.11.4",
         "@types/node": "^10.12.18",
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.7.18",
@@ -114,7 +152,9 @@
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {
+        "vscode": "^1.1.26",
         "fs-extra": "^7.0.1",
+        "js-yaml": "^3.12.1",
         "object-path": "^0.11.4",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",

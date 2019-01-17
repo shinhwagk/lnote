@@ -1,5 +1,4 @@
 out/
-out-webview/
 node_modules/
 .vscode-test/
 *.vsix

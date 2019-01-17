@@ -29,15 +29,15 @@ const webviewConfig: webpack.Configuration = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: [
-                    { loader: 'babel-loader' },
+                loaders: [
+                    'babel-loader',
                     {
                         loader: 'ts-loader',
                         options: { configFile: 'tsconfig.webview.json', transpileOnly: true }
                     }
                 ]
             },
-            { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] }
+            { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
         ]
     },
     externals: {
