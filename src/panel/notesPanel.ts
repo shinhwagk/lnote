@@ -32,7 +32,7 @@ function getWebviewContent(extPath: string) {
 	</html>`;
 }
 
-class VSNWebviewPanel {
+export class VSNWebviewPanel {
     public panel: vscode.WebviewPanel | undefined = undefined;
     private state: boolean = false;
     private trayCnt: number = 0;
@@ -61,7 +61,7 @@ class VSNWebviewPanel {
             return;
         }
         if (this.panel) {
-            this.panel!.webview.postMessage(domain);
+            this.panel!.webview.postMessage({ command: 'data', data: domain });
         }
     }
 
@@ -96,20 +96,7 @@ class VSNWebviewPanel {
     }
 }
 
-export function VSNWebviewExplorer(context: vscode.ExtensionContext, db: VSNDatabase) {
-    const vsnPanel = new VSNWebviewPanel(context);
-    context.subscriptions.push(
-        vscode.commands.registerCommand('updateOrCreateWebview', (dpath: string) => {
-            vsnPanel.initIfNeed();
-            const notes: VSNNote[] = db.selectNotes(dpath);
-            const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            vsnPanel.updateWebviewContent(vsnDomain);
-        })
-    );
-    return vsnPanel;
-}
-
-function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
+export function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
     const categorys: twv.VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;

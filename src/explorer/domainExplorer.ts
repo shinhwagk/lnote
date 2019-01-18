@@ -37,7 +37,7 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
                 : 0, // vscode.TreeItemCollapsibleState
             command: {
                 arguments: [element.dpath],
-                command: 'updateOrCreateWebview',
+                command: 'vsnPanel.update',
                 title: 'Show Vscode Note'
             },
             label: path.basename(element.dpath)

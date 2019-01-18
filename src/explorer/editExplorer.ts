@@ -1,18 +1,7 @@
-import * as path from 'path';
-
 import * as vscode from 'vscode';
 
 import { RootNode } from './models/rootNode';
 import { NodeBase } from './models/nodeBase';
-
-export function VSNEditExplorer() {
-    const treeDataProvider = new VSNNoteEditExplorerProvider();
-    const treeView = vscode.window.createTreeView('vsnoteEditExplorer', {
-        treeDataProvider,
-        showCollapseAll: true
-    });
-    return { treeDataProvider, treeView };
-}
 
 export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<NodeBase> {
     private _onDidChangeTreeData: vscode.EventEmitter<NodeBase> = new vscode.EventEmitter<NodeBase>();
@@ -22,7 +11,14 @@ export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<Node
     private _filesNode: RootNode | undefined;
     private _docNode: RootNode | undefined;
 
-    public refresh(id: number): void {
+    private readonly ctx: vscode.Memento;
+
+    constructor(ctx: vscode.Memento) {
+        this.ctx = ctx;
+    }
+
+    public refresh(): void {
+        this._onDidChangeTreeData.fire(); // temp
         this.refreshNote();
         this.refreshFiles();
         this.refreshDoc();
@@ -30,6 +26,7 @@ export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<Node
     public refreshNote(): void {
         this._onDidChangeTreeData.fire(this._noteNode);
     }
+
     public refreshFiles(): void {
         this._onDidChangeTreeData.fire(this._filesNode);
     }
@@ -44,8 +41,10 @@ export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<Node
 
     public async getChildren(element?: NodeBase): Promise<NodeBase[]> {
         if (!element) {
+            // root nodes
             return this.getRootNodes();
         }
+        // childs node of root node
         return element.getChildren(element);
     }
 
@@ -53,15 +52,15 @@ export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<Node
         const rootNodes: RootNode[] = [];
         let node: RootNode;
 
-        node = new RootNode('Note', 'noteRootNode');
+        node = new RootNode('Note', 'noteRootNode', this.ctx);
         rootNodes.push(node);
         this._noteNode = node;
 
-        node = new RootNode('Doc', 'docRootNode');
+        node = new RootNode('Doc', 'docRootNode', this.ctx);
         rootNodes.push(node);
         this._noteNode = node;
 
-        node = new RootNode('Files', 'filesRootNode');
+        node = new RootNode('Files', 'filesRootNode', this.ctx);
         rootNodes.push(node);
         this._noteNode = node;
 

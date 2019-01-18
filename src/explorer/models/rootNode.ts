@@ -12,14 +12,15 @@ import * as path from 'path';
 export class RootNode extends NodeBase {
     constructor(
         public readonly label: string,
-        public readonly contextValue: 'noteRootNode' | 'docRootNode' | 'filesRootNode' | 'none'
+        public readonly contextValue: 'noteRootNode' | 'docRootNode' | 'filesRootNode',
+        public readonly globalStorage: vscode.Memento
     ) {
         super(label);
     }
     public getTreeItem(): vscode.TreeItem {
         return {
             label: this.label,
-            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            collapsibleState: this.contextValue === 'noteRootNode' ? 2 : 1,
             contextValue: this.contextValue
         };
     }
@@ -42,10 +43,24 @@ export class RootNode extends NodeBase {
     }
     async getNoteFiles(): Promise<(NoteFileNode | ErrorNode)[]> {
         const nFiles: NoteFileNode[] = [];
-        const fs = readdirSync(path.join(os.homedir(), '.vscode-note', 'notes', '1'));
-        for (const f of fs) {
-            nFiles.push(new NoteFileNode(f));
+        const nid = this.globalStorage.get<number>('nid');
+        if (!nid) {
+            return nFiles;
         }
+
+        const dbPath = vscode.workspace.getConfiguration('vscode-note').get<string>('dbPath', os.homedir());
+        const notePath = path.join(dbPath, '.vscode-note', 'notes', nid.toString());
+
+        const isColFile = n => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
+
+        const fs = readdirSync(notePath).filter(isColFile);
+
+        for (const f of fs) {
+            const uri = vscode.Uri.file(path.join(notePath, f));
+            nFiles.push(new NoteFileNode(f, uri));
+        }
+        const uri = vscode.Uri.file(path.join(notePath, '.n.json'));
+        nFiles.push(new NoteFileNode('.n.json', uri));
         return nFiles;
     }
     async getFilesFiles() {

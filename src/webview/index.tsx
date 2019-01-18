@@ -47,13 +47,16 @@ function VNSDomain(props: twv.VSNWVDomain) {
 }
 
 window.addEventListener('message', event => {
+    console.log(event.data);
     const message: twv.DomainData = event.data;
     switch (message.command) {
-        case 'domain-data':
+        case 'data':
             const name = message.data.name;
             const categorys = message.data.categorys;
             ReactDOM.render(<VNSDomain name={name} categorys={categorys} />, document.getElementById('root'));
             break;
+        default:
+            ReactDOM.render(<h1>Error</h1>, document.getElementById('root'));
     }
 });
 

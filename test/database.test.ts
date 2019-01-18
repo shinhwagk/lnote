@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import rimraf = require('rimraf');
 
-import * as db from '../database/database';
+import * as db from '../src/database';
 import { TestFileStructure } from './lib';
 
 let vscodeDB: db.VSNDatabase | undefined;

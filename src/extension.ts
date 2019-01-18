@@ -1,14 +1,18 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-
-import { VSNDatabase } from './database';
+import * as os from 'os';
+import { VSNDatabase, VSNNote } from './database';
 import { VSNDomainExplorer, VSNDomainNode } from './explorer/domainExplorer';
-import { VSNEditExplorer } from './explorer/editExplorer';
-import { splitPath } from './helper';
+import { VSNNoteEditExplorerProvider as VSNEditExplorerProvider } from './explorer/editExplorer';
+import { splitPath, vfs } from './helper';
 import { commands as cs } from './names.global';
-import { VSNWebviewExplorer as VSNNotePanelExplorer } from './panel/notesPanel';
+import { VSNWebviewPanel as VSNPanel, fusionNotes } from './panel/notesPanel';
+import { readdirSync, writeFileSync } from 'fs';
+import { NoteFileNode } from './explorer/models/noteFileNode';
+import { removeSync } from 'fs-extra';
 
 export function activate(context: vscode.ExtensionContext) {
+    const globalStorage: vscode.Memento = context.globalState;
     console.log('vscode extension "vscode-note" is now active!');
 
     const vsndb = new VSNDatabase();
@@ -17,14 +21,28 @@ export function activate(context: vscode.ExtensionContext) {
     const vsnDomain = VSNDomainExplorer(vsndb);
     console.log('vsn tree domain explorer startup.');
 
-    const vsnPanel = VSNNotePanelExplorer(context, vsndb);
+    // const vsnPanel = VSNNotePanelExplorer(context, vsndb);
+    const vsnPanel = new VSNPanel(context);
     console.log('vsn webview explorer startup.');
 
-    const { treeDataProvider, treeView } = VSNEditExplorer();
-    // console.log("vsn tree edit explorer startup.");
+    const vsnEditTreeDataProvider = new VSNEditExplorerProvider(globalStorage);
+    const treeView = vscode.window.createTreeView('vsnoteEditExplorer', {
+        treeDataProvider: vsnEditTreeDataProvider,
+        showCollapseAll: true
+    });
+    console.log('vsn tree edit explorer startup.');
 
     // const vsnTreeFiles = VSNFilesExplorer();
     // const vsnTreeDocs = VSNDocsExplorer();
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vsnPanel.update', (dpath: string) => {
+            vsnPanel.initIfNeed();
+            const notes: VSNNote[] = vsndb.selectNotes(dpath);
+            const vsnDomain = fusionNotes(path.basename(dpath), notes);
+            vsnPanel.updateWebviewContent(vsnDomain);
+        })
+    );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vsnoteEditExplorer.openFileResource', async resource =>
@@ -37,12 +55,13 @@ export function activate(context: vscode.ExtensionContext) {
      */
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.create', async (node: VSNDomainNode) => {
-            const noteid = vsndb.createNote(node.dpath);
-            // treeDataProvider.refreshNote();
+            const nid = vsndb.createNote(node.dpath);
+            globalStorage.update('nid', nid);
+            vsnEditTreeDataProvider.refreshNote();
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
             // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
             // treeDataProvider.refresh();
-            // vscode.commands.executeCommand('updateOrCreateWebview', fspath);
+            // vscode.commands.executeCommand('vsnPanel.update', fspath);
         })
     );
 
@@ -50,8 +69,29 @@ export function activate(context: vscode.ExtensionContext) {
      * close note edit tree
      * */
     context.subscriptions.push(
-        vscode.commands.registerCommand(cs.editTreeClose, async () => {
+        vscode.commands.registerCommand('vscode-note.edit-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', false);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'vscode-note.edit-explorer.note.col.remove',
+            async (f: NoteFileNode) => {
+                removeSync(f.uri.fsPath);
+                vsnEditTreeDataProvider.refresh();
+
+                // vsndb.deleteNodeCol(t.resourceUri.fsPath);
+            }
+        )
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
+            const nid = globalStorage.get<number>('nid');
+            if (nid) {
+                vsndb.createNodeCol(nid);
+                vsnEditTreeDataProvider.refresh();
+            }
         })
     );
 
@@ -70,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
             const oldname = dpaths[dpaths.length - 1];
             const newName: string = await vscode.window.showInputBox({ value: oldname });
             vsndb.renameDomain(node.dpath, newName);
-            vscode.commands.executeCommand('updateOrCreateWebview', node.dpath);
+            vscode.commands.executeCommand('vsnPanel.update', node.dpath);
             vsnDomain.refresh();
         })
     );

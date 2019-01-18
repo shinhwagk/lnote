@@ -108,6 +108,17 @@ export class VSNDatabase {
         return noteid;
     }
 
+    public async createNodeCol(nid: number): Promise<void> {
+        const notePath = path.join(this.dbPath, 'notes', nid.toString());
+        const cnt = readdirSync(notePath).length;
+        vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
+    }
+    // public async deleteNodeCol(nid: number): Promise<void> {
+    //     const notePath = path.join(this.dbPath, 'notes', nid.toString());
+    //     const cnt = readdirSync(notePath).length;
+    //     vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
+    // }
+
     public selectSeq(): number {
         return Number(vfs.readFileSync(this.seqFile));
     }

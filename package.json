@@ -82,8 +82,13 @@
                     "group": "domain"
                 },
                 {
-                    "command": "vscode-note.edit-explorer.addFile",
+                    "command": "vscode-note.edit-explorer.note.col.add",
                     "when": "view == vsnoteEditExplorer && viewItem == noteRootNode",
+                    "group": "inline"
+                },
+                {
+                    "command": "vscode-note.edit-explorer.note.col.remove",
+                    "when": "view == vsnoteEditExplorer && viewItem == localNodeFileNode",
                     "group": "inline"
                 }
             ]
@@ -114,10 +119,6 @@
                 "title": "Rname Domain"
             },
             {
-                "command": "vsnoteEditExplorer.openFtpResource",
-                "title": "Open FTP Resource"
-            },
-            {
                 "command": "vsnoteEditExplorer.openFileResource",
                 "title": "Refresh",
                 "icon": {
@@ -134,11 +135,19 @@
                 }
             },
             {
-                "command": "vscode-note.edit-explorer.addFile",
-                "title": "Add File",
+                "command": "vscode-note.edit-explorer.note.col.add",
+                "title": "Add Col",
                 "icon": {
-                    "light": "images/light/addFile.svg",
-                    "dark": "images/dark/addFile.svg"
+                    "light": "images/light/add.svg",
+                    "dark": "images/dark/add.svg"
+                }
+            },
+            {
+                "command": "vscode-note.edit-explorer.note.col.remove",
+                "title": "Del Col",
+                "icon": {
+                    "light": "images/light/close.svg",
+                    "dark": "images/dark/close.svg"
                 }
             }
         ]

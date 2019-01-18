@@ -2,8 +2,7 @@ export const commands = {
     createNote: 'vscode-note.note.create',
     DomainCreate: 'vscode-note.domain.create',
     renameDomain: 'vscode-note.domain.rename',
-    deleteDomain: 'vscode-note.domain.delete',
-    editTreeClose: 'vscode-note.edit-explorer.close'
+    deleteDomain: 'vscode-note.domain.delete'
 };
 
 export const trees = {

@@ -15,7 +15,7 @@ export namespace ToWebView {
     }
 
     export interface DomainData {
-        command: 'domain-data';
+        command: 'data';
         data: VSNWVDomain;
     }
 }
