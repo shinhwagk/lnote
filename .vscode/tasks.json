@@ -5,7 +5,7 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "watch:dev",
+            "script": "watch",
             "isBackground": true,
             "presentation": {
                 "reveal": "never"

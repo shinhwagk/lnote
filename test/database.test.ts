@@ -3,10 +3,10 @@ import * as path from 'path';
 
 import rimraf = require('rimraf');
 
-import * as db from '../src/database';
+import * as db from '../database/database';
 import { TestFileStructure } from './lib';
 
-let vscodeDB: db.VSNDatabase | undefined = undefined;
+let vscodeDB: db.VSNDatabase | undefined;
 
 const testDataRootPath = './';
 const testDataPath = path.join(testDataRootPath, '.vscode-note');
@@ -52,7 +52,6 @@ function createTestFileAndDirectory(tdl: TestFileStructure[]) {
                 break;
             case 'f':
                 fs.writeFileSync(p, f.content, { encoding: 'utf-8' });
-                break;
         }
     }
 }
@@ -66,20 +65,20 @@ beforeAll(() => {
     vscodeDB = new db.VSNDatabase(testDataRootPath);
 });
 
-afterAll(() => removeTestData());
+afterAll(removeTestData);
 
 test('true', () => {
-    expect(vscodeDB!.selectDomain('/powershell').domains.length >= 1 ? true : false).toBe(true);
+    expect(vscodeDB.selectDomain('/powershell').domains.length >= 1 ? true : false).toBe(true);
 });
 
 test('select domain, dpath: /', () => {
     const domains: string[] = Object.keys(exampleDataDomains);
-    const expectData: db.VSNDomain = { domains: domains, notes: exampleDataDomains['.notes'] };
-    expect(vscodeDB!.selectDomain('/')).toEqual(expectData);
+    const expectData: db.VSNDomain = { domains, notes: exampleDataDomains['.notes'] };
+    expect(vscodeDB.selectDomain('/')).toEqual(expectData);
 });
 
 test('select domain childs length', () => {
-    expect(vscodeDB!.selectDomain('/oracle').domains.length >= 1 ? true : false).toBe(false);
+    expect(vscodeDB.selectDomain('/oracle').domains.length >= 1 ? true : false).toBe(false);
 });
 
 // test('dqual powershell notes', () => {
@@ -87,23 +86,23 @@ test('select domain childs length', () => {
 // });
 
 test('select note', () => {
-    expect(vscodeDB!.selectNote(1)).toEqual(exampleDataNote);
+    expect(vscodeDB.selectNote(1)).toEqual(exampleDataNote);
 });
 
 test('inc seq', () => {
-    const id = vscodeDB!.incSeq();
+    const id = vscodeDB.incSeq();
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
     expect(id).toEqual(noteseq);
 });
 
 test('select seq', () => {
-    const id = vscodeDB!.selectSeq();
+    const id = vscodeDB.selectSeq();
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
     expect(id).toEqual(noteseq);
 });
 
 test('create note', () => {
-    vscodeDB!.createNote('/powershell');
+    vscodeDB.createNote('/powershell');
     const noteseq = Number(fs.readFileSync(testNotesSeq, { encoding: 'utf-8' }));
     expect(fs.existsSync(path.join(testDataPath, 'notes', noteseq.toString()))).toEqual(true);
 });

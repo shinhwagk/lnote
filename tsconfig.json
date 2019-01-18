@@ -1,22 +1,11 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es6",
+        "target": "esnext",
         "outDir": "out",
-        "lib": [
-            "es6",
-            "dom"
-        ],
+        "lib": ["es7", "dom"],
         "sourceMap": true,
         "strict": false,
         "jsx": "preserve"
-    },
-    "plugins": [
-        {
-            "name": "typescript-tslint-plugin"
-        }
-    ],
-    "include": [
-        "src"
-    ]
+    }
 }

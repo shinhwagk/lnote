@@ -1,11 +1,11 @@
 {
-    "exclude": ["./tsconfig.json"],
+    "extends": "./tsconfig.json",
     "compilerOptions": {
         "strict": true,
         "noUnusedLocals": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "noUnusedParameters": true,
-        "noImplicitAny": true,
+        "noImplicitAny": true
     }
 }

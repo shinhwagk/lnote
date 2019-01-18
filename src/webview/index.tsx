@@ -4,9 +4,14 @@ import * as ReactDOM from 'react-dom';
 import { ToWebView as twv } from '../panel/message';
 
 import './index.scss';
-/// <reference path ="api.d.ts">
 
-const vscode = acquireVsCodeApi();
+interface vscode {
+    postMessage(message: any): void;
+}
+
+declare function acquireVsCodeApi(): vscode;
+
+const vscode: vscode = acquireVsCodeApi();
 
 function VSNNotes(props: twv.VSNWVNote) {
     const contents = props.contents.map(c => <td>{c}</td>);

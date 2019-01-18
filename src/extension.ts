@@ -1,14 +1,12 @@
 import * as path from 'path';
-import * as os from 'os';
-
 import * as vscode from 'vscode';
 
-import { VSNDomainExplorer, VSNDomainNode } from './explorer/domainExplorer';
-import { VSNWebviewExplorer as VSNNotePanelExplorer } from './panel/notesPanel';
-import { VSNEditExplorer } from './explorer/editExplorer';
 import { VSNDatabase } from './database';
+import { VSNDomainExplorer, VSNDomainNode } from './explorer/domainExplorer';
+import { VSNEditExplorer } from './explorer/editExplorer';
 import { splitPath } from './helper';
 import { commands as cs } from './names.global';
+import { VSNWebviewExplorer as VSNNotePanelExplorer } from './panel/notesPanel';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -29,10 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
     // const vsnTreeDocs = VSNDocsExplorer();
 
     context.subscriptions.push(
-        vscode.commands.registerCommand(
-            'vsnoteEditExplorer.openFileResource',
-            async resource =>
-                await vscode.window.showTextDocument(resource, { viewColumn: vscode.ViewColumn.Two })
+        vscode.commands.registerCommand('vsnoteEditExplorer.openFileResource', async resource =>
+            vscode.window.showTextDocument(resource, { viewColumn: vscode.ViewColumn.Two })
         )
     );
 
@@ -40,12 +36,12 @@ export function activate(context: vscode.ExtensionContext) {
      * create note ,enabel tree
      */
     context.subscriptions.push(
-        vscode.commands.registerCommand(cs.createNote, async (node: VSNDomainNode) => {
+        vscode.commands.registerCommand('vscode-note.note.create', async (node: VSNDomainNode) => {
             const noteid = vsndb.createNote(node.dpath);
-            treeDataProvider.refreshRegistries();
+            // treeDataProvider.refreshNote();
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
-            const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
-            treeDataProvider.refresh();
+            // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
+            // treeDataProvider.refresh();
             // vscode.commands.executeCommand('updateOrCreateWebview', fspath);
         })
     );

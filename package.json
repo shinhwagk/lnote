@@ -33,7 +33,7 @@
         "views": {
             "vsnote-explorer": [
                 {
-                    "id": "vsnDomainExplorer",
+                    "id": "vsnoteDomainExplorer",
                     "name": "domain"
                 },
                 {
@@ -80,6 +80,11 @@
                     "command": "vscode-note.domain.rename",
                     "title": "New Domain",
                     "group": "domain"
+                },
+                {
+                    "command": "vscode-note.edit-explorer.addFile",
+                    "when": "view == vsnoteEditExplorer && viewItem == noteRootNode",
+                    "group": "inline"
                 }
             ]
         },
@@ -127,21 +132,26 @@
                     "light": "images/light/close.svg",
                     "dark": "images/dark/close.svg"
                 }
+            },
+            {
+                "command": "vscode-note.edit-explorer.addFile",
+                "title": "Add File",
+                "icon": {
+                    "light": "images/light/addFile.svg",
+                    "dark": "images/dark/addFile.svg"
+                }
             }
         ]
     },
     "scripts": {
         "vscode:prepublish": "yarn lint:all && yarn compile",
         "compile": "webpack --mode production --config webpack.config.ts",
-        "compile:web": "webpack --mode development --config webpack.webview.ts",
         "watch": "webpack --mode development --config webpack.config.ts --watch",
-        "watch:dev": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest",
-        "tslint:check": "tslint -c ./tslint.json ./src/**/*.ts",
-        "watch-webview": "webpack --mode development --config webpack.config.webview.ts --watch",
-        "tslint": "tslint -p .",
-        "lint:prettier": "prettier --write src/** test/**",
+        "lint:tslint:check": "tslint -c ./tslint.json ./src/**/*.ts",
+        "lint:tslint": "tslint --project tsconfig.prod.json -t verbose",
+        "lint:prettier": "prettier --write **/*.ts",
         "lint:all": "yarn tslint && yarn lint:prettier && yarn tslint:check"
     },
     "devDependencies": {
@@ -174,10 +184,8 @@
         "ts-node": "^7.0.1",
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.17.0",
-        "tslint-microsoft-contrib": "^6.0.0",
         "tslint-react": "^3.6.0",
         "typescript": "^3.2.2",
-        "vscode": "^1.1.26",
         "webpack": "^4.28.4",
         "webpack-cli": "^3.2.1"
     },

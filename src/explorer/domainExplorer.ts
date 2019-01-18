@@ -16,7 +16,7 @@ export function VSNDomainExplorer(db: VSNDatabase): VSNDomainExplorerProvider {
 
 export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDomainNode> {
     private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-    readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
+    public readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
 
     private readonly db: VSNDatabase;
 
@@ -28,7 +28,7 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
         this._onDidChangeTreeData.fire();
     }
 
-    async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
+    public async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         return {
             collapsibleState: (this.db.selectDomain(element.dpath).domains.length >= 1
               ? true
@@ -44,7 +44,7 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
         };
     }
 
-    async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {
+    public async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {
         const dpath: string = element ? element.dpath : '/';
         return this.db.selectDomain(dpath).domains.map(name => {
             return { dpath: path.join(dpath, name) };

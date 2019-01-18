@@ -6420,13 +6420,6 @@ tslint-config-prettier@^1.17.0:
   resolved "http://registry.npm.taobao.org/tslint-config-prettier/download/tslint-config-prettier-1.17.0.tgz#946ed6117f98f3659a65848279156d87628c33dc"
   integrity sha1-lG7WEX+Y82WaZYSCeRVth2KMM9w=
 
-tslint-microsoft-contrib@^6.0.0:
-  version "6.0.0"
-  resolved "http://registry.npm.taobao.org/tslint-microsoft-contrib/download/tslint-microsoft-contrib-6.0.0.tgz#7bff73c9ad7a0b7eb5cdb04906de58f42a2bf7a2"
-  integrity sha1-e/9zya16C361zbBJBt5Y9Cor96I=
-  dependencies:
-    tsutils "^2.27.2 <2.29.0"
-
 tslint-react@^3.6.0:
   version "3.6.0"
   resolved "http://registry.npm.taobao.org/tslint-react/download/tslint-react-3.6.0.tgz#7f462c95c4a0afaae82507f06517ff02942196a1"
@@ -6456,13 +6449,6 @@ tsutils@^2.13.1, tsutils@^2.27.2:
   version "2.29.0"
   resolved "http://registry.npm.taobao.org/tsutils/download/tsutils-2.29.0.tgz#32b488501467acbedd4b85498673a0812aca0b99"
   integrity sha1-MrSIUBRnrL7dS4VJhnOggSrKC5k=
-  dependencies:
-    tslib "^1.8.1"
-
-"tsutils@^2.27.2 <2.29.0":
-  version "2.28.0"
-  resolved "http://registry.npm.taobao.org/tsutils/download/tsutils-2.28.0.tgz#6bd71e160828f9d019b6f4e844742228f85169a1"
-  integrity sha1-a9ceFggo+dAZtvToRHQiKPhRaaE=
   dependencies:
     tslib "^1.8.1"
 

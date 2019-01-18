@@ -43,7 +43,7 @@ const webviewConfig: webpack.Configuration = {
                     'babel-loader',
                     {
                         loader: 'ts-loader',
-                        options: { configFile: 'tsconfig.webview.json', transpileOnly: true }
+                        options: { configFile: 'tsconfig.prod.json', transpileOnly: true }
                     }
                 ]
             },

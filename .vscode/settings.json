@@ -1,11 +1,11 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "files.exclude": {
-        "node_modules":true,
+        "node_modules": false,
         "out": false // set this to true to hide the "out" folder with the compiled JS files
     },
     "search.exclude": {
-        "node_modules":true,
+        "node_modules": true,
         "out": true // set this to false to include "out" folder in search results
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
@@ -14,5 +14,7 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.detectIndentation": true,
+    "editor.formatOnSave": true,
+    "tslint.autoFixOnSave": true,
     "npm.packageManager": "yarn"
 }

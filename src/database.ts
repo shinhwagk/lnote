@@ -1,11 +1,10 @@
-import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
+import { existsSync, readdirSync, statSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 
-import { vfs, splitPath } from './helper';
-import { existsSync, readdirSync, statSync } from 'fs-extra';
+import { splitPath, vfs } from './helper';
 
 export interface VSNDomain {
     domains: string[];
@@ -36,10 +35,10 @@ export class VSNDatabase {
         this.domainsFile = path.join(this.dbPath, 'domains.json');
         this.seqFile = path.join(this.dbPath, 'seq');
         this.createDBIfNotExist();
-        this.open();
+        this.cacheDB();
     }
 
-    public open() {
+    public cacheDB() {
         this.cacheDomains = vfs.readJSONSync(this.domainsFile);
     }
 
@@ -47,13 +46,6 @@ export class VSNDatabase {
         const domain = objectPath.get(this.cacheDomains, splitPath(dPath));
         const domains: string[] = Object.keys(domain).filter(name => name !== '.notes');
         return { domains, notes: domain['.notes'] };
-    }
-
-    private createDBIfNotExist(): void {
-        if (!existsSync(this.dbPath)) {
-            vfs.mkdirsSync(this.dbPath, this.notesPath);
-            this.createExampleData();
-        }
     }
 
     public selectNotes(dpath: string): VSNNote[] {
@@ -124,6 +116,13 @@ export class VSNDatabase {
         const seq = this.selectSeq() + 1;
         vfs.writeFileSync(this.seqFile, seq.toString());
         return seq;
+    }
+
+    private createDBIfNotExist(): void {
+        if (!existsSync(this.dbPath)) {
+            vfs.mkdirsSync(this.dbPath, this.notesPath);
+            this.createExampleData();
+        }
     }
 
     private checkout() {

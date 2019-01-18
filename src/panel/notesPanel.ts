@@ -44,9 +44,24 @@ class VSNWebviewPanel {
         this.context = context;
     }
 
-    initIfNeed() {
+    public initIfNeed() {
         if (!this.state) {
             this.init();
+        }
+    }
+
+    public updateWebviewContent(domain: twv.VSNWVDomain): void {
+        if (this.trayCnt >= 50) {
+            vscode.window.showErrorMessage('webview update failse 50 times.');
+            return;
+        }
+        if (!this.state) {
+            setTimeout(() => this.updateWebviewContent(domain), 100);
+            this.trayCnt += 1;
+            return;
+        }
+        if (this.panel) {
+            this.panel!.webview.postMessage(domain);
         }
     }
 
@@ -78,21 +93,6 @@ class VSNWebviewPanel {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.file(path.join(this.extPath, 'out'))]
         });
-    }
-
-    updateWebviewContent(domain: twv.VSNWVDomain): void {
-        if (this.trayCnt >= 50) {
-            vscode.window.showErrorMessage('webview update failse 50 times.');
-            return;
-        }
-        if (!this.state) {
-            setTimeout(() => this.updateWebviewContent(domain), 100);
-            this.trayCnt += 1;
-            return;
-        }
-        if (this.panel) {
-            this.panel!.webview.postMessage(domain);
-        }
     }
 }
 
