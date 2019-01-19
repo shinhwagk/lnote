@@ -22,8 +22,8 @@ function getWebviewContent(extPath: string) {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Cat Coding</title>
-        <script src="${wFile('react.production.min.js')}" crossorigin></script>
-        <script src="${wFile('react-dom.production.min.js')}" crossorigin></script>
+        <!-- <script src="${wFile('react.production.min.js')}" crossorigin></script> -->
+        <!-- <script src="${wFile('react-dom.production.min.js')}" crossorigin></script> -->
 	</head>
     <body>
         <div id="root"></div>
@@ -61,6 +61,7 @@ export class VSNWebviewPanel {
             return;
         }
         if (this.panel) {
+            this.trayCnt = 0;
             this.panel!.webview.postMessage({ command: 'data', data: domain });
         }
     }
@@ -78,8 +79,19 @@ export class VSNWebviewPanel {
         );
         this.panel.webview.onDidReceiveMessage(
             message => {
-                if (message) {
-                    this.state = true;
+                switch (message.command) {
+                    case 'ready':
+                        this.state = message.data;
+                        break;
+                    case 'edit':
+                        vscode.commands.executeCommand('vscode-note.note.edit', message.data);
+                        break;
+                    case 'doc':
+                        const nId = message.data;
+                        const uri = vscode.Uri.file(
+                            path.join('/Users/shinhwagk/.vscode-note', 'docs', nId.toString(), 'README.md')
+                        );
+                        vscode.commands.executeCommand('markdown.showPreviewToSide', uri, {});
                 }
             },
             undefined,

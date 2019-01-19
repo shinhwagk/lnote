@@ -57,7 +57,18 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.create', async (node: VSNDomainNode) => {
             const nid = vsndb.createNote(node.dpath);
             globalStorage.update('nid', nid);
-            vsnEditTreeDataProvider.refreshNote();
+            vsnEditTreeDataProvider.refresh();
+            await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
+            // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
+            // treeDataProvider.refresh();
+            // vscode.commands.executeCommand('vsnPanel.update', fspath);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
+            globalStorage.update('nid', nid);
+            vsnEditTreeDataProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
             // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
             // treeDataProvider.refresh();

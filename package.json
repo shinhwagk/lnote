@@ -1,8 +1,8 @@
 {
     "name": "vscode-note",
     "displayName": "vscode-note",
-    "description": "a simple note extension. note data is saved in file.",
-    "version": "0.2.1",
+    "description": "a simple note extension.",
+    "version": "0.3.1",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -161,7 +161,7 @@
         "lint:tslint:check": "tslint -c ./tslint.json ./src/**/*.ts",
         "lint:tslint": "tslint --project tsconfig.prod.json -t verbose",
         "lint:prettier": "prettier --write **/*.ts",
-        "lint:all": "yarn tslint && yarn lint:prettier && yarn tslint:check"
+        "lint:all": "yarn lint:tslint && yarn lint:prettier && yarn lint:tslint:check"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",
@@ -176,6 +176,7 @@
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.7.20",
         "@types/react-dom": "^16.0.11",
+        "@types/react-table": "^6.7.21",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
         "@types/webpack": "^4.4.23",
@@ -199,13 +200,17 @@
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {
-        "vscode": "^1.1.26",
+        "@fortawesome/fontawesome-svg-core": "^1.2.12",
+        "@fortawesome/free-solid-svg-icons": "^5.6.3",
+        "@fortawesome/react-fontawesome": "^0.1.4",
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.12.1",
         "object-path": "^0.11.4",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
+        "react-table": "^6.8.6",
         "rimraf": "^2.6.3",
-        "untildify": "^3.0.3"
+        "untildify": "^3.0.3",
+        "vscode": "^1.1.26"
     }
 }

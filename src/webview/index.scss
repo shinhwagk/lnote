@@ -1,6 +1,14 @@
-table {
+table,
+td {
     border: 1px solid white;
+}
+
+tr {
     width: 100%;
+}
+
+.id {
+    width: 5%;
 }
 
 h1 {

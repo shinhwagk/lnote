@@ -25,4 +25,8 @@ export namespace ToExtension {
         command: 'ready';
         data: boolean;
     }
+    export interface EditNote {
+        command: 'edit';
+        data: number;
+    }
 }

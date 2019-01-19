@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-
-import { ToWebView as twv } from '../panel/message';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faPen } from '@fortawesome/free-solid-svg-icons';
+import { ToWebView as twv, ToExtension as te } from '../panel/message';
 
 import './index.scss';
 
@@ -13,12 +14,27 @@ declare function acquireVsCodeApi(): vscode;
 
 const vscode: vscode = acquireVsCodeApi();
 
+const editNote = (id: number) => () => vscode.postMessage({ command: 'edit', data: id });
+const viewDoc = (id: number) => () => vscode.postMessage({ command: 'doc', data: id });
+
 function VSNNotes(props: twv.VSNWVNote) {
-    const contents = props.contents.map(c => <td>{c}</td>);
+    const contents = props.contents.map(c => (
+        <td>
+            <pre>{c}</pre>
+        </td>
+    ));
+
     return (
         <tr>
-            <td>{props.id}</td>
+            <td className="id">
+                <a onClick={viewDoc(props.id)}>{props.id}</a>
+            </td>
             {contents}
+            <td>
+                <a onClick={editNote(props.id)}>
+                    <FontAwesomeIcon inverse icon={faPen} />
+                </a>
+            </td>
         </tr>
     );
 }
@@ -47,7 +63,6 @@ function VNSDomain(props: twv.VSNWVDomain) {
 }
 
 window.addEventListener('message', event => {
-    console.log(event.data);
     const message: twv.DomainData = event.data;
     switch (message.command) {
         case 'data':
@@ -60,5 +75,5 @@ window.addEventListener('message', event => {
     }
 });
 
-vscode.postMessage({ state: true });
-console.log('web post');
+vscode.postMessage({ command: 'ready', data: true });
+console.log('web view ready.');
