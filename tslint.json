@@ -6,5 +6,8 @@
         "semicolon": [true, "always"],
         "quotemark": [false, "single"]
     },
+    "linterOptions": {
+        "exclude": ["node_modules"]
+    },
     "rulesDirectory": []
 }

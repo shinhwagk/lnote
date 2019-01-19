@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "a simple note extension.",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -206,6 +206,7 @@
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.12.1",
         "object-path": "^0.11.4",
+        "rc-table": "^6.4.3",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
         "react-table": "^6.8.6",

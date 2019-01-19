@@ -1,7 +1,7 @@
 import * as os from 'os';
 import * as path from 'path';
 
-import { existsSync, readdirSync, statSync } from 'fs-extra';
+import { existsSync, readdirSync, statSync, mkdirsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 
 import { splitPath, vfs } from './helper';
@@ -153,5 +153,7 @@ export class VSNDatabase {
         vfs.writeFileSync(path.join(notePath, '1.txt'), 'windows');
         vfs.writeFileSync(path.join(notePath, '2.txt'), 'chose install powershell');
         vfs.writeFileSync(path.join(notePath, '.n.json'), '{"category":"install"}');
+        mkdirsSync(path.join(notePath, 'doc'));
+        mkdirsSync(path.join(notePath, 'doc'));
     }
 }

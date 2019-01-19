@@ -12,7 +12,7 @@ import { NoteFileNode } from './explorer/models/noteFileNode';
 import { removeSync } from 'fs-extra';
 
 export function activate(context: vscode.ExtensionContext) {
-    const globalStorage: vscode.Memento = context.globalState;
+    const globalState: vscode.Memento = context.globalState;
     console.log('vscode extension "vscode-note" is now active!');
 
     const vsndb = new VSNDatabase();
@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
     const vsnPanel = new VSNPanel(context);
     console.log('vsn webview explorer startup.');
 
-    const vsnEditTreeDataProvider = new VSNEditExplorerProvider(globalStorage);
+    const vsnEditTreeDataProvider = new VSNEditExplorerProvider(globalState);
     const treeView = vscode.window.createTreeView('vsnoteEditExplorer', {
         treeDataProvider: vsnEditTreeDataProvider,
         showCollapseAll: true
@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.create', async (node: VSNDomainNode) => {
             const nid = vsndb.createNote(node.dpath);
-            globalStorage.update('nid', nid);
+            globalState.update('nid', nid);
             vsnEditTreeDataProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
             // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
@@ -67,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
-            globalStorage.update('nid', nid);
+            globalState.update('nid', nid);
             vsnEditTreeDataProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'extension.note.edit', true);
             // const uri = vscode.Uri.file(vsndb.selectNoteFsPath(noteid));
@@ -98,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
-            const nid = globalStorage.get<number>('nid');
+            const nid = globalState.get<number>('nid');
             if (nid) {
                 vsndb.createNodeCol(nid);
                 vsnEditTreeDataProvider.refresh();
