@@ -1,7 +1,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as jsyml from 'js-yaml';
-import { existsSync, readdirSync, statSync, mkdirsSync } from 'fs-extra';
+import { existsSync, readdirSync, statSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import untildify = require('untildify');
 import { splitPath, vfs } from './helper';

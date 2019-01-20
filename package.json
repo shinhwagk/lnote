@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "a simple note extension.",
-    "version": "0.3.4",
+    "version": "0.3.6",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -159,10 +159,9 @@
         "watch": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "jest",
-        "lint:tslint:check": "tslint -c ./tslint.json ./src/**/*.ts",
-        "lint:tslint": "tslint --project tsconfig.prod.json -t verbose",
+        "lint:tslint": "tslint --project tsconfig.json --fix",
         "lint:prettier": "prettier --write **/*.ts",
-        "lint:all": "yarn lint:tslint && yarn lint:prettier && yarn lint:tslint:check"
+        "lint:all": "yarn lint:tslint && yarn lint:prettier"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",

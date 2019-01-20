@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
-import { ToWebView as twv, ToExtension as te } from '../panel/message';
+import { ToWebView as twv } from '../panel/message';
 
 import './index.scss';
 

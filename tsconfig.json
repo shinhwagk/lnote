@@ -5,7 +5,12 @@
         "outDir": "out",
         "lib": ["es7", "dom"],
         "sourceMap": true,
-        "strict": false,
-        "jsx": "preserve"
+        "jsx": "preserve",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedParameters": true,
+        "noImplicitAny": true
     }
 }

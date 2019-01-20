@@ -15,10 +15,7 @@ const extConfig: webpack.Configuration = {
         rules: [
             {
                 test: /\.ts$/,
-                loader: {
-                    loader: 'ts-loader',
-                    options: { configFile: 'tsconfig.prod.json', transpileOnly: true }
-                }
+                loader: 'ts-loader'
             }
         ]
     },
@@ -39,20 +36,11 @@ const webviewConfig: webpack.Configuration = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loaders: [
-                    'babel-loader',
-                    {
-                        loader: 'ts-loader',
-                        options: { configFile: 'tsconfig.prod.json', transpileOnly: true }
-                    }
-                ]
+                loaders: ['babel-loader', 'ts-loader']
             },
             { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
         ]
-    },
-    externals: {
-        // react: 'React',
-        // 'react-dom': 'ReactDOM'
     }
 };
+
 export default [webviewConfig, extConfig];

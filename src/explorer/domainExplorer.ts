@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { selectDomain } from '../database';
-import { dom } from '@fortawesome/fontawesome-svg-core';
 
 export interface VSNDomainNode extends vscode.TreeItem {
     dpath: string;

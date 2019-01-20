@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import { NodeBase } from './nodeBase';
 
-import * as os from 'os';
 import * as path from 'path';
 
 export class NoteFileNode extends NodeBase {

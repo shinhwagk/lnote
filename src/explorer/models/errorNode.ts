@@ -16,7 +16,7 @@ export class ErrorNode extends NodeBase {
     // public readonly iconPath: IconPath = path.join(imagesPath, 'warning.svg');
     public readonly iconPath: IconPath = path.join('imagesPath', 'warning.svg');
 
-    constructor(error: unknown, public readonly contextValue: string) {
+    constructor(_error: unknown, public readonly contextValue: string) {
         // super(parseError(error).message);
         super('dfd');
     }

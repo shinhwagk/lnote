@@ -68,7 +68,7 @@ export class VSNWebviewPanel {
 
     private init() {
         this.createPanel();
-        this.panel.onDidDispose(
+        this.panel!.onDidDispose(
             () => {
                 this.panel = undefined;
                 this.state = false;
@@ -77,7 +77,7 @@ export class VSNWebviewPanel {
             null,
             this.context.subscriptions
         );
-        this.panel.webview.onDidReceiveMessage(
+        this.panel!.webview.onDidReceiveMessage(
             message => {
                 switch (message.command) {
                     case 'ready':
@@ -93,7 +93,7 @@ export class VSNWebviewPanel {
             undefined,
             this.context.subscriptions
         );
-        this.panel.webview.html = getWebviewContent(this.extPath);
+        this.panel!.webview.html = getWebviewContent(this.extPath);
     }
 
     private createPanel() {

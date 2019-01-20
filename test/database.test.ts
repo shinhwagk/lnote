@@ -3,17 +3,7 @@ import * as path from 'path';
 
 import rimraf = require('rimraf');
 
-import {
-    VSNNote,
-    initDB,
-    selectNotes,
-    createNote,
-    createNodeCol,
-    createDomain,
-    renameDomain,
-    selectDomain,
-    VSNDomain
-} from '../src/database';
+import { VSNNote, initDB, createNote, selectDomain, VSNDomain } from '../src/database';
 import { TestFileStructure } from './lib';
 
 const testDataRootPath = './';

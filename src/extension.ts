@@ -125,11 +125,12 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand(cs.DomainCreate, async (node: VSNDomainNode) => {
-            const name: string = await vscode.window.showInputBox();
-            vscode.window.showInformationMessage(name);
-            createDomain(node.dpath, name);
-            vsnDomainTree.refresh();
+        vscode.commands.registerCommand('vscode-note.domain.create', async (node: VSNDomainNode) => {
+            const name: string | undefined = await vscode.window.showInputBox();
+            if (name) {
+                createDomain(node.dpath, name);
+                vsnDomainTree.refresh();
+            }
         })
     );
 
@@ -137,10 +138,12 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(cs.renameDomain, async (node: VSNDomainNode) => {
             const dpaths = splitPath(node.dpath);
             const oldname = dpaths[dpaths.length - 1];
-            const newName: string = await vscode.window.showInputBox({ value: oldname });
-            renameDomain(node.dpath, newName);
-            vscode.commands.executeCommand('vsnPanel.update', node.dpath);
-            vsnDomainTree.refresh();
+            const newName: string | undefined = await vscode.window.showInputBox({ value: oldname });
+            if (newName) {
+                renameDomain(node.dpath, newName);
+                vscode.commands.executeCommand('vsnPanel.update', node.dpath);
+                vsnDomainTree.refresh();
+            }
         })
     );
 }

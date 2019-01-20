@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
 
-import { FilesFileNode } from './FilesFileNode';
-import { DocFileNode } from './docFileNode';
 import { NoteFileNode } from './noteFileNode';
 import { NodeBase } from './nodeBase';
 import { ErrorNode } from './errorNode';
@@ -31,10 +29,12 @@ export class RootNode extends NodeBase {
                 return this.getNoteFiles();
             }
             case 'filesRootNode': {
-                return this.getFilesFiles();
+                return [];
+                // return this.getFilesFiles();
             }
             case 'docRootNode': {
-                return this.getDocFiles();
+                return [];
+                // return this.getDocFiles();
             }
             default: {
                 throw new Error(`Unexpected contextValue ${element.contextValue}`);
@@ -51,7 +51,7 @@ export class RootNode extends NodeBase {
         const dbPath = vscode.workspace.getConfiguration('vscode-note').get<string>('dbPath', os.homedir());
         const notePath = path.join(dbPath, '.vscode-note', 'notes', nid.toString());
 
-        const isColFile = n => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
+        const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
 
         const fs = readdirSync(notePath).filter(isColFile);
 
@@ -64,11 +64,11 @@ export class RootNode extends NodeBase {
         return nFiles;
     }
     async getFilesFiles() {
-        const fFiles: FilesFileNode[] = [];
-        return fFiles;
+        // const fFiles: FilesFileNode[] = [];
+        // return fFiles;
     }
     async getDocFiles() {
-        const dFiles: DocFileNode[] = [];
-        return dFiles;
+        // const dFiles: DocFileNode[] = [];
+        // return dFiles;
     }
 }

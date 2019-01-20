@@ -13,7 +13,7 @@ export abstract class NodeBase {
             contextValue: this.contextValue
         };
     }
-    public async getChildren(element: NodeBase): Promise<NodeBase[]> {
+    public async getChildren(_element: NodeBase): Promise<NodeBase[]> {
         return [];
     }
 }
