@@ -44,7 +44,7 @@ const tdl: TestFileStructure[] = [
     { path: `notes/${exampleDataNote.id}/1.txt`, kind: 'f', content: exampleDataNote.contents[0] },
     { path: `notes/${exampleDataNote.id}/2.sql`, kind: 'f', content: exampleDataNote.contents[1] },
     {
-        path: `notes/${exampleDataNote.id}/.n.json`,
+        path: `notes/${exampleDataNote.id}/.n.yml`,
         kind: 'f',
         content: JSON.stringify({ category: exampleDataNote.meta.category })
     },

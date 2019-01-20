@@ -59,8 +59,8 @@ export class RootNode extends NodeBase {
             const uri = vscode.Uri.file(path.join(notePath, f));
             nFiles.push(new NoteFileNode(f, uri));
         }
-        const uri = vscode.Uri.file(path.join(notePath, '.n.json'));
-        nFiles.push(new NoteFileNode('.n.json', uri));
+        const uri = vscode.Uri.file(path.join(notePath, '.n.yml'));
+        nFiles.push(new NoteFileNode('.n.yml', uri));
         return nFiles;
     }
     async getFilesFiles() {

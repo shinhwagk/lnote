@@ -87,11 +87,7 @@ export class VSNWebviewPanel {
                         vscode.commands.executeCommand('vscode-note.note.edit', message.data);
                         break;
                     case 'doc':
-                        const nId = message.data;
-                        const uri = vscode.Uri.file(
-                            path.join('/Users/shinhwagk/.vscode-note', 'docs', nId.toString(), 'README.md')
-                        );
-                        vscode.commands.executeCommand('markdown.showPreviewToSide', uri, {});
+                        vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
                 }
             },
             undefined,

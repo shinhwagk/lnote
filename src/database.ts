@@ -1,6 +1,6 @@
 import * as os from 'os';
 import * as path from 'path';
-
+import * as jsyml from 'js-yaml';
 import { existsSync, readdirSync, statSync, mkdirsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import untildify = require('untildify');
@@ -48,6 +48,10 @@ async function cacheDB(): Promise<void> {
     return vfs.readJSONSync(domainsFilePath);
 }
 
+export function selectDocReameFilePath(nId: number): string {
+    return path.join(notesDirPath, 'docs', nId.toString(), 'README.md');
+}
+
 export async function selectDomain(dpath: string): Promise<VSNDomain> {
     const domain = objectPath.get(cacheDomains, splitPath(dpath));
     const domains: string[] = Object.keys(domain).filter(name => name !== '.notes');
@@ -68,7 +72,7 @@ async function selectNote(id: number): Promise<VSNNote> {
         .filter(f => statSync(f).isFile)
         .map(f => vfs.readFileSync(f));
 
-    const meta: VSNNoteMeta = vfs.readJSONSync(noteMetaPath);
+    const meta: VSNNoteMeta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
     return { id, contents, meta: { category: meta.category } };
 }
 
@@ -80,7 +84,7 @@ export async function createNote(dpath: string): Promise<number> {
     objectPath.set(cacheDomains, oPath, notes);
     vfs.mkdirsSync(path.join(notesDirPath, noteid.toString()));
     vfs.writeFileSync(path.join(notesDirPath, noteid.toString(), '1.txt'), '');
-    vfs.writeFileSync(path.join(notesDirPath, noteid.toString(), '.n.json'), '{"category":"default"}');
+    vfs.writeFileSync(path.join(notesDirPath, noteid.toString(), '.n.yml'), 'category: default');
     await checkout();
     return noteid;
 }
@@ -132,15 +136,26 @@ export function _selectDomain(dpath: string): any {
 async function createExampleData(): Promise<void> {
     const data: { [domain: string]: any } = {
         powershell: {
-            install: {},
-            '.notes': [1]
+            install: { '.notes': [1, 2] },
+            '.notes': []
         }
     };
+    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '1');
     vfs.writeJsonSync(domainsFilePath, data);
-    const notePath = path.join(notesDirPath, '1');
+    let notePath = path.join(notesDirPath, '1');
     vfs.mkdirsSync(notePath);
     vfs.writeFileSync(path.join(notePath, '1.txt'), 'windows');
     vfs.writeFileSync(path.join(notePath, '2.txt'), 'chose install powershell');
-    vfs.writeFileSync(path.join(notePath, '.n.yml'), '{"category":"install"}');
-    vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
+    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: install');
+    vfs.mkdirsSync(path.join(notePath, 'doc'));
+    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), 'example.');
+
+    notePath = path.join(notesDirPath, '2');
+    vfs.mkdirsSync(notePath);
+    vfs.writeFileSync(path.join(notePath, '1.txt'), 'linux');
+    vfs.writeFileSync(path.join(notePath, '2.txt'), 'yum install powershell');
+    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: install');
+
+    vfs.mkdirsSync(path.join(notePath, 'doc'));
+    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), 'example.');
 }
