@@ -142,7 +142,7 @@ async function createExampleData(): Promise<void> {
             '.notes': []
         }
     };
-    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '1');
+    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '5');
     vfs.writeJsonSync(domainsFilePath, data);
     let notePath = path.join(notesDirPath, '1');
     vfs.mkdirsSync(notePath);
