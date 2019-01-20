@@ -124,12 +124,18 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.domain.create', async (node: VSNDomainNode) => {
+        vscode.commands.registerCommand('vscode-note.domain-explorer.pin', async (dpath: string) => {
+            await vscode.commands.executeCommand('vsnPanel.update', dpath);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.domain.create', async (node?: VSNDomainNode) => {
             const name: string | undefined = await vscode.window.showInputBox();
-            if (name) {
-                createDomain(node.dpath, name);
-                vsnDomainTree.refresh();
-            }
+            if (!name) return;
+            const dpath = node ? node.dpath : '/';
+            createDomain(dpath, name);
+            vsnDomainTree.refresh();
         })
     );
 

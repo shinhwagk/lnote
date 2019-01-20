@@ -22,7 +22,7 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
             collapsibleState: (domain.domains.length >= 1 ? true : false) ? 1 : 0, // vscode.TreeItemCollapsibleState
             command: {
                 arguments: [element.dpath],
-                command: 'vsnPanel.update',
+                command: 'vscode-note.domain-explorer.pin',
                 title: 'Show Vscode Note'
             },
             contextValue: 'vsnDomainNode',

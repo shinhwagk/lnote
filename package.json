@@ -1,8 +1,8 @@
 {
     "name": "vscode-note",
     "displayName": "vscode-note",
-    "description": "a simple note extension.",
-    "version": "0.3.10",
+    "description": "A simple note extension.",
+    "version": "0.3.11",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -63,6 +63,11 @@
                     "command": "vscode-note.edit-explorer.close",
                     "group": "navigation",
                     "when": "view == vsnoteEditExplorer"
+                },
+                {
+                    "command": "vscode-note.domain.create",
+                    "group": "navigation",
+                    "when": "view == vsnoteDomainExplorer"
                 }
             ],
             "view/item/context": [
@@ -113,7 +118,11 @@
             },
             {
                 "command": "vscode-note.domain.create",
-                "title": "New Domain"
+                "title": "New Domain",
+                "icon": {
+                    "light": "images/light/add.svg",
+                    "dark": "images/dark/add.svg"
+                }
             },
             {
                 "command": "vscode-note.domain.rename",
