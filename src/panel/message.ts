@@ -12,6 +12,7 @@ export namespace ToWebView {
     export interface VSNWVNote {
         id: number;
         contents: string[];
+        doc: boolean;
     }
 
     export interface DomainData {

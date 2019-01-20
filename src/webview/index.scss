@@ -1,6 +1,7 @@
 table,
 td {
     border: 1px solid white;
+    // padding: 10px;\
 }
 
 tr {
@@ -9,4 +10,8 @@ tr {
 
 .id {
     width: 5%;
+}
+
+pre {
+    margin: 10px;
 }

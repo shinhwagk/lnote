@@ -113,7 +113,10 @@ export function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
         if (!testCategoryExist(n.meta.category)) {
             categorys.push({ name: n.meta.category, notes: [] });
         }
-        categorys.filter(c => c.name === n.meta.category)[0].notes.push({ id: n.id, contents: n.contents });
+
+        categorys
+            .filter(c => c.name === n.meta.category)[0]
+            .notes.push({ id: n.id, contents: n.contents, doc: n.meta.doc });
     }
     return { name, categorys };
 }

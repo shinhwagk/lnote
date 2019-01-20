@@ -24,23 +24,29 @@ function VSNNotes(props: twv.VSNWVNote) {
         </td>
     ));
 
-    const domId = props.id === 123 ? <a onClick={viewDoc(props.id)}>{props.id}</a> : <span>{props.id}</span>;
+    const domId = props.doc ? <a onClick={viewDoc(props.id)}>{props.id}</a> : <span>{props.id}</span>;
 
     return (
         <tr>
-            <td className="id">{domId}</td>
+            <td className="id">
+                <pre>{domId}</pre>
+            </td>
             {contents}
             <td>
-                <a onClick={editNote(props.id)}>
-                    <FontAwesomeIcon inverse icon={faPen} />
-                </a>
+                <pre>
+                    <a onClick={editNote(props.id)}>
+                        <FontAwesomeIcon inverse icon={faPen} />
+                    </a>
+                </pre>
             </td>
         </tr>
     );
 }
 
 function VSNCategory(props: twv.VSNWVCategory) {
-    const listnote = props.notes.map((note: any) => <VSNNotes id={note.id} contents={note.contents} />);
+    const listnote = props.notes.map((note: twv.VSNWVNote) => (
+        <VSNNotes id={note.id} contents={note.contents} doc={note.doc} />
+    ));
     return (
         <div>
             <h3>{props.name}</h3>

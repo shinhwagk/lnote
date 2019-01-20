@@ -19,6 +19,7 @@ export interface VSNNote {
 
 interface VSNNoteMeta {
     category: string;
+    doc: boolean;
 }
 
 let dbDirPath: string;
@@ -49,7 +50,7 @@ async function cacheDB(): Promise<void> {
 }
 
 export function selectDocReameFilePath(nId: number): string {
-    return path.join(notesDirPath, 'docs', nId.toString(), 'README.md');
+    return path.join(notesDirPath, nId.toString(), 'doc', 'README.md');
 }
 
 export async function selectDomain(dpath: string): Promise<VSNDomain> {
@@ -73,7 +74,8 @@ async function selectNote(id: number): Promise<VSNNote> {
         .map(f => vfs.readFileSync(f));
 
     const meta: VSNNoteMeta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
-    return { id, contents, meta: { category: meta.category } };
+    const existDoc = existsSync(selectDocReameFilePath(id));
+    return { id, contents, meta: { category: meta.category, doc: existDoc } };
 }
 
 export async function createNote(dpath: string): Promise<number> {
@@ -155,7 +157,4 @@ async function createExampleData(): Promise<void> {
     vfs.writeFileSync(path.join(notePath, '1.txt'), 'linux');
     vfs.writeFileSync(path.join(notePath, '2.txt'), 'yum install powershell');
     vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: install');
-
-    vfs.mkdirsSync(path.join(notePath, 'doc'));
-    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), 'example.');
 }

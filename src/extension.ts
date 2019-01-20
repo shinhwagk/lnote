@@ -62,8 +62,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.doc.showPreview', async (nId: number) => {
             const rp = selectDocReameFilePath(nId);
             const uri = vscode.Uri.file(rp);
-            vscode.commands.executeCommand('markdown.showPreviewToSide', uri, {});
-            vscode.window.showTextDocument(uri, { viewColumn: vscode.ViewColumn.Two });
+            vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
         })
     );
 

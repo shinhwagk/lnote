@@ -23,7 +23,7 @@ const exampleDataDomains: { [domain: string]: any } = {
 const exampleDataNote: VSNNote = {
     id: 1,
     contents: ['test', 'select * from dual;'],
-    meta: { category: 'test' }
+    meta: { category: 'test', doc: true }
 };
 
 const tdl: TestFileStructure[] = [
