@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "a simple note extension.",
-    "version": "0.3.2",
+    "version": "0.3.4",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -78,7 +78,7 @@
                 },
                 {
                     "command": "vscode-note.domain.rename",
-                    "title": "New Domain",
+                    "when": "view == vsnoteDomainExplorer",
                     "group": "domain"
                 },
                 {
@@ -95,9 +95,10 @@
         },
         "configuration": [
             {
+                "type": "object",
                 "title": "VScode Note",
                 "properties": {
-                    "vsnote.dbpath": {
+                    "vscode-note.dbpath": {
                         "type": "string",
                         "default": "~/.vscode-note",
                         "description": "data location"

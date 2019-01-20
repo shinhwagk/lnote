@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { ToWebView as twv, ToExtension as te } from '../panel/message';
-import ReactTable from 'react-table';
+
 import './index.scss';
 
 interface vscode {
@@ -54,19 +54,11 @@ function VNSDomain(props: twv.VSNWVDomain) {
     const listCategory = categorys.map((category: twv.VSNWVCategory) => (
         <VSNCategory name={category.name} notes={category.notes} />
     ));
-    const data = [{ abc: 11 }];
-    const columns = [
-        {
-            Header: 'Name',
-            accessor: 'name'
-        }
-    ]; // String-based value accessors!
-    const TheadComponent = props => null; // a component returning null (to hide) or you could write as per your requirement
 
     return (
         <div>
             <h1>{props.name}</h1>
-            <ReactTable data={data} columns={columns} TheadComponent={TheadComponent} />
+
             <div>{listCategory} </div>
         </div>
     );

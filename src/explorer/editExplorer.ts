@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { RootNode } from './models/rootNode';
 import { NodeBase } from './models/nodeBase';
 
-export class VSNNoteEditExplorerProvider implements vscode.TreeDataProvider<NodeBase> {
+export class VSNEditExplorerProvider implements vscode.TreeDataProvider<NodeBase> {
     private _onDidChangeTreeData: vscode.EventEmitter<NodeBase> = new vscode.EventEmitter<NodeBase>();
     public readonly onDidChangeTreeData: vscode.Event<NodeBase> = this._onDidChangeTreeData.event;
 

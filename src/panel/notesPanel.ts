@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { VSNDatabase, VSNNote } from '../database';
+import { VSNNote } from '../database';
 import { ToWebView as twv } from './message';
 
 const assetsFile = (extPath: string) => (name: string) => {

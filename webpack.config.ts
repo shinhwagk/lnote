@@ -51,8 +51,8 @@ const webviewConfig: webpack.Configuration = {
         ]
     },
     externals: {
-        // react: 'React',
-        // 'react-dom': 'ReactDOM'
+        react: 'React',
+        'react-dom': 'ReactDOM'
     }
 };
 export default [webviewConfig, extConfig];
