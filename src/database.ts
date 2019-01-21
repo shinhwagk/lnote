@@ -4,7 +4,7 @@ import * as jsyml from 'js-yaml';
 import { existsSync, readdirSync, statSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import untildify = require('untildify');
-import { splitPath, vfs } from './helper';
+import { vpath, vfs } from './helper';
 
 export interface VSNDomain {
     domains: string[];
@@ -54,7 +54,7 @@ export function selectDocReameFilePath(nId: number): string {
 }
 
 export async function selectDomain(dpath: string): Promise<VSNDomain> {
-    const domain = objectPath.get(cacheDomains, splitPath(dpath));
+    const domain = objectPath.get(cacheDomains, vpath.splitPath(dpath));
     const domains: string[] = Object.keys(domain).filter(name => name !== '.notes');
     return { domains, notes: domain['.notes'] };
 }
@@ -80,7 +80,7 @@ async function selectNote(id: number): Promise<VSNNote> {
 
 export async function createNote(dpath: string): Promise<number> {
     const noteid: number = await incSeq();
-    const oPath = splitPath(path.join(dpath, '.notes'));
+    const oPath = vpath.splitPath(path.join(dpath, '.notes'));
     const notes = objectPath.get<number[]>(cacheDomains, oPath, []);
     notes.push(noteid);
     objectPath.set(cacheDomains, oPath, notes);
@@ -108,7 +108,7 @@ export async function createNodeCol(nid: number): Promise<void> {
 }
 
 export async function createDomain(dpath: string, name: string): Promise<void> {
-    const oPath = splitPath(path.join(dpath, name));
+    const oPath = vpath.splitPath(path.join(dpath, name));
     objectPath.set(cacheDomains, oPath, { '.notes': [] });
     await checkout();
 }
@@ -117,7 +117,7 @@ async function checkout(): Promise<void> {
     vfs.writeJsonSync(domainsFilePath, cacheDomains);
 }
 export async function renameDomain(dpath: any, newName: string): Promise<void> {
-    const opath = splitPath(dpath);
+    const opath = vpath.splitPath(dpath);
     const domain = _selectDomain(dpath);
     opath[opath.length - 1] = newName;
     objectPath.set(cacheDomains, opath, domain);
@@ -126,13 +126,13 @@ export async function renameDomain(dpath: any, newName: string): Promise<void> {
 }
 
 async function deleteDomain(dpath: string): Promise<void> {
-    const oPath = splitPath(dpath);
+    const oPath = vpath.splitPath(dpath);
     objectPath.del(cacheDomains, oPath);
     await checkout();
 }
 
 export function _selectDomain(dpath: string): any {
-    return objectPath.get(cacheDomains, splitPath(dpath));
+    return objectPath.get(cacheDomains, vpath.splitPath(dpath));
 }
 
 async function createExampleData(): Promise<void> {

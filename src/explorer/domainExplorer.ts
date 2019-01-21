@@ -9,8 +9,10 @@ export interface VSNDomainNode extends vscode.TreeItem {
 }
 
 export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDomainNode> {
-    private _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-    public readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: vscode.EventEmitter<VSNDomainNode> = new vscode.EventEmitter<
+        VSNDomainNode
+    >();
+    public readonly onDidChangeTreeData: vscode.Event<VSNDomainNode> = this._onDidChangeTreeData.event;
 
     public refresh(): any {
         this._onDidChangeTreeData.fire();

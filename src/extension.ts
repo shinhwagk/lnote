@@ -12,8 +12,7 @@ import {
 } from './database';
 import { VSNDomainExplorerProvider, VSNDomainNode } from './explorer/domainExplorer';
 import { VSNEditExplorerProvider } from './explorer/editExplorer';
-import { splitPath } from './helper';
-import { commands as cs } from './names.global';
+import { vpath } from './helper';
 import { VSNWebviewPanel as VSNPanel, fusionNotes } from './panel/notesPanel';
 import { NoteFileNode } from './explorer/models/noteFileNode';
 import { removeSync } from 'fs-extra';
@@ -140,8 +139,8 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand(cs.renameDomain, async (node: VSNDomainNode) => {
-            const dpaths = splitPath(node.dpath);
+        vscode.commands.registerCommand('vscode-note.domain.rename', async (node: VSNDomainNode) => {
+            const dpaths = vpath.splitPath(node.dpath);
             const oldname = dpaths[dpaths.length - 1];
             const newName: string | undefined = await vscode.window.showInputBox({ value: oldname });
             if (newName) {

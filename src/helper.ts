@@ -22,11 +22,9 @@ export namespace vfs {
     }
 }
 export namespace vpath {
-    // export function
-}
-
-export function splitPath(path: string): string[] {
-    const s = path.startsWith('/') ? path.substr(1) : path;
-    const e = s.endsWith('/') ? s.substr(0, s.length - 1) : s;
-    return e.split('/').filter(p => !!p);
+    export function splitPath(path: string): string[] {
+        const s = path.startsWith('/') ? path.substr(1) : path;
+        const e = s.endsWith('/') ? s.substr(0, s.length - 1) : s;
+        return e.split('/').filter(p => !!p);
+    }
 }
