@@ -1,9 +1,9 @@
-import * as os from 'os';
 import * as path from 'path';
 import * as jsyml from 'js-yaml';
-import { existsSync, readdirSync, statSync } from 'fs-extra';
+import { existsSync, readdirSync, statSync, mkdirSync } from 'fs-extra';
 import * as objectPath from 'object-path';
-import untildify = require('untildify');
+import { ext } from './extensionVariables';
+
 import { vpath, vfs } from './helper';
 
 export interface VSNDomain {
@@ -22,25 +22,23 @@ interface VSNNoteMeta {
     doc: boolean;
 }
 
-let dbDirPath: string;
 let notesDirPath: string;
 const noteNameRegex = /^[0-9]\.[a-z]+$/;
 let cacheDomains: any;
 let domainsFilePath: string;
 let seqFilePath: string;
 
-export async function initDB(dp?: string): Promise<void> {
-    dbDirPath = dp ? untildify(dp) : path.join(os.homedir(), '.vscode-note');
-    notesDirPath = path.join(dbDirPath, 'notes');
-    domainsFilePath = path.join(dbDirPath, 'domains.json');
-    seqFilePath = path.join(dbDirPath, 'seq');
+export async function initDB(): Promise<void> {
+    notesDirPath = path.join(ext.dbDirPath, 'notes');
+    domainsFilePath = path.join(ext.dbDirPath, 'domains.json');
+    seqFilePath = path.join(ext.dbDirPath, 'seq');
     await createDBIfNotExist();
     cacheDomains = await cacheDB();
 }
 
 async function createDBIfNotExist(): Promise<void> {
-    if (!existsSync(dbDirPath)) {
-        vfs.mkdirsSync(dbDirPath, notesDirPath);
+    if (!existsSync(ext.dbDirPath)) {
+        vfs.mkdirsSync(ext.dbDirPath, notesDirPath);
         await createExampleData();
     }
 }
@@ -84,9 +82,14 @@ export async function createNote(dpath: string): Promise<number> {
     const notes = objectPath.get<number[]>(cacheDomains, oPath, []);
     notes.push(noteid);
     objectPath.set(cacheDomains, oPath, notes);
-    vfs.mkdirsSync(path.join(notesDirPath, noteid.toString()));
-    vfs.writeFileSync(path.join(notesDirPath, noteid.toString(), '1.txt'), '');
-    vfs.writeFileSync(path.join(notesDirPath, noteid.toString(), '.n.yml'), 'category: default');
+    const notePath = path.join(notesDirPath, noteid.toString());
+
+    mkdirSync(notePath);
+    vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
+    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), '');
+    vfs.writeFileSync(path.join(notePath, '1.txt'), '');
+    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: default');
+
     await checkout();
     return noteid;
 }
@@ -142,7 +145,7 @@ async function createExampleData(): Promise<void> {
             '.notes': []
         }
     };
-    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '5');
+    vfs.writeFileSync(path.join(ext.dbDirPath, 'seq'), '5');
     vfs.writeJsonSync(domainsFilePath, data);
     let notePath = path.join(notesDirPath, '1');
     vfs.mkdirsSync(notePath);

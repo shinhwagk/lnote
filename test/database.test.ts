@@ -60,7 +60,7 @@ function removeTestData() {
 
 beforeAll(() => {
     createTestFileAndDirectory(tdl);
-    initDB(testDataPath);
+    initDB();
 });
 
 afterAll(removeTestData);

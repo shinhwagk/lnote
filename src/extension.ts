@@ -16,15 +16,22 @@ import { vpath } from './helper';
 import { VSNWebviewPanel as VSNPanel, fusionNotes } from './panel/notesPanel';
 import { NoteFileNode } from './explorer/models/noteFileNode';
 import { removeSync } from 'fs-extra';
+import { initializeExtensionVariables } from './extensionVariables';
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
 
-    const dbDirPath: string | undefined = vscode.workspace.getConfiguration('vscode-note').get('dbpath');
-
-    // vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {});
-    await initDB(dbDirPath);
+    initializeExtensionVariables(context);
+    await initDB();
     console.log('init db.');
+
+    vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
+        if (e.affectsConfiguration('vscode-note')) {
+            initializeExtensionVariables(context);
+            await initDB();
+            console.log('init db.');
+        }
+    });
 
     const globalState: vscode.Memento = context.globalState;
 
@@ -52,9 +59,10 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vsnoteEditExplorer.openFileResource', async resource =>
-            vscode.window.showTextDocument(resource, { viewColumn: vscode.ViewColumn.Two })
-        )
+        vscode.commands.registerCommand('vsnoteEditExplorer.openFileResource', async resource => {
+            console.log(resource);
+            vscode.window.showTextDocument(resource, { viewColumn: vscode.ViewColumn.Two });
+        })
     );
 
     context.subscriptions.push(

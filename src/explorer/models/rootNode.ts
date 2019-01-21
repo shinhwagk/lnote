@@ -3,9 +3,10 @@ import * as vscode from 'vscode';
 import { NoteFileNode } from './noteFileNode';
 import { NodeBase } from './nodeBase';
 import { ErrorNode } from './errorNode';
-import { readdirSync } from 'fs';
-import * as os from 'os';
+import { readdirSync, statSync } from 'fs';
+import { ext } from '../../extensionVariables';
 import * as path from 'path';
+import { FileSystemFileNode as FileSystemNode } from './filesSystemNode';
 
 export class RootNode extends NodeBase {
     constructor(
@@ -29,12 +30,10 @@ export class RootNode extends NodeBase {
                 return this.getNoteFiles();
             }
             case 'filesRootNode': {
-                return [];
-                // return this.getFilesFiles();
+                return this.getFilesFiles();
             }
             case 'docRootNode': {
-                return [];
-                // return this.getDocFiles();
+                return await this.getDocFiles();
             }
             default: {
                 throw new Error(`Unexpected contextValue ${element.contextValue}`);
@@ -42,14 +41,13 @@ export class RootNode extends NodeBase {
         }
     }
     async getNoteFiles(): Promise<(NoteFileNode | ErrorNode)[]> {
-        const nFiles: NoteFileNode[] = [];
+        const nNodes: NoteFileNode[] = [];
         const nid = this.globalStorage.get<number>('nid');
         if (!nid) {
-            return nFiles;
+            return nNodes;
         }
 
-        const dbPath = vscode.workspace.getConfiguration('vscode-note').get<string>('dbPath', os.homedir());
-        const notePath = path.join(dbPath, '.vscode-note', 'notes', nid.toString());
+        const notePath = path.join(ext.dbDirPath, 'notes', nid.toString());
 
         const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
 
@@ -57,18 +55,43 @@ export class RootNode extends NodeBase {
 
         for (const f of fs) {
             const uri = vscode.Uri.file(path.join(notePath, f));
-            nFiles.push(new NoteFileNode(f, uri));
+            nNodes.push(new NoteFileNode(f, uri));
         }
         const uri = vscode.Uri.file(path.join(notePath, '.n.yml'));
-        nFiles.push(new NoteFileNode('.n.yml', uri));
-        return nFiles;
+        nNodes.push(new NoteFileNode('.n.yml', uri));
+        return nNodes;
     }
     async getFilesFiles() {
-        // const fFiles: FilesFileNode[] = [];
-        // return fFiles;
+        const fnodes: FileSystemNode[] = [];
+        const nid = this.globalStorage.get<number>('nid');
+        if (!nid) return fnodes;
+
+        const docPath = path.join(ext.dbDirPath, 'notes', nid.toString(), 'files');
+
+        for (const f of readdirSync(docPath)) {
+            const p = path.join(docPath, f);
+            const stat = statSync(p);
+            const fileType = stat.isDirectory ? vscode.FileType.Directory : vscode.FileType.File;
+            const fsn = new FileSystemNode(f, vscode.Uri.file(p), fileType);
+            fnodes.push(fsn);
+        }
+
+        return fnodes;
     }
     async getDocFiles() {
-        // const dFiles: DocFileNode[] = [];
-        // return dFiles;
+        const fnodes: FileSystemNode[] = [];
+        const nid = this.globalStorage.get<number>('nid');
+        if (!nid) return fnodes;
+
+        const docFsPath = path.join(ext.dbDirPath, 'notes', nid.toString(), 'doc');
+
+        for (const cf of readdirSync(docFsPath)) {
+            const p = path.join(docFsPath, cf);
+            const stat = statSync(p);
+            const fileType = stat.isDirectory() ? vscode.FileType.Directory : vscode.FileType.File;
+            const fsn = new FileSystemNode(cf, vscode.Uri.file(p), fileType);
+            fnodes.push(fsn);
+        }
+        return fnodes;
     }
 }
