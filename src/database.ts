@@ -85,10 +85,13 @@ export async function createNote(dpath: string): Promise<number> {
     const notePath = path.join(notesDirPath, noteid.toString());
 
     mkdirSync(notePath);
-    vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
-    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), '');
+
     vfs.writeFileSync(path.join(notePath, '1.txt'), '');
     vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: default');
+
+    vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
+    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), '');
+    vfs.writeFileSync(path.join(notePath, 'files', 'main.ts'), '');
 
     await checkout();
     return noteid;
@@ -106,7 +109,7 @@ async function incSeq(): Promise<number> {
 
 export async function createNodeCol(nid: number): Promise<void> {
     const notePath = path.join(notesDirPath, nid.toString());
-    const cnt = readdirSync(notePath).length;
+    const cnt = readdirSync(notePath).length - 2;
     vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
 }
 

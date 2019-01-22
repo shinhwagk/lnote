@@ -11,10 +11,9 @@ import {
     selectDocReameFilePath
 } from './database';
 import { VSNDomainExplorerProvider, VSNDomainNode } from './explorer/domainExplorer';
-import { VSNEditExplorerProvider } from './explorer/editExplorer';
+import { VSNSampleEditExplorerProvider } from './explorer/sampleEditExplorer';
 import { vpath } from './helper';
 import { VSNWebviewPanel as VSNPanel, fusionNotes } from './panel/notesPanel';
-import { NoteFileNode } from './explorer/models/noteFileNode';
 import { removeSync } from 'fs-extra';
 import { initializeExtensionVariables } from './extensionVariables';
 
@@ -42,7 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const vsnPanel = new VSNPanel(context);
     console.log('vsn webview explorer startup.');
 
-    const vsnEditTree = new VSNEditExplorerProvider(globalState);
+    const vsnEditTree = new VSNSampleEditExplorerProvider();
     vscode.window.createTreeView('vsnoteEditExplorer', { treeDataProvider: vsnEditTree });
     console.log('vsn tree edit explorer startup.');
 
@@ -53,6 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vsnPanel.update', async (dpath: string) => {
             vsnPanel.initIfNeed();
             const notes: VSNNote[] = await selectNotes(dpath);
+            if (notes.length === 0) return;
             const vsnDomain = fusionNotes(path.basename(dpath), notes);
             vsnPanel.updateWebviewContent(vsnDomain);
         })
@@ -111,11 +111,9 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand(
             'vscode-note.edit-explorer.note.col.remove',
-            async (f: NoteFileNode) => {
-                removeSync(f.uri.fsPath);
+            async (f: vscode.TreeItem) => {
+                removeSync(f.resourceUri!.fsPath);
                 vsnEditTree.refresh();
-
-                // vsndb.deleteNodeCol(t.resourceUri.fsPath);
             }
         )
     );

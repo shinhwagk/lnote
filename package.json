@@ -56,8 +56,9 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "vsnoteEditExplorer.openFileResource",
-                    "group": "navigation"
+                    "command": "vscode-note.edit-explorer.note.col.add",
+                    "group": "navigation",
+                    "when": "view == vsnoteEditExplorer"
                 },
                 {
                     "command": "vscode-note.edit-explorer.close",
@@ -87,13 +88,8 @@
                     "group": "domain"
                 },
                 {
-                    "command": "vscode-note.edit-explorer.note.col.add",
-                    "when": "view == vsnoteEditExplorer && viewItem == noteRootNode",
-                    "group": "inline"
-                },
-                {
                     "command": "vscode-note.edit-explorer.note.col.remove",
-                    "when": "view == vsnoteEditExplorer && viewItem == localNodeFileNode",
+                    "when": "view == vsnoteEditExplorer && viewItem == editNoteNode",
                     "group": "inline"
                 }
             ]
