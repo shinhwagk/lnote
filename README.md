@@ -12,9 +12,9 @@ a simple note extension.
 
 ## Features
 
-1. recode your note in row
-2. recode your example files in folder
-3. recode your note with document in folder (document just a markdown)
+1. record your note in row
+2. record your example files in folder
+3. record your note with document in folder (document just a markdown)
 
 ## Source
 
