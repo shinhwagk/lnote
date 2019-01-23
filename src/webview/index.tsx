@@ -32,7 +32,7 @@ function VSNNotes(props: twv.VSNWVNote) {
                 <pre>{domId}</pre>
             </td>
             {contents}
-            <td>
+            <td className="edit">
                 <pre>
                     <a onClick={editNote(props.id)}>
                         <FontAwesomeIcon inverse icon={faPen} />
@@ -47,6 +47,7 @@ function VSNCategory(props: twv.VSNWVCategory) {
     const listnote = props.notes.map((note: twv.VSNWVNote) => (
         <VSNNotes id={note.id} contents={note.contents} doc={note.doc} />
     ));
+
     return (
         <div>
             <h3>{props.name}</h3>
@@ -64,7 +65,6 @@ function VNSDomain(props: twv.VSNWVDomain) {
     return (
         <div>
             <h1>{props.name}</h1>
-
             <div>{listCategory} </div>
         </div>
     );

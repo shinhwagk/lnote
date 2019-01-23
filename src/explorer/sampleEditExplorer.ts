@@ -21,15 +21,10 @@ export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem>
     }
 
     public async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        if (!element) {
-            const nodes: TreeItem[] = [];
-            const nid = ext.context.globalState.get<number>('nid');
-            if (!nid) return [];
-            (await getNoteFiles(nid)).forEach(n => nodes.push(n));
-            nodes.push(await getDocMainFile(nid));
-            return nodes;
-        }
-        return [];
+        const nid = ext.context.globalState.get<number>('nid');
+        if (element) return [];
+        if (!nid) return [];
+        return (await getNoteFiles(nid)).concat(await getDocMainFile(nid));
     }
 }
 
@@ -54,7 +49,6 @@ async function getNoteFiles(nid: number): Promise<TreeItem[]> {
         });
 
     const uri = Uri.file(path.join(notePath, '.n.yml'));
-
     nodes.push(new TreeItem(uri, 0));
     return nodes;
 }

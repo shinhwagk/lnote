@@ -37,19 +37,14 @@
                     "name": "domain"
                 },
                 {
-                    "id": "vsnoteFilesExplorer",
-                    "name": "files",
-                    "when": "extension.files"
-                },
-                {
-                    "id": "vsnoteDocsExplorer",
-                    "name": "docs",
-                    "when": "extension.docs"
-                },
-                {
                     "id": "vsnoteEditExplorer",
                     "name": "note edit",
-                    "when": "extension.note.edit"
+                    "when": "vscode-note.note.edit"
+                },
+                {
+                    "id": "vsnoteFilesExplorer",
+                    "name": "files",
+                    "when": "vscode-note.note.files"
                 }
             ]
         },
@@ -66,9 +61,18 @@
                     "when": "view == vsnoteEditExplorer"
                 },
                 {
+                    "command": "vscode-note.files-explorer.close",
+                    "group": "navigation",
+                    "when": "view == vsnoteFilesExplorer"
+                },
+                {
                     "command": "vscode-note.domain.create",
                     "group": "navigation",
                     "when": "view == vsnoteDomainExplorer"
+                },
+                {
+                    "command": "vscode-note.note.files.edit",
+                    "when": "view == vsnoteEditExplorer"
                 }
             ],
             "view/item/context": [
@@ -141,6 +145,14 @@
                 }
             },
             {
+                "command": "vscode-note.files-explorer.close",
+                "title": "Close",
+                "icon": {
+                    "light": "images/light/close.svg",
+                    "dark": "images/dark/close.svg"
+                }
+            },
+            {
                 "command": "vscode-note.edit-explorer.note.col.add",
                 "title": "Add Col",
                 "icon": {
@@ -155,6 +167,10 @@
                     "light": "images/light/close.svg",
                     "dark": "images/dark/close.svg"
                 }
+            },
+            {
+                "command": "vscode-note.note.files.edit",
+                "title": "edit files"
             }
         ]
     },
@@ -171,8 +187,6 @@
     "devDependencies": {
         "@babel/core": "^7.2.2",
         "@babel/preset-react": "^7.0.0",
-        "@types/clean-webpack-plugin": "^0.1.2",
-        "@types/copy-webpack-plugin": "^4.4.2",
         "@types/fs-extra": "^5.0.4",
         "@types/html-webpack-plugin": "^3.2.0",
         "@types/jest": "^23.3.13",
@@ -184,24 +198,22 @@
         "@types/react-table": "^6.7.21",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
-        "@types/webpack": "^4.4.23",
+        "@types/webpack": "^4.4.24",
         "babel-loader": "^8.0.5",
-        "clean-webpack-plugin": "^1.0.0",
-        "copy-webpack-plugin": "^4.6.0",
         "css-loader": "^2.1.0",
         "jest": "^23.6.0",
         "node-sass": "^4.11.0",
-        "prettier": "^1.15.3",
+        "prettier": "^1.16.1",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.23.1",
         "ts-jest": "^23.10.5",
         "ts-loader": "^5.3.3",
-        "ts-node": "^7.0.1",
+        "ts-node": "^8.0.1",
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.17.0",
         "tslint-react": "^3.6.0",
         "typescript": "^3.2.4",
-        "webpack": "^4.28.4",
+        "webpack": "^4.29.0",
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {
@@ -211,12 +223,10 @@
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.12.1",
         "object-path": "^0.11.4",
-        "rc-table": "^6.4.3",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",
-        "react-table": "^6.8.6",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3",
-        "vscode": "^1.1.26"
+        "vscode": "^1.1.27"
     }
 }

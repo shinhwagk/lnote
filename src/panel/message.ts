@@ -5,7 +5,7 @@ export namespace ToWebView {
     }
 
     export interface VSNWVCategory {
-        name: string;
+        name?: string;
         notes: VSNWVNote[];
     }
 

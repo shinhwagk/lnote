@@ -3,7 +3,6 @@ import * as jsyml from 'js-yaml';
 import { existsSync, readdirSync, statSync, mkdirSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import { ext } from './extensionVariables';
-
 import { vpath, vfs } from './helper';
 
 export interface VSNDomain {
@@ -47,7 +46,7 @@ async function cacheDB(): Promise<void> {
     return vfs.readJSONSync(domainsFilePath);
 }
 
-export function selectDocReameFilePath(nId: number): string {
+export function selectDocReadmeFilePath(nId: number): string {
     return path.join(notesDirPath, nId.toString(), 'doc', 'README.md');
 }
 
@@ -71,9 +70,9 @@ async function selectNote(id: number): Promise<VSNNote> {
         .filter(f => statSync(f).isFile)
         .map(f => vfs.readFileSync(f));
 
-    const meta: VSNNoteMeta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
-    const existDoc = existsSync(selectDocReameFilePath(id));
-    return { id, contents, meta: { category: meta.category, doc: existDoc } };
+    const meta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
+    const existDoc = statSync(selectDocReadmeFilePath(id)).size >= 1;
+    return { id, contents, meta: { category: meta.category || 'default', doc: existDoc } };
 }
 
 export async function createNote(dpath: string): Promise<number> {
@@ -87,11 +86,11 @@ export async function createNote(dpath: string): Promise<number> {
     mkdirSync(notePath);
 
     vfs.writeFileSync(path.join(notePath, '1.txt'), '');
-    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: default');
+    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category:');
 
     vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
     vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), '');
-    vfs.writeFileSync(path.join(notePath, 'files', 'main.ts'), '');
+    vfs.writeFileSync(path.join(notePath, 'files', 'main.txt'), '');
 
     await checkout();
     return noteid;

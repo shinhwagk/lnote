@@ -4,30 +4,26 @@ import * as vscode from 'vscode';
 
 import { VSNNote } from '../database';
 import { ToWebView as twv } from './message';
+import { ext } from '../extensionVariables';
 
-const assetsFile = (extPath: string) => (name: string) => {
-    const file = path.join(extPath, 'out', name);
+const assetsFile = (name: string) => {
+    const file = path.join(ext.context.extensionPath, 'out', name);
     return vscode.Uri.file(file)
-        .with({
-            scheme: 'vscode-resource'
-        })
+        .with({ scheme: 'vscode-resource' })
         .toString();
 };
 
-function getWebviewContent(extPath: string) {
-    const wFile = assetsFile(extPath);
+function getWebviewContent() {
     return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cat Coding</title>
-        <!-- <script src="${wFile('react.production.min.js')}" crossorigin></script> -->
-        <!-- <script src="${wFile('react-dom.production.min.js')}" crossorigin></script> -->
+        <title>vscode-note</title>
 	</head>
     <body>
         <div id="root"></div>
-        <script src="${wFile('main.wv.js')}"></script>
+        <script src="${assetsFile('main.wv.js')}"></script>
 	</body>
 	</html>`;
 }
@@ -93,7 +89,7 @@ export class VSNWebviewPanel {
             undefined,
             this.context.subscriptions
         );
-        this.panel!.webview.html = getWebviewContent(this.extPath);
+        this.panel!.webview.html = getWebviewContent();
     }
 
     private createPanel() {
