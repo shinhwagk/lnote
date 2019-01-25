@@ -21,8 +21,8 @@ export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem>
     }
 
     public async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const nid = ext.context.globalState.get<number>('nid');
         if (element) return [];
+        const nid = ext.context.globalState.get<number>('nid');
         if (!nid) return [];
         return (await getNoteFiles(nid)).concat(await getDocMainFile(nid));
     }

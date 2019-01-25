@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.5.1",
+    "version": "0.5.4",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -73,6 +73,10 @@
                 {
                     "command": "vscode-note.note.files.edit",
                     "when": "view == vsnoteEditExplorer"
+                },
+                {
+                    "command": "vscode-note.note.delete",
+                    "when": "view == vsnoteEditExplorer"
                 }
             ],
             "view/item/context": [
@@ -115,6 +119,10 @@
             {
                 "command": "vscode-note.note.create",
                 "title": "New Note"
+            },
+            {
+                "command": "vscode-note.note.delete",
+                "title": "delete note"
             },
             {
                 "command": "vscode-note.domain.create",
@@ -192,6 +200,7 @@
         "@types/jest": "^23.3.13",
         "@types/js-yaml": "^3.12.0",
         "@types/node": "^10.12.18",
+        "@types/nodegit": "^0.22.7",
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.7.20",
         "@types/react-dom": "^16.0.11",
@@ -222,6 +231,7 @@
         "@fortawesome/react-fontawesome": "^0.1.4",
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.12.1",
+        "nodegit": "^0.24.0",
         "object-path": "^0.11.4",
         "react": "^16.7.0",
         "react-dom": "^16.7.0",

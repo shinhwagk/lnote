@@ -71,7 +71,8 @@ async function selectNote(id: number): Promise<VSNNote> {
         .map(f => vfs.readFileSync(f));
 
     const meta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
-    const existDoc = statSync(selectDocReadmeFilePath(id)).size >= 1;
+    const existDoc =
+        existsSync(selectDocReadmeFilePath(id)) && statSync(selectDocReadmeFilePath(id)).size >= 1;
     return { id, contents, meta: { category: meta.category || 'default', doc: existDoc } };
 }
 
@@ -136,6 +137,13 @@ async function deleteDomain(dpath: string): Promise<void> {
     await checkout();
 }
 
+export async function deleteNote(dpath: string, noteId: number): Promise<void> {
+    const domain = objectPath.get(cacheDomains, vpath.splitPath(dpath));
+    const newNotes = domain['.notes'].filter((i: number) => i !== noteId);
+    objectPath.set(cacheDomains, vpath.splitPath(path.join(dpath, '.notes')), newNotes);
+    await checkout();
+}
+
 export function _selectDomain(dpath: string): any {
     return objectPath.get(cacheDomains, vpath.splitPath(dpath));
 }
@@ -149,17 +157,25 @@ async function createExampleData(): Promise<void> {
     };
     vfs.writeFileSync(path.join(ext.dbDirPath, 'seq'), '5');
     vfs.writeJsonSync(domainsFilePath, data);
-    let notePath = path.join(notesDirPath, '1');
-    vfs.mkdirsSync(notePath);
-    vfs.writeFileSync(path.join(notePath, '1.txt'), 'windows');
-    vfs.writeFileSync(path.join(notePath, '2.txt'), 'chose install powershell');
-    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: install');
-    vfs.mkdirsSync(path.join(notePath, 'doc'));
-    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), 'example.');
 
-    notePath = path.join(notesDirPath, '2');
-    vfs.mkdirsSync(notePath);
-    vfs.writeFileSync(path.join(notePath, '1.txt'), 'linux');
-    vfs.writeFileSync(path.join(notePath, '2.txt'), 'yum install powershell');
-    vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category: install');
+    let notePath_1 = path.join(notesDirPath, '1');
+    let notePath_2 = path.join(notesDirPath, '2');
+    vfs.mkdirsSync(notePath_1, notePath_2);
+
+    vfs.writeFileSync(path.join(notePath_1, '1.txt'), 'windows');
+    vfs.writeFileSync(path.join(notePath_1, '2.txt'), 'chose install powershell');
+    vfs.writeFileSync(path.join(notePath_1, '.n.yml'), 'category: install');
+    vfs.mkdirsSync(path.join(notePath_1, 'doc'));
+    vfs.writeFileSync(path.join(notePath_1, 'doc', 'README.md'), 'example.');
+    vfs.mkdirsSync(path.join(notePath_1, 'files'));
+    vfs.writeFileSync(path.join(notePath_1, 'files', 'example_01.txt'), 'example 01.');
+    vfs.writeFileSync(path.join(notePath_1, 'files', 'example_02.txt'), 'example 02.');
+
+    vfs.writeFileSync(path.join(notePath_2, '1.txt'), 'linux');
+    vfs.writeFileSync(path.join(notePath_2, '2.txt'), 'yum install powershell');
+    vfs.writeFileSync(path.join(notePath_2, '.n.yml'), 'category: install');
+    vfs.mkdirsSync(path.join(notePath_2, 'doc'));
+    vfs.writeFileSync(path.join(notePath_2, 'doc', 'README.md'), 'example.');
+    vfs.mkdirsSync(path.join(notePath_2, 'files'));
+    vfs.writeFileSync(path.join(notePath_2, 'files', 'example.txt'), 'example.');
 }

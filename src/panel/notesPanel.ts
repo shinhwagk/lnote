@@ -32,13 +32,6 @@ export class VSNWebviewPanel {
     public panel: vscode.WebviewPanel | undefined = undefined;
     private state: boolean = false;
     private trayCnt: number = 0;
-    private extPath: string;
-    private context: vscode.ExtensionContext;
-
-    constructor(context: vscode.ExtensionContext) {
-        this.extPath = context.extensionPath;
-        this.context = context;
-    }
 
     public initIfNeed() {
         if (!this.state) {
@@ -71,7 +64,7 @@ export class VSNWebviewPanel {
                 console.log('vsnote webview closed.');
             },
             null,
-            this.context.subscriptions
+            ext.context.subscriptions
         );
         this.panel!.webview.onDidReceiveMessage(
             message => {
@@ -87,7 +80,7 @@ export class VSNWebviewPanel {
                 }
             },
             undefined,
-            this.context.subscriptions
+            ext.context.subscriptions
         );
         this.panel!.webview.html = getWebviewContent();
     }
@@ -95,7 +88,7 @@ export class VSNWebviewPanel {
     private createPanel() {
         this.panel = vscode.window.createWebviewPanel('catCoding', 'vscode-note', vscode.ViewColumn.One, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(this.extPath, 'out'))]
+            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
         });
     }
 }

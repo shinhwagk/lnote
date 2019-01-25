@@ -1,7 +1,5 @@
 import * as path from 'path';
-
 import * as vscode from 'vscode';
-
 import { selectDomain } from '../database';
 
 export interface VSNDomainNode extends vscode.TreeItem {
