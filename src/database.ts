@@ -50,6 +50,17 @@ export function selectDocReadmeFilePath(nId: number): string {
     return path.join(notesDirPath, nId.toString(), 'doc', 'README.md');
 }
 
+export async function selectDomainNotesCount(dpath: string): Promise<number> {
+    const domain = await selectDomain(dpath);
+    if (domain.domains.length === 0) return domain.notes.length;
+    let total = 0;
+    for (const d of domain.domains) {
+        const dp = path.join(dpath, d);
+        total += (await selectDomainNotesCount(dp)) + domain.notes.length;
+    }
+    return total;
+}
+
 export function selectFilesExist(nId: number): boolean {
     const filesDirPath = path.join(notesDirPath, nId.toString(), 'files');
     const files = readdirSync(filesDirPath);

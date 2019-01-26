@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { selectDomain } from '../database';
+import { selectDomain, selectDomainNotesCount } from '../database';
 
 export interface VSNDomainNode extends vscode.TreeItem {
     dpath: string;
@@ -26,7 +26,8 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
                 title: 'Show Vscode Note'
             },
             contextValue: 'vsnDomainNode',
-            label: path.basename(element.dpath)
+            label: path.basename(element.dpath),
+            description: `${domain.notes.length}/${await selectDomainNotesCount(element.dpath)}`
         };
     }
 
