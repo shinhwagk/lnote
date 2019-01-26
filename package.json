@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -77,6 +77,10 @@
                 {
                     "command": "vscode-note.note.delete",
                     "when": "view == vsnoteEditExplorer"
+                },
+                {
+                    "command": "vscode-note.files-explorer.openTerminal",
+                    "when": "view == vsnoteFilesExplorer"
                 }
             ],
             "view/item/context": [
@@ -179,6 +183,10 @@
             {
                 "command": "vscode-note.note.files.edit",
                 "title": "edit files"
+            },
+            {
+                "command": "vscode-note.files-explorer.openTerminal",
+                "title": "open terminal"
             }
         ]
     },

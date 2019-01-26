@@ -160,6 +160,18 @@ export async function activate(context: vscode.ExtensionContext) {
             ext.vsnPanel.updateWebviewContent(vsnDomain);
         })
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.files-explorer.openTerminal', async () => {
+            const nId = ext.context.globalState.get<number>('nid');
+            const dpath = ext.context.globalState.get<string>('dpath');
+            if (!nId || !dpath) return;
+            vscode.window.showInformationMessage('open t');
+            const filePath = path.join(ext.dbDirPath, 'notes', nId.toString(), 'files');
+            const fileTerminal = vscode.window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
+            fileTerminal.show(true);
+        })
+    );
 }
 
 export function deactivate() {}

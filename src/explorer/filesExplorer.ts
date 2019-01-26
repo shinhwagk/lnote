@@ -17,7 +17,6 @@ export class VSNFilesExplorerProvider implements TreeDataProvider<TreeItem> {
 
     async getChildren(element?: TreeItem | undefined): Promise<TreeItem[]> {
         const nid = ext.context.globalState.get<number>('nid');
-        console.log(nid);
         if (!element) {
             if (!nid) return [];
             const noteFileDirPath = join(ext.dbDirPath, 'notes', nid.toString(), 'files');
