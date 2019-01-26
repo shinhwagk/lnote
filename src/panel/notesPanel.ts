@@ -105,7 +105,7 @@ export function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
 
         categorys
             .filter(c => c.name === n.meta.category)[0]
-            .notes.push({ id: n.id, contents: n.contents, doc: n.meta.doc });
+            .notes.push({ id: n.id, contents: n.contents, doc: n.meta.docOrFiles });
     }
     return { name, categorys };
 }

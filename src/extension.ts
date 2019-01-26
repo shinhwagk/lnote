@@ -8,7 +8,8 @@ import {
     createDomain,
     renameDomain,
     selectDocReadmeFilePath,
-    deleteNote
+    deleteNote,
+    selectFilesExist
 } from './database';
 import { VSNDomainNode } from './explorer/domainExplorer';
 import { vpath } from './helper';
@@ -59,6 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
             ext.context.globalState.update('nid', nId);
             const uri = vscode.Uri.file(selectDocReadmeFilePath(nId));
             await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
+            if (!selectFilesExist(nId)) return;
             ext.vsnFilesProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })

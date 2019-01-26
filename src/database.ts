@@ -18,7 +18,7 @@ export interface VSNNote {
 
 interface VSNNoteMeta {
     category: string;
-    doc: boolean;
+    docOrFiles: boolean;
 }
 
 let notesDirPath: string;
@@ -50,6 +50,12 @@ export function selectDocReadmeFilePath(nId: number): string {
     return path.join(notesDirPath, nId.toString(), 'doc', 'README.md');
 }
 
+export function selectFilesExist(nId: number): boolean {
+    const filesDirPath = path.join(notesDirPath, nId.toString(), 'files');
+    const files = readdirSync(filesDirPath);
+    return files.length >= 2 || statSync(path.join(filesDirPath, files[0])).size >= 1;
+}
+
 export async function selectDomain(dpath: string): Promise<VSNDomain> {
     const domain = objectPath.get(cacheDomains, vpath.splitPath(dpath));
     const domains: string[] = Object.keys(domain).filter(name => name !== '.notes');
@@ -73,7 +79,12 @@ async function selectNote(id: number): Promise<VSNNote> {
     const meta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
     const existDoc =
         existsSync(selectDocReadmeFilePath(id)) && statSync(selectDocReadmeFilePath(id)).size >= 1;
-    return { id, contents, meta: { category: meta.category || 'default', doc: existDoc } };
+    const existFiles = selectFilesExist(id);
+    return {
+        id,
+        contents,
+        meta: { category: meta.category || 'default', docOrFiles: existDoc || existFiles }
+    };
 }
 
 export async function createNote(dpath: string): Promise<number> {
