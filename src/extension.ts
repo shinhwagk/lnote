@@ -11,6 +11,7 @@ import {
     deleteNote,
     selectFilesExist
 } from './database';
+import * as vsnPanel from './panel/notesPanel';
 import { VSNDomainNode } from './explorer/domainExplorer';
 import { vpath } from './helper';
 import { fusionNotes } from './panel/notesPanel';
@@ -35,7 +36,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const notes: VSNNote[] = await selectNotes(dpath);
             if (notes.length === 0) return;
             const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            ext.vsnPanel.updateContent(vsnDomain);
+            vsnPanel.updateContent(vsnDomain);
         })
     );
 
@@ -169,7 +170,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (sqp === 'Yes') await deleteNote(dpath, nId);
             const notes: VSNNote[] = await selectNotes(dpath);
             const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            ext.vsnPanel.updateContent(vsnDomain);
+            vsnPanel.updateContent(vsnDomain);
         })
     );
 

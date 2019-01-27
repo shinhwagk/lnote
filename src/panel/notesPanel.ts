@@ -28,65 +28,63 @@ function getWebviewContent() {
 	</html>`;
 }
 
-export class VSNWebviewPanel {
-    public panel: vscode.WebviewPanel | undefined = undefined;
-    private state: boolean = false;
-    private tryCnt: number = 0;
+let panel: vscode.WebviewPanel | undefined = undefined;
+let state: boolean = false;
+let tryCnt: number = 0;
 
-    public updateContent(domain: twv.VSNWVDomain): void {
-        if (!this.panel) this.init();
+export function updateContent(domain: twv.VSNWVDomain): void {
+    if (!panel) init();
 
-        if (this.tryCnt >= 50) {
-            vscode.window.showErrorMessage('webview update failse 50 times.');
-            return;
-        }
-        if (!this.state) {
-            setTimeout(() => this.updateContent(domain), 100);
-            this.tryCnt += 1;
-            return;
-        }
-        if (this.panel) {
-            this.tryCnt = 0;
-            this.panel.webview.postMessage({ command: 'data', data: domain });
-        }
+    if (tryCnt >= 50) {
+        vscode.window.showErrorMessage('webview update failse 50 times.');
+        return;
     }
-
-    private init() {
-        this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
-            enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
-        });
-        this.panel.onDidDispose(
-            () => {
-                this.panel = undefined;
-                this.state = false;
-                console.log('vsnote webview closed.');
-            },
-            null,
-            ext.context.subscriptions
-        );
-        this.panel.webview.onDidReceiveMessage(
-            message => {
-                switch (message.command) {
-                    case 'ready':
-                        this.state = message.data;
-                        break;
-                    case 'edit':
-                        vscode.commands.executeCommand('vscode-note.note.edit', message.data);
-                        break;
-                    case 'doc':
-                        vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
-                        break;
-                    case 'files':
-                        vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
-                        break;
-                }
-            },
-            undefined,
-            ext.context.subscriptions
-        );
-        this.panel.webview.html = getWebviewContent();
+    if (!state) {
+        setTimeout(() => updateContent(domain), 100);
+        tryCnt += 1;
+        return;
     }
+    if (panel) {
+        tryCnt = 0;
+        panel.webview.postMessage({ command: 'data', data: domain });
+    }
+}
+
+function init() {
+    panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
+        enableScripts: true,
+        localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
+    });
+    panel.onDidDispose(
+        () => {
+            panel = undefined;
+            state = false;
+            console.log('vsnote webview closed.');
+        },
+        null,
+        ext.context.subscriptions
+    );
+    panel.webview.onDidReceiveMessage(
+        message => {
+            switch (message.command) {
+                case 'ready':
+                    state = message.data;
+                    break;
+                case 'edit':
+                    vscode.commands.executeCommand('vscode-note.note.edit', message.data);
+                    break;
+                case 'doc':
+                    vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                    break;
+                case 'files':
+                    vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                    break;
+            }
+        },
+        undefined,
+        ext.context.subscriptions
+    );
+    panel.webview.html = getWebviewContent();
 }
 
 export function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {

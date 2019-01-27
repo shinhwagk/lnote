@@ -30,11 +30,8 @@ export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem>
 
 async function getNoteFiles(nid: number): Promise<TreeItem[]> {
     const notePath = path.join(ext.dbDirPath, 'notes', nid.toString());
-
     const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
-
     const nodes = [];
-
     const item = new TreeItem(Uri.file(path.join(notePath, '1.txt')), 0);
     item.contextValue = 'finalNoteNode';
     nodes.push(item);

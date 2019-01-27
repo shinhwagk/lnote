@@ -3,7 +3,6 @@ import * as path from 'path';
 import { ExtensionContext, workspace, window, TreeView } from 'vscode';
 import untildify = require('untildify');
 import { VSNDomainExplorerProvider, VSNDomainNode } from './explorer/domainExplorer';
-import { VSNWebviewPanel } from './panel/notesPanel';
 import { VSNSampleEditExplorerProvider } from './explorer/sampleEditExplorer';
 import { VSNFilesExplorerProvider } from './explorer/filesExplorer';
 import { initDB } from './database';
@@ -15,7 +14,6 @@ export namespace ext {
     export let vsnDomainTree: TreeView<VSNDomainNode>;
     export let vsnEditProvider: VSNSampleEditExplorerProvider;
     export let vsnFilesProvider: VSNFilesExplorerProvider;
-    export let vsnPanel: VSNWebviewPanel;
 }
 
 export async function initializeExtensionVariables(ctx: ExtensionContext): Promise<void> {
@@ -42,9 +40,5 @@ export async function initializeExtensionVariables(ctx: ExtensionContext): Promi
     if (!ext.vsnFilesProvider) {
         ext.vsnFilesProvider = new VSNFilesExplorerProvider();
         window.createTreeView('vsnoteFilesExplorer', { treeDataProvider: ext.vsnFilesProvider });
-    }
-
-    if (!ext.vsnPanel) {
-        ext.vsnPanel = new VSNWebviewPanel();
     }
 }
