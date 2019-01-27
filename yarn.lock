@@ -221,13 +221,6 @@
   resolved "http://registry.npm.taobao.org/@types/anymatch/download/@types/anymatch-1.3.0.tgz#d1d55958d1fccc5527d4aba29fc9c4b942f563ff"
   integrity sha1-0dVZWNH8zFUn1Kuin8nEuUL1Y/8=
 
-"@types/clean-css@*":
-  version "4.2.0"
-  resolved "http://registry.npm.taobao.org/@types/clean-css/download/@types/clean-css-4.2.0.tgz#785749d3ba799ae2cd3efcb3ce622781efd00340"
-  integrity sha1-eFdJ07p5muLNPvyzzmInge/QA0A=
-  dependencies:
-    "@types/node" "*"
-
 "@types/events@*":
   version "3.0.0"
   resolved "http://registry.npm.taobao.org/@types/events/download/@types/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
@@ -248,24 +241,6 @@
     "@types/events" "*"
     "@types/minimatch" "*"
     "@types/node" "*"
-
-"@types/html-minifier@*":
-  version "3.5.2"
-  resolved "http://registry.npm.taobao.org/@types/html-minifier/download/@types/html-minifier-3.5.2.tgz#f897a13d847a774e9b6fd91497e9b0e0ead71c35"
-  integrity sha1-+JehPYR6d06bb9kUl+mw4OrXHDU=
-  dependencies:
-    "@types/clean-css" "*"
-    "@types/relateurl" "*"
-    "@types/uglify-js" "*"
-
-"@types/html-webpack-plugin@^3.2.0":
-  version "3.2.0"
-  resolved "http://registry.npm.taobao.org/@types/html-webpack-plugin/download/@types/html-webpack-plugin-3.2.0.tgz#26b20854124bbcccbc22ccec715a1ba74583526c"
-  integrity sha1-JrIIVBJLvMy8IszscVobp0WDUmw=
-  dependencies:
-    "@types/html-minifier" "*"
-    "@types/tapable" "*"
-    "@types/webpack" "*"
 
 "@types/jest@^23.3.13":
   version "23.3.13"
@@ -326,11 +301,6 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@types/relateurl@*":
-  version "0.2.28"
-  resolved "http://registry.npm.taobao.org/@types/relateurl/download/@types/relateurl-0.2.28.tgz#6bda7db8653fa62643f5ee69e9f69c11a392e3a6"
-  integrity sha1-a9p9uGU/piZD9e5p6facEaOS46Y=
-
 "@types/rimraf@^2.0.2":
   version "2.0.2"
   resolved "http://registry.npm.taobao.org/@types/rimraf/download/@types/rimraf-2.0.2.tgz#7f0fc3cf0ff0ad2a99bb723ae1764f30acaf8b6e"
@@ -356,7 +326,7 @@
   resolved "http://registry.npm.taobao.org/@types/untildify/download/@types/untildify-3.0.0.tgz#cd3e6624e46ccf292d3823fb48fa90dda0deaec0"
   integrity sha1-zT5mJORszyktOCP7SPqQ3aDersA=
 
-"@types/webpack@*", "@types/webpack@^4.4.24":
+"@types/webpack@^4.4.24":
   version "4.4.24"
   resolved "http://registry.npm.taobao.org/@types/webpack/download/@types/webpack-4.4.24.tgz#75bc301176066f566ec54151b6101c2b45abb8b2"
   integrity sha1-dbwwEXYGb1ZuxUFRthAcK0WruLI=
@@ -6404,7 +6374,7 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vscode@^1.1.28:
+vscode@^1.1.27:
   version "1.1.28"
   resolved "http://registry.npm.taobao.org/vscode/download/vscode-1.1.28.tgz#642acc4a84de5ea0764e7419ae84a383b0c74062"
   integrity sha1-ZCrMSoTeXqB2TnQZroSjg7DHQGI=

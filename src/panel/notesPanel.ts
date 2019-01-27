@@ -77,7 +77,7 @@ function init() {
                     vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
                     break;
                 case 'files':
-                    vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                    vscode.commands.executeCommand('vscode-note.note.file.show', message.data);
                     break;
             }
         },
