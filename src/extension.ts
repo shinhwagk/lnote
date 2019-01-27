@@ -32,11 +32,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vsnPanel.update', async (dpath: string) => {
             context.globalState.update('dpath', dpath);
-            ext.vsnPanel.initIfNeed();
             const notes: VSNNote[] = await selectNotes(dpath);
             if (notes.length === 0) return;
             const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            ext.vsnPanel.updateWebviewContent(vsnDomain);
+            ext.vsnPanel.updateContent(vsnDomain);
         })
     );
 
@@ -57,6 +56,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.doc.showPreview', async (nId: number) => {
+            ext.context.globalState.update('nid', nId);
+            const uri = vscode.Uri.file(selectDocReadmeFilePath(nId));
+            await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
+            if (!selectFilesExist(nId)) return;
+            ext.vsnFilesProvider.refresh();
+            await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.note.files.showPreview', async (nId: number) => {
             ext.context.globalState.update('nid', nId);
             const uri = vscode.Uri.file(selectDocReadmeFilePath(nId));
             await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
@@ -159,7 +169,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (sqp === 'Yes') await deleteNote(dpath, nId);
             const notes: VSNNote[] = await selectNotes(dpath);
             const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            ext.vsnPanel.updateWebviewContent(vsnDomain);
+            ext.vsnPanel.updateContent(vsnDomain);
         })
     );
 

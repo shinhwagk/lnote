@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { selectDomain, selectDomainNotesCount } from '../database';
 
-export interface VSNDomainNode extends vscode.TreeItem {
+export interface VSNDomainNode {
     dpath: string;
 }
 

@@ -31,33 +31,32 @@ function getWebviewContent() {
 export class VSNWebviewPanel {
     public panel: vscode.WebviewPanel | undefined = undefined;
     private state: boolean = false;
-    private trayCnt: number = 0;
+    private tryCnt: number = 0;
 
-    public initIfNeed() {
-        if (!this.state) {
-            this.init();
-        }
-    }
+    public updateContent(domain: twv.VSNWVDomain): void {
+        if (!this.panel) this.init();
 
-    public updateWebviewContent(domain: twv.VSNWVDomain): void {
-        if (this.trayCnt >= 50) {
+        if (this.tryCnt >= 50) {
             vscode.window.showErrorMessage('webview update failse 50 times.');
             return;
         }
         if (!this.state) {
-            setTimeout(() => this.updateWebviewContent(domain), 100);
-            this.trayCnt += 1;
+            setTimeout(() => this.updateContent(domain), 100);
+            this.tryCnt += 1;
             return;
         }
         if (this.panel) {
-            this.trayCnt = 0;
-            this.panel!.webview.postMessage({ command: 'data', data: domain });
+            this.tryCnt = 0;
+            this.panel.webview.postMessage({ command: 'data', data: domain });
         }
     }
 
     private init() {
-        this.createPanel();
-        this.panel!.onDidDispose(
+        this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
+            enableScripts: true,
+            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
+        });
+        this.panel.onDidDispose(
             () => {
                 this.panel = undefined;
                 this.state = false;
@@ -66,7 +65,7 @@ export class VSNWebviewPanel {
             null,
             ext.context.subscriptions
         );
-        this.panel!.webview.onDidReceiveMessage(
+        this.panel.webview.onDidReceiveMessage(
             message => {
                 switch (message.command) {
                     case 'ready':
@@ -77,19 +76,16 @@ export class VSNWebviewPanel {
                         break;
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                        break;
+                    case 'files':
+                        vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                        break;
                 }
             },
             undefined,
             ext.context.subscriptions
         );
-        this.panel!.webview.html = getWebviewContent();
-    }
-
-    private createPanel() {
-        this.panel = vscode.window.createWebviewPanel('catCoding', 'vscode-note', vscode.ViewColumn.One, {
-            enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
-        });
+        this.panel.webview.html = getWebviewContent();
     }
 }
 

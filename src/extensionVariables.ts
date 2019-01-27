@@ -20,8 +20,8 @@ export namespace ext {
 
 export async function initializeExtensionVariables(ctx: ExtensionContext): Promise<void> {
     const dbpath: string | undefined = workspace.getConfiguration('vscode-note').get('dbpath');
-    ext.context = ctx;
     ext.dbDirPath = path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
+    ext.context = ctx;
 
     await initDB();
 

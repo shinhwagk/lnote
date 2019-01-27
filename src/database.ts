@@ -32,7 +32,7 @@ export async function initDB(): Promise<void> {
     domainsFilePath = path.join(ext.dbDirPath, 'domains.json');
     seqFilePath = path.join(ext.dbDirPath, 'seq');
     await createDBIfNotExist();
-    cacheDomains = await cacheDB();
+    await cacheDB();
 }
 
 async function createDBIfNotExist(): Promise<void> {
@@ -43,7 +43,7 @@ async function createDBIfNotExist(): Promise<void> {
 }
 
 async function cacheDB(): Promise<void> {
-    return vfs.readJSONSync(domainsFilePath);
+    cacheDomains = vfs.readJSONSync(domainsFilePath);
 }
 
 export function selectDocReadmeFilePath(nId: number): string {
@@ -137,6 +137,7 @@ export async function createNodeCol(nid: number): Promise<void> {
 
 export async function createDomain(dpath: string, name: string): Promise<void> {
     const oPath = vpath.splitPath(path.join(dpath, name));
+    if (objectPath.has(cacheDomains, oPath)) return;
     objectPath.set(cacheDomains, oPath, { '.notes': [] });
     await checkout();
 }

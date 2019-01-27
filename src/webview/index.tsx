@@ -15,7 +15,10 @@ declare function acquireVsCodeApi(): vscode;
 const vscode: vscode = acquireVsCodeApi();
 
 const editNote = (id: number) => () => vscode.postMessage({ command: 'edit', data: id });
-const viewDoc = (id: number) => () => vscode.postMessage({ command: 'doc', data: id });
+const viewDoc = (id: number) => () => {
+    vscode.postMessage({ command: 'doc', data: id });
+    vscode.postMessage({ command: 'files', data: id });
+};
 
 function VSNNotes(props: twv.VSNWVNote) {
     const contents = props.contents.map(c => (
