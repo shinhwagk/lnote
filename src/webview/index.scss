@@ -1,20 +1,9 @@
-table,
-td {
-    border: 1px solid white;
-}
+@import '../../node_modules/bootstrap/scss/functions';
+@import '../../node_modules/bootstrap/scss/variables';
+@import '../../node_modules/bootstrap/scss/mixins';
 
-tr {
-    width: 100%;
-}
+$card-border-color: $gray-600;
+$card-bg: $gray-900; // rgb(30, 30, 30)
 
-.id {
-    width: 5%;
-}
-
-pre {
-    margin: 10px;
-}
-
-.edit {
-    width: 15px;
-}
+@import '../../node_modules/bootstrap/scss/grid';
+@import '../../node_modules/bootstrap/scss/card';

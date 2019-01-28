@@ -29,7 +29,7 @@ const webviewConfig: webpack.Configuration = {
         path: path.resolve(__dirname, 'out')
     },
     resolve: {
-        extensions: ['.js', '.ts', '.tsx']
+        extensions: ['.js', '.ts', '.tsx', 'css', 'scss']
     },
     module: {
         rules: [
@@ -37,7 +37,7 @@ const webviewConfig: webpack.Configuration = {
                 test: /\.tsx?$/,
                 loaders: ['babel-loader', 'ts-loader']
             },
-            { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
+            { test: /\.s?css$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
         ]
     }
 };

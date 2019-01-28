@@ -22,27 +22,27 @@ const viewDoc = (id: number) => () => {
 
 function VSNNotes(props: twv.VSNWVNote) {
     const contents = props.contents.map(c => (
-        <td>
+        <div className="col">
             <pre>{c}</pre>
-        </td>
+        </div>
     ));
 
     const domId = props.doc ? <a onClick={viewDoc(props.id)}>{props.id}</a> : <span>{props.id}</span>;
 
     return (
-        <tr>
-            <td className="id">
+        <div className="row ">
+            <div className="col col-1">
                 <pre>{domId}</pre>
-            </td>
+            </div>
             {contents}
-            <td className="edit">
+            <div className="col col-1">
                 <pre>
                     <a onClick={editNote(props.id)}>
                         <FontAwesomeIcon inverse icon={faPen} />
                     </a>
                 </pre>
-            </td>
-        </tr>
+            </div>
+        </div>
     );
 }
 
@@ -52,9 +52,11 @@ function VSNCategory(props: twv.VSNWVCategory) {
     ));
 
     return (
-        <div>
-            <h3>{props.name}</h3>
-            <table>{listnote}</table>
+        <div className="card bg-dark text-white">
+            <div className="card-header">{props.name}</div>
+            <div className="card-body">
+                <div className="container">{listnote}</div>
+            </div>
         </div>
     );
 }
