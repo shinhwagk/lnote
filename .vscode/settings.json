@@ -1,10 +1,10 @@
 {
     "files.exclude": {
-        "node_modules": false,
+        "node_modules": true,
         "out": false
     },
     "search.exclude": {
-        "node_modules": false,
+        "node_modules": true,
         "out": true
     },
 
