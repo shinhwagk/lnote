@@ -18,17 +18,17 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
 
     public async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
         const domain = await selectDomain(element.dpath);
-        return {
-            collapsibleState: (domain.domains.length >= 1 ? true : false) ? 1 : 0, // vscode.TreeItemCollapsibleState
-            command: {
+        const item = new vscode.TreeItem(path.basename(element.dpath), domain.domains.length >= 1 ? 1 : 0);
+        item.contextValue = 'vsnDomainNode';
+        item.description = `${domain.notes.length}/${await selectDomainNotesCount(element.dpath)}`;
+        if (domain.notes.length >= 1) {
+            item.command = {
                 arguments: [element.dpath],
                 command: 'vscode-note.domain-explorer.pin',
                 title: 'Show Vscode Note'
-            },
-            contextValue: 'vsnDomainNode',
-            label: path.basename(element.dpath),
-            description: `${domain.notes.length}/${await selectDomainNotesCount(element.dpath)}`
-        };
+            };
+        }
+        return item;
     }
 
     public async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {

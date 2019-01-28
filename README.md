@@ -6,14 +6,14 @@
 
 a simple note extension.
 
+## Features
+
+> record your note in row
+
 ## note data locaction
 
 > ~/.vscode-note
 
-## Features
-
-1. record your note in row
-2. record your example files in folder
-3. record your note with document in folder (document just a markdown)
+## screenshot
 
 ![Image of Git Log](images/example.png)
