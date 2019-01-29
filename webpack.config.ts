@@ -11,33 +11,25 @@ const extConfig: webpack.Configuration = {
     },
     resolve: { extensions: ['.ts', '.js'] },
     module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                loader: 'ts-loader'
-            }
-        ]
+        rules: [{ test: /\.ts$/, loader: 'ts-loader' }]
     },
     externals: { vscode: 'vscode' }
 };
 
 const webviewConfig: webpack.Configuration = {
     target: 'web',
-    entry: './src/webview/index.tsx',
+    entry: './preview-src/index.ts',
     output: {
-        filename: '[name].wv.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'out')
     },
     resolve: {
-        extensions: ['.js', '.ts', '.tsx', 'css', 'scss']
+        extensions: ['.js', '.ts']
     },
     module: {
         rules: [
-            {
-                test: /\.tsx?$/,
-                loaders: ['babel-loader', 'ts-loader']
-            },
-            { test: /\.s?css$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
+            { test: /\.ts$/, loaders: ['ts-loader'] },
+            { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
         ]
     }
 };

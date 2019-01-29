@@ -114,7 +114,17 @@
                     "vscode-note.dbpath": {
                         "type": "string",
                         "default": "~/.vscode-note",
-                        "description": "data location"
+                        "description": "note data location"
+                    },
+                    "vscode-note.author.name": {
+                        "type": "string",
+                        "default": "unknown",
+                        "description": "git author name"
+                    },
+                    "vscode-note.author.email": {
+                        "type": "string",
+                        "default": "unknown@example.com",
+                        "description": "git author email"
                     }
                 }
             }
@@ -201,23 +211,18 @@
         "lint:all": "yarn lint:tslint && yarn lint:prettier"
     },
     "devDependencies": {
-        "@babel/core": "^7.2.2",
-        "@babel/preset-react": "^7.0.0",
         "@types/fs-extra": "^5.0.4",
+        "@types/highlight.js": "^9.12.3",
         "@types/jest": "^23.3.13",
         "@types/js-yaml": "^3.12.0",
-        "@types/node": "^10.12.18",
-        "@types/nodegit": "^0.22.7",
+        "@types/node": "^10.12.19",
+        "@types/nodegit": "^0.24.0",
         "@types/object-path": "^0.11.0",
-        "@types/react": "^16.7.21",
-        "@types/react-dom": "^16.0.11",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
         "@types/webpack": "^4.4.24",
-        "babel-loader": "^8.0.5",
         "css-loader": "^2.1.0",
         "jest": "^24.0.0",
-        "node-sass": "^4.11.0",
         "prettier": "^1.16.1",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.23.1",
@@ -226,22 +231,20 @@
         "ts-node": "^8.0.2",
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.17.0",
-        "tslint-react": "^3.6.0",
         "typescript": "^3.2.4",
         "webpack": "^4.29.0",
         "webpack-cli": "^3.2.1"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^1.2.12",
-        "@fortawesome/free-solid-svg-icons": "^5.6.3",
+        "@fortawesome/fontawesome-svg-core": "^1.2.13",
+        "@fortawesome/free-solid-svg-icons": "^5.7.0",
         "@fortawesome/react-fontawesome": "^0.1.4",
         "bootstrap": "^4.2.1",
         "fs-extra": "^7.0.1",
+        "highlight.js": "^9.13.1",
         "js-yaml": "^3.12.1",
         "nodegit": "^0.24.0",
         "object-path": "^0.11.4",
-        "react": "^16.7.0",
-        "react-dom": "^16.7.0",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3",
         "vscode": "^1.1.28"
