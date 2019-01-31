@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { selectDomain, selectDomainNotesCount } from '../database';
+import { vpath } from '../helper';
 
 export interface VSNDomainNode {
     dpath: string;
@@ -32,7 +33,7 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
     }
 
     public async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {
-        const dpath: string = element ? element.dpath : '/';
+        const dpath: string = element ? element.dpath : vpath.splitStr;
         const domain = await selectDomain(dpath);
         return domain.domains.map(name => {
             return { dpath: path.join(dpath, name) };

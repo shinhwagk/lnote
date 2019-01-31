@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import * as os from 'os';
 
 export namespace vfs {
     export function readFileSync(path: string) {
@@ -22,9 +23,10 @@ export namespace vfs {
     }
 }
 export namespace vpath {
+    export const splitStr = os.platform() === 'win32' ? "\\" : '/';
     export function splitPath(path: string): string[] {
-        const s = path.startsWith('/') ? path.substr(1) : path;
-        const e = s.endsWith('/') ? s.substr(0, s.length - 1) : s;
-        return e.split('/').filter(p => !!p);
+        const s = path.startsWith(splitStr) ? path.substr(1) : path;
+        const e = s.endsWith(splitStr) ? s.substr(0, s.length - 1) : s;
+        return e.split(splitStr).filter(p => !!p);
     }
 }
