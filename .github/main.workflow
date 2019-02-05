@@ -9,8 +9,8 @@ action "Install" {
 }
 
 action "Test" {
-  uses = "actions/npm@master"
   needs = ["Install"]
+  uses = "actions/npm@master"
   args = "test"
 }
 
