@@ -1,11 +1,11 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as jsyml from 'js-yaml';
-import { fusionNoteTags } from '../src/database';
+import { fusionNoteTags, initDB } from '../src/database';
 import { TestFileStructure } from './lib';
+import rimraf = require('rimraf');
 
-const testDataRootPath = './';
-const testDataNotesPath = path.join(testDataRootPath, '.vscode-note');
+const testDataPath = path.join('.vscode-note');
 
 const exampleDataNote = {
     id: 1,
@@ -28,7 +28,7 @@ const tdl: TestFileStructure[] = [
 
 async function createTestFileAndDirectory(tdl: TestFileStructure[]) {
     for (const f of tdl) {
-        const p = path.join(testDataNotesPath, f.path);
+        const p = path.join(testDataPath, f.path);
         switch (f.kind) {
             case 'd':
                 fse.ensureDirSync(p);
@@ -39,18 +39,19 @@ async function createTestFileAndDirectory(tdl: TestFileStructure[]) {
     }
 }
 
-// function removeTestData() {
-//     rimraf.sync(testDataNotesPath);
-// }
+function removeTestData() {
+    rimraf.sync(testDataPath);
+}
 
 beforeAll(async () => {
+    initDB(testDataPath);
     await createTestFileAndDirectory(tdl);
 });
 
-// afterAll(removeTestData);
+afterAll(removeTestData);
 
 test('fusionNoteTags', async () => {
-    const cacheTags = await fusionNoteTags(testDataNotesPath);
+    const cacheTags = await fusionNoteTags(testDataPath);
     expect(cacheTags).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1]}}}'));
 });
 

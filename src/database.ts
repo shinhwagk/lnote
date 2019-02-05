@@ -2,9 +2,7 @@ import * as path from 'path';
 import * as jsyml from 'js-yaml';
 import { existsSync, readdirSync, statSync, mkdirSync } from 'fs-extra';
 import * as objectPath from 'object-path';
-// import { ext } from './extensionVariables';
 import { vpath, vfs } from './helper';
-import { ext } from './extensionVariables';
 
 export interface VSNDomain {
     domains: string[];
@@ -27,17 +25,17 @@ const noteNameRegex = /^[0-9]\.[a-z]+$/;
 let cacheDomains: any;
 let seqFilePath: string;
 
-export async function initDB(): Promise<void> {
-    notesDirPath = path.join(ext.dbDirPath);
-    seqFilePath = path.join(ext.dbDirPath, 'seq');
-    await createDBIfNotExist();
+export async function initDB(dbDirPath: string): Promise<void> {
+    notesDirPath = path.join(dbDirPath);
+    seqFilePath = path.join(dbDirPath, 'seq');
+    await createDBIfNotExist(dbDirPath);
     await cacheDB();
 }
 
-async function createDBIfNotExist(): Promise<void> {
-    if (!existsSync(ext.dbDirPath)) {
-        vfs.mkdirsSync(ext.dbDirPath, notesDirPath);
-        await createExampleData();
+async function createDBIfNotExist(dbDirPath: string): Promise<void> {
+    if (!existsSync(dbDirPath)) {
+        vfs.mkdirsSync(dbDirPath, notesDirPath);
+        await createExampleData(dbDirPath);
     }
 }
 
@@ -188,8 +186,8 @@ export function _selectDomain(dpath: string): any {
     return objectPath.get(cacheDomains, vpath.splitPath(dpath));
 }
 
-async function createExampleData(): Promise<void> {
-    vfs.writeFileSync(path.join(ext.dbDirPath, 'seq'), '5');
+async function createExampleData(dbDirPath: string): Promise<void> {
+    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '5');
     let notePath_1 = path.join(notesDirPath, '1');
     let notePath_2 = path.join(notesDirPath, '2');
     vfs.mkdirsSync(notePath_1, notePath_2);

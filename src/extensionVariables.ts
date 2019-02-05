@@ -21,7 +21,7 @@ export async function initializeExtensionVariables(ctx: vscode.ExtensionContext)
     ext.dbDirPath = path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
     ext.context = ctx;
 
-    await initDB();
+    await initDB(ext.dbDirPath);
 
     if (!ext.vsnDomainProvider) {
         ext.vsnDomainProvider = new VSNDomainExplorerProvider();

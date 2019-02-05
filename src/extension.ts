@@ -26,7 +26,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
         if (e.affectsConfiguration('vscode-note')) {
             await initializeExtensionVariables(context);
-            ext.vsnDomainProvider.refresh();
+            ext.vsnDomainProvider!.refresh();
         }
     });
 
@@ -50,29 +50,29 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.files.edit', async () => {
             const nid = context.globalState.get<number>('nid');
             if (!nid) return;
-            const filesFolder = path.join(ext.dbDirPath, 'notes', nid.toString(), 'files');
+            const filesFolder = path.join(ext.dbDirPath!, 'notes', nid.toString(), 'files');
             await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(filesFolder), true);
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.doc.showPreview', async (nId: number) => {
-            ext.context.globalState.update('nid', nId);
+            ext.context!.globalState.update('nid', nId);
             const uri = vscode.Uri.file(selectDocReadmeFilePath(nId));
             await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
             if (!selectFilesExist(nId)) return;
-            ext.vsnFilesProvider.refresh();
+            ext.vsnFilesProvider!.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.files.showPreview', async (nId: number) => {
-            ext.context.globalState.update('nid', nId);
+            ext.context!.globalState.update('nid', nId);
             const uri = vscode.Uri.file(selectDocReadmeFilePath(nId));
             await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
             if (!selectFilesExist(nId)) return;
-            ext.vsnFilesProvider.refresh();
+            ext.vsnFilesProvider!.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })
     );
@@ -84,7 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.create', async (node: VSNDomainNode) => {
             const nid: number = await createNote(node.dpath);
             context.globalState.update('nid', nid);
-            ext.vsnEditProvider.refresh();
+            ext.vsnEditProvider!.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
         })
     );
@@ -92,7 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
             context.globalState.update('nid', nid);
-            ext.vsnEditProvider.refresh();
+            ext.vsnEditProvider!.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
         })
     );
@@ -116,7 +116,7 @@ export async function activate(context: vscode.ExtensionContext) {
             'vscode-note.edit-explorer.note.col.remove',
             async (f: vscode.TreeItem) => {
                 removeSync(f.resourceUri!.fsPath);
-                ext.vsnEditProvider.refresh();
+                ext.vsnEditProvider!.refresh();
             }
         )
     );
@@ -126,7 +126,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const nid = context.globalState.get<number>('nid');
             if (nid) {
                 createNodeCol(nid);
-                ext.vsnEditProvider.refresh();
+                ext.vsnEditProvider!.refresh();
             }
         })
     );
@@ -143,7 +143,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (!name) return;
             const dpath = node ? node.dpath : '/';
             createDomain(dpath, name);
-            ext.vsnDomainProvider.refresh();
+            ext.vsnDomainProvider!.refresh();
         })
     );
 
@@ -155,15 +155,15 @@ export async function activate(context: vscode.ExtensionContext) {
             if (newName) {
                 renameDomain(node.dpath, newName);
                 vscode.commands.executeCommand('vsnPanel.update', node.dpath);
-                ext.vsnDomainProvider.refresh();
+                ext.vsnDomainProvider!.refresh();
             }
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.delete', async () => {
-            const nId = ext.context.globalState.get<number>('nid');
-            const dpath = ext.context.globalState.get<string>('dpath');
+            const nId = ext.context!.globalState.get<number>('nid');
+            const dpath = ext.context!.globalState.get<string>('dpath');
             if (!nId || !dpath) return;
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
@@ -176,10 +176,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.files-explorer.openTerminal', async () => {
-            const nId = ext.context.globalState.get<number>('nid');
-            const dpath = ext.context.globalState.get<string>('dpath');
+            const nId = ext.context!.globalState.get<number>('nid');
+            const dpath = ext.context!.globalState.get<string>('dpath');
             if (!nId || !dpath) return;
-            const filePath = path.join(ext.dbDirPath, 'notes', nId.toString(), 'files');
+            const filePath = path.join(ext.dbDirPath!, 'notes', nId.toString(), 'files');
             const fileTerminal = vscode.window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
             fileTerminal.show(true);
         })
