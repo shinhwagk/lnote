@@ -7,10 +7,10 @@
         "sourceMap": true,
         "jsx": "preserve",
         "strict": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": true,
+        "noUnusedParameters": false,
         "noImplicitAny": true
     }
 }

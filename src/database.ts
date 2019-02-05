@@ -2,9 +2,9 @@ import * as path from 'path';
 import * as jsyml from 'js-yaml';
 import { existsSync, readdirSync, statSync, mkdirSync } from 'fs-extra';
 import * as objectPath from 'object-path';
-import { ext } from './extensionVariables';
+// import { ext } from './extensionVariables';
 import { vpath, vfs } from './helper';
-import { isNumber } from 'util';
+import { ext } from './extensionVariables';
 
 export interface VSNDomain {
     domains: string[];
@@ -25,12 +25,10 @@ interface VSNNoteMeta {
 let notesDirPath: string;
 const noteNameRegex = /^[0-9]\.[a-z]+$/;
 let cacheDomains: any;
-let domainsFilePath: string;
 let seqFilePath: string;
 
 export async function initDB(): Promise<void> {
-    notesDirPath = path.join(ext.dbDirPath, 'notes');
-    domainsFilePath = path.join(ext.dbDirPath, 'domains.json');
+    notesDirPath = path.join(ext.dbDirPath);
     seqFilePath = path.join(ext.dbDirPath, 'seq');
     await createDBIfNotExist();
     await cacheDB();
@@ -43,29 +41,27 @@ async function createDBIfNotExist(): Promise<void> {
     }
 }
 
-
-async function fusionNoteTags() {
-    for (const id of readdirSync(notesDirPath).filter(isNumber)) {
-        const noteMetaFile = path.join(notesDirPath, id, ".n.yml");
-        const noteMeta = jsyml.safeLoad(noteMetaFile);
-        const tags = noteMeta["tags"];
+export async function fusionNoteTags(notesDirPath: string) {
+    const cacheDomains: any = {};
+    for (const id of readdirSync(notesDirPath).filter(f => f !== 'seq')) {
+        const noteMetaFile = path.join(notesDirPath, id, '.n.yml');
+        const noteMeta = jsyml.safeLoad(vfs.readFileSync(noteMetaFile));
+        const tags = noteMeta['tags'];
         for (const tag of tags) {
-            const t: string = tag["tag"];
-            const c: string = tag["category"] || "default";
-            const category: {
-                ".category": { [category: string]: number[] }
-            } = objectPath.ensureExists(cacheDomains, t.split("/").filter(s => !!s), { ".category": {} });
-            if (!category[".category"][c]) category[".category"][c] = [];
-            category[".category"][c].push(Number(id));
-            objectPath.set(cacheDomains, t.split("/").filter(s => !!s), category);
+            const t: string = tag['tag'];
+            const c: string = tag['category'] || 'default';
+            const sp = vpath.splitPath(path.join(t, '.notes'));
+            objectPath.ensureExists(cacheDomains, sp, []);
+            const notes: number[] = objectPath.get(cacheDomains, sp);
+            notes.push(Number(id));
+            objectPath.set(cacheDomains, sp, notes);
         }
     }
+    return cacheDomains;
 }
 
 async function cacheDB(): Promise<void> {
-    cacheDomains = {};
-    fusionNoteTags();
-    // cacheDomains = vfs.readJSONSync(domainsFilePath);
+    cacheDomains = await fusionNoteTags(notesDirPath);
 }
 
 export function selectDocReadmeFilePath(nId: number): string {
@@ -92,15 +88,15 @@ export function selectFilesExist(nId: number): boolean {
 export async function selectDomain(dpath: string): Promise<VSNDomain> {
     const domain = objectPath.get(cacheDomains, vpath.splitPath(dpath));
     const domains: string[] = Object.keys(domain).filter(name => name !== '.notes');
-    return { domains, notes: domain['.notes'] };
+    return { domains, notes: domain['.notes'] || [] };
 }
 
 export async function selectNotes(dpath: string): Promise<VSNNote[]> {
     const domain = await selectDomain(dpath);
-    return Promise.all(domain.notes.map(id => selectNote(id)));
+    return Promise.all(domain.notes.map(id => selectNote(dpath, id)));
 }
 
-async function selectNote(id: number): Promise<VSNNote> {
+async function selectNote(dpath: string, id: number): Promise<VSNNote> {
     const notePath = path.join(notesDirPath, id.toString());
     const noteMetaPath = path.join(notePath, '.n.yml');
     const contents = readdirSync(notePath)
@@ -110,13 +106,14 @@ async function selectNote(id: number): Promise<VSNNote> {
         .map(f => vfs.readFileSync(f));
 
     const meta = jsyml.safeLoad(vfs.readFileSync(noteMetaPath));
+    const category = meta['tags'].filter((tag: any) => tag['tag'] === dpath)[0]['category'];
     const existDoc =
         existsSync(selectDocReadmeFilePath(id)) && statSync(selectDocReadmeFilePath(id)).size >= 1;
     const existFiles = selectFilesExist(id);
     return {
         id,
         contents,
-        meta: { category: meta.category || 'default', docOrFiles: existDoc || existFiles }
+        meta: { category: category, docOrFiles: existDoc || existFiles }
     };
 }
 
@@ -164,9 +161,7 @@ export async function createDomain(dpath: string, name: string): Promise<void> {
     await checkout();
 }
 
-async function checkout(): Promise<void> {
-    vfs.writeJsonSync(domainsFilePath, cacheDomains);
-}
+async function checkout(): Promise<void> {}
 export async function renameDomain(dpath: any, newName: string): Promise<void> {
     const opath = vpath.splitPath(dpath);
     const domain = _selectDomain(dpath);
@@ -194,15 +189,7 @@ export function _selectDomain(dpath: string): any {
 }
 
 async function createExampleData(): Promise<void> {
-    const data: { [domain: string]: any } = {
-        powershell: {
-            install: { '.notes': [1, 2] },
-            '.notes': []
-        }
-    };
     vfs.writeFileSync(path.join(ext.dbDirPath, 'seq'), '5');
-    vfs.writeJsonSync(domainsFilePath, data);
-
     let notePath_1 = path.join(notesDirPath, '1');
     let notePath_2 = path.join(notesDirPath, '2');
     vfs.mkdirsSync(notePath_1, notePath_2);

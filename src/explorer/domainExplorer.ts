@@ -22,13 +22,11 @@ export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDom
         const item = new vscode.TreeItem(path.basename(element.dpath), domain.domains.length >= 1 ? 1 : 0);
         item.contextValue = 'vsnDomainNode';
         item.description = `${domain.notes.length}/${await selectDomainNotesCount(element.dpath)}`;
-        if (domain.notes.length >= 1) {
-            item.command = {
-                arguments: [element.dpath],
-                command: 'vscode-note.domain-explorer.pin',
-                title: 'Show Vscode Note'
-            };
-        }
+        item.command = {
+            arguments: [element.dpath],
+            command: 'vscode-note.domain-explorer.pin',
+            title: 'Show Vscode Note'
+        };
         return item;
     }
 
