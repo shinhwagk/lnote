@@ -1,6 +1,6 @@
 workflow "Build, Test, and Publish" {
   on = "push"
-  resolves = ["Master"]
+  resolves = ["Master", "Slack"]
 }
 
 action "Install" {
@@ -18,4 +18,9 @@ action "Master" {
   needs = "Test"
   uses = "actions/bin/filter@master"
   args = "branch master"
+}
+
+action "Slack" {
+  uses = "Ilshidur/action-slack@master"
+  needs = ["Test"]
 }
