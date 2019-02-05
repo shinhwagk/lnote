@@ -4,6 +4,7 @@ import { existsSync, readdirSync, statSync, mkdirSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import { ext } from './extensionVariables';
 import { vpath, vfs } from './helper';
+import { isNumber } from 'util';
 
 export interface VSNDomain {
     domains: string[];
@@ -42,8 +43,29 @@ async function createDBIfNotExist(): Promise<void> {
     }
 }
 
+
+async function fusionNoteTags() {
+    for (const id of readdirSync(notesDirPath).filter(isNumber)) {
+        const noteMetaFile = path.join(notesDirPath, id, ".n.yml");
+        const noteMeta = jsyml.safeLoad(noteMetaFile);
+        const tags = noteMeta["tags"];
+        for (const tag of tags) {
+            const t: string = tag["tag"];
+            const c: string = tag["category"] || "default";
+            const category: {
+                ".category": { [category: string]: number[] }
+            } = objectPath.ensureExists(cacheDomains, t.split("/").filter(s => !!s), { ".category": {} });
+            if (!category[".category"][c]) category[".category"][c] = [];
+            category[".category"][c].push(Number(id));
+            objectPath.set(cacheDomains, t.split("/").filter(s => !!s), category);
+        }
+    }
+}
+
 async function cacheDB(): Promise<void> {
-    cacheDomains = vfs.readJSONSync(domainsFilePath);
+    cacheDomains = {};
+    fusionNoteTags();
+    // cacheDomains = vfs.readJSONSync(domainsFilePath);
 }
 
 export function selectDocReadmeFilePath(nId: number): string {

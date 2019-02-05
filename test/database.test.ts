@@ -28,7 +28,6 @@ const exampleDataNote: VSNNote = {
 
 const tdl: TestFileStructure[] = [
     { path: '', kind: 'd' },
-    { path: 'domains.json', kind: 'f', content: JSON.stringify(exampleDataDomains) },
     { path: 'notes', kind: 'd' },
     { path: `notes/${exampleDataNote.id}`, kind: 'd' },
     { path: `notes/${exampleDataNote.id}/1.txt`, kind: 'f', content: exampleDataNote.contents[0] },
