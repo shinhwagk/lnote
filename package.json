@@ -228,6 +228,7 @@
         "tslint-config-prettier": "^1.18.0",
         "tslint-react": "^3.6.0",
         "typescript": "^3.3.3",
+        "vscode": "^1.1.29",
         "webpack": "^4.29.3",
         "webpack-cli": "^3.2.3"
     },
@@ -243,7 +244,6 @@
         "react": "^16.8.1",
         "react-dom": "^16.8.1",
         "rimraf": "^2.6.3",
-        "untildify": "^3.0.3",
-        "vscode": "^1.1.29"
+        "untildify": "^3.0.3"
     }
 }
