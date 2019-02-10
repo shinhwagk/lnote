@@ -1,44 +1,43 @@
 import { homedir } from 'os';
 import * as path from 'path';
-import { ExtensionContext, workspace, window, TreeView } from 'vscode';
+import * as vscode from 'vscode';
 import untildify = require('untildify');
-import { VSNDomainExplorerProvider, VSNDomainNode } from './explorer/domainExplorer';
-import { VSNSampleEditExplorerProvider } from './explorer/sampleEditExplorer';
-import { VSNFilesExplorerProvider } from './explorer/filesExplorer';
-import { initDB } from './database';
+import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
+import { EditExplorerProvider } from './explorer/editExplorer';
+import { FilesExplorerProvider } from './explorer/filesExplorer';
+import { initializeDBVariables } from './database';
 
 export namespace ext {
-    export let context: ExtensionContext;
-    export let dbDirPath: string;
-    export let vsnDomainProvider: VSNDomainExplorerProvider;
-    export let vsnDomainTree: TreeView<VSNDomainNode>;
-    export let vsnEditProvider: VSNSampleEditExplorerProvider;
-    export let vsnFilesProvider: VSNFilesExplorerProvider;
+    export let context: vscode.ExtensionContext;
+    export let domainProvider: DomainExplorerProvider;
+    export let vsnDomainTree: vscode.TreeView<DomainNode>;
+    export let editProvider: EditExplorerProvider;
+    export let FilesProvider: FilesExplorerProvider;
 }
 
-export async function initializeExtensionVariables(ctx: ExtensionContext): Promise<void> {
-    const dbpath: string | undefined = workspace.getConfiguration('vscode-note').get('dbpath');
-    ext.dbDirPath = path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
+export async function initializeExtensionVariables(ctx: vscode.ExtensionContext): Promise<void> {
+    const dbpath: string | undefined = vscode.workspace.getConfiguration('vscode-note').get('dbpath');
+    const dbDirPath = path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
     ext.context = ctx;
 
-    await initDB();
+    await initializeDBVariables(dbDirPath);
 
-    if (!ext.vsnDomainProvider) {
-        ext.vsnDomainProvider = new VSNDomainExplorerProvider();
+    if (!ext.domainProvider) {
+        ext.domainProvider = new DomainExplorerProvider();
     }
     if (!ext.vsnDomainTree) {
-        ext.vsnDomainTree = window.createTreeView('vsnoteDomainExplorer', {
-            treeDataProvider: ext.vsnDomainProvider
+        ext.vsnDomainTree = vscode.window.createTreeView('domainExplorer', {
+            treeDataProvider: ext.domainProvider
         });
     }
 
-    if (!ext.vsnEditProvider) {
-        ext.vsnEditProvider = new VSNSampleEditExplorerProvider();
-        window.createTreeView('vsnoteEditExplorer', { treeDataProvider: ext.vsnEditProvider });
+    if (!ext.editProvider) {
+        ext.editProvider = new EditExplorerProvider();
+        vscode.window.createTreeView('editExplorer', { treeDataProvider: ext.editProvider });
     }
 
-    if (!ext.vsnFilesProvider) {
-        ext.vsnFilesProvider = new VSNFilesExplorerProvider();
-        window.createTreeView('vsnoteFilesExplorer', { treeDataProvider: ext.vsnFilesProvider });
+    if (!ext.FilesProvider) {
+        ext.FilesProvider = new FilesExplorerProvider();
+        vscode.window.createTreeView('filesExplorer', { treeDataProvider: ext.FilesProvider });
     }
 }

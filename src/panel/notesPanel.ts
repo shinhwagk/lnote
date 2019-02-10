@@ -1,10 +1,9 @@
 import * as path from 'path';
-
 import * as vscode from 'vscode';
-
-import { VSNNote } from '../database';
+import { selectNoteContent, DBCxt, getNoteMetaFile, selectFilesExist, selectDocExist } from '../database';
 import { ToWebView as twv } from './message';
 import { ext } from '../extensionVariables';
+import { vfs } from '../helper';
 
 const assetsFile = (name: string) => {
     const file = path.join(ext.context.extensionPath, 'out', name);
@@ -32,7 +31,7 @@ let panel: vscode.WebviewPanel | undefined = undefined;
 let state: boolean = false;
 let tryCnt: number = 0;
 
-export function updateContent(domain: twv.VSNWVDomain): void {
+export async function updateContent(notes: number[]): Promise<void> {
     if (!panel) init();
 
     if (tryCnt >= 50) {
@@ -40,13 +39,15 @@ export function updateContent(domain: twv.VSNWVDomain): void {
         return;
     }
     if (!state) {
-        setTimeout(() => updateContent(domain), 100);
+        setTimeout(async () => await updateContent(notes), 100);
         tryCnt += 1;
         return;
     }
     if (panel) {
         tryCnt = 0;
-        panel.webview.postMessage({ command: 'data', data: domain });
+        const command = 'data';
+        const data = await fusionNotes(notes);
+        panel.webview.postMessage({ command, data });
     }
 }
 
@@ -74,7 +75,7 @@ function init() {
                     vscode.commands.executeCommand('vscode-note.note.edit', message.data);
                     break;
                 case 'doc':
-                    vscode.commands.executeCommand('vscode-note.note.doc.showPreview', message.data);
+                    vscode.commands.executeCommand('vscode-note.note.doc.show', message.data);
                     break;
                 case 'files':
                     vscode.commands.executeCommand('vscode-note.note.file.show', message.data);
@@ -87,19 +88,27 @@ function init() {
     panel.webview.html = getWebviewContent();
 }
 
-export function fusionNotes(name: string, ns: VSNNote[]): twv.VSNWVDomain {
+export async function fusionNotes(notes: number[]): Promise<twv.VSNWVDomain> {
+    const dpath = ext.context.globalState.get<string>('dpath')!;
+    const cs = notes
+        .map(getNoteMetaFile)
+        .map(vfs.readYamlSync)
+        .map(m => m.tags.filter((t: any) => t.tag === dpath)[0].category);
+
     const categorys: twv.VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;
     }
-    for (const n of ns) {
-        if (!testCategoryExist(n.meta.category)) {
-            categorys.push({ name: n.meta.category, notes: [] });
+    for (let i = 0; i < notes.length; i++) {
+        const id = notes[i];
+        const category = cs[i];
+        if (!testCategoryExist(category)) {
+            categorys.push({ name: category, notes: [] });
         }
-
+        const contents = await selectNoteContent(id);
         categorys
-            .filter(c => c.name === n.meta.category)[0]
-            .notes.push({ id: n.id, contents: n.contents, doc: n.meta.docOrFiles });
+            .filter(c => c.name === category)[0]
+            .notes.push({ id: id, contents: contents, doc: selectDocExist(id), files: selectFilesExist(id) });
     }
-    return { name, categorys };
+    return { name: path.basename(dpath), categorys };
 }

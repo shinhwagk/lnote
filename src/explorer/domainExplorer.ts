@@ -1,42 +1,49 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { selectDomain, selectDomainNotesCount } from '../database';
+import { selectDomain, selectAllNotesUnderDomain } from '../database';
 import { vpath } from '../helper';
 
-export interface VSNDomainNode {
+export interface DomainNode {
     dpath: string;
 }
 
-export class VSNDomainExplorerProvider implements vscode.TreeDataProvider<VSNDomainNode> {
-    private _onDidChangeTreeData: vscode.EventEmitter<VSNDomainNode> = new vscode.EventEmitter<
-        VSNDomainNode
-    >();
-    public readonly onDidChangeTreeData: vscode.Event<VSNDomainNode> = this._onDidChangeTreeData.event;
+export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNode> {
+    private _onDidChangeTreeData: vscode.EventEmitter<DomainNode> = new vscode.EventEmitter<DomainNode>();
+    public readonly onDidChangeTreeData: vscode.Event<DomainNode> = this._onDidChangeTreeData.event;
 
     public refresh(): any {
         this._onDidChangeTreeData.fire();
     }
 
-    public async getTreeItem(element: VSNDomainNode): Promise<vscode.TreeItem> {
+    public async getTreeItem(element: DomainNode): Promise<vscode.TreeItem> {
         const domain = await selectDomain(element.dpath);
-        const item = new vscode.TreeItem(path.basename(element.dpath), domain.domains.length >= 1 ? 1 : 0);
-        item.contextValue = 'vsnDomainNode';
-        item.description = `${domain.notes.length}/${await selectDomainNotesCount(element.dpath)}`;
-        if (domain.notes.length >= 1) {
+        const childDomainNumber = Object.keys(domain).length;
+        const notesNumberUnderDomain = (await selectAllNotesUnderDomain(domain)).length;
+        const item: vscode.TreeItem = {};
+        item.label = path.basename(element.dpath);
+        item.contextValue = 'domainNode';
+        if (domain['.notes']) {
+            item.collapsibleState = childDomainNumber - 1 >= 1 ? 1 : 0; // sub '.notes'
+            item.description = `${domain['.notes'].length}/${notesNumberUnderDomain}`;
             item.command = {
                 arguments: [element.dpath],
                 command: 'vscode-note.domain-explorer.pin',
                 title: 'Show Vscode Note'
             };
+        } else {
+            item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
+            item.description = `0/${notesNumberUnderDomain}`;
         }
         return item;
     }
 
-    public async getChildren(element?: VSNDomainNode): Promise<VSNDomainNode[]> {
+    public async getChildren(element?: DomainNode): Promise<DomainNode[]> {
         const dpath: string = element ? element.dpath : vpath.splitStr;
         const domain = await selectDomain(dpath);
-        return domain.domains.map(name => {
-            return { dpath: path.join(dpath, name) };
-        });
+        return Object.keys(domain)
+            .filter(t => t !== '.notes')
+            .map(name => {
+                return { dpath: path.join(dpath, name) };
+            });
     }
 }

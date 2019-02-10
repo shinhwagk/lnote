@@ -1,27 +1,38 @@
-import * as fs from 'fs-extra';
+import * as fse from 'fs-extra';
 import * as os from 'os';
+import * as jsyaml from 'js-yaml';
 
 export namespace vfs {
-    export function readFileSync(path: string) {
-        return fs.readFileSync(path, { encoding: 'utf-8' });
+    export function readFileSync(path: string): string {
+        return fse.readFileSync(path, { encoding: 'utf-8' });
     }
 
     export function writeJsonSync(file: string, object: any) {
-        fs.writeJsonSync(file, object, { encoding: 'utf-8' });
+        fse.writeJsonSync(file, object, { encoding: 'utf-8' });
     }
 
     export function writeFileSync(path: string, data: string) {
-        return fs.writeFileSync(path, data, { encoding: 'utf-8' });
+        return fse.writeFileSync(path, data, { encoding: 'utf-8' });
     }
 
-    export function readJSONSync(file: string) {
-        return fs.readJSONSync(file, { encoding: 'utf-8' });
+    export function readJsonSync(file: string) {
+        return fse.readJsonSync(file, { encoding: 'utf-8' });
     }
 
     export function mkdirsSync(...paths: string[]) {
-        paths.forEach(p => fs.ensureDirSync(p));
+        paths.forEach(fse.ensureDirSync);
+    }
+
+    export function readYamlSync(file: string) {
+        return jsyaml.safeLoad(readFileSync(file));
+    }
+
+    export function writeYamlSync(file: string, obj: any) {
+        fse.ensureFileSync(file);
+        writeFileSync(file, jsyaml.safeDump(obj));
     }
 }
+
 export namespace vpath {
     export const splitStr = os.platform() === 'win32' ? '\\' : '/';
     export function splitPath(path: string): string[] {

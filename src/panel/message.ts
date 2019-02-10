@@ -13,6 +13,7 @@ export namespace ToWebView {
         id: number;
         contents: string[];
         doc: boolean;
+        files: boolean;
     }
 
     export interface DomainData {

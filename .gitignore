@@ -1,7 +1,8 @@
-out/
-node_modules/
-.vscode-test/
+/out/
+/node_modules/
+/.vscode-test/
 *.vsix
-.DS_Store
-coverage/
-yarn-error.log
+/.DS_Store
+/coverage/
+/yarn-error.log
+/.vscode-note

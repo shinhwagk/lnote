@@ -7,3 +7,14 @@ $card-bg: $gray-900; // rgb(30, 30, 30)
 
 @import '../../node_modules/bootstrap/scss/grid';
 @import '../../node_modules/bootstrap/scss/card';
+// @import '../../node_modules/bootstrap/scss/transitions';
+// @import '../../node_modules/bootstrap/scss/buttons';
+.card-body {
+    padding: 0px;
+}
+
+pre {
+    white-space: pre-wrap;
+
+    white-space: -o-pre-wrap;
+}
