@@ -1,41 +1,35 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as jsyml from 'js-yaml';
-import { fusionNoteTags, initDB } from '../src/database';
-import { TestFileStructure } from './lib';
+import { cacheTags, Domain, initializeDBVariables } from '../src/database';
 import rimraf = require('rimraf');
+import { vfs } from '../src/helper';
 
-const testDataPath = path.join('.vscode-note');
+const testDataPath = './.vscode-note';
 
-const exampleDataNote = {
-    id: 1,
-    tags: [{ tag: '/adf/abc', category: 'test' }],
-    contents: ['adfdf', 'sdfdf']
-};
-
-const tdl: TestFileStructure[] = [
-    { path: '', kind: 'd' },
-    { path: `${exampleDataNote.id}`, kind: 'd' },
-    { path: `${exampleDataNote.id}/1.txt`, kind: 'f', content: exampleDataNote.contents[0] },
-    { path: `${exampleDataNote.id}/2.sql`, kind: 'f', content: exampleDataNote.contents[1] },
+const exampleDataNotes = [
     {
-        path: `${exampleDataNote.id}/.n.yml`,
-        kind: 'f',
-        content: jsyml.safeDump({ tags: exampleDataNote.tags })
+        id: 1,
+        tags: [{ tag: '/adf/abc', category: 'test' }],
+        contents: ['adfdf', 'sdfdf']
     },
-    { path: `seq`, kind: 'f', content: '3' }
+    {
+        id: 2,
+        tags: [{ tag: '/adf/abc', category: 'test' }],
+        contents: ['adfdf', 'sdfdf']
+    },
+    {
+        id: 3,
+        tags: [{ tag: '/g/abc', category: 'test' }],
+        contents: ['adfdf', 'sdfdf']
+    }
 ];
 
-async function createTestFileAndDirectory(tdl: TestFileStructure[]) {
-    for (const f of tdl) {
-        const p = path.join(testDataPath, f.path);
-        switch (f.kind) {
-            case 'd':
-                fse.ensureDirSync(p);
-                break;
-            case 'f':
-                fse.writeFileSync(p, f.content, { encoding: 'utf-8' });
-        }
+async function createTestFileAndDirectory() {
+    for (const testNote of exampleDataNotes) {
+        const noteDir = path.join(testDataPath, testNote.id.toString());
+        fse.ensureDirSync(noteDir);
+        const noteMetaFile = path.join(noteDir, '.n.yml');
+        vfs.writeYamlSync(noteMetaFile, { tags: testNote.tags });
     }
 }
 
@@ -44,16 +38,23 @@ function removeTestData() {
 }
 
 beforeAll(async () => {
-    initDB(testDataPath);
-    await createTestFileAndDirectory(tdl);
+    await createTestFileAndDirectory();
+    await initializeDBVariables(testDataPath);
 });
 
 afterAll(removeTestData);
 
-test('fusionNoteTags', async () => {
-    const cacheTags = await fusionNoteTags(testDataPath);
-    expect(cacheTags).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1]}}}'));
+test('cache tags', async () => {
+    const domainDB: Domain = await cacheTags();
+    expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1,2]}},"g":{"abc":{".notes":[3]}}}'));
 });
+
+// test('cache tags', async () => {
+//     const domainDB: Domain = await cacheTags();
+//     const domain = await selectAllNotesUnderDomain(domainDB['g'] as Domain);
+//     console.log(domain);
+//     // expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1]}}}'));
+// });
 
 // test('true', async () => {
 //     const domain = await selectDomain('/powershell');

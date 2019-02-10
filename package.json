@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.6.3",
+    "version": "0.7.0",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
@@ -17,7 +17,7 @@
     ],
     "license": "MIT",
     "activationEvents": [
-        "onView:vsnoteDomainExplorer"
+        "onView:domainExplorer"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -33,16 +33,16 @@
         "views": {
             "vsnote-explorer": [
                 {
-                    "id": "vsnoteDomainExplorer",
+                    "id": "domainExplorer",
                     "name": "domain"
                 },
                 {
-                    "id": "vsnoteEditExplorer",
+                    "id": "editExplorer",
                     "name": "note edit",
                     "when": "vscode-note.note.edit"
                 },
                 {
-                    "id": "vsnoteFilesExplorer",
+                    "id": "filesExplorer",
                     "name": "files",
                     "when": "vscode-note.note.files"
                 }
@@ -53,55 +53,55 @@
                 {
                     "command": "vscode-note.edit-explorer.note.col.add",
                     "group": "navigation",
-                    "when": "view == vsnoteEditExplorer"
+                    "when": "view == editExplorer"
                 },
                 {
                     "command": "vscode-note.edit-explorer.close",
                     "group": "navigation",
-                    "when": "view == vsnoteEditExplorer"
+                    "when": "view == editExplorer"
                 },
                 {
                     "command": "vscode-note.files-explorer.close",
                     "group": "navigation",
-                    "when": "view == vsnoteFilesExplorer"
+                    "when": "view == filesExplorer"
                 },
                 {
-                    "command": "vscode-note.domain.create",
+                    "command": "vscode-note.domain.add",
                     "group": "navigation",
-                    "when": "view == vsnoteDomainExplorer"
+                    "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.note.files.edit",
-                    "when": "view == vsnoteEditExplorer"
+                    "command": "vscode-note.note.edit.full",
+                    "when": "view == editExplorer"
                 },
                 {
                     "command": "vscode-note.note.delete",
-                    "when": "view == vsnoteEditExplorer"
+                    "when": "view == editExplorer"
                 },
                 {
                     "command": "vscode-note.files-explorer.openTerminal",
-                    "when": "view == vsnoteFilesExplorer"
+                    "when": "view == filesExplorer"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-note.note.create",
-                    "when": "view == vsnoteDomainExplorer",
+                    "command": "vscode-note.note.add",
+                    "when": "view == domainExplorer",
                     "group": "note"
                 },
                 {
-                    "command": "vscode-note.domain.create",
-                    "when": "view == vsnoteDomainExplorer",
+                    "command": "vscode-note.domain.add",
+                    "when": "view == domainExplorer",
                     "group": "domain"
                 },
                 {
                     "command": "vscode-note.domain.rename",
-                    "when": "view == vsnoteDomainExplorer",
+                    "when": "view == domainExplorer",
                     "group": "domain"
                 },
                 {
                     "command": "vscode-note.edit-explorer.note.col.remove",
-                    "when": "view == vsnoteEditExplorer && viewItem == editNoteNode",
+                    "when": "view == editExplorer && viewItem == editNoteNode",
                     "group": "inline"
                 }
             ]
@@ -121,7 +121,7 @@
         ],
         "commands": [
             {
-                "command": "vscode-note.note.create",
+                "command": "vscode-note.note.add",
                 "title": "New Note"
             },
             {
@@ -129,7 +129,7 @@
                 "title": "delete note"
             },
             {
-                "command": "vscode-note.domain.create",
+                "command": "vscode-note.domain.add",
                 "title": "New Domain",
                 "icon": {
                     "light": "images/light/add.svg",
@@ -141,7 +141,7 @@
                 "title": "Rname Domain"
             },
             {
-                "command": "vsnoteEditExplorer.openFileResource",
+                "command": "editExplorer.openFileResource",
                 "title": "Refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -181,8 +181,8 @@
                 }
             },
             {
-                "command": "vscode-note.note.files.edit",
-                "title": "edit files"
+                "command": "vscode-note.note.edit.full",
+                "title": "edit full"
             },
             {
                 "command": "vscode-note.files-explorer.openTerminal",
@@ -206,17 +206,17 @@
         "@types/fs-extra": "^5.0.4",
         "@types/jest": "^24.0.0",
         "@types/js-yaml": "^3.12.0",
-        "@types/node": "^10.12.21",
+        "@types/node": "^10.12.24",
         "@types/nodegit": "^0.24.0",
         "@types/object-path": "^0.11.0",
-        "@types/react": "^16.8.1",
-        "@types/react-dom": "^16.0.11",
+        "@types/react": "^16.8.2",
+        "@types/react-dom": "^16.8.0",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
         "@types/webpack": "^4.4.24",
         "babel-loader": "^8.0.5",
         "css-loader": "^2.1.0",
-        "jest": "^24.0.0",
+        "jest": "^24.1.0",
         "node-sass": "^4.11.0",
         "prettier": "^1.16.4",
         "sass-loader": "^7.1.0",
@@ -227,8 +227,8 @@
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.18.0",
         "tslint-react": "^3.6.0",
-        "typescript": "^3.3.1",
-        "webpack": "^4.29.1",
+        "typescript": "^3.3.3",
+        "webpack": "^4.29.3",
         "webpack-cli": "^3.2.3"
     },
     "dependencies": {
@@ -240,10 +240,10 @@
         "js-yaml": "^3.12.1",
         "nodegit": "^0.24.0",
         "object-path": "^0.11.4",
-        "react": "^16.7.0",
-        "react-dom": "^16.7.0",
+        "react": "^16.8.1",
+        "react-dom": "^16.8.1",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3",
-        "vscode": "^1.1.28"
+        "vscode": "^1.1.29"
     }
 }

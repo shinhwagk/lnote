@@ -2,8 +2,9 @@ import { TreeItem, TreeDataProvider, EventEmitter, Event, Uri } from 'vscode';
 import * as path from 'path';
 import { ext } from '../extensionVariables';
 import { readdirSync } from 'fs';
+import { DBCxt } from '../database';
 
-export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem> {
+export class EditExplorerProvider implements TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: EventEmitter<TreeItem> = new EventEmitter<TreeItem>();
     public readonly onDidChangeTreeData: Event<TreeItem> = this._onDidChangeTreeData.event;
 
@@ -13,7 +14,7 @@ export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem>
 
     public getTreeItem(element: TreeItem): TreeItem {
         element.command = {
-            command: 'vsnoteEditExplorer.openFileResource',
+            command: 'editExplorer.openFileResource',
             arguments: [element.resourceUri!],
             title: path.basename(element.resourceUri!.path)
         };
@@ -24,12 +25,13 @@ export class VSNSampleEditExplorerProvider implements TreeDataProvider<TreeItem>
         if (element) return [];
         const nid = ext.context.globalState.get<number>('nid');
         if (!nid) return [];
-        return (await getNoteFiles(nid)).concat(await getDocMainFile(nid));
+        return await getNoteFiles(nid);
+        // .concat(await getDocMainFile(nid));
     }
 }
 
 async function getNoteFiles(nid: number): Promise<TreeItem[]> {
-    const notePath = path.join(ext.dbDirPath, 'notes', nid.toString());
+    const notePath = path.join(DBCxt.dbDirPath, nid.toString());
     const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
     const nodes = [];
     const item = new TreeItem(Uri.file(path.join(notePath, '1.txt')), 0);
@@ -51,7 +53,7 @@ async function getNoteFiles(nid: number): Promise<TreeItem[]> {
 }
 
 async function getDocMainFile(nid: number): Promise<TreeItem> {
-    const docFilePath = path.join(ext.dbDirPath, 'notes', nid.toString(), 'doc', 'README.md');
+    const docFilePath = path.join(DBCxt.dbDirPath, 'notes', nid.toString(), 'doc', 'README.md');
     const uri = Uri.file(docFilePath);
     const item = new TreeItem(uri, 0);
     item.contextValue = 'editDocNode';

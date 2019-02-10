@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
+import { faFile } from '@fortawesome/free-solid-svg-icons/faFile';
+import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
 import { ToWebView as twv } from '../panel/message';
 
 import './index.scss';
@@ -15,10 +17,8 @@ declare function acquireVsCodeApi(): vscode;
 const vscode: vscode = acquireVsCodeApi();
 
 const editNote = (id: number) => () => vscode.postMessage({ command: 'edit', data: id });
-const viewDoc = (id: number) => () => {
-    vscode.postMessage({ command: 'doc', data: id });
-    vscode.postMessage({ command: 'files', data: id });
-};
+const viewDoc = (id: number) => () => vscode.postMessage({ command: 'doc', data: id });
+const viewFiles = (id: number) => () => vscode.postMessage({ command: 'files', data: id });
 
 function VSNNotes(props: twv.VSNWVNote) {
     const contents = props.contents.map(c => (
@@ -27,16 +27,30 @@ function VSNNotes(props: twv.VSNWVNote) {
         </div>
     ));
 
-    const domId = props.doc ? <a onClick={viewDoc(props.id)}>{props.id}</a> : <span>{props.id}</span>;
-
+    const isDoc = props.doc ? (
+        <a onClick={viewDoc(props.id)}>
+            <FontAwesomeIcon inverse icon={faFile} />
+        </a>
+    ) : (
+        <span />
+    );
+    const isFiles = props.files ? (
+        <a onClick={viewFiles(props.id)}>
+            <FontAwesomeIcon inverse icon={faFileAlt} />
+        </a>
+    ) : (
+        <span />
+    );
     return (
-        <div className="row ">
+        <div className="row">
             <div className="col col-1">
-                <pre>{domId}</pre>
+                <pre>{props.id}</pre>
             </div>
             {contents}
             <div className="col col-1">
                 <pre>
+                    {isDoc}
+                    {isFiles}
                     <a onClick={editNote(props.id)}>
                         <FontAwesomeIcon inverse icon={faPen} />
                     </a>
@@ -48,14 +62,14 @@ function VSNNotes(props: twv.VSNWVNote) {
 
 function VSNCategory(props: twv.VSNWVCategory) {
     const listnote = props.notes.map((note: twv.VSNWVNote) => (
-        <VSNNotes id={note.id} contents={note.contents} doc={note.doc} />
+        <VSNNotes id={note.id} contents={note.contents} doc={note.doc} files={note.files} />
     ));
 
     return (
         <div className="card bg-dark text-white">
             <div className="card-header">{props.name}</div>
             <div className="card-body">
-                <div className="container">{listnote}</div>
+                <div className="container-fluid">{listnote}</div>
             </div>
         </div>
     );
@@ -84,7 +98,7 @@ window.addEventListener('message', event => {
             ReactDOM.render(<VNSDomain name={name} categorys={categorys} />, document.getElementById('root'));
             break;
         default:
-            ReactDOM.render(<h1>Error</h1>, document.getElementById('root'));
+            ReactDOM.render(<h1>Error: {message}</h1>, document.getElementById('root'));
     }
 });
 

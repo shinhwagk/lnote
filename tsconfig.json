@@ -7,10 +7,10 @@
         "sourceMap": true,
         "jsx": "preserve",
         "strict": true,
-        "noUnusedLocals": false,
+        "noUnusedLocals": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": false,
+        "noUnusedParameters": true,
         "noImplicitAny": true
     },
     "exclude": ["node_modules"]
