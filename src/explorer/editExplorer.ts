@@ -52,10 +52,10 @@ async function getNoteFiles(nid: number): Promise<TreeItem[]> {
     return nodes;
 }
 
-async function getDocMainFile(nid: number): Promise<TreeItem> {
-    const docFilePath = path.join(DBCxt.dbDirPath, 'notes', nid.toString(), 'doc', 'README.md');
-    const uri = Uri.file(docFilePath);
-    const item = new TreeItem(uri, 0);
-    item.contextValue = 'editDocNode';
-    return item;
-}
+// async function getDocMainFile(nid: number): Promise<TreeItem> {
+//     const docFilePath = path.join(DBCxt.dbDirPath, 'notes', nid.toString(), 'doc', 'README.md');
+//     const uri = Uri.file(docFilePath);
+//     const item = new TreeItem(uri, 0);
+//     item.contextValue = 'editDocNode';
+//     return item;
+// }
