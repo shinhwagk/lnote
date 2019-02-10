@@ -257,12 +257,7 @@
   resolved "http://registry.npm.taobao.org/@types/minimatch/download/@types/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha1-PcoOPzOyAPx9ETnAzZbBJoyt/Z0=
 
-"@types/node@*":
-  version "10.12.23"
-  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-10.12.23.tgz#308a3acdc5d1c842aeadc50b867d99c46cfae868"
-  integrity sha1-MIo6zcXRyEKurcULhn2ZxGz66Gg=
-
-"@types/node@^10.12.24":
+"@types/node@*", "@types/node@^10.12.24":
   version "10.12.24"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-10.12.24.tgz#b13564af612a22a20b5d95ca40f1bffb3af315cf"
   integrity sha1-sTVkr2EqIqILXZXKQPG/+zrzFc8=
@@ -537,9 +532,9 @@ ajv-keywords@^3.1.0:
   integrity sha1-y2SZ2puDF3r4vBcysvChoaOqz4w=
 
 ajv@^6.1.0, ajv@^6.5.5:
-  version "6.8.1"
-  resolved "http://registry.npm.taobao.org/ajv/download/ajv-6.8.1.tgz#0890b93742985ebf8973cd365c5b23920ce3cb20"
-  integrity sha1-CJC5N0KYXr+Jc802XFsjkgzjyyA=
+  version "6.9.1"
+  resolved "http://registry.npm.taobao.org/ajv/download/ajv-6.9.1.tgz#a4d3683d74abc5670e75f0b16520f70a20ea8dc1"
+  integrity sha1-pNNoPXSrxWcOdfCxZSD3CiDqjcE=
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
@@ -3555,7 +3550,7 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "http://registry.npm.taobao.org/kind-of/download/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha1-ARRrNqYhjmTljzqNZt5df8b20FE=
 
-kleur@^3.0.0:
+kleur@^3.0.2:
   version "3.0.2"
   resolved "http://registry.npm.taobao.org/kleur/download/kleur-3.0.2.tgz#83c7ec858a41098b613d5998a7b653962b504f68"
   integrity sha1-g8fshYpBCYthPVmYp7ZTlitQT2g=
@@ -4740,11 +4735,11 @@ promisify-node@~0.3.0:
     nodegit-promise "~4.0.0"
 
 prompts@^2.0.1:
-  version "2.0.1"
-  resolved "http://registry.npm.taobao.org/prompts/download/prompts-2.0.1.tgz#201b3718b4276fb407f037db48c0029d6465245c"
-  integrity sha1-IBs3GLQnb7QH8DfbSMACnWRlJFw=
+  version "2.0.2"
+  resolved "http://registry.npm.taobao.org/prompts/download/prompts-2.0.2.tgz#094119b0b0a553ec652908b583205b9867630154"
+  integrity sha1-CUEZsLClU+xlKQi1gyBbmGdjAVQ=
   dependencies:
-    kleur "^3.0.0"
+    kleur "^3.0.2"
     sisteransi "^1.0.0"
 
 prop-types@^15.5.10, prop-types@^15.6.2:
