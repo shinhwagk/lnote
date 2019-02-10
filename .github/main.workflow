@@ -1,6 +1,9 @@
 workflow "Build, Test, and Publish" {
   on = "push"
-  resolves = ["Master", "Slack"]
+  resolves = [
+    "Slack",
+    "Publish",
+  ]
 }
 
 action "Install" {
@@ -23,4 +26,11 @@ action "Master" {
 action "Slack" {
   uses = "Ilshidur/action-slack@master"
   needs = ["Test"]
+}
+
+action "Publish" {
+  needs = ["Master"]
+  uses = "lannonbr/vsce-action@master"
+  args = "publish -p $VSCE_TOKEN"
+  secrets = ["VSCE_TOKEN"]
 }
