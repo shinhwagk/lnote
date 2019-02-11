@@ -11,14 +11,30 @@ import './index.scss';
 interface vscode {
     postMessage(message: any): void;
 }
-
 declare function acquireVsCodeApi(): vscode;
-
 const vscode: vscode = acquireVsCodeApi();
 
 const editNote = (id: number) => () => vscode.postMessage({ command: 'edit', data: id });
 const viewDoc = (id: number) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: number) => () => vscode.postMessage({ command: 'files', data: id });
+
+function renderNoteDoc(props: { id: number }) {
+    return (
+        <a onClick={viewDoc(props.id)}>
+            <FontAwesomeIcon inverse icon={faFile} />
+            <span> </span>
+        </a>
+    );
+}
+
+function renderNoteFiles(props: { id: number }) {
+    return (
+        <a onClick={viewFiles(props.id)}>
+            <FontAwesomeIcon inverse icon={faFileAlt} />
+            <span> </span>
+        </a>
+    );
+}
 
 function VSNNotes(props: twv.VSNWVNote) {
     const contents = props.contents.map(c => (
@@ -27,20 +43,8 @@ function VSNNotes(props: twv.VSNWVNote) {
         </div>
     ));
 
-    const isDoc = props.doc ? (
-        <a onClick={viewDoc(props.id)}>
-            <FontAwesomeIcon inverse icon={faFile} />
-        </a>
-    ) : (
-        <span />
-    );
-    const isFiles = props.files ? (
-        <a onClick={viewFiles(props.id)}>
-            <FontAwesomeIcon inverse icon={faFileAlt} />
-        </a>
-    ) : (
-        <span />
-    );
+    const isDoc = props.doc ? renderNoteDoc({ id: props.id }) : <span />;
+    const isFiles = props.files ? renderNoteFiles({ id: props.id }) : <span />;
     return (
         <div className="row">
             <div className="col col-1">
