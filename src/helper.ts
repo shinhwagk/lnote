@@ -20,7 +20,7 @@ export namespace vfs {
     }
 
     export function mkdirsSync(...paths: string[]) {
-        paths.forEach(fse.ensureDirSync);
+        paths.forEach(p => fse.mkdirsSync(p));
     }
 
     export function readYamlSync(file: string) {

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { readdirSync, statSync, pathExistsSync } from 'fs-extra';
+import { readdirSync, statSync, pathExistsSync, existsSync, mkdirSync, mkdirsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import { vpath, vfs } from './helper';
 
@@ -14,16 +14,19 @@ export namespace DBCxt {
     export let dbDirPath: string;
     export let domainCache: Domain;
 }
+
 export async function initializeDBVariables(dbDirPath: string): Promise<void> {
     DBCxt.dbDirPath = dbDirPath;
     DBCxt.domainCache = await cacheTags();
 }
 
-// async function createDBIfNotExist(): Promise<void> {
-//     if (existsSync(DBCxt.dbDirPath)) return;
-//     vfs.mkdirsSync(DBCxt.dbDirPath);
-//     // await createExampleData();
-// }
+export async function initializeDatabase(dbDirPath: string): Promise<void> {
+    if (!existsSync(dbDirPath)) {
+        vfs.mkdirsSync(dbDirPath);
+        await createExampleData(dbDirPath);
+    }
+    await initializeDBVariables(dbDirPath);
+}
 
 export async function cacheTags(): Promise<Domain> {
     const cacheTags: any = {};
@@ -173,26 +176,20 @@ export async function deleteNote(dpath: string, noteId: number): Promise<void> {
     objectPath.set(DBCxt.domainCache, vpath.splitPath(path.join(dpath, '.notes')), newNotes);
 }
 
-// async function createExampleData(): Promise<void> {
-//     vfs.writeFileSync(path.join(dbDirPath, 'seq'), '5');
-//     let notePath_1 = path.join(dbDirPath, '1');
-//     let notePath_2 = path.join(dbDirPath, '2');
-//     vfs.mkdirsSync(notePath_1, notePath_2);
-
-//     vfs.writeFileSync(path.join(notePath_1, '1.txt'), 'windows');
-//     vfs.writeFileSync(path.join(notePath_1, '2.txt'), 'chose install powershell');
-//     vfs.writeFileSync(path.join(notePath_1, '.n.yml'), 'category: install');
-//     vfs.mkdirsSync(path.join(notePath_1, 'doc'));
-//     vfs.writeFileSync(path.join(notePath_1, 'doc', 'README.md'), 'example.');
-//     vfs.mkdirsSync(path.join(notePath_1, 'files'));
-//     vfs.writeFileSync(path.join(notePath_1, 'files', 'example_01.txt'), 'example 01.');
-//     vfs.writeFileSync(path.join(notePath_1, 'files', 'example_02.txt'), 'example 02.');
-
-//     vfs.writeFileSync(path.join(notePath_2, '1.txt'), 'linux');
-//     vfs.writeFileSync(path.join(notePath_2, '2.txt'), 'yum install powershell');
-//     vfs.writeFileSync(path.join(notePath_2, '.n.yml'), 'category: install');
-//     vfs.mkdirsSync(path.join(notePath_2, 'doc'));
-//     vfs.writeFileSync(path.join(notePath_2, 'doc', 'README.md'), 'example.');
-//     vfs.mkdirsSync(path.join(notePath_2, 'files'));
-//     vfs.writeFileSync(path.join(notePath_2, 'files', 'example.txt'), 'example.');
-// }
+async function createExampleData(dbDirPath: string): Promise<void> {
+    console.log('111');
+    vfs.writeFileSync(path.join(dbDirPath, 'seq'), '1');
+    const notePath: string = path.join(dbDirPath, '1');
+    vfs.mkdirsSync(notePath);
+    vfs.writeFileSync(path.join(notePath, '1.txt'), 'windows');
+    vfs.writeFileSync(path.join(notePath, '2.txt'), 'chose install powershell');
+    vfs.writeFileSync(
+        path.join(notePath, '.n.yml'),
+        'tags:\n    - tag: /powershell/install\n      category: install'
+    );
+    vfs.mkdirsSync(path.join(notePath, 'doc'));
+    vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), 'example.');
+    vfs.mkdirsSync(path.join(notePath, 'files'));
+    vfs.writeFileSync(path.join(notePath, 'files', 'example_01.txt'), 'example 01.');
+    vfs.writeFileSync(path.join(notePath, 'files', 'example_02.txt'), 'example 02.');
+}

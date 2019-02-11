@@ -10,7 +10,8 @@ import {
     selectFilesExist,
     createDomain,
     createNode,
-    getNotePath
+    getNotePath,
+    initializeDatabase
 } from './database';
 import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
@@ -18,15 +19,21 @@ import { vpath } from './helper';
 import { removeSync } from 'fs-extra';
 import { initializeExtensionVariables, ext } from './extensionVariables';
 import objectPath = require('object-path');
+import untildify = require('untildify');
+import { homedir } from 'os';
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
 
+    const dbpath: string | undefined = vscode.workspace.getConfiguration('vscode-note').get('dbpath');
+    const dbDirPath = path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
+
     await initializeExtensionVariables(context);
+    await initializeDatabase(dbDirPath);
 
     vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
         if (e.affectsConfiguration('vscode-note')) {
-            await initializeExtensionVariables(context);
+            await initializeDatabase(dbDirPath);
             ext.domainProvider.refresh();
         }
     });
@@ -67,17 +74,12 @@ export async function activate(context: vscode.ExtensionContext) {
             ext.context.globalState.update('nid', nId);
             const uri = vscode.Uri.file(selectDocReadmeFile(nId));
             await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
-            if (!selectFilesExist(nId)) return;
-            ext.FilesProvider.refresh();
-            await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.files.show', async (nId: number) => {
             ext.context.globalState.update('nid', nId);
-            const uri = vscode.Uri.file(selectDocReadmeFile(nId));
-            await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
             if (!selectFilesExist(nId)) return;
             ext.FilesProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
