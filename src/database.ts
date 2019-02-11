@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { readdirSync, statSync, pathExistsSync, existsSync, mkdirSync, mkdirsSync } from 'fs-extra';
+import { readdirSync, statSync, pathExistsSync, existsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import { vpath, vfs } from './helper';
 
