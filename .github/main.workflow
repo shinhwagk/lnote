@@ -7,13 +7,13 @@ workflow "Build, Test, and Publish" {
 }
 
 action "Install" {
-  uses = "actions/npm@master"
+  uses = "nuxt/actions-yarn@node-10"
   args = "install"
 }
 
 action "Test" {
   needs = ["Install"]
-  uses = "actions/npm@master"
+  uses = "nuxt/actions-yarn@node-10"
   args = "test"
 }
 
