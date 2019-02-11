@@ -7,13 +7,13 @@ workflow "Build, Test, and Publish" {
 }
 
 action "Install" {
-  uses = "actions/npm@master"
+  uses = "nuxt/actions-yarn@node-10"
   args = "install"
 }
 
 action "Test" {
   needs = ["Install"]
-  uses = "actions/npm@master"
+  uses = "nuxt/actions-yarn@node-10"
   args = "test"
 }
 
@@ -30,7 +30,7 @@ action "Slack" {
 
 action "Publish" {
   needs = ["Master"]
-  uses = "shinhwagk/vsce-action@master"
+  uses = "lannonbr/vsce-action@master"
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
 }
