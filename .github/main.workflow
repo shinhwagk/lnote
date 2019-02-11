@@ -30,7 +30,7 @@ action "Slack" {
 
 action "Publish" {
   needs = ["Master"]
-  uses = "shinhwagk/vsce-action@master"
+  uses = "lannonbr/vsce-action@master"
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
 }
