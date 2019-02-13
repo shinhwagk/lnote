@@ -12,6 +12,5 @@
         "noFallthroughCasesInSwitch": true,
         "noUnusedParameters": true,
         "noImplicitAny": true
-    },
-    "exclude": ["node_modules"]
+    }
 }

@@ -30,7 +30,9 @@ export async function initializeDatabase(dbDirPath: string): Promise<void> {
 
 export async function cacheTags(): Promise<Domain> {
     const cacheTags: any = {};
-    for (const id of readdirSync(DBCxt.dbDirPath).filter(f => f !== 'seq')) {
+    for (const id of readdirSync(DBCxt.dbDirPath)
+        .filter(f => f !== 'seq')
+        .filter(f => f !== '.git')) {
         const noteMetaFile = path.join(DBCxt.dbDirPath, id, '.n.yml');
         const noteMeta = vfs.readYamlSync(noteMetaFile);
         const tags = noteMeta['tags'];

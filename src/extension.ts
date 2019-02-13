@@ -7,7 +7,6 @@ import {
     deleteNote,
     Domain,
     DBCxt,
-    selectFilesExist,
     createDomain,
     createNode,
     getNotePath,
@@ -80,7 +79,6 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.files.show', async (nId: number) => {
             ext.context.globalState.update('nid', nId);
-            if (!selectFilesExist(nId)) return;
             ext.FilesProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })
@@ -106,14 +104,12 @@ export async function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    /**
-     * close note edit tree
-     * */
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
         })
     );
+
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.files-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', false);
