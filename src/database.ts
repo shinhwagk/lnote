@@ -125,12 +125,13 @@ export async function createNode(dpath: string): Promise<number> {
     const newNoteOneFIle = path.join(DBCxt.dbDirPath, newId.toString(), '1.txt');
     vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath, category: 'default' }] });
     vfs.writeFileSync(newNoteOneFIle, '');
+    DBCxt.domainCache = await cacheTags();
     return newId;
 }
 
 export async function createNodeCol(nid: number): Promise<void> {
     const notePath = path.join(DBCxt.dbDirPath, nid.toString());
-    const cnt = readdirSync(notePath).length - 2;
+    const cnt = readdirSync(notePath).filter(f => /[1-9]+.*/.test(f)).length + 1;
     vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
 }
 

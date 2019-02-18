@@ -42,8 +42,9 @@ export async function activate(context: vscode.ExtensionContext) {
     // });
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('notesPanel.update', async (dpath: string) => {
-            context.globalState.update('dpath', dpath);
+        vscode.commands.registerCommand('notesPanel.update', async () => {
+            const dpath = context.globalState.get<string>('dpath');
+            if (!dpath) return;
             const domain = objectPath.get(DBCxt.domainCache, vpath.splitPath(dpath)) as Domain;
             if (domain['.notes'].length === 0) return;
             await notesPanel.updateContent(domain['.notes']);
@@ -84,9 +85,6 @@ export async function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    /**
-     * create note ,enabel tree
-     */
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.add', async (node: DomainNode) => {
             const nid: number = await createNode(node.dpath);
@@ -107,6 +105,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
+            await vscode.commands.executeCommand('notesPanel.update');
+            ext.domainProvider.refresh();
         })
     );
 
@@ -138,7 +138,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain-explorer.pin', async (dpath: string) => {
-            await vscode.commands.executeCommand('notesPanel.update', dpath);
+            context.globalState.update('dpath', dpath);
+            await vscode.commands.executeCommand('notesPanel.update');
         })
     );
 
