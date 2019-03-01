@@ -89,12 +89,11 @@ function init() {
 }
 
 export async function fusionNotes(notes: number[]): Promise<twv.VSNWVDomain> {
-    const dpath = ext.context.globalState.get<string>('dpath')!;
+    const dpath = ext.context.globalState.get<string[]>('dpath')!;
     const cs = notes
         .map(getNoteMetaFile)
         .map(vfs.readYamlSync)
-        .map(m => m.tags.filter((t: any) => t.tag === dpath)[0].category);
-
+        .map(m => m.tags.filter((t: any) => t.tag === dpath)[0]);
     const categorys: twv.VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;
@@ -110,5 +109,5 @@ export async function fusionNotes(notes: number[]): Promise<twv.VSNWVDomain> {
             .filter(c => c.name === category)[0]
             .notes.push({ id: id, contents: contents, doc: selectDocExist(id), files: selectFilesExist(id) });
     }
-    return { name: path.basename(dpath), categorys };
+    return { name: dpath[dpath.length - 1], categorys };
 }

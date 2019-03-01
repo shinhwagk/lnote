@@ -4,7 +4,7 @@ import { selectDomain, selectAllNotesUnderDomain } from '../database';
 import { vpath } from '../helper';
 
 export interface DomainNode {
-    dpath: string;
+    dpath: string[];
 }
 
 export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNode> {
@@ -20,7 +20,7 @@ export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNod
         const childDomainNumber = Object.keys(domain).length;
         const notesNumberUnderDomain = (await selectAllNotesUnderDomain(domain)).length;
         const item: vscode.TreeItem = {};
-        item.label = path.basename(element.dpath);
+        item.label = path.basename(element.dpath[element.dpath.length - 1]);
         item.contextValue = 'domainNode';
         if (domain['.notes']) {
             item.collapsibleState = childDomainNumber - 1 >= 1 ? 1 : 0; // sub '.notes'
@@ -38,12 +38,12 @@ export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNod
     }
 
     public async getChildren(element?: DomainNode): Promise<DomainNode[]> {
-        const dpath: string = element ? element.dpath : vpath.splitStr;
+        const dpath: string[] = element ? element.dpath : [];
         const domain = await selectDomain(dpath);
         return Object.keys(domain)
             .filter(t => t !== '.notes')
             .map(name => {
-                return { dpath: path.join(dpath, name) };
+                return { dpath: dpath.concat(name) };
             });
     }
 }

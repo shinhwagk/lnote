@@ -14,7 +14,6 @@ import {
 } from './database';
 import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
-import { vpath } from './helper';
 import { removeSync } from 'fs-extra';
 import { initializeExtensionVariables, ext } from './extensionVariables';
 import objectPath = require('object-path');
@@ -43,9 +42,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('notesPanel.update', async () => {
-            const dpath = context.globalState.get<string>('dpath');
+            const dpath = context.globalState.get<string[]>('dpath');
             if (!dpath) return;
-            const domain = objectPath.get(DBCxt.domainCache, vpath.splitPath(dpath)) as Domain;
+            const domain = objectPath.get(DBCxt.domainCache, dpath) as Domain;
             if (domain['.notes'].length === 0) return;
             await notesPanel.updateContent(domain['.notes']);
         })
@@ -137,7 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.domain-explorer.pin', async (dpath: string) => {
+        vscode.commands.registerCommand('vscode-note.domain-explorer.pin', async (dpath: string[]) => {
             context.globalState.update('dpath', dpath);
             await vscode.commands.executeCommand('notesPanel.update');
         })
@@ -145,7 +144,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain.add', async (node?: DomainNode) => {
-            const dpath = node ? node.dpath : '/';
+            const dpath = node ? node.dpath : [];
             const name: string | undefined = await vscode.window.showInputBox();
             if (!name) return;
             createDomain(dpath, name);
@@ -155,7 +154,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain.rename', async (node: DomainNode) => {
-            const dpaths = vpath.splitPath(node.dpath);
+            const dpaths = node.dpath;
             const oldname = dpaths[dpaths.length - 1];
             const newName: string | undefined = await vscode.window.showInputBox({ value: oldname });
             if (!newName) return;
@@ -190,4 +189,4 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 }
 
-export function deactivate() {}
+export function deactivate() { }

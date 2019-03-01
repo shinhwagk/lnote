@@ -38,7 +38,7 @@ export async function cacheTags(): Promise<Domain> {
         const tags = noteMeta['tags'];
         for (const tag of tags) {
             const t: string = tag['tag'];
-            const sp = vpath.splitPath(path.join(t, '.notes'));
+            const sp = vpath.splitPath(vpath.join(t, '.notes'));
             objectPath.ensureExists(cacheTags, sp, []);
             const notes: number[] = objectPath.get(cacheTags, sp);
             notes.push(Number(id));
@@ -73,8 +73,8 @@ export function selectFilesExist(nId: number): boolean {
     return pathExistsSync(filesDirPath);
 }
 
-export async function selectDomain(dpath: string): Promise<Domain> {
-    return objectPath.get(DBCxt.domainCache, vpath.splitPath(dpath));
+export async function selectDomain(dpath: string[]): Promise<Domain> {
+    return objectPath.get(DBCxt.domainCache, dpath);
 }
 
 export async function selectNoteContent(id: number): Promise<string[]> {
@@ -119,11 +119,11 @@ async function incSeq(): Promise<number> {
     return seq;
 }
 
-export async function createNode(dpath: string): Promise<number> {
+export async function createNode(dpath: string[]): Promise<number> {
     const newId = await incSeq();
     const newNoteMetaFile = path.join(DBCxt.dbDirPath, newId.toString(), '.n.yml');
     const newNoteOneFIle = path.join(DBCxt.dbDirPath, newId.toString(), '1.txt');
-    vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath, category: 'default' }] });
+    vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath.join('/'), category: 'default' }] });
     vfs.writeFileSync(newNoteOneFIle, '');
     DBCxt.domainCache = await cacheTags();
     return newId;
@@ -135,19 +135,19 @@ export async function createNodeCol(nid: number): Promise<void> {
     vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
 }
 
-export async function createDomain(dpath: string, name: string): Promise<void> {
-    const oPath = vpath.splitPath(path.join(dpath, name));
+export async function createDomain(dpath: string[], name: string): Promise<void> {
+    const oPath = dpath.concat(name);
     if (objectPath.has(DBCxt.domainCache, oPath)) return;
     objectPath.set(DBCxt.domainCache, oPath, {});
 }
 
-export async function renameDomain(dpath: string, newName: string): Promise<void> {
-    const opath = vpath.splitPath(dpath);
+export async function renameDomain(dpath: string[], newName: string): Promise<void> {
+    const opath = dpath;
     const domain = await selectDomain(dpath);
     opath[opath.length - 1] = newName;
     objectPath.set(DBCxt.domainCache, opath, domain);
     const notes = await selectAllNotesUnderDomain(domain);
-    notes.forEach(id => resetNoteDomain(id, dpath, '/' + opath.join('/')));
+    notes.forEach(id => resetNoteDomain(id, dpath.join('/'), '/' + opath.join('/')));
 }
 
 export function getNotePath(id: number | string): string {
@@ -180,7 +180,6 @@ export async function deleteNote(dpath: string, noteId: number): Promise<void> {
 }
 
 async function createExampleData(dbDirPath: string): Promise<void> {
-    console.log('111');
     vfs.writeFileSync(path.join(dbDirPath, 'seq'), '1');
     const notePath: string = path.join(dbDirPath, '1');
     vfs.mkdirsSync(notePath);
