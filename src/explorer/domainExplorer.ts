@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { selectDomain, selectAllNotesUnderDomain } from '../database';
-import { vpath } from '../helper';
 
 export interface DomainNode {
     dpath: string[];

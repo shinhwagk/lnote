@@ -1,5 +1,4 @@
 import * as fse from 'fs-extra';
-import * as os from 'os';
 import * as jsyaml from 'js-yaml';
 
 export namespace vfs {
