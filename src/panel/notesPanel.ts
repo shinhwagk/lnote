@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { selectNoteContent, getNoteMetaFile, selectFilesExist, selectDocExist } from '../database';
-import { ToWebView as twv } from './message';
+import { ToWebView as twv } from './notesMessage';
 import { ext } from '../extensionVariables';
 import { vfs } from '../helper';
 

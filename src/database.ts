@@ -62,12 +62,18 @@ export async function selectAllNotesUnderDomain(domain: Domain): Promise<number[
 }
 
 export function selectDocReadmeFile(nId: number): string {
-    return path.join(DBCxt.dbDirPath, nId.toString(), 'doc', 'README.md');
+    const indexFile = readdirSync(path.join(DBCxt.dbDirPath, nId.toString(), 'doc'))
+        .filter(f => /^README\.*/.test(f))[0];
+    return path.join(DBCxt.dbDirPath, nId.toString(), 'doc', indexFile);
 }
 
 export function selectDocExist(nId: number): boolean {
-    return pathExistsSync(selectDocReadmeFile(nId));
+    const docDir = path.join(DBCxt.dbDirPath, nId.toString(), 'doc');
+    return existsSync(path.join(docDir, 'README.md')) ||
+        existsSync(path.join(docDir, 'README.html')) ||
+        existsSync(path.join(docDir, 'README.htm'));
 }
+
 export function selectFilesExist(nId: number): boolean {
     const filesDirPath = path.join(DBCxt.dbDirPath, nId.toString(), 'files');
     return pathExistsSync(filesDirPath);

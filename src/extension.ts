@@ -19,6 +19,7 @@ import { initializeExtensionVariables, ext } from './extensionVariables';
 import objectPath = require('object-path');
 import untildify = require('untildify');
 import { homedir } from 'os';
+import { htmlShowPreview } from './panel/htmlPanel';
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -71,8 +72,13 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.doc.show', async (nId: number) => {
             ext.context.globalState.update('nid', nId);
-            const uri = vscode.Uri.file(selectDocReadmeFile(nId));
-            await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
+            const readmeFile = selectDocReadmeFile(nId);
+            if (path.basename(readmeFile).split('.')[1] === 'md') {
+                const uri = vscode.Uri.file(readmeFile);
+                await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
+            } else {
+                htmlShowPreview(readmeFile, dbDirPath);
+            }
         })
     );
 

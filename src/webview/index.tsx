@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faFile } from '@fortawesome/free-solid-svg-icons/faFile';
 import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
-import { ToWebView as twv } from '../panel/message';
+import { ToWebView as twv } from '../panel/notesMessage';
 
 import './index.scss';
 
@@ -21,8 +21,7 @@ const viewFiles = (id: number) => () => vscode.postMessage({ command: 'files', d
 function renderNoteDoc(props: { id: number }) {
     return (
         <a onClick={viewDoc(props.id)}>
-            <FontAwesomeIcon inverse icon={faFile} />
-            <span> </span>
+            <span>{props.id}</span>
         </a>
     );
 }
@@ -43,17 +42,18 @@ function VSNNotes(props: twv.VSNWVNote) {
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.id }) : <span />;
+    const isDoc = props.doc ? renderNoteDoc({ id: props.id }) : <span>{props.id}</span>;
     const isFiles = props.files ? renderNoteFiles({ id: props.id }) : <span />;
     return (
         <div className="row">
             <div className="col col-1">
-                <pre>{props.id}</pre>
+                <pre>
+                    {isDoc}
+                </pre>
             </div>
             {contents}
             <div className="col col-1">
                 <pre>
-                    {isDoc}
                     {isFiles}
                     <a onClick={editNote(props.id)}>
                         <FontAwesomeIcon inverse icon={faPen} />
