@@ -173,15 +173,12 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.delete', async () => {
             const nId = ext.context.globalState.get<number>('nid');
-            const dpath = ext.context.globalState.get<string>('dpath');
-            if (!nId || !dpath) return;
+            if (!nId) return;
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
-            if (sqp === 'Yes') await deleteNote(dpath, nId);
+            if (sqp === 'Yes') await deleteNote(nId);
+            await vscode.commands.executeCommand('vscode-note.domain.refresh');
             await vscode.commands.executeCommand('notesPanel.update');
-            // const notes: VSNNote[] = await selectNotes(dpath);
-            // const vsnDomain = fusionNotes(path.basename(dpath), notes);
-            // vsnPanel.updateContent(vsnDomain);
         })
     );
 

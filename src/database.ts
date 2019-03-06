@@ -1,7 +1,8 @@
 import * as path from 'path';
-import { readdirSync, statSync, pathExistsSync, existsSync } from 'fs-extra';
+import { readdirSync, statSync, pathExistsSync, existsSync, moveSync, mkdirsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
 import { vpath, vfs } from './helper';
+import { noNoteDirs } from './constants';
 
 const noteNameRegex = /^[0-9]\.[a-z]+$/;
 
@@ -30,9 +31,7 @@ export async function initializeDatabase(dbDirPath: string): Promise<void> {
 
 export async function cacheTags(): Promise<Domain> {
     const cacheTags: any = {};
-    for (const id of readdirSync(DBCxt.dbDirPath)
-        .filter(f => f !== 'seq')
-        .filter(f => f !== '.git')) {
+    for (const id of readdirSync(DBCxt.dbDirPath).filter(f => !(noNoteDirs.filter(nn => nn === f).length))) {
         const noteMetaFile = path.join(DBCxt.dbDirPath, id, '.n.yml');
         const noteMeta = vfs.readYamlSync(noteMetaFile);
         const tags = noteMeta['tags'];
@@ -160,6 +159,12 @@ export function getNotePath(id: number | string): string {
     const noteId: string = typeof id === 'number' ? id.toString() : id;
     return path.join(DBCxt.dbDirPath, noteId);
 }
+
+export function getTrashNotePath(id: number | string): string {
+    const noteId: string = typeof id === 'number' ? id.toString() : id;
+    return path.join(DBCxt.dbDirPath, 'trash', noteId);
+}
+
 export function getNoteMetaFile(id: number | string): string {
     return path.join(getNotePath(id), '.n.yml');
 }
@@ -175,14 +180,12 @@ export async function resetNoteDomain(id: number, oldDomain: string, newDomain: 
     vfs.writeYamlSync(noteMetaFile, noteMeta);
 }
 
-// async function deleteDomain(): Promise<void> {
-//     DBCxt.domainCache = await cacheTags();
-// }
-
-export async function deleteNote(dpath: string, noteId: number): Promise<void> {
-    const domain = objectPath.get(DBCxt.domainCache, vpath.splitPath(dpath));
-    const newNotes = domain['.notes'].filter((i: number) => i !== noteId);
-    objectPath.set(DBCxt.domainCache, vpath.splitPath(path.join(dpath, '.notes')), newNotes);
+export async function deleteNote(noteId: number): Promise<void> {
+    const trashDir = path.join(DBCxt.dbDirPath, 'trash');
+    if (!existsSync(trashDir)) { mkdirsSync(trashDir); }
+    const notePath = getNotePath(noteId);
+    const trashNotePath = getTrashNotePath(noteId);
+    moveSync(notePath, trashNotePath);
 }
 
 async function createExampleData(dbDirPath: string): Promise<void> {
