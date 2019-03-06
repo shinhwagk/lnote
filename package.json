@@ -71,6 +71,11 @@
                     "when": "view == domainExplorer"
                 },
                 {
+                    "command": "vscode-note.domain.refresh",
+                    "group": "navigation",
+                    "when": "view == domainExplorer"
+                },
+                {
                     "command": "vscode-note.note.edit.full",
                     "when": "view == editExplorer"
                 },
@@ -147,6 +152,14 @@
             },
             {
                 "command": "editExplorer.openFileResource",
+                "title": "Refresh",
+                "icon": {
+                    "light": "images/light/refresh.svg",
+                    "dark": "images/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "vscode-note.domain.refresh",
                 "title": "Refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -246,8 +259,8 @@
         "js-yaml": "^3.12.2",
         "nodegit": "^0.24.1",
         "object-path": "^0.11.4",
-        "react": "^16.8.3",
-        "react-dom": "^16.8.3",
+        "react": "^16.8.4",
+        "react-dom": "^16.8.4",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3"
     }

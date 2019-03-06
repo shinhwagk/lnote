@@ -10,7 +10,8 @@ import {
     createDomain,
     createNode,
     getNotePath,
-    initializeDatabase
+    initializeDatabase,
+    cacheTags
 } from './database';
 import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
@@ -111,7 +112,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.edit-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
             await vscode.commands.executeCommand('notesPanel.update');
-            ext.domainProvider.refresh();
+            await vscode.commands.executeCommand('vscode-note.domain.refresh');
         })
     );
 
@@ -177,6 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
             if (sqp === 'Yes') await deleteNote(dpath, nId);
+            await vscode.commands.executeCommand('notesPanel.update');
             // const notes: VSNNote[] = await selectNotes(dpath);
             // const vsnDomain = fusionNotes(path.basename(dpath), notes);
             // vsnPanel.updateContent(vsnDomain);
@@ -191,6 +193,13 @@ export async function activate(context: vscode.ExtensionContext) {
             const filePath = path.join(DBCxt.dbDirPath!, 'notes', nId.toString(), 'files');
             const fileTerminal = vscode.window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
             fileTerminal.show(true);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.domain.refresh', async () => {
+            DBCxt.domainCache = await cacheTags();
+            ext.domainProvider.refresh();
         })
     );
 }

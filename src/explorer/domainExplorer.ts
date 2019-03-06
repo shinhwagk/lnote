@@ -10,7 +10,7 @@ export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNod
     private _onDidChangeTreeData: vscode.EventEmitter<DomainNode> = new vscode.EventEmitter<DomainNode>();
     public readonly onDidChangeTreeData: vscode.Event<DomainNode> = this._onDidChangeTreeData.event;
 
-    public refresh(): any {
+    public refresh(): void {
         this._onDidChangeTreeData.fire();
     }
 
