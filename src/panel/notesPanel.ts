@@ -93,7 +93,7 @@ export async function fusionNotes(notes: number[]): Promise<twv.VSNWVDomain> {
     const cs = notes
         .map(getNoteMetaFile)
         .map(vfs.readYamlSync)
-        .map(m => m.tags.filter((t: any) => t.tag === dpath)[0]);
+        .map(m => m.tags.filter((t: any) => t.tag === '/' + dpath.join('/') || t.tag === dpath.join('/'))[0].category);
     const categorys: twv.VSNWVCategory[] = [];
     function testCategoryExist(name: string): boolean {
         return categorys.filter(c => c.name === name).length >= 1 ? true : false;
