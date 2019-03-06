@@ -39,10 +39,10 @@ export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNod
     public async getChildren(element?: DomainNode): Promise<DomainNode[]> {
         const dpath: string[] = element ? element.dpath : [];
         const domain = await selectDomain(dpath);
-        return Object.keys(domain)
+        return Object.keys(domain).sort()
             .filter(t => t !== '.notes')
             .map(name => {
                 return { dpath: dpath.concat(name) };
-            });
+            }).sort();
     }
 }
