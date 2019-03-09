@@ -43,3 +43,9 @@ export namespace vpath {
         return paths.length >= 2 ? paths.join('/') : paths[0];
     }
 }
+
+export namespace tools {
+    export function arraysEqual(a1: any[], a2: any[]) {
+        return JSON.stringify(a1) == JSON.stringify(a2);
+    }
+}

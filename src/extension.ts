@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {
     createNodeCol,
-    renameDomain,
+    resetNoteTags,
     selectDocReadmeFile,
     deleteNote,
     Domain,
@@ -11,7 +11,7 @@ import {
     createNode,
     getNotePath,
     initializeDatabase,
-    cacheTags
+    refreshDomainCache
 } from './database';
 import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
@@ -161,11 +161,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain.rename', async (node: DomainNode) => {
-            const dpaths = node.dpath;
-            const oldname = dpaths[dpaths.length - 1];
+            const dpath = node.dpath;
+            const oldname = dpath[dpath.length - 1];
             const newName: string | undefined = await vscode.window.showInputBox({ value: oldname });
             if (!newName) return;
-            renameDomain(node.dpath, newName);
+            await resetNoteTags(dpath, newName);
+            DBCxt.domainCache = await refreshDomainCache();
             ext.domainProvider.refresh();
         })
     );
@@ -195,7 +196,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain.refresh', async () => {
-            DBCxt.domainCache = await cacheTags();
+            DBCxt.domainCache = await refreshDomainCache();
             ext.domainProvider.refresh();
         })
     );

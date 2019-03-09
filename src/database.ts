@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { readdirSync, statSync, pathExistsSync, existsSync, moveSync, mkdirsSync } from 'fs-extra';
 import * as objectPath from 'object-path';
-import { vpath, vfs } from './helper';
+import { vpath, vfs, tools } from './helper';
 import { noNoteDirs } from './constants';
 
 const noteNameRegex = /^[0-9]\.[a-z]+$/;
@@ -18,7 +18,7 @@ export namespace DBCxt {
 
 export async function initializeDBVariables(dbDirPath: string): Promise<void> {
     DBCxt.dbDirPath = dbDirPath;
-    DBCxt.domainCache = await cacheTags();
+    DBCxt.domainCache = await refreshDomainCache();
 }
 
 export async function initializeDatabase(dbDirPath: string): Promise<void> {
@@ -29,7 +29,7 @@ export async function initializeDatabase(dbDirPath: string): Promise<void> {
     await initializeDBVariables(dbDirPath);
 }
 
-export async function cacheTags(): Promise<Domain> {
+export async function refreshDomainCache(): Promise<Domain> {
     const cacheTags: any = {};
     for (const id of readdirSync(DBCxt.dbDirPath).filter(f => !(noNoteDirs.filter(nn => nn === f).length))) {
         const noteMetaFile = path.join(DBCxt.dbDirPath, id, '.n.yml');
@@ -130,7 +130,7 @@ export async function createNode(dpath: string[]): Promise<number> {
     const newNoteOneFIle = path.join(DBCxt.dbDirPath, newId.toString(), '1.txt');
     vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath.join('/'), category: 'default' }] });
     vfs.writeFileSync(newNoteOneFIle, '');
-    DBCxt.domainCache = await cacheTags();
+    DBCxt.domainCache = await refreshDomainCache();
     return newId;
 }
 
@@ -146,13 +146,14 @@ export async function createDomain(dpath: string[], name: string): Promise<void>
     objectPath.set(DBCxt.domainCache, oPath, {});
 }
 
-export async function renameDomain(dpath: string[], newName: string): Promise<void> {
-    const opath = dpath;
+export async function resetNoteTags(dpath: string[], newName: string): Promise<void> {
+    const opath = dpath.slice();
     const domain = await selectDomain(dpath);
     opath[opath.length - 1] = newName;
-    objectPath.set(DBCxt.domainCache, opath, domain);
     const notes = await selectAllNotesUnderDomain(domain);
-    notes.forEach(id => resetNoteDomain(id, dpath.join('/'), '/' + opath.join('/')));
+    for (const id of notes) {
+        await resetNoteTag(id, dpath, opath);
+    }
 }
 
 export function getNotePath(id: number | string): string {
@@ -169,12 +170,16 @@ export function getNoteMetaFile(id: number | string): string {
     return path.join(getNotePath(id), '.n.yml');
 }
 
-export async function resetNoteDomain(id: number, oldDomain: string, newDomain: string): Promise<void> {
+export async function resetNoteTag(id: number, oldPreTag: string[], newPreTag: string[]): Promise<void> {
     const noteMetaFile = getNoteMetaFile(id);
     const noteMeta = vfs.readYamlSync(noteMetaFile);
+    const replaceLength = oldPreTag.length;
     for (let i = 0; i < noteMeta['tags'].length; i++) {
-        if (noteMeta['tags'][i].tag + '/'.startsWith(oldDomain + '/')) {
-            noteMeta['tags'][i].tag = newDomain;
+        const noteTag: string[] = noteMeta["tags"][i]["tag"].split('/').filter((s: string) => !!s);
+        const preTag = noteTag.slice(0, oldPreTag.length)
+        if (tools.arraysEqual(preTag, oldPreTag)) {
+            noteTag.splice(0, replaceLength, ...newPreTag)
+            noteMeta["tags"][i]["tag"] = noteTag.join("/")
         }
     }
     vfs.writeYamlSync(noteMetaFile, noteMeta);

@@ -1,6 +1,6 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { cacheTags, Domain, initializeDBVariables } from '../src/database';
+import { refreshDomainCache, Domain, initializeDBVariables } from '../src/database';
 import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
 
@@ -45,7 +45,7 @@ beforeAll(async () => {
 afterAll(removeTestData);
 
 test('cache tags', async () => {
-    const domainDB: Domain = await cacheTags();
+    const domainDB: Domain = await refreshDomainCache();
     expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1,2]}},"g":{"abc":{".notes":[3]}}}'));
 });
 
