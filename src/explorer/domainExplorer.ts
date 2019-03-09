@@ -43,6 +43,6 @@ export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNod
             .filter(t => t !== '.notes')
             .map(name => {
                 return { dpath: dpath.concat(name) };
-            }).sort();
+            });
     }
 }
