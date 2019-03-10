@@ -67,7 +67,7 @@ function init() {
         null,
         ext.context.subscriptions
     );
-    panel.onDidChangeViewState(e => {
+    panel.onDidChangeViewState(() => {
         if (panel && panel.visible) {
             updateContent(ns)
         }
