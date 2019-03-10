@@ -180,6 +180,7 @@ export async function activate(context: vscode.ExtensionContext) {
             if (sqp === 'Yes') await deleteNote(nId);
             await vscode.commands.executeCommand('vscode-note.domain.refresh');
             await vscode.commands.executeCommand('notesPanel.update');
+            await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
         })
     );
 
