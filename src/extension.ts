@@ -104,6 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
             context.globalState.update('nid', nid);
             ext.editProvider.refresh();
+            await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid.toString(), '1.txt')))
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
         })
     );
