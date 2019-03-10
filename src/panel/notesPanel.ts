@@ -30,8 +30,10 @@ function getWebviewContent() {
 let panel: vscode.WebviewPanel | undefined = undefined;
 let state: boolean = false;
 let tryCnt: number = 0;
+let ns: number[] = [];
 
 export async function updateContent(notes: number[]): Promise<void> {
+    ns = notes.slice()
     if (!panel) init();
 
     if (tryCnt >= 50) {
@@ -65,6 +67,11 @@ function init() {
         null,
         ext.context.subscriptions
     );
+    panel.onDidChangeViewState(e => {
+        if (panel && panel.visible) {
+            updateContent(ns)
+        }
+    }, null, ext.context.subscriptions);
     panel.webview.onDidReceiveMessage(
         message => {
             switch (message.command) {

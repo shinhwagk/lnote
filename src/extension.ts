@@ -94,9 +94,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.add', async (node: DomainNode) => {
             const nid: number = await createNode(node.dpath);
-            context.globalState.update('nid', nid);
-            ext.editProvider.refresh();
-            await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
+            await vscode.commands.executeCommand('vscode-note.note.edit', nid);
         })
     );
 
@@ -104,8 +102,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
             context.globalState.update('nid', nid);
             ext.editProvider.refresh();
-            await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid.toString(), '1.txt')))
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
+            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid.toString(), '1.txt')))
         })
     );
 
