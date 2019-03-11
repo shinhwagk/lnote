@@ -10,7 +10,7 @@ export namespace ToWebView {
     }
 
     export interface VSNWVNote {
-        id: number;
+        id: string;
         contents: string[];
         doc: boolean;
         files: boolean;

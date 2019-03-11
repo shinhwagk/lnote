@@ -60,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.edit.full', async () => {
-            const nid = context.globalState.get<number>('nid');
+            const nid = context.globalState.get<string>('nid');
             if (!nid) return;
             await vscode.commands.executeCommand(
                 'vscode.openFolder',
@@ -71,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.note.doc.show', async (nId: number) => {
+        vscode.commands.registerCommand('vscode-note.note.doc.show', async (nId: string) => {
             ext.context.globalState.update('nid', nId);
             const readmeFile = selectDocReadmeFile(nId);
             if (path.basename(readmeFile).split('.')[1] === 'md') {
@@ -84,7 +84,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.note.files.show', async (nId: number) => {
+        vscode.commands.registerCommand('vscode-note.note.files.show', async (nId: string) => {
             ext.context.globalState.update('nid', nId);
             ext.FilesProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.files', true);
@@ -93,17 +93,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.add', async (node: DomainNode) => {
-            const nid: number = await createNode(node.dpath);
+            const nid: string = await createNode(node.dpath);
             await vscode.commands.executeCommand('vscode-note.note.edit', nid);
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.note.edit', async (nid: number) => {
+        vscode.commands.registerCommand('vscode-note.note.edit', async (nid: string) => {
             context.globalState.update('nid', nid);
             ext.editProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
-            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid.toString(), '1.txt')))
+            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, '1.txt')));
         })
     );
 
@@ -133,7 +133,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
-            const nid = context.globalState.get<number>('nid');
+            const nid = context.globalState.get<string>('nid');
             if (nid) {
                 createNodeCol(nid);
                 ext.editProvider.refresh();
@@ -172,7 +172,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.delete', async () => {
-            const nId = ext.context.globalState.get<number>('nid');
+            const nId = ext.context.globalState.get<string>('nid');
             if (!nId) return;
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
@@ -185,10 +185,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.files-explorer.openTerminal', async () => {
-            const nId = ext.context.globalState.get<number>('nid');
+            const nId = ext.context.globalState.get<string>('nid');
             const dpath = ext.context.globalState.get<string>('dpath');
             if (!nId || !dpath) return;
-            const filePath = path.join(DBCxt.dbDirPath!, 'notes', nId.toString(), 'files');
+            const filePath = path.join(DBCxt.dbDirPath!, 'notes', nId, 'files');
             const fileTerminal = vscode.window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
             fileTerminal.show(true);
         })

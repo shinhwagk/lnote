@@ -23,15 +23,15 @@ export class EditExplorerProvider implements TreeDataProvider<TreeItem> {
 
     public async getChildren(element?: TreeItem): Promise<TreeItem[]> {
         if (element) return [];
-        const nid = ext.context.globalState.get<number>('nid');
+        const nid = ext.context.globalState.get<string>('nid');
         if (!nid) return [];
         return await getNoteFiles(nid);
         // .concat(await getDocMainFile(nid));
     }
 }
 
-async function getNoteFiles(nid: number): Promise<TreeItem[]> {
-    const notePath = path.join(DBCxt.dbDirPath, nid.toString());
+async function getNoteFiles(nid: string): Promise<TreeItem[]> {
+    const notePath = path.join(DBCxt.dbDirPath, nid);
     const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
     const nodes = [];
     const item = new TreeItem(Uri.file(path.join(notePath, '1.txt')), 0);

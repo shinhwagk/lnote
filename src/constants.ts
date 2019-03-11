@@ -1,2 +1,2 @@
-export const noNoteDirs = [".git", "seq", 'trash'];
+export const noNoteDirs = [".git", 'trash'];
 export const finalDirs = ['trash'];

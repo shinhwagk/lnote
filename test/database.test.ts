@@ -8,17 +8,17 @@ const testDataPath = './.vscode-note';
 
 const exampleDataNotes = [
     {
-        id: 1,
+        id: "1",
         tags: [{ tag: '/adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
-        id: 2,
+        id: "2",
         tags: [{ tag: '/adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
-        id: 3,
+        id: "3",
         tags: [{ tag: '/g/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     }
@@ -26,7 +26,7 @@ const exampleDataNotes = [
 
 async function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
-        const noteDir = path.join(testDataPath, testNote.id.toString());
+        const noteDir = path.join(testDataPath, testNote.id);
         fse.ensureDirSync(noteDir);
         const noteMetaFile = path.join(noteDir, '.n.yml');
         vfs.writeYamlSync(noteMetaFile, { tags: testNote.tags });
@@ -46,7 +46,7 @@ afterAll(removeTestData);
 
 test('cache tags', async () => {
     const domainDB: Domain = await refreshDomainCache();
-    expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":[1,2]}},"g":{"abc":{".notes":[3]}}}'));
+    expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'));
 });
 
 // test('cache tags', async () => {

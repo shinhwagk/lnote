@@ -13,11 +13,11 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 const vscode: vscode = acquireVsCodeApi();
 
-const editNote = (id: number) => () => vscode.postMessage({ command: 'edit', data: id });
-const viewDoc = (id: number) => () => vscode.postMessage({ command: 'doc', data: id });
-const viewFiles = (id: number) => () => vscode.postMessage({ command: 'files', data: id });
+const editNote = (id: string) => () => vscode.postMessage({ command: 'edit', data: id });
+const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
+const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
-function renderNoteDoc(props: { id: number }) {
+function renderNoteDoc(props: { id: string }) {
     return (
         <a onClick={viewDoc(props.id)}>
             <span>{props.id}</span>
@@ -25,7 +25,7 @@ function renderNoteDoc(props: { id: number }) {
     );
 }
 
-function renderNoteFiles(props: { id: number }) {
+function renderNoteFiles(props: { id: string }) {
     return (
         <a onClick={viewFiles(props.id)}>
             <FontAwesomeIcon inverse icon={faFileAlt} />
@@ -81,7 +81,10 @@ function VSNCategory(props: twv.VSNWVCategory) {
 function VNSDomain(props: twv.VSNWVDomain) {
     const categorys = props.categorys;
     const listCategory = categorys.map((category: twv.VSNWVCategory) => (
-        <VSNCategory name={category.name} notes={category.notes} />
+        <div>
+            <VSNCategory name={category.name} notes={category.notes} />
+            <p></p>
+        </div>
     ));
 
     return (

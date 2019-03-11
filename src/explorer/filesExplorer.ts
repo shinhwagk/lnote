@@ -17,10 +17,10 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const nid = ext.context.globalState.get<number>('nid');
+        const nid = ext.context.globalState.get<string>('nid');
         if (!element) {
             if (!nid) return [];
-            const noteFileDirPath = join(DBCxt.dbDirPath, nid.toString(), 'files');
+            const noteFileDirPath = join(DBCxt.dbDirPath, nid, 'files');
             return readdirSync(noteFileDirPath).map(f => {
                 const uri = Uri.file(join(noteFileDirPath, f));
                 if (statSync(uri.fsPath).isDirectory()) {
