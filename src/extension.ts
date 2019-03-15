@@ -44,7 +44,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 return;
             }
             const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
-            const notes = await selectDomainNotes(dpath)
+            const notes = await selectDomainNotes(dpath);
             await notesPanel.updateContent(await notesPanel.genViewDataByNotes(notes));
         })
     );
@@ -57,8 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.edit.full', async () => {
-            const nid = context.globalState.get<string>('nid');
-            if (!nid) return;
+            const nid = context.globalState.get<string>('nid')!;
             await vscode.commands.executeCommand(
                 'vscode.openFolder',
                 vscode.Uri.file(getNotePath(nid)),
@@ -144,12 +143,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
-            const nid = context.globalState.get<string>('nid');
-            if (nid) {
-                const id = await createNodeCol(nid);
-                await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, `${id}.txt`)));
-                ext.editProvider.refresh();
-            }
+            const nid = context.globalState.get<string>('nid')!;
+            const id = await createNodeCol(nid);
+            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, `${id}.txt`)));
+            ext.editProvider.refresh();
         })
     );
 
@@ -184,8 +181,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.delete', async () => {
-            const nId = ext.context.globalState.get<string>('nid');
-            if (!nId) return;
+            const nId = ext.context.globalState.get<string>('nid')!;
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
             if (sqp === 'Yes') await deleteNote(nId);

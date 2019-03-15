@@ -84,7 +84,7 @@ export async function selectDomain(dpath: string[]): Promise<Domain> {
 }
 
 export async function selectDomainNotes(dpath: string[]): Promise<string[]> {
-    return objectPath.get(DBCxt.domainCache, dpath, { '.notes': [] })[".notes"];
+    return objectPath.get<{ '.notes': string[] }>(DBCxt.domainCache, dpath, { '.notes': [] })[".notes"];
 }
 
 export async function selectNoteContent(id: string): Promise<string[]> {
@@ -122,7 +122,7 @@ export async function createNodeCol(nid: string): Promise<number> {
 export async function createDomain(dpath: string[], name: string): Promise<void> {
     const oPath = dpath.concat(name);
     if (objectPath.has(DBCxt.domainCache, oPath)) return;
-    objectPath.set(DBCxt.domainCache, oPath, {});
+    objectPath.set(DBCxt.domainCache, oPath, { '.notes': [] });
 }
 
 export async function resetNoteTags(dpath: string[], newName: string): Promise<void> {
