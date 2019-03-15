@@ -30,10 +30,10 @@ function getWebviewContent() {
 let panel: vscode.WebviewPanel | undefined = undefined;
 let state: boolean = false;
 let tryCnt: number = 0;
-let ns: string[] = [];
+let viewData: twv.VSNWVDomain | undefined = undefined;
 
-export async function updateContent(notes: string[]): Promise<void> {
-    ns = notes.slice();
+export async function updateContent(vdata: twv.VSNWVDomain): Promise<void> {
+    viewData = vdata;
     if (!panel) init();
 
     if (tryCnt >= 50) {
@@ -41,15 +41,14 @@ export async function updateContent(notes: string[]): Promise<void> {
         return;
     }
     if (!state) {
-        setTimeout(async () => await updateContent(notes), 100);
+        setTimeout(async () => await updateContent(vdata), 100);
         tryCnt += 1;
         return;
     }
     if (panel) {
         tryCnt = 0;
         const command = 'data';
-        const data = await fusionNotes(notes);
-        panel.webview.postMessage({ command, data });
+        panel.webview.postMessage({ command, data: vdata });
     }
 }
 
@@ -68,8 +67,8 @@ function init() {
         ext.context.subscriptions
     );
     panel.onDidChangeViewState(() => {
-        if (panel && panel.visible) {
-            updateContent(ns);
+        if (panel && panel.visible && viewData) {
+            updateContent(viewData);
         }
     }, null, ext.context.subscriptions);
     panel.webview.onDidReceiveMessage(
@@ -87,6 +86,12 @@ function init() {
                 case 'files':
                     vscode.commands.executeCommand('vscode-note.note.files.show', message.data);
                     break;
+                case 'add':
+                    vscode.commands.executeCommand('vscode-note.note.add', message.data);
+                    break;
+                case 'add-category':
+                    vscode.commands.executeCommand('vscode-note.note.category.add');
+                    break;
             }
         },
         undefined,
@@ -95,7 +100,7 @@ function init() {
     panel.webview.html = getWebviewContent();
 }
 
-export async function fusionNotes(notes: string[]): Promise<twv.VSNWVDomain> {
+export async function genViewDataByNotes(notes: string[]): Promise<twv.VSNWVDomain> {
     const dpath = ext.context.globalState.get<string[]>('dpath')!;
     const cs = notes
         .map(getNoteMetaFile)

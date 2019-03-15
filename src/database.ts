@@ -83,6 +83,10 @@ export async function selectDomain(dpath: string[]): Promise<Domain> {
     return objectPath.get(DBCxt.domainCache, dpath);
 }
 
+export async function selectDomainNotes(dpath: string[]): Promise<string[]> {
+    return objectPath.get(DBCxt.domainCache, dpath, { '.notes': [] })[".notes"];
+}
+
 export async function selectNoteContent(id: string): Promise<string[]> {
     const notePath = path.join(DBCxt.dbDirPath, id);
     const contents = readdirSync(notePath)
@@ -98,11 +102,11 @@ function genNewSeq(): string {
     return existsSync(getNotePath(id)) ? genNewSeq() : id;
 }
 
-export async function createNode(dpath: string[]): Promise<string> {
+export async function createNode(dpath: string[], category: string = 'default'): Promise<string> {
     const newId = genNewSeq();
     const newNoteMetaFile = path.join(DBCxt.dbDirPath, newId, '.n.yml');
     const newNoteOneFIle = path.join(DBCxt.dbDirPath, newId, '1.txt');
-    vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath.join('/'), category: 'default' }] });
+    vfs.writeYamlSync(newNoteMetaFile, { tags: [{ tag: dpath.join('/'), category }] });
     vfs.writeFileSync(newNoteOneFIle, '');
     DBCxt.domainCache = await refreshDomainCache();
     return newId;

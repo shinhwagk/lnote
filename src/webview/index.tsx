@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
 import { ToWebView as twv } from '../panel/notesMessage';
 
@@ -13,6 +14,8 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 const vscode: vscode = acquireVsCodeApi();
 
+const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
+const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
 const editNote = (id: string) => () => vscode.postMessage({ command: 'edit', data: id });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
@@ -70,7 +73,11 @@ function VSNCategory(props: twv.VSNWVCategory) {
 
     return (
         <div className="card bg-dark text-white">
-            <div className="card-header">{props.name}</div>
+            <div className="card-header">{props.name + ' '}
+                <a onClick={addNote(props.name!)}>
+                    <FontAwesomeIcon inverse icon={faPlus} />
+                </a>
+            </div>
             <div className="card-body">
                 <div className="container-fluid">{listnote}</div>
             </div>
@@ -89,7 +96,12 @@ function VNSDomain(props: twv.VSNWVDomain) {
 
     return (
         <div>
-            <h1>{props.name}</h1>
+            <h1>{props.name + ' '}
+                <a onClick={addCategory()}>
+                    <FontAwesomeIcon inverse icon={faPlus} />
+                </a>
+            </h1>
+
             <div>{listCategory} </div>
         </div>
     );

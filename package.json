@@ -90,11 +90,6 @@
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-note.note.add",
-                    "when": "view == domainExplorer",
-                    "group": "note"
-                },
-                {
                     "command": "vscode-note.domain.add",
                     "when": "view == domainExplorer",
                     "group": "domain"

@@ -5,19 +5,18 @@ import {
     resetNoteTags,
     selectDocReadmeFile,
     deleteNote,
-    Domain,
     DBCxt,
     createDomain,
     createNode,
     getNotePath,
     initializeDatabase,
-    refreshDomainCache
+    refreshDomainCache,
+    selectDomainNotes
 } from './database';
 import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
 import { removeSync } from 'fs-extra';
 import { initializeExtensionVariables, ext } from './extensionVariables';
-import objectPath = require('object-path');
 import untildify = require('untildify');
 import { homedir } from 'os';
 import { htmlShowPreview } from './panel/htmlPanel';
@@ -38,17 +37,15 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // vscode.workspace.onDidCloseTextDocument((e: vscode.TextDocument) => {
-    //     vscode.window.showInformationMessage(e.uri.toString());
-    // });
-
     context.subscriptions.push(
-        vscode.commands.registerCommand('notesPanel.update', async () => {
-            const dpath = context.globalState.get<string[]>('dpath');
-            if (!dpath) return;
-            const domain = objectPath.get(DBCxt.domainCache, dpath) as Domain;
-            if (domain['.notes'].length === 0) return;
-            await notesPanel.updateContent(domain['.notes']);
+        vscode.commands.registerCommand('notesPanel.update', async (vdata?: any) => {
+            if (vdata) {
+                await notesPanel.updateContent(vdata);
+                return;
+            }
+            const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
+            const notes = await selectDomainNotes(dpath)
+            await notesPanel.updateContent(await notesPanel.genViewDataByNotes(notes));
         })
     );
 
@@ -92,9 +89,23 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.note.add', async (node: DomainNode) => {
-            const nid: string = await createNode(node.dpath);
+        vscode.commands.registerCommand('vscode-note.note.add', async (category: string) => {
+            const dpath = context.globalState.get<string[]>('dpath')!;
+            const nid: string = await createNode(dpath, category);
             await vscode.commands.executeCommand('vscode-note.note.edit', nid);
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('vscode-note.note.category.add', async () => {
+            const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
+            const notes = await selectDomainNotes(dpath)
+            const vdata = await notesPanel.genViewDataByNotes(notes)
+            const cname: string | undefined = await vscode.window.showInputBox({ value: 'default' });
+            if (!cname) return;
+            if (vdata.categorys.filter(c => c.name === cname).length >= 1) return;
+            const cs = vdata.categorys.concat({ name: cname, notes: [] });
+            await vscode.commands.executeCommand('notesPanel.update', { name: vdata.name, categorys: cs });
         })
     );
 
