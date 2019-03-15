@@ -93,27 +93,6 @@ export async function selectNoteContent(id: string): Promise<string[]> {
     return contents;
 }
 
-// export async function createNote(dpath: string): Promise<number> {
-//     const noteid: number = await incSeq();
-//     const oPath = vpath.splitPath(path.join(dpath, '.notes'));
-//     const notes = objectPath.get<number[]>(DBCxt.domainCache, oPath, []);
-//     notes.push(noteid);
-//     objectPath.set(DBCxt.domainCache, oPath, notes);
-//     const notePath = path.join(DBCxt.dbDirPath, noteid.toString());
-
-//     mkdirSync(notePath);
-
-//     vfs.writeFileSync(path.join(notePath, '1.txt'), '');
-//     vfs.writeFileSync(path.join(notePath, '.n.yml'), 'category:');
-
-//     vfs.mkdirsSync(path.join(notePath, 'doc'), path.join(notePath, 'files'));
-//     vfs.writeFileSync(path.join(notePath, 'doc', 'README.md'), '');
-//     vfs.writeFileSync(path.join(notePath, 'files', 'main.txt'), '');
-
-//     await checkout();
-//     return noteid;
-// }
-
 function genNewSeq(): string {
     const id = randomBytes(3).toString('hex');
     return existsSync(getNotePath(id)) ? genNewSeq() : id;
@@ -129,10 +108,11 @@ export async function createNode(dpath: string[]): Promise<string> {
     return newId;
 }
 
-export async function createNodeCol(nid: string): Promise<void> {
+export async function createNodeCol(nid: string): Promise<number> {
     const notePath = path.join(DBCxt.dbDirPath, nid);
     const cnt = readdirSync(notePath).filter(f => /[1-9]+.*/.test(f)).length + 1;
     vfs.writeFileSync(path.join(notePath, `${cnt}.txt`), '');
+    return cnt;
 }
 
 export async function createDomain(dpath: string[], name: string): Promise<void> {

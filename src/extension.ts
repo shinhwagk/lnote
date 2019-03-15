@@ -135,7 +135,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
             const nid = context.globalState.get<string>('nid');
             if (nid) {
-                createNodeCol(nid);
+                const id = await createNodeCol(nid);
+                await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, `${id}.txt`)));
                 ext.editProvider.refresh();
             }
         })
