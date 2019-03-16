@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.8.5",
+    "version": "0.8.6",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
