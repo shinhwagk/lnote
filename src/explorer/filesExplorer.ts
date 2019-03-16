@@ -18,24 +18,25 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
         const nid = ext.context.globalState.get<string>('nid');
-        if (!element) {
-            if (!nid) return [];
-            const noteFileDirPath = join(DBCxt.dbDirPath, nid, 'files');
-            return readdirSync(noteFileDirPath).map(f => {
-                const uri = Uri.file(join(noteFileDirPath, f));
-                if (statSync(uri.fsPath).isDirectory()) {
-                    return new TreeItem(uri, 1);
-                } else {
-                    const item = new TreeItem(uri, 0);
-                    item.command = {
-                        command: 'editExplorer.openFileResource',
-                        arguments: [uri],
-                        title: basename(uri.path)
-                    };
-                    return item;
-                }
-            });
-        }
-        return [];
+        if (!nid) return [];
+
+        const fPath: string =
+            element ? element.resourceUri!.fsPath : join(DBCxt.dbDirPath, nid, 'files');
+
+        return readdirSync(fPath).map(f => {
+            const uri = Uri.file(join(fPath, f));
+            if (statSync(uri.fsPath).isDirectory()) {
+                return new TreeItem(uri, 1);
+            } else {
+                const item = new TreeItem(uri, 0);
+                item.command = {
+                    command: 'editExplorer.openFileResource',
+                    arguments: [uri],
+                    title: basename(uri.path)
+                };
+                return item;
+            }
+        });
+
     }
 }

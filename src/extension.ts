@@ -68,7 +68,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.note.doc.show', async (nId: string) => {
-            ext.context.globalState.update('nid', nId);
             const readmeFile = selectDocReadmeFile(nId);
             if (path.basename(readmeFile).split('.')[1] === 'md') {
                 const uri = vscode.Uri.file(readmeFile);
