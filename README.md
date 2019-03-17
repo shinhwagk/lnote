@@ -8,8 +8,7 @@ a simple note extension.
 
 ## Features
 
--   [x] record your note in row
--   [ ] version contorl note
+- record your note in row
 
 ## note data locaction
 
