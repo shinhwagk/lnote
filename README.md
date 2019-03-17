@@ -14,6 +14,8 @@ a simple note extension.
 
 > ~/.vscode-note
 
+Recommend to put the note directory in onedrive
+
 ## screenshot
 
 ![Image of Git Log](images/example.png)
