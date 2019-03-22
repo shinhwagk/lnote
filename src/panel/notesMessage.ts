@@ -1,16 +1,16 @@
 export namespace ToWebView {
-    export interface VSNWVDomain {
+    export interface WVDomain {
         name: string;
-        categorys: VSNWVCategory[];
+        categories: WVCategory[];
     }
 
-    export interface VSNWVCategory {
-        name?: string;
-        notes: VSNWVNote[];
+    export interface WVCategory {
+        name: string;
+        notes: WVNote[];
     }
 
-    export interface VSNWVNote {
-        id: string;
+    export interface WVNote {
+        nId: string;
         contents: string[];
         doc: boolean;
         files: boolean;
@@ -18,7 +18,7 @@ export namespace ToWebView {
 
     export interface DomainData {
         command: 'data';
-        data: VSNWVDomain;
+        data: WVDomain;
     }
 }
 

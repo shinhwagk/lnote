@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
 import { basename } from 'path';
+import * as vscode from 'vscode';
 
 const viewType = 'htmlShowPreview';
 const title = viewType;
@@ -7,13 +7,13 @@ const title = viewType;
 let _panel: vscode.WebviewPanel | undefined;
 const _disposables: vscode.Disposable[] = [];
 
-export function htmlShowPreview(htmlFile: string, resourcePath: string) {
+export function noteDocHtmlPanel(htmlFile: string, resourcePath: string) {
     if (_panel) {
         _update(_panel!, htmlFile);
         return;
     }
     _panel = createPanel(resourcePath!);
-    htmlShowPreview(htmlFile, resourcePath);
+    noteDocHtmlPanel(htmlFile, resourcePath);
 }
 
 function createPanel(resourcePath: string) {
@@ -30,7 +30,7 @@ function _dispose() {
 }
 
 function _update(panel: vscode.WebviewPanel, htmlFile: string) {
-    panel.title = "vscode-note -> " + ' -> ' + basename(htmlFile);
+    panel.title = 'vscode-note' + ' -> ' + basename(htmlFile);
     panel.webview.html = _getHtmlForWebview(htmlFile);
 }
 
@@ -59,4 +59,3 @@ function _getHtmlForWebview(htmlFile: string) {
         </body>
         </html>`;
 }
-

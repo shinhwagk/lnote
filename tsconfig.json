@@ -3,14 +3,23 @@
         "module": "commonjs",
         "target": "esnext",
         "outDir": "out",
-        "lib": ["es7", "dom"],
+        "lib": [
+            "es7",
+            "dom"
+        ],
         "sourceMap": true,
         "jsx": "preserve",
         "strict": true,
-        "noUnusedLocals": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "noUnusedParameters": true,
+        "noUnusedLocals": true,
         "noImplicitAny": true
-    }
+    },
+    "plugins": [
+        {
+            "name": "typescript-tslint-plugin",
+            "configFile": "./tslint.json"
+        }
+    ]
 }

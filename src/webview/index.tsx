@@ -1,9 +1,9 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
-import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { ToWebView as twv } from '../panel/notesMessage';
 
 import './index.scss';
@@ -31,34 +31,34 @@ function renderNoteDoc(props: { id: string }) {
 function renderNoteFiles(props: { id: string }) {
     return (
         <a onClick={viewFiles(props.id)}>
-            <FontAwesomeIcon inverse icon={faFileAlt} />
-            <span> </span>
+            <FontAwesomeIcon inverse={true} icon={faFileAlt} />
+            <span>{' '}</span>
         </a>
     );
 }
 
-function VSNNotes(props: twv.VSNWVNote) {
-    const contents = props.contents.map(c => (
-        <div className="col">
+function VSNNotes(props: twv.WVNote) {
+    const contents = props.contents.map((c) => (
+        <div className='col'>
             <pre>{c}</pre>
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.id }) : <span>{props.id}</span>;
-    const isFiles = props.files ? renderNoteFiles({ id: props.id }) : <span />;
+    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId}</span>;
+    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span />;
     return (
-        <div className="row">
-            <div className="col col-1">
+        <div className='row'>
+            <div className='col col-1'>
                 <pre>
                     {isDoc}
                 </pre>
             </div>
             {contents}
-            <div className="col col-1">
+            <div className='col col-1'>
                 <pre>
                     {isFiles}
-                    <a onClick={editNote(props.id)}>
-                        <FontAwesomeIcon inverse icon={faPen} />
+                    <a onClick={editNote(props.nId)}>
+                        <FontAwesomeIcon inverse={true} icon={faPen} />
                     </a>
                 </pre>
             </div>
@@ -66,31 +66,30 @@ function VSNNotes(props: twv.VSNWVNote) {
     );
 }
 
-function VSNCategory(props: twv.VSNWVCategory) {
-    const listnote = props.notes.map((note: twv.VSNWVNote) => (
-        <VSNNotes id={note.id} contents={note.contents} doc={note.doc} files={note.files} />
+function VSNCategory(props: twv.WVCategory) {
+    const listnote = props.notes.map((note: twv.WVNote) => (
+        <VSNNotes nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} />
     ));
 
     return (
-        <div className="card bg-dark text-white">
-            <div className="card-header">{props.name + ' '}
+        <div className='card bg-dark text-white'>
+            <div className='card-header'>{props.name + ' '}
                 <a onClick={addNote(props.name!)}>
-                    <FontAwesomeIcon inverse icon={faPlus} />
+                    <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </div>
-            <div className="card-body">
-                <div className="container-fluid">{listnote}</div>
+            <div className='card-body'>
+                <div className='container-fluid'>{listnote}</div>
             </div>
         </div>
     );
 }
 
-function VNSDomain(props: twv.VSNWVDomain) {
-    const categorys = props.categorys;
-    const listCategory = categorys.map((category: twv.VSNWVCategory) => (
+function VNSDomain(props: twv.WVDomain) {
+    const categories = props.categories.map((category: twv.WVCategory) => (
         <div>
             <VSNCategory name={category.name} notes={category.notes} />
-            <p></p>
+            <p />
         </div>
     ));
 
@@ -98,25 +97,26 @@ function VNSDomain(props: twv.VSNWVDomain) {
         <div>
             <h1>{props.name + ' '}
                 <a onClick={addCategory()}>
-                    <FontAwesomeIcon inverse icon={faPlus} />
+                    <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </h1>
 
-            <div>{listCategory} </div>
+            <div>{categories}</div>
         </div>
     );
 }
 
-window.addEventListener('message', event => {
+window.addEventListener('message', (event) => {
     const message: twv.DomainData = event.data;
+
     switch (message.command) {
         case 'data':
             const name = message.data.name;
-            const categorys = message.data.categorys;
-            ReactDOM.render(<VNSDomain name={name} categorys={categorys} />, document.getElementById('root'));
+            const categories = message.data.categories;
+            ReactDOM.render(<VNSDomain name={name} categories={categories} />, document.getElementById('root'));
             break;
         default:
-            ReactDOM.render(<h1>Error: {message}</h1>, document.getElementById('root'));
+            ReactDOM.render(<h1>loading...{message}</h1>, document.getElementById('root'));
     }
 });
 

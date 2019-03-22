@@ -1,24 +1,25 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { refreshDomainCache, Domain, initializeDBVariables } from '../src/database';
 import rimraf = require('rimraf');
+import { Domain, initializeDBVariables, refreshDomainCache } from '../src/database';
 import { vfs } from '../src/helper';
+import { metaFileName } from '../src/constants';
 
 const testDataPath = './.vscode-note';
 
 const exampleDataNotes = [
     {
-        id: "1",
+        id: '1',
         tags: [{ tag: '/adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
-        id: "2",
+        id: '2',
         tags: [{ tag: '/adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
-        id: "3",
+        id: '3',
         tags: [{ tag: '/g/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     }
@@ -28,7 +29,7 @@ async function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
         const noteDir = path.join(testDataPath, testNote.id);
         fse.ensureDirSync(noteDir);
-        const noteMetaFile = path.join(noteDir, '.n.yml');
+        const noteMetaFile = path.join(noteDir, metaFileName);
         vfs.writeYamlSync(noteMetaFile, { tags: testNote.tags });
     }
 }
@@ -46,7 +47,11 @@ afterAll(removeTestData);
 
 test('cache tags', async () => {
     const domainDB: Domain = await refreshDomainCache();
-    expect(domainDB).toEqual(JSON.parse('{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'));
+    expect(domainDB).toEqual(
+        JSON.parse(
+            '{"adf":{"abc":{".categories":{"test":["1","2"]}}},"g":{"abc":{".categories":{"test":["3"]}}},".categories":{}}'
+        )
+    );
 });
 
 // test('cache tags', async () => {

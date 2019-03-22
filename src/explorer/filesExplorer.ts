@@ -20,8 +20,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
         const nid = ext.context.globalState.get<string>('nid');
         if (!nid) return [];
 
-        const fPath: string =
-            element ? element.resourceUri!.fsPath : join(DBCxt.dbDirPath, nid, 'files');
+        const fPath: string = element ? element.resourceUri!.fsPath : join(DBCxt.dbDirPath, nid, 'files');
 
         return readdirSync(fPath).map(f => {
             const uri = Uri.file(join(fPath, f));
@@ -37,6 +36,5 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
                 return item;
             }
         });
-
     }
 }

@@ -14,7 +14,7 @@ a simple note extension.
 
 > ~/.vscode-note
 
-Recommend to put the note directory in onedrive
+Recommend use onedrive to save your notes.
 
 ## screenshot
 

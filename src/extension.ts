@@ -1,25 +1,25 @@
+import { removeSync } from 'fs-extra';
+import { homedir } from 'os';
 import * as path from 'path';
+import untildify = require('untildify');
 import * as vscode from 'vscode';
 import {
-    createNodeCol,
-    resetNoteTags,
-    selectDocReadmeFile,
-    deleteNote,
-    DBCxt,
+    createCategory,
     createDomain,
     createNode,
+    createNodeCol,
+    DBCxt,
+    deleteNote,
     getNotePath,
     initializeDatabase,
     refreshDomainCache,
-    selectDomainNotes
+    resetNoteTags,
+    selectDocReadmeFile
 } from './database';
-import * as notesPanel from './panel/notesPanel';
 import { DomainNode } from './explorer/domainExplorer';
-import { removeSync } from 'fs-extra';
-import { initializeExtensionVariables, ext } from './extensionVariables';
-import untildify = require('untildify');
-import { homedir } from 'os';
-import { htmlShowPreview } from './panel/htmlPanel';
+import { ext, initializeExtensionVariables } from './extensionVariables';
+import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
+import * as notesPanel from './panel/notesPanel';
 
 export async function activate(context: vscode.ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -36,18 +36,6 @@ export async function activate(context: vscode.ExtensionContext) {
             ext.domainProvider.refresh();
         }
     });
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand('notesPanel.update', async (vdata?: any) => {
-            if (vdata) {
-                await notesPanel.updateContent(vdata);
-                return;
-            }
-            const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
-            const notes = await selectDomainNotes(dpath);
-            await notesPanel.updateContent(await notesPanel.genViewDataByNotes(notes));
-        })
-    );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('editExplorer.openFileResource', async resource => {
@@ -73,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 const uri = vscode.Uri.file(readmeFile);
                 await vscode.commands.executeCommand('markdown.showPreviewToSide', uri);
             } else {
-                htmlShowPreview(readmeFile, dbDirPath);
+                noteDocHtmlPanel(readmeFile, dbDirPath);
             }
         })
     );
@@ -95,15 +83,16 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('vscode-note.note.category.add', async () => {
-            const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
-            const notes = await selectDomainNotes(dpath)
-            const vdata = await notesPanel.genViewDataByNotes(notes)
+        vscode.commands.registerCommand('vscode-note.note.category.add', async (domainNode?: DomainNode) => {
+            const dpath: string[] = domainNode
+                ? domainNode.dpath
+                : ext.context.globalState.get<string[]>('dpath')!;
+            context.globalState.update('dpath', dpath);
             const cname: string | undefined = await vscode.window.showInputBox({ value: 'default' });
             if (!cname) return;
-            if (vdata.categorys.filter(c => c.name === cname).length >= 1) return;
-            const cs = vdata.categorys.concat({ name: cname, notes: [] });
-            await vscode.commands.executeCommand('notesPanel.update', { name: vdata.name, categorys: cs });
+            await createCategory(dpath, cname);
+            await notesPanel.updateContent();
+            await ext.domainProvider.refresh();
         })
     );
 
@@ -112,15 +101,17 @@ export async function activate(context: vscode.ExtensionContext) {
             context.globalState.update('nid', nid);
             ext.editProvider.refresh();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', true);
-            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, '1.txt')));
+            await vscode.commands.executeCommand(
+                'editExplorer.openFileResource',
+                vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, '1.txt'))
+            );
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.edit-explorer.close', async () => {
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
-            await vscode.commands.executeCommand('notesPanel.update');
-            await vscode.commands.executeCommand('vscode-note.domain.refresh');
+            notesPanel.updateContent();
         })
     );
 
@@ -144,7 +135,10 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('vscode-note.edit-explorer.note.col.add', async () => {
             const nid = context.globalState.get<string>('nid')!;
             const id = await createNodeCol(nid);
-            await vscode.commands.executeCommand('editExplorer.openFileResource', vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, `${id}.txt`)));
+            await vscode.commands.executeCommand(
+                'editExplorer.openFileResource',
+                vscode.Uri.file(path.join(DBCxt.dbDirPath, nid, `${id}.txt`))
+            );
             ext.editProvider.refresh();
         })
     );
@@ -152,7 +146,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('vscode-note.domain-explorer.pin', async (dpath: string[]) => {
             context.globalState.update('dpath', dpath);
-            await vscode.commands.executeCommand('notesPanel.update');
+            await notesPanel.updateContent();
         })
     );
 
@@ -184,8 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const sqp = await vscode.window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
             if (sqp === 'Yes') await deleteNote(nId);
-            await vscode.commands.executeCommand('vscode-note.domain.refresh');
-            await vscode.commands.executeCommand('notesPanel.update');
+            await notesPanel.updateContent();
             await vscode.commands.executeCommand('setContext', 'vscode-note.note.edit', false);
         })
     );
@@ -209,4 +202,4 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 }
 
-export function deactivate() { }
+export function deactivate() {}

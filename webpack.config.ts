@@ -11,12 +11,7 @@ const extConfig: webpack.Configuration = {
     },
     resolve: { extensions: ['.ts', '.js'] },
     module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                loader: 'ts-loader'
-            }
-        ]
+        rules: [{ test: /\.ts$/, loader: 'ts-loader' }]
     },
     externals: { vscode: 'vscode' }
 };
@@ -33,10 +28,7 @@ const webviewConfig: webpack.Configuration = {
     },
     module: {
         rules: [
-            {
-                test: /\.tsx?$/,
-                loaders: ['babel-loader', 'ts-loader']
-            },
+            { test: /\.tsx?$/, loaders: ['babel-loader', 'ts-loader'] },
             { test: /\.s?css$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] }
         ]
     }

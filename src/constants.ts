@@ -1,2 +1,2 @@
-export const noNoteDirs = [".git", 'trash'];
-export const finalDirs = ['trash'];
+export const noNoteDirs = ['.git', 'trash'];
+export const metaFileName = '.n.yml';

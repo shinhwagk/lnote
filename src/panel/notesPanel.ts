@@ -1,9 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { selectNoteContent, getNoteMetaFile, selectFilesExist, selectDocExist } from '../database';
-import { ToWebView as twv } from './notesMessage';
+import { selectDocExist, selectDomain, selectFilesExist, selectNoteContents } from '../database';
 import { ext } from '../extensionVariables';
-import { vfs } from '../helper';
+import { ToWebView as twv } from './notesMessage';
 
 const assetsFile = (name: string) => {
     const file = path.join(ext.context.extensionPath, 'out', name);
@@ -27,28 +26,30 @@ function getWebviewContent() {
 	</html>`;
 }
 
-let panel: vscode.WebviewPanel | undefined = undefined;
+let panel: vscode.WebviewPanel | undefined;
 let state: boolean = false;
 let tryCnt: number = 0;
-let viewData: twv.VSNWVDomain | undefined = undefined;
 
-export async function updateContent(vdata: twv.VSNWVDomain): Promise<void> {
-    viewData = vdata;
-    if (!panel) init();
+export async function updateContent(): Promise<void> {
+    if (!panel) {
+        init();
+    }
 
     if (tryCnt >= 50) {
         vscode.window.showErrorMessage('webview update failse 50 times.');
         return;
     }
     if (!state) {
-        setTimeout(async () => await updateContent(vdata), 100);
+        setTimeout(async () => await updateContent(), 100);
         tryCnt += 1;
         return;
     }
     if (panel) {
+        const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
         tryCnt = 0;
         const command = 'data';
-        panel.webview.postMessage({ command, data: vdata });
+        const data = await genViewDataByDpath(dpath);
+        panel.webview.postMessage({ command, data });
     }
 }
 
@@ -66,11 +67,15 @@ function init() {
         null,
         ext.context.subscriptions
     );
-    panel.onDidChangeViewState(() => {
-        if (panel && panel.visible && viewData) {
-            updateContent(viewData);
-        }
-    }, null, ext.context.subscriptions);
+    panel.onDidChangeViewState(
+        () => {
+            if (panel && panel.visible) {
+                updateContent();
+            }
+        },
+        null,
+        ext.context.subscriptions
+    );
     panel.webview.onDidReceiveMessage(
         message => {
             switch (message.command) {
@@ -100,26 +105,18 @@ function init() {
     panel.webview.html = getWebviewContent();
 }
 
-export async function genViewDataByNotes(notes: string[]): Promise<twv.VSNWVDomain> {
-    const dpath = ext.context.globalState.get<string[]>('dpath')!;
-    const cs = notes
-        .map(getNoteMetaFile)
-        .map(vfs.readYamlSync)
-        .map(m => m.tags.filter((t: any) => t.tag === '/' + dpath.join('/') || t.tag === dpath.join('/'))[0].category);
-    const categorys: twv.VSNWVCategory[] = [];
-    function testCategoryExist(name: string): boolean {
-        return categorys.filter(c => c.name === name).length >= 1 ? true : false;
-    }
-    for (let i = 0; i < notes.length; i++) {
-        const id = notes[i];
-        const category = cs[i];
-        if (!testCategoryExist(category)) {
-            categorys.push({ name: category, notes: [] });
+export async function genViewDataByDpath(dpath: string[]): Promise<twv.WVDomain> {
+    const domain = await selectDomain(dpath);
+    const categories = [];
+    for (const name of Object.keys(domain['.categories'])) {
+        const notes = [];
+        for (const nId of domain['.categories'][name]) {
+            const contents: string[] = await selectNoteContents(nId);
+            const isDoc = selectDocExist(nId);
+            const isFiles = selectFilesExist(nId);
+            notes.push({ nId, contents, doc: isDoc, files: isFiles });
         }
-        const contents = await selectNoteContent(id);
-        categorys
-            .filter(c => c.name === category)[0]
-            .notes.push({ id: id, contents: contents, doc: selectDocExist(id), files: selectFilesExist(id) });
+        categories.push({ name, notes });
     }
-    return { name: dpath[dpath.length - 1], categorys };
+    return { name: dpath[dpath.length - 1], categories };
 }

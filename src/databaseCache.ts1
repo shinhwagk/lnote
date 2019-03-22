@@ -1,0 +1,21 @@
+import { randomBytes } from 'crypto';
+import { existsSync, moveSync, pathExistsSync, readdirSync, statSync, mkdirSync, writeFileSync, readFileSync } from 'fs-extra';
+import * as objectPath from 'object-path';
+import * as path from 'path';
+import { noNoteDirs } from './constants';
+import { tools, vfs, vpath } from './helper';
+import { readNoteMeta } from './database';
+
+export async function initializeDatabaseCache(dbDirPath: string): Promise<void> {
+    const cacheDir = path.join(dbDirPath, '.cache');
+    for (const nId of readdirSync(dbDirPath).filter(f => !noNoteDirs.filter(nn => nn === f).length)) {
+        const noteMeta = await readNoteMeta(nId);
+        for (const tag of noteMeta.tags) {
+            const domainPath = path.join(cacheDir, tag.tag);
+            mkdirSync(domainPath);
+            const categoriesFile = path.join(domainPath, '.categories.json');
+            if (!existsSync(categoriesFile)) writeFileSync(categoriesFile, '{}');
+            const categories = JSON.parse(readFileSync(categoriesFile, { encoding: 'utf8' }));
+        }
+    }
+}
