@@ -2,7 +2,6 @@ import { TreeItem, TreeDataProvider, Uri, EventEmitter, Event } from 'vscode';
 import { ext } from '../extensionVariables';
 import { readdirSync, statSync } from 'fs';
 import { join, basename } from 'path';
-import { DBCxt } from '../database';
 
 export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: EventEmitter<TreeItem> = new EventEmitter<TreeItem>();
@@ -17,10 +16,9 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const nid = ext.context.globalState.get<string>('nid');
-        if (!nid) return [];
+        if (!ext.activeNoteId) return [];
 
-        const fPath: string = element ? element.resourceUri!.fsPath : join(DBCxt.dbDirPath, nid, 'files');
+        const fPath: string = element ? element.resourceUri!.fsPath : ext.dbFS.getNoteFilesPath(ext.activeNoteId);
 
         return readdirSync(fPath).map(f => {
             const uri = Uri.file(join(fPath, f));

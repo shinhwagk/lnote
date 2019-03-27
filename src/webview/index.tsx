@@ -80,12 +80,14 @@ function VSNCategory(props: twv.WVCategory) {
             </div>
             <div className='card-body'>
                 <div className='container-fluid'>{listnote}</div>
+
             </div>
         </div>
     );
 }
 
 function VNSDomain(props: twv.WVDomain) {
+
     const categories = props.categories.map((category: twv.WVCategory) => (
         <div>
             <VSNCategory name={category.name} notes={category.notes} />
@@ -120,5 +122,5 @@ window.addEventListener('message', (event) => {
     }
 });
 
-vscode.postMessage({ command: 'ready', data: true });
+vscode.postMessage({ command: 'ready' });
 console.log('web view ready.');

@@ -1,9 +1,9 @@
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import rimraf = require('rimraf');
-import { Domain, initializeDBVariables, refreshDomainCache } from '../src/database';
 import { vfs } from '../src/helper';
 import { metaFileName } from '../src/constants';
+import { DatabaseFileSystem } from '../src/database';
 
 const testDataPath = './.vscode-note';
 
@@ -40,16 +40,25 @@ function removeTestData() {
 
 beforeAll(async () => {
     await createTestFileAndDirectory();
-    await initializeDBVariables(testDataPath);
 });
 
 afterAll(removeTestData);
 
 test('cache tags', async () => {
-    const domainDB: Domain = await refreshDomainCache();
-    expect(domainDB).toEqual(
+    const dbFileSystem = new DatabaseFileSystem(testDataPath);
+    expect(dbFileSystem.domainCache).toEqual(
         JSON.parse(
-            '{"adf":{"abc":{".categories":{"test":["1","2"]}}},"g":{"abc":{".categories":{"test":["3"]}}},".categories":{}}'
+            '{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'
+        )
+    );
+});
+
+
+test('add category', async () => {
+    const dbFileSystem = new DatabaseFileSystem(testDataPath);
+    expect(dbFileSystem.domainCache).toEqual(
+        JSON.parse(
+            '{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'
         )
     );
 });

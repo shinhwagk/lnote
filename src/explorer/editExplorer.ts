@@ -1,9 +1,6 @@
 import { TreeItem, TreeDataProvider, EventEmitter, Event, Uri } from 'vscode';
 import * as path from 'path';
 import { ext } from '../extensionVariables';
-import { readdirSync } from 'fs';
-import { DBCxt } from '../database';
-import { metaFileName } from '../constants';
 
 export class EditExplorerProvider implements TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: EventEmitter<TreeItem> = new EventEmitter<TreeItem>();
@@ -24,27 +21,22 @@ export class EditExplorerProvider implements TreeDataProvider<TreeItem> {
 
     public async getChildren(element?: TreeItem): Promise<TreeItem[]> {
         if (element) return [];
-        const nid = ext.context.globalState.get<string>('nid');
-        if (!nid) return [];
-        return await getNoteFiles(nid);
+        return await getNoteFiles(ext.activeNoteId!);
     }
 }
 
-async function getNoteFiles(nid: string): Promise<TreeItem[]> {
-    const notePath = path.join(DBCxt.dbDirPath, nid);
-    const isColFile = (n: string) => /^[1-9]+[0-9]*\.[a-z]+$/.test(n);
-    const firstNote = new TreeItem(Uri.file(path.join(notePath, '1.txt')), 0);
+async function getNoteFiles(nId: string): Promise<TreeItem[]> {
+    const firstNote = new TreeItem(Uri.file(ext.dbFS.getNoteContentFile(nId, '1')), 0);
 
-    const editNotes = readdirSync(notePath)
-        .filter(isColFile)
-        .filter(f => f !== '1.txt')
-        .map(f => {
-            const item = new TreeItem(Uri.file(path.join(notePath, f)), 0);
+    const editNotes = ext.dbFS.getNoteContentFiles(nId)
+        .filter((f: string) => ext.dbFS.getNoteContentFile(nId, '1') !== f)
+        .map((f: string) => {
+            const item = new TreeItem(Uri.file(f), 0);
             item.contextValue = 'editNoteNode';
             return item;
         });
 
-    const uri = Uri.file(path.join(notePath, metaFileName));
+    const uri = Uri.file(ext.dbFS.getNoteMetaFile(nId));
     const metaNote = new TreeItem(uri, 0);
 
     return [firstNote].concat(editNotes).concat(metaNote);

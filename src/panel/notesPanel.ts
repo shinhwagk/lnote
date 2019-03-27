@@ -1,8 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { selectDocExist, selectDomain, selectFilesExist, selectNoteContents } from '../database';
 import { ext } from '../extensionVariables';
-import { ToWebView as twv } from './notesMessage';
 
 const assetsFile = (name: string) => {
     const file = path.join(ext.context.extensionPath, 'out', name);
@@ -30,9 +28,9 @@ let panel: vscode.WebviewPanel | undefined;
 let state: boolean = false;
 let tryCnt: number = 0;
 
-export async function updateContent(): Promise<void> {
+export async function updateNotePanelContent(viewData: any): Promise<void> {
     if (!panel) {
-        init();
+        init(viewData);
     }
 
     if (tryCnt >= 50) {
@@ -40,20 +38,16 @@ export async function updateContent(): Promise<void> {
         return;
     }
     if (!state) {
-        setTimeout(async () => await updateContent(), 100);
+        setTimeout(async () => await updateNotePanelContent(viewData), 100);
         tryCnt += 1;
         return;
     }
-    if (panel) {
-        const dpath: string[] = ext.context.globalState.get<string[]>('dpath')!;
-        tryCnt = 0;
-        const command = 'data';
-        const data = await genViewDataByDpath(dpath);
-        panel.webview.postMessage({ command, data });
-    }
+
+    tryCnt = 0;
+    panel!.webview.postMessage({ command: 'data', data: viewData });
 }
 
-function init() {
+function init(viewData: any) {
     panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
         enableScripts: true,
         localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
@@ -70,7 +64,7 @@ function init() {
     panel.onDidChangeViewState(
         () => {
             if (panel && panel.visible) {
-                updateContent();
+                updateNotePanelContent(viewData);
             }
         },
         null,
@@ -80,7 +74,7 @@ function init() {
         message => {
             switch (message.command) {
                 case 'ready':
-                    state = message.data;
+                    state = true;
                     break;
                 case 'edit':
                     vscode.commands.executeCommand('vscode-note.note.edit', message.data);
@@ -103,20 +97,4 @@ function init() {
         ext.context.subscriptions
     );
     panel.webview.html = getWebviewContent();
-}
-
-export async function genViewDataByDpath(dpath: string[]): Promise<twv.WVDomain> {
-    const domain = await selectDomain(dpath);
-    const categories = [];
-    for (const name of Object.keys(domain['.categories'])) {
-        const notes = [];
-        for (const nId of domain['.categories'][name]) {
-            const contents: string[] = await selectNoteContents(nId);
-            const isDoc = selectDocExist(nId);
-            const isFiles = selectFilesExist(nId);
-            notes.push({ nId, contents, doc: isDoc, files: isFiles });
-        }
-        categories.push({ name, notes });
-    }
-    return { name: dpath[dpath.length - 1], categories };
 }

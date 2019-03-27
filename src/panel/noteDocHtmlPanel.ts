@@ -1,5 +1,6 @@
 import { basename } from 'path';
 import * as vscode from 'vscode';
+import { ext } from '../extensionVariables';
 
 const viewType = 'htmlShowPreview';
 const title = viewType;
@@ -7,18 +8,18 @@ const title = viewType;
 let _panel: vscode.WebviewPanel | undefined;
 const _disposables: vscode.Disposable[] = [];
 
-export function noteDocHtmlPanel(htmlFile: string, resourcePath: string) {
+export function noteDocHtmlPanel(htmlFile: string) {
     if (_panel) {
         _update(_panel!, htmlFile);
         return;
     }
-    _panel = createPanel(resourcePath!);
-    noteDocHtmlPanel(htmlFile, resourcePath);
+    _panel = createPanel();
+    noteDocHtmlPanel(htmlFile);
 }
 
-function createPanel(resourcePath: string) {
+function createPanel() {
     const panel = vscode.window.createWebviewPanel(viewType, title, vscode.ViewColumn.Two, {
-        localResourceRoots: [vscode.Uri.file(resourcePath)]
+        localResourceRoots: [vscode.Uri.file(ext.dbDirPath)]
     });
     panel.onDidDispose(() => _dispose(), null, _disposables);
     return panel;

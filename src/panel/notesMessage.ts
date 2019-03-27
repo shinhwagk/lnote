@@ -22,13 +22,13 @@ export namespace ToWebView {
     }
 }
 
-export namespace ToExtension {
-    export interface WebReady {
-        command: 'ready';
-        data: boolean;
-    }
-    export interface EditNote {
-        command: 'edit';
-        data: number;
-    }
-}
+// export namespace ToExtension {
+//     export interface WebReady {
+//         command: 'ready';
+//         data: boolean;
+//     }
+//     export interface EditNote {
+//         command: 'edit';
+//         data: number;
+//     }
+// }

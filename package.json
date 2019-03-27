@@ -52,17 +52,17 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "vscode-note.edit-explorer.note.col.add",
+                    "command": "vscode-note.note.edit.col.add",
                     "group": "navigation",
                     "when": "view == editExplorer"
                 },
                 {
-                    "command": "vscode-note.edit-explorer.close",
+                    "command": "vscode-note.note.edit.close",
                     "group": "navigation",
                     "when": "view == editExplorer"
                 },
                 {
-                    "command": "vscode-note.files-explorer.close",
+                    "command": "vscode-note.note.files.close",
                     "group": "navigation",
                     "when": "view == filesExplorer"
                 },
@@ -87,7 +87,7 @@
                     "group": "2_orderBy"
                 },
                 {
-                    "command": "vscode-note.files-explorer.openTerminal",
+                    "command": "vscode-note.note.files.openTerminal",
                     "when": "view == filesExplorer"
                 }
             ],
@@ -108,7 +108,7 @@
                     "group": "2_category"
                 },
                 {
-                    "command": "vscode-note.edit-explorer.note.col.remove",
+                    "command": "vscode-note.note.edit.col.remove",
                     "when": "view == editExplorer && viewItem == editNoteNode",
                     "group": "inline"
                 }
@@ -170,7 +170,7 @@
                 }
             },
             {
-                "command": "vscode-note.edit-explorer.close",
+                "command": "vscode-note.note.edit.close",
                 "title": "Close",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -178,7 +178,7 @@
                 }
             },
             {
-                "command": "vscode-note.files-explorer.close",
+                "command": "vscode-note.note.files.close",
                 "title": "Close",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -186,7 +186,7 @@
                 }
             },
             {
-                "command": "vscode-note.edit-explorer.note.col.add",
+                "command": "vscode-note.note.edit.col.add",
                 "title": "Add Col",
                 "icon": {
                     "light": "images/light/add.svg",
@@ -194,7 +194,7 @@
                 }
             },
             {
-                "command": "vscode-note.edit-explorer.note.col.remove",
+                "command": "vscode-note.note.edit.col.remove",
                 "title": "Del Col",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -206,7 +206,7 @@
                 "title": "Edit Full"
             },
             {
-                "command": "vscode-note.files-explorer.openTerminal",
+                "command": "vscode-note.note.files.openTerminal",
                 "title": "open terminal"
             }
         ]
@@ -227,7 +227,7 @@
         "@types/fs-extra": "^5.0.5",
         "@types/jest": "^24.0.11",
         "@types/js-yaml": "^3.12.0",
-        "@types/node": "^11.11.5",
+        "@types/node": "^11.12.0",
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.8.8",
         "@types/react-dom": "^16.8.3",
@@ -245,7 +245,7 @@
         "ts-loader": "^5.3.3",
         "ts-node": "^8.0.3",
         "tslint": "^5.14.0",
-        "tslint-react": "^3.6.0",
+        "tslint-react": "^4.0.0",
         "typescript": "^3.3.4000",
         "typescript-tslint-plugin": "^0.3.1",
         "vscode": "^1.1.33",
@@ -260,8 +260,8 @@
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.13.0",
         "object-path": "^0.11.4",
-        "react": "^16.8.4",
-        "react-dom": "^16.8.4",
+        "react": "^16.8.5",
+        "react-dom": "^16.8.5",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3"
     }

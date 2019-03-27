@@ -22,7 +22,7 @@ export namespace vfs {
         paths.forEach(p => fse.mkdirsSync(p));
     }
 
-    export function readYamlSync(file: string) {
+    export function readYamlSync<T>(file: string): T {
         return jsyaml.safeLoad(readFileSync(file));
     }
 
@@ -33,14 +33,11 @@ export namespace vfs {
 }
 
 export namespace vpath {
-    export const splitStr = '/';
+    const splitStr = '/';
     export function splitPath(path: string): string[] {
         const s = path.startsWith(splitStr) ? path.substr(1) : path;
         const e = s.endsWith(splitStr) ? s.substr(0, s.length - 1) : s;
         return e.split(splitStr).filter(p => !!p);
-    }
-    export function join(...paths: string[]): string {
-        return paths.length >= 2 ? paths.join('/') : paths[0];
     }
 }
 
