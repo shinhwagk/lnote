@@ -4,6 +4,7 @@ import { noNoteDirs, metaFileName } from './constants';
 import { vpath, vfs } from './helper';
 import * as path from 'path';
 import { randomBytes } from 'crypto';
+import { window } from 'vscode';
 
 export interface Domain {
     '.notes': string[];
@@ -24,12 +25,13 @@ export class DatabaseFileSystem {
     trashPath: string;
     storageDomainCacheFile: string;
     domainCache: Domain = { '.notes': [] };
-    noteContentNameRegex = /^([0-9])\.txt$/;
+    contentFileNameRegex = /^([0-9])\.txt$/;
 
     constructor(dbDirPath: string) {
         this.dbDirPath = dbDirPath;
         this.trashPath = path.join(dbDirPath, 'trash');
         this.storageDomainCacheFile = path.join(dbDirPath, '.domainCache.json');
+        this.initialize();
         this.cacheDomain();
     }
 
@@ -58,7 +60,7 @@ export class DatabaseFileSystem {
     }
 
     insertNote(dpath: string[], nId: string): void {
-        const notes = objectPath.get(this.domainCache, dpath);
+        const notes = objectPath.get<string[]>(this.domainCache, dpath.concat('.notes'), []);
         notes.push(nId);
         objectPath.set(this.domainCache, dpath, Array.from(new Set(notes)));
     }
@@ -114,8 +116,8 @@ export class DatabaseFileSystem {
 
     getNoteContentFiles = (nId: string) =>
         readdirSync(this.getNotePath(nId))
-            .filter(f => this.noteContentNameRegex.test(f))
-            .map(f => this.noteContentNameRegex.exec(f)![1])
+            .filter(f => this.contentFileNameRegex.test(f))
+            .map(f => this.contentFileNameRegex.exec(f)![1])
             .map(f => this.getNoteContentFile(nId, f))
 
     selectDocIndexFile = (nId: string) => {
@@ -166,7 +168,8 @@ export class DatabaseFileSystem {
 
     createNode(dpath: string[], category: string = 'default'): string {
         const newId = this.genNewSeq();
-        this.writeNoteMeta(this.getNoteMetaFile(newId), { tags: [{ tag: dpath.join('/'), category }] });
+        mkdirSync(this.getNotePath(newId));
+        this.writeNoteMeta(newId, { tags: [{ tag: dpath.join('/'), category }] });
         this.createNodeCol(newId);
         this.insertNote(dpath, newId);
         return newId;
@@ -179,7 +182,7 @@ export class DatabaseFileSystem {
     }
 
     createNodeCol(nid: string): string {
-        const cnt = (readdirSync(this.getNotePath(nid)).filter(f => /[1-9]+.*/.test(f)).length + 1).toString();
+        const cnt = (readdirSync(this.getNotePath(nid)).filter(f => this.contentFileNameRegex.test(f)).length + 1).toString();
         vfs.writeFileSync(this.getNoteContentFile(nid, cnt), '');
         return cnt;
     }

@@ -24,7 +24,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('editExplorer.openFileResource', async (resource: any) => {
-            commands.executeCommand('open', resource, ViewColumn.Two);
+            commands.executeCommand('vscode.open', resource, ViewColumn.Two);
         })
     );
 
@@ -57,8 +57,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.note.add', async (category: string) => {
-            const dpath = ext.activeDpath!;
-            const nid: string = ext.dbFS.createNode(dpath, category);
+            const nid: string = ext.dbFS.createNode(ext.activeDpath, category);
             await commands.executeCommand('vscode-note.note.edit', nid);
             await commands.executeCommand('editExplorer.openFileResource',
                 Uri.file(ext.dbFS.getNoteContentFile(nid, '1'))
@@ -101,7 +100,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand(
-            'vscode-note.edit-explorer.note.col.remove',
+            'vscode-note.note.edit.col.remove',
             async (f: TreeItem) => {
                 removeSync(f.resourceUri!.fsPath);
                 ext.editProvider.refresh();
