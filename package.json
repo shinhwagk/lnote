@@ -18,7 +18,7 @@
     ],
     "license": "MIT",
     "activationEvents": [
-        "onView:domainExplorer"
+        "*"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -67,7 +67,7 @@
                     "when": "view == filesExplorer"
                 },
                 {
-                    "command": "vscode-note.domain.add",
+                    "command": "vscode-note.domain.create",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
@@ -93,19 +93,23 @@
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-note.domain.add",
+                    "command": "vscode-note.domain.create",
                     "when": "view == domainExplorer",
-                    "group": "1_domain"
+                    "group": "1_1_domain"
                 },
                 {
                     "command": "vscode-note.domain.rename",
                     "when": "view == domainExplorer",
-                    "group": "1_domain"
+                    "group": "1_2_domain"
                 },
                 {
-                    "command": "vscode-note.note.category.add",
-                    "when": "view == domainExplorer && viewItem == noCategory",
-                    "group": "2_category"
+                    "command": "vscode-note.domain.move",
+                    "when": "view == domainExplorer",
+                    "group": "1_2_domain"
+                },
+                {
+                    "command": "vscode-note.note.create",
+                    "when": "view == domainExplorer && viewItem == emptyNotes"
                 },
                 {
                     "command": "vscode-note.note.edit.col.remove",
@@ -123,11 +127,6 @@
                         "type": "string",
                         "default": "~/.vscode-note",
                         "description": "note data location"
-                    },
-                    "vscode-note.repository": {
-                        "type": "string",
-                        "default": "",
-                        "description": "note data repository"
                     }
                 }
             }
@@ -142,16 +141,8 @@
                 "title": "Trash"
             },
             {
-                "command": "vscode-note.domain.add",
+                "command": "vscode-note.domain.create",
                 "title": "New Domain",
-                "icon": {
-                    "light": "images/light/add.svg",
-                    "dark": "images/dark/add.svg"
-                }
-            },
-            {
-                "command": "vscode-note.note.category.add",
-                "title": "New Category",
                 "icon": {
                     "light": "images/light/add.svg",
                     "dark": "images/dark/add.svg"
@@ -208,6 +199,14 @@
             {
                 "command": "vscode-note.note.files.openTerminal",
                 "title": "open terminal"
+            },
+            {
+                "command": "vscode-note.domain.move",
+                "title": "Move Domain"
+            },
+            {
+                "command": "vscode-note.note.create",
+                "title": "Create Notes"
             }
         ]
     },
@@ -227,9 +226,9 @@
         "@types/fs-extra": "^5.0.5",
         "@types/jest": "^24.0.11",
         "@types/js-yaml": "^3.12.0",
-        "@types/node": "^11.12.0",
+        "@types/node": "^11.12.2",
         "@types/object-path": "^0.11.0",
-        "@types/react": "^16.8.8",
+        "@types/react": "^16.8.10",
         "@types/react-dom": "^16.8.3",
         "@types/rimraf": "^2.0.2",
         "@types/untildify": "^3.0.0",
@@ -241,12 +240,12 @@
         "prettier": "^1.16.4",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.23.1",
-        "ts-jest": "^24.0.0",
+        "ts-jest": "^24.0.1",
         "ts-loader": "^5.3.3",
         "ts-node": "^8.0.3",
         "tslint": "^5.14.0",
         "tslint-react": "^4.0.0",
-        "typescript": "^3.3.4000",
+        "typescript": "^3.4.1",
         "typescript-tslint-plugin": "^0.3.1",
         "vscode": "^1.1.33",
         "webpack": "^4.29.6",
@@ -260,8 +259,8 @@
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.13.0",
         "object-path": "^0.11.4",
-        "react": "^16.8.5",
-        "react-dom": "^16.8.5",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
         "rimraf": "^2.6.3",
         "untildify": "^3.0.3"
     }

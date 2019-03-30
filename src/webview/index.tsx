@@ -17,6 +17,7 @@ const vscode: vscode = acquireVsCodeApi();
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
 const editNote = (id: string) => () => vscode.postMessage({ command: 'edit', data: id });
+const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
@@ -38,8 +39,8 @@ function renderNoteFiles(props: { id: string }) {
 }
 
 function VSNNotes(props: twv.WVNote) {
-    const contents = props.contents.map((c) => (
-        <div className='col'>
+    const contents = props.contents.map((c, i) => (
+        <div className='col' onDoubleClick={editContentFile(props.nId, (i + 1).toString())}>
             <pre>{c}</pre>
         </div>
     ));

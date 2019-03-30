@@ -1,47 +1,64 @@
-import * as path from 'path';
-import * as vscode from 'vscode';
+import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 import { ext } from '../extensionVariables';
 
-export interface DomainNode {
+export class DomainNode {
+    constructor(parent: DomainNode | undefined, dpath: string[]) {
+        this.dpath = dpath;
+        this.parent = parent;
+    }
     dpath: string[];
+    parent: DomainNode | undefined;
+
+    static create(parent: DomainNode | undefined, dpath: string[]) {
+        return new DomainNode(parent, dpath);
+    }
 }
 
-export class DomainExplorerProvider implements vscode.TreeDataProvider<DomainNode> {
-    private _onDidChangeTreeData: vscode.EventEmitter<DomainNode> = new vscode.EventEmitter<DomainNode>();
-    public readonly onDidChangeTreeData: vscode.Event<DomainNode> = this._onDidChangeTreeData.event;
+export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
+    private _onDidChangeTreeData: EventEmitter<DomainNode> = new EventEmitter<DomainNode>();
+    readonly onDidChangeTreeData: Event<DomainNode> = this._onDidChangeTreeData.event;
 
-    public refresh(): void {
-        this._onDidChangeTreeData.fire();
+    public refresh(dn?: DomainNode, parent: boolean = false): void {
+        if (dn) {
+            if (parent) {
+                this._onDidChangeTreeData.fire(dn.parent);
+                return;
+            }
+            this._onDidChangeTreeData.fire(dn);
+        } else {
+            this._onDidChangeTreeData.fire();
+        }
     }
 
-    public async getTreeItem(element: DomainNode): Promise<vscode.TreeItem> {
-        const domain = ext.dbFS.selectDomain(element.dpath);
+    public getTreeItem(element: DomainNode): TreeItem {
+        const domain = ext.dbFS.dch.selectDomain(element.dpath);
         const childDomainNumber = Object.keys(domain).filter(name => name != '.notes').length;
-        const notesTotalNumberUnderDomain = ext.dbFS.selectAllNotesUnderDomain(element.dpath).length;
-        const notesNumberUnderDomain = ext.dbFS.selectNotesUnderDomain(element.dpath).length;
-        const item: vscode.TreeItem = {};
-        item.label = path.basename(element.dpath[element.dpath.length - 1]);
-        item.contextValue = 'domainNode';
+        const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(element.dpath).length;
+        const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(element.dpath).length;
+        const item: TreeItem =
+            new TreeItem(element.dpath[element.dpath.length - 1], childDomainNumber >= 1 ? 1 : 0);
         item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
-        item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
         if (domain['.notes']) {
             item.command = {
                 arguments: [element.dpath],
                 command: 'vscode-note.domain.pin',
                 title: 'Show Vscode Note'
             };
+        } else {
+            item.contextValue = 'emptyNotes';
         }
         return item;
     }
 
-    public async getChildren(element?: DomainNode): Promise<DomainNode[]> {
+    public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
         const dpath: string[] = element ? element.dpath : [];
-        const domain = ext.dbFS.selectDomain(dpath);
-        return Object.keys(domain)
+        return Object.keys(ext.dbFS.dch.selectDomain(dpath))
             .filter(t => t !== '.notes')
             .sort()
-            .map(name => {
-                return { dpath: dpath.concat(name) };
-            });
+            .map(name => DomainNode.create(element, dpath.concat(name)));
+    }
+
+    public getParent(element: DomainNode): ProviderResult<DomainNode> {
+        return element.parent;
     }
 }

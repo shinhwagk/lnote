@@ -5,9 +5,8 @@ import { ext, initializeExtensionVariables, getDbDirPath } from './extensionVari
 import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { vscodeConfigSection } from './constants';
 import { ExtensionContext, ConfigurationChangeEvent, ViewColumn, commands, workspace, Uri, window, TreeItem } from 'vscode';
-import { updateNotePanelContent } from './panel/notesPanel';
 import { DatabaseFileSystem } from './database';
-
+import { vpath } from './helper';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -50,7 +49,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(
         commands.registerCommand('vscode-note.note.files.show', async (nId: string) => {
             ext.activeNoteId = nId;
-            ext.FilesProvider.refresh();
+            ext.filesProvider.refresh();
             await commands.executeCommand('setContext', 'vscode-note.note.files', true);
         })
     );
@@ -69,11 +68,7 @@ export async function activate(context: ExtensionContext) {
         commands.registerCommand('vscode-note.note.category.add', async () => {
             const cname: string | undefined = await window.showInputBox({ value: 'default' });
             if (!cname) return;
-            await updateNotePanelContent(ext.panelViewCache
-                .parseAndCache(ext.activeDpath!)
-                .addCategory(cname)
-                .getViewData());
-            await ext.domainProvider.refresh();
+            ext.notesPanelView.parseDomain(ext.activeDpath).addCategory(cname).showNotesPlanView();
         })
     );
 
@@ -86,9 +81,18 @@ export async function activate(context: ExtensionContext) {
     );
 
     context.subscriptions.push(
+        commands.registerCommand('vscode-note.note.create', async (domainNode: DomainNode) => {
+            domainNode.dpath;
+            ext.dbFS.dch.createNotes(domainNode.dpath);
+            ext.domainProvider.refresh(domainNode);
+            commands.executeCommand('vscode-note.domain.pin', domainNode.dpath);
+        })
+    );
+
+    context.subscriptions.push(
         commands.registerCommand('vscode-note.note.edit.close', async () => {
             await commands.executeCommand('setContext', 'vscode-note.note.edit', false);
-            updateNotePanelContent(ext.panelViewCache.parseAndCache(ext.activeDpath!).getViewData());
+            // ext.notesPanelView.parseDomain(ext.activeDpath).showNotesPlanView();
         })
     );
 
@@ -123,31 +127,45 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(
         commands.registerCommand('vscode-note.domain.pin', async (dpath: string[]) => {
             ext.activeDpath = dpath;
-            await updateNotePanelContent(ext.panelViewCache.parseAndCache(dpath).getViewData());
+            ext.notesPanelView.parseDomain(dpath).showNotesPlanView();
         })
     );
 
     context.subscriptions.push(
-        commands.registerCommand('vscode-note.domain.add', async (node?: DomainNode) => {
-            const dpath = node ? node.dpath : [];
+        commands.registerCommand('vscode-note.domain.create', async (dn?: DomainNode) => {
+            const dpath = dn ? dn.dpath : [];
             const name: string | undefined = await window.showInputBox();
             if (!name) return;
-            ext.dbFS.createDomain(dpath, name);
-            ext.domainProvider.refresh();
+            ext.dbFS.dch.createDomain(dpath, name);
+            ext.domainProvider.refresh(dn);
         })
     );
 
     context.subscriptions.push(
-        commands.registerCommand('vscode-note.domain.rename', async (node: DomainNode) => {
-            const orgDpath = node.dpath;
+        commands.registerCommand('vscode-note.domain.rename', async (dn: DomainNode) => {
+            const orgDpath = dn.dpath;
             const orgName = orgDpath[orgDpath.length - 1];
             const newName: string | undefined = await window.showInputBox({ value: orgName });
             if (!newName) return;
             const newDpath = orgDpath.slice();
             newDpath[newDpath.length - 1] = newName;
-            const orgDomain = ext.dbFS.selectDomain(orgDpath);
-            ext.dbFS.deleteDomain(orgDpath);
-            ext.dbFS.insertDomain(newDpath, orgDomain);
+            ext.dbFS.renameDomain(orgDpath, newDpath);
+            ext.domainProvider.refresh(dn, true);
+        })
+    );
+
+    context.subscriptions.push(
+        commands.registerCommand('vscode-note.domain.move', async (node: DomainNode) => {
+            const orgDpath = node.dpath;
+            const newName: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
+            const cascade = await window.showQuickPick(['True', 'False']);
+            if (!newName || !cascade) return;
+            if (cascade === 'False') {
+                ext.dbFS.updateNotesPath(orgDpath, vpath.splitPath(newName), false);
+            } else {
+                ext.dbFS.dch.deleteDomain(orgDpath);
+                ext.dbFS.updateNotesPath(orgDpath, vpath.splitPath(newName), true);
+            }
             ext.domainProvider.refresh();
         })
     );
@@ -160,12 +178,10 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.note.delete', async () => {
-            const nId = ext.activeNoteId!;
-            const dpath = ext.activeDpath!;
             const sqp = await window.showQuickPick(['Yes', 'No']);
             if (!sqp) return;
-            if (sqp === 'Yes') await ext.dbFS.deleteNote(dpath, nId);
-            await updateNotePanelContent(ext.panelViewCache.parseAndCache(dpath).getViewData());
+            if (sqp === 'Yes') await ext.dbFS.deleteNote(ext.activeDpath, ext.activeNoteId);
+            ext.notesPanelView.parseDomain(ext.activeDpath).showNotesPlanView();
             await commands.executeCommand('setContext', 'vscode-note.note.edit', false);
         })
     );
@@ -179,7 +195,6 @@ export async function activate(context: ExtensionContext) {
             fileTerminal.show(true);
         })
     );
-
 }
 
 export function deactivate() { }

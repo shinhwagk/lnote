@@ -42,7 +42,7 @@ export namespace vpath {
 }
 
 export namespace tools {
-    export function arraysEqual(a1: any[], a2: any[]) {
+    export function arrayEqual(a1: any[], a2: any[]) {
         return JSON.stringify(a1) == JSON.stringify(a2);
     }
 }

@@ -4,6 +4,7 @@ import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
 import { metaFileName } from '../src/constants';
 import { DatabaseFileSystem } from '../src/database';
+import { mkdirSync } from 'fs-extra';
 
 const testDataPath = './.vscode-note';
 
@@ -20,12 +21,19 @@ const exampleDataNotes = [
     },
     {
         id: '3',
+        tags: [{ tag: '/adf/abc/ccc', category: 'test' }],
+        contents: ['adfdf', 'sdfdf']
+    },
+    {
+        id: '4',
         tags: [{ tag: '/g/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     }
 ];
 
-async function createTestFileAndDirectory() {
+const resultData = JSON.parse('{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}');
+
+function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
         const noteDir = path.join(testDataPath, testNote.id);
         fse.ensureDirSync(noteDir);
@@ -34,35 +42,63 @@ async function createTestFileAndDirectory() {
     }
 }
 
-function removeTestData() {
-    rimraf.sync(testDataPath);
-}
+let dbFileSystem: DatabaseFileSystem;
 
-beforeAll(async () => {
-    await createTestFileAndDirectory();
+describe('test select', () => {
+    beforeAll(() => {
+        mkdirSync(testDataPath);
+        createTestFileAndDirectory();
+        dbFileSystem = new DatabaseFileSystem(testDataPath);
+    });
+
+    afterAll(() => {
+        rimraf.sync(testDataPath);
+    });
+
+    test('cache domain', () => {
+        expect(dbFileSystem.dch.selectDomain([])).toEqual(resultData);
+    });
+
+    test('test note under domain', () => {
+        expect(dbFileSystem.dch.selectNotesUnderDomain(['adf', 'abc'])).toEqual(['1', '2']);
+    });
+
+    test('test all note under domain', () => {
+        expect(dbFileSystem.dch.selectAllNotesUnderDomain(['adf']).sort()).toEqual(['1', '2', '3'].sort());
+    });
+
+    test('domain add', () => {
+        dbFileSystem.dch.createDomain(['afd'], 'xxx');
+        expect(dbFileSystem.dch.selectDomain(['afd', 'xxx'])).toEqual({});
+    });
 });
 
-afterAll(removeTestData);
+describe('test modify', () => {
+    beforeAll(() => {
+        mkdirSync(testDataPath);
+        createTestFileAndDirectory();
+        dbFileSystem = new DatabaseFileSystem(testDataPath);
+    });
 
-test('cache tags', async () => {
-    const dbFileSystem = new DatabaseFileSystem(testDataPath);
-    expect(dbFileSystem.domainCache).toEqual(
-        JSON.parse(
-            '{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'
-        )
-    );
+    afterAll(() => {
+        rimraf.sync(testDataPath);
+    });
+
+    test('update tag', () => {
+        dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc'], false);
+        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        resultData['adf']['acc'] = {};
+        resultData['adf']['acc']['.notes'] = resultData['adf']['abc']['.notes'];
+        delete resultData['adf']['abc']['.notes'];
+        expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
+    });
 });
-
-
-test('add category', async () => {
-    const dbFileSystem = new DatabaseFileSystem(testDataPath);
-    expect(dbFileSystem.domainCache).toEqual(
-        JSON.parse(
-            '{"adf":{"abc":{".notes":["1","2"]}},"g":{"abc":{".notes":["3"]}},".notes":[]}'
-        )
-    );
-});
-
+// test('update tag cascade', () => {
+//     dbFileSystem.updateNotesTagPath(['adf', 'abc'], ['adf', 'acc'], true);
+//     dbFileSystem = new DatabaseFileSystem(testDataPath);
+//     expect(dbFileSystem.dch.selectDomain())
+//         .toEqual(JSON.parse('{"adf":{"acc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'));
+// });
 // test('cache tags', async () => {
 //     const domainDB: Domain = await cacheTags();
 //     const domain = await selectAllNotesUnderDomain(domainDB['g'] as Domain);
