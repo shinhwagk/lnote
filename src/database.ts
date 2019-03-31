@@ -35,8 +35,9 @@ export class DatabaseFileSystem {
 
     private genDomainCache() {
         const localDomainCache = { '.notes': [] };
-        for (const nId of readdirSync(this.dbDirPath)
-            .filter(f => noNoteDirs.filter(nn => nn === f).length === 0)) {
+        for (const nId of readdirSync(this.dbDirPath).filter(
+            f => noNoteDirs.filter(nn => nn === f).length === 0
+        )) {
             const noteMeta = this.readNoteMeta(nId);
             for (const tag of noteMeta.tags) {
                 const notesPath = vpath.splitPath(tag.tag).concat(['.notes']);
@@ -75,19 +76,21 @@ export class DatabaseFileSystem {
         readdirSync(this.getNotePath(nId))
             .filter(f => this.contentFileNameRegex.test(f))
             .map(f => this.contentFileNameRegex.exec(f)![1])
-            .map(f => this.getNoteContentFile(nId, f))
+            .map(f => this.getNoteContentFile(nId, f));
 
     selectDocIndexFile = (nId: string) => {
         const indexFile = readdirSync(this.getNoteDocPath(nId)).filter(f => /^README\.*/.test(f))[0];
         return this.getNoteDocIndexFile(nId, indexFile);
-    }
+    };
 
     writeNoteMeta = (id: string, meta: Tags) => vfs.writeYamlSync(this.getNoteMetaFile(id), meta);
 
     selectDocExist(nId: string): boolean {
-        return existsSync(this.getNoteDocIndexFile(nId, 'README.md')) ||
+        return (
+            existsSync(this.getNoteDocIndexFile(nId, 'README.md')) ||
             existsSync(this.getNoteDocIndexFile(nId, 'README.html')) ||
-            existsSync(this.getNoteDocIndexFile(nId, 'README.htm'));
+            existsSync(this.getNoteDocIndexFile(nId, 'README.htm'))
+        );
     }
 
     selectNoteContents(nId: string): string[] {
@@ -118,7 +121,8 @@ export class DatabaseFileSystem {
 
     initialize(): void {
         if (!existsSync(this.dbDirPath)) {
-            vfs.mkdirsSync(this.dbDirPath); this.createExampleData();
+            vfs.mkdirsSync(this.dbDirPath);
+            this.createExampleData();
         }
         if (!existsSync(this.trashPath)) mkdirSync(this.trashPath);
     }
@@ -145,12 +149,14 @@ export class DatabaseFileSystem {
     }
 
     createNodeCol(nid: string): string {
-        const cnt = (readdirSync(this.getNotePath(nid)).filter(f => this.contentFileNameRegex.test(f)).length + 1).toString();
+        const cnt = (
+            readdirSync(this.getNotePath(nid)).filter(f => this.contentFileNameRegex.test(f)).length + 1
+        ).toString();
         vfs.writeFileSync(this.getNoteContentFile(nid, cnt), '');
         return cnt;
     }
 
-    storageTimeOut = (m: number) => (new Date()).getTime() - m > 1000 * 60 * 60;
+    storageTimeOut = (m: number) => new Date().getTime() - m > 1000 * 60 * 60;
     //     const cacheTime = statSync(storageDomainCacheFile).mtimeMs;
     //     if(!existsSync(storageDomainCacheFile) || storageTimeOut(cacheTime)) {
     //     await initializeDomainCache();
@@ -159,7 +165,8 @@ export class DatabaseFileSystem {
     // }
 
     updateNotesPath(orgDpath: string[], newDpath: string[], cascade: boolean) {
-        this.dch.selectAllNotesUnderDomain(orgDpath)
+        this.dch
+            .selectAllNotesUnderDomain(orgDpath)
             .forEach(nId => this.updateNoteTagPath(nId, orgDpath, newDpath, cascade));
     }
 
@@ -171,14 +178,12 @@ export class DatabaseFileSystem {
                 if (tools.arrayEqual(orgDpath, metaPath.slice(0, orgDpath.length)))
                     noteMeta.tags[i].tag = newDpath.concat(metaPath.slice(orgDpath.length)).join('/');
             } else {
-                if (tools.arrayEqual(orgDpath, metaPath))
-                    noteMeta.tags[i].tag = newDpath.join('/');
+                if (tools.arrayEqual(orgDpath, metaPath)) noteMeta.tags[i].tag = newDpath.join('/');
             }
         }
         this.writeNoteMeta(nId, noteMeta);
     }
 }
-
 
 class DomainCacheHandler {
     private domainCache: Domain;

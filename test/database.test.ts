@@ -31,7 +31,9 @@ const exampleDataNotes = [
     }
 ];
 
-const resultData = JSON.parse('{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}');
+const resultData = JSON.parse(
+    '{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'
+);
 
 function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {

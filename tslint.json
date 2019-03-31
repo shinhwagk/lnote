@@ -12,7 +12,8 @@
         "quotemark": [
             true,
             "single"
-        ]
+        ],
+        "jsx-key": false
     },
     "linterOptions": {
         "exclude": [

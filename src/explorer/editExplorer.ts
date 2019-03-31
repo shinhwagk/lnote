@@ -27,7 +27,8 @@ export class EditExplorerProvider implements TreeDataProvider<TreeItem> {
     private getNoteContentFiles(nId: string): TreeItem[] {
         const firstNote = new TreeItem(Uri.file(ext.dbFS.getNoteContentFile(nId, '1')), 0);
 
-        const editNotes = ext.dbFS.getNoteContentFiles(nId)
+        const editNotes = ext.dbFS
+            .getNoteContentFiles(nId)
             .filter((f: string) => ext.dbFS.getNoteContentFile(nId, '1') !== f)
             .map((f: string) => {
                 const item = new TreeItem(Uri.file(f), 0);

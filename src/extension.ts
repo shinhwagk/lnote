@@ -4,7 +4,16 @@ import { DomainNode } from './explorer/domainExplorer';
 import { ext, initializeExtensionVariables, getDbDirPath } from './extensionVariables';
 import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { vscodeConfigSection } from './constants';
-import { ExtensionContext, ConfigurationChangeEvent, ViewColumn, commands, workspace, Uri, window, TreeItem } from 'vscode';
+import {
+    ExtensionContext,
+    ConfigurationChangeEvent,
+    ViewColumn,
+    commands,
+    workspace,
+    Uri,
+    window,
+    TreeItem
+} from 'vscode';
 import { DatabaseFileSystem } from './database';
 import { vpath } from './helper';
 
@@ -29,8 +38,11 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.note.edit.full', async () => {
-            await commands.executeCommand('openFolder',
-                Uri.file(ext.dbFS.getNotePath(ext.activeNoteId!)), true);
+            await commands.executeCommand(
+                'openFolder',
+                Uri.file(ext.dbFS.getNotePath(ext.activeNoteId!)),
+                true
+            );
         })
     );
 
@@ -58,7 +70,8 @@ export async function activate(context: ExtensionContext) {
         commands.registerCommand('vscode-note.note.add', async (category: string) => {
             const nid: string = ext.dbFS.createNode(ext.activeDpath, category);
             await commands.executeCommand('vscode-note.note.edit', nid);
-            await commands.executeCommand('editExplorer.openFileResource',
+            await commands.executeCommand(
+                'editExplorer.openFileResource',
                 Uri.file(ext.dbFS.getNoteContentFile(nid, '1'))
             );
         })
@@ -68,7 +81,10 @@ export async function activate(context: ExtensionContext) {
         commands.registerCommand('vscode-note.note.category.add', async () => {
             const cname: string | undefined = await window.showInputBox({ value: 'default' });
             if (!cname) return;
-            ext.notesPanelView.parseDomain(ext.activeDpath).addCategory(cname).showNotesPlanView();
+            ext.notesPanelView
+                .parseDomain(ext.activeDpath)
+                .addCategory(cname)
+                .showNotesPlanView();
         })
     );
 
@@ -103,13 +119,10 @@ export async function activate(context: ExtensionContext) {
     );
 
     context.subscriptions.push(
-        commands.registerCommand(
-            'vscode-note.note.edit.col.remove',
-            async (f: TreeItem) => {
-                removeSync(f.resourceUri!.fsPath);
-                ext.editProvider.refresh();
-            }
-        )
+        commands.registerCommand('vscode-note.note.edit.col.remove', async (f: TreeItem) => {
+            removeSync(f.resourceUri!.fsPath);
+            ext.editProvider.refresh();
+        })
     );
 
     context.subscriptions.push(
@@ -172,7 +185,8 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.domain.refresh', async () => {
-            ext.dbFS = new DatabaseFileSystem(getDbDirPath()); ext.domainProvider.refresh();
+            ext.dbFS = new DatabaseFileSystem(getDbDirPath());
+            ext.domainProvider.refresh();
         })
     );
 
@@ -197,4 +211,4 @@ export async function activate(context: ExtensionContext) {
     );
 }
 
-export function deactivate() { }
+export function deactivate() {}

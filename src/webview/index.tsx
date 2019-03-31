@@ -68,9 +68,9 @@ function VSNNotes(props: twv.WVNote) {
 }
 
 function VSNCategory(props: twv.WVCategory) {
-    const listnote = props.notes.map((note: twv.WVNote) => (
+    const listnote = props.notes.map((note: twv.WVNote) =>
         <VSNNotes nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} />
-    ));
+    );
 
     return (
         <div className='card bg-dark text-white'>

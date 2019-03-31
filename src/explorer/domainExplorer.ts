@@ -35,8 +35,10 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
         const childDomainNumber = Object.keys(domain).filter(name => name != '.notes').length;
         const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(element.dpath).length;
         const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(element.dpath).length;
-        const item: TreeItem =
-            new TreeItem(element.dpath[element.dpath.length - 1], childDomainNumber >= 1 ? 1 : 0);
+        const item: TreeItem = new TreeItem(
+            element.dpath[element.dpath.length - 1],
+            childDomainNumber >= 1 ? 1 : 0
+        );
         item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
         if (domain['.notes']) {
             item.command = {

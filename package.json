@@ -211,7 +211,7 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "yarn lint:all && yarn compile",
+        "vscode:prepublish": "yarn compile",
         "compile": "webpack --mode production --config webpack.config.ts",
         "watch": "webpack --mode development --config webpack.config.ts --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",

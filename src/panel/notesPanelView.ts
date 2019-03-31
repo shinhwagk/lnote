@@ -24,7 +24,7 @@ export class NotesPanelView {
         return vscode.Uri.file(file)
             .with({ scheme: 'vscode-resource' })
             .toString();
-    }
+    };
 
     private getWebviewContent() {
         return `<!DOCTYPE html>
@@ -136,14 +136,17 @@ export class NotesPanelView {
         const notes = this.dfs.dch.selectNotesUnderDomain(dpath);
         const categories: twv.WVCategory[] = [];
         for (const nId of notes) {
-            const cname = this.dfs.readNoteMeta(nId).tags
-                .filter(tag => tools.arrayEqual(vpath.splitPath(tag.tag), dpath))[0].category;
+            const cname = this.dfs
+                .readNoteMeta(nId)
+                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.tag), dpath))[0].category;
             const contents: string[] = this.dfs.selectNoteContents(nId);
             const isDoc = this.dfs.selectDocExist(nId);
             const isFiles = this.dfs.selectFilesExist(nId);
 
             if (categories.filter(c => c.name === cname).length >= 1) {
-                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+                categories
+                    .filter(c => c.name === cname)[0]
+                    .notes.push({ nId, contents, doc: isDoc, files: isFiles });
             } else {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }
