@@ -10,9 +10,7 @@ const extConfig: webpack.Configuration = {
         path: path.resolve(__dirname, 'out')
     },
     resolve: { extensions: ['.ts', '.js'] },
-    module: {
-        rules: [{ test: /\.ts$/, loader: 'ts-loader' }]
-    },
+    module: { rules: [{ test: /\.ts$/, loader: 'ts-loader' }] },
     externals: { vscode: 'vscode' }
 };
 

@@ -14,13 +14,13 @@ export interface Tags {
 }
 
 export interface Tag {
-    tag: string;
+    domain: string;
     category: string;
 }
 
 export class DatabaseFileSystem {
-    private readonly dbDirPath: string;
-    private readonly trashPath: string;
+    private dbDirPath: string;
+    private trashPath: string;
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
     readonly dch: DomainCache = new DomainCache();
 
@@ -31,16 +31,24 @@ export class DatabaseFileSystem {
         this.cacheAllNotes();
     }
 
+    changeDbDirPath(dbDirPath: string) {
+        this.dbDirPath = dbDirPath;
+        this.trashPath = path.join(dbDirPath, 'trash');
+        this.initialize();
+        this.cacheAllNotes();
+    }
+
     insertNotesByMeta(...notes: string[]) {
         for (const nId of notes) {
             const meta = this.readNoteMeta(nId);
             for (const tag of meta.tags) {
-                this.dch.insertNotesByDpath(vpath.splitPath(tag.tag), nId);
+                this.dch.insertNotesByDpath(vpath.splitPath(tag.domain), nId);
             }
         }
     }
 
     private cacheAllNotes() {
+        this.dch.cleanCache();
         const notes = readdirSync(this.dbDirPath).filter(f => noNoteDirs.filter(nn => nn === f).length === 0);
         this.insertNotesByMeta(...notes);
     }
@@ -121,7 +129,7 @@ export class DatabaseFileSystem {
     createNode(dpath: string[], category: string = 'default'): string {
         const newId = this.genNewSeq();
         mkdirSync(this.getNotePath(newId));
-        this.writeNoteMeta(newId, { tags: [{ tag: dpath.join('/'), category }] });
+        this.writeNoteMeta(newId, { tags: [{ domain: dpath.join('/'), category }] });
         this.createNoteCol(newId);
         this.dch.insertNotesByDpath(dpath, newId);
         return newId;
@@ -161,12 +169,12 @@ export class DatabaseFileSystem {
     updateNoteTagPath(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
         const noteMeta = this.readNoteMeta(nId);
         for (let i = 0; i < noteMeta.tags.length; i++) {
-            const metaPath = vpath.splitPath(noteMeta.tags[i].tag);
+            const metaPath = vpath.splitPath(noteMeta.tags[i].domain);
             if (cascade) {
                 if (tools.arrayEqual(orgDpath, metaPath.slice(0, orgDpath.length)))
-                    noteMeta.tags[i].tag = newDpath.concat(metaPath.slice(orgDpath.length)).join('/');
+                    noteMeta.tags[i].domain = newDpath.concat(metaPath.slice(orgDpath.length)).join('/');
             } else {
-                if (tools.arrayEqual(orgDpath, metaPath)) noteMeta.tags[i].tag = newDpath.join('/');
+                if (tools.arrayEqual(orgDpath, metaPath)) noteMeta.tags[i].domain = newDpath.join('/');
             }
         }
         this.writeNoteMeta(nId, noteMeta);
@@ -183,7 +191,11 @@ export class DatabaseFileSystem {
 }
 
 class DomainCache {
-    cache: Domain = { '.notes': [] };
+    private cache: Domain = { '.notes': [] };
+
+    cleanCache() {
+        this.cache = { '.notes': [] };
+    }
 
     createDomain(dpath: string[], name: string): void {
         objectPath.set(this.cache, dpath.concat(name), {}, true);

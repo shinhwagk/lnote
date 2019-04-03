@@ -4,11 +4,12 @@ import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { homedir } from 'os';
 import * as path from 'path';
 import untildify = require('untildify');
-import { vscodeConfigSection } from './constants';
+import { section } from './constants';
 import { DatabaseFileSystem } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
-import { GitNotes } from './abccc';
+import { GitNotes } from './gitNotes';
+import { pga } from './ga';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -21,29 +22,37 @@ export namespace ext {
     export let dbFS: DatabaseFileSystem;
     export let gitNotes: GitNotes;
     export let outputChannel: OutputChannel;
+    export let ga: any;
 }
 
-export function getDbDirPath() {
-    const dbpath: string | undefined = workspace.getConfiguration(vscodeConfigSection).get('dbpath');
-    return path.join(dbpath ? untildify(dbpath) : path.join(homedir(), '.vscode-note'));
+export function getConfigure<T>(name: string, defaultValue: T): T {
+    return workspace.getConfiguration(section).get(name) || defaultValue;
 }
 
-function listenerDbDirPath(ctx: ExtensionContext) {
+function getDbDirPath() {
+    return untildify(getConfigure('dbpath', path.join(homedir(), '.vscode-note')))
+}
+
+
+function listenerConfigure(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
-            if (e.affectsConfiguration(vscodeConfigSection)) {
-                ext.dbDirPath = getDbDirPath();
-                ext.dbFS = new DatabaseFileSystem(getDbDirPath());
+            if (e.affectsConfiguration(section)) {
+                ext.dbFS.changeDbDirPath(getDbDirPath());
+                ext.ga = pga(getConfigure('ga', true));
             }
         })
     );
 }
 
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
-    listenerDbDirPath(ctx);
+    listenerConfigure(ctx);
     ext.context = ctx;
 
+    // delete soon
     ext.dbDirPath = getDbDirPath();
+
+    ext.ga = pga(getConfigure('ga', true));
 
     ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
 

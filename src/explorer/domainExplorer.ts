@@ -3,7 +3,7 @@ import { ext } from '../extensionVariables';
 
 export class DomainNode {
     constructor(parent: DomainNode | undefined, dpath: string[]) {
-        this.dpath = dpath;
+        this.dpath = dpath; // domain path
         this.parent = parent;
     }
     dpath: string[];

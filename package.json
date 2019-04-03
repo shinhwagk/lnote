@@ -16,6 +16,10 @@
     "categories": [
         "Other"
     ],
+    "keywords": [
+        "note",
+        "vscode"
+    ],
     "license": "MIT",
     "activationEvents": [
         "*"
@@ -40,12 +44,12 @@
                 {
                     "id": "editExplorer",
                     "name": "note edit",
-                    "when": "vscode-note.note.edit-explorer"
+                    "when": "vscode-note.edit-explorer"
                 },
                 {
                     "id": "filesExplorer",
                     "name": "files",
-                    "when": "vscode-note.note.files"
+                    "when": "vscode-note.files-explorer"
                 }
             ]
         },
@@ -77,24 +81,19 @@
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.note.edit.full",
+                    "command": "vscode-note.note.edit.openFolder",
                     "when": "view == editExplorer",
-                    "group": "1_orderBy"
+                    "group": "6_orderBy"
                 },
                 {
-                    "command": "vscode-note.note.delete",
+                    "command": "vscode-note.note.edit.delete",
                     "when": "view == editExplorer",
-                    "group": "4_orderBy"
-                },
-                {
-                    "command": "vscode-note.note.edit.doc",
-                    "when": "view == editExplorer && vscode-note.note.doc.exist",
-                    "group": "2_orderBy"
+                    "group": "5_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.files",
-                    "when": "view == editExplorer && vscode-note.note.doc.exist",
-                    "group": "2_orderBy"
+                    "when": "view == editExplorer && vscode-note.note.files.exist",
+                    "group": "3_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.doc.full",
@@ -108,12 +107,12 @@
                 {
                     "command": "vscode-note.note.edit.category.rename",
                     "when": "view == editExplorer",
-                    "group": "3_orderBy"
+                    "group": "4_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.files.create",
                     "when": "view == editExplorer && !vscode-note.note.files.exist",
-                    "group": "2_orderBy"
+                    "group": "3_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.doc.create",
@@ -125,17 +124,17 @@
                 {
                     "command": "vscode-note.domain.create",
                     "when": "view == domainExplorer",
-                    "group": "1_1_domain"
+                    "group": "1_domain"
                 },
                 {
                     "command": "vscode-note.domain.rename",
                     "when": "view == domainExplorer",
-                    "group": "1_2_domain"
+                    "group": "2_domain"
                 },
                 {
                     "command": "vscode-note.domain.move",
                     "when": "view == domainExplorer",
-                    "group": "1_2_domain"
+                    "group": "2_domain"
                 },
                 {
                     "command": "vscode-note.notes.create",
@@ -157,13 +156,18 @@
                         "type": "string",
                         "default": "~/.vscode-note",
                         "description": "note data location"
+                    },
+                    "vscode-note.ga": {
+                        "type": "boolean",
+                        "default": "true",
+                        "description": "ga collect"
                     }
                 }
             }
         ],
         "commands": [
             {
-                "command": "vscode-note.note.delete",
+                "command": "vscode-note.note.edit.delete",
                 "title": "Trash"
             },
             {
@@ -223,12 +227,8 @@
                 }
             },
             {
-                "command": "vscode-note.note.edit.full",
-                "title": "Edit Full"
-            },
-            {
-                "command": "vscode-note.note.edit.doc",
-                "title": "doc index"
+                "command": "vscode-note.note.edit.openFolder",
+                "title": "open note folder"
             },
             {
                 "command": "vscode-note.note.edit.doc.full",
@@ -271,13 +271,13 @@
         "lint:all": "yarn lint:tslint && yarn lint:prettier"
     },
     "devDependencies": {
-        "@babel/core": "^7.4.0",
+        "@babel/core": "^7.4.3",
         "@babel/preset-react": "^7.0.0",
         "@types/fs-extra": "^5.0.5",
         "@types/got": "^9.4.1",
         "@types/jest": "^24.0.11",
-        "@types/js-yaml": "^3.12.0",
-        "@types/node": "^11.12.2",
+        "@types/js-yaml": "^3.12.1",
+        "@types/node": "^11.13.0",
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.8.10",
         "@types/react-dom": "^16.8.3",
@@ -286,7 +286,7 @@
         "@types/webpack": "^4.4.26",
         "babel-loader": "^8.0.5",
         "css-loader": "^2.1.1",
-        "jest": "^24.5.0",
+        "jest": "^24.7.0",
         "node-sass": "^4.11.0",
         "prettier": "^1.16.4",
         "sass-loader": "^7.1.0",
@@ -294,7 +294,7 @@
         "ts-jest": "^24.0.1",
         "ts-loader": "^5.3.3",
         "ts-node": "^8.0.3",
-        "tslint": "^5.14.0",
+        "tslint": "^5.15.0",
         "tslint-react": "^4.0.0",
         "typescript": "^3.4.1",
         "typescript-tslint-plugin": "^0.3.1",

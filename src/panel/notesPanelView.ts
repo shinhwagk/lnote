@@ -84,7 +84,7 @@ export class NotesPanelView {
                         break;
                     case 'edit':
                         vscode.commands.executeCommand(
-                            'vscode-note.note.edit',
+                            'vscode-note.note.edit.open',
                             message.data.id,
                             message.data.category
                         );
@@ -105,7 +105,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.add', message.data);
                         break;
                     case 'add-category':
-                        vscode.commands.executeCommand('vscode-note.note.category.add');
+                        vscode.commands.executeCommand('vscode-note.category.add');
                         break;
                 }
             },
@@ -131,7 +131,7 @@ export class NotesPanelView {
         for (const nId of notes) {
             const cname = ext.dbFS
                 .readNoteMeta(nId)
-                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.tag), ext.activeNote.dpath))[0]
+                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.domain), ext.activeNote.dpath))[0]
                 .category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);

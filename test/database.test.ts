@@ -11,22 +11,22 @@ const testDataPath = './.vscode-note';
 const exampleDataNotes = [
     {
         id: '1',
-        tags: [{ tag: '/adf/abc', category: 'test' }],
+        tags: [{ domain: 'adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '2',
-        tags: [{ tag: '/adf/abc', category: 'test' }],
+        tags: [{ domain: 'adf/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '3',
-        tags: [{ tag: '/adf/abc/ccc', category: 'test' }],
+        tags: [{ domain: 'adf/abc/ccc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '4',
-        tags: [{ tag: '/g/abc', category: 'test' }],
+        tags: [{ domain: 'g/abc', category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     }
 ];
@@ -109,10 +109,13 @@ describe('test modify domain cascade', () => {
 
     test('update tag', () => {
         dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
+
         dbFileSystem = new DatabaseFileSystem(testDataPath);
-        resultData['adf']['acc'] = {};
-        resultData['adf']['acc']['.notes'] = resultData['adf']['abc']['.notes'];
-        delete resultData['adf']['abc']['.notes'];
+        console.log(1, JSON.stringify(dbFileSystem.dch.selectDomain()));
+        resultData['adf']['acc'] = { 'abc': { '.notes': [] } };
+        resultData['adf']['abc']['.notes'].forEach((n: string) => resultData['adf']['acc']['abc']['.notes'].push(n));
+        delete resultData['adf']['abc'];
+        console.log(2, JSON.stringify(resultData))
         expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
     });
 });

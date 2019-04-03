@@ -1,34 +1,32 @@
-import * as got from 'got';
+import { post } from 'got';
 import { tools } from './helper';
 import { homedir } from 'os';
-import * as path from 'path';
-import { existsSync, readFileSync, writeFileSync, ensureFileSync } from 'fs-extra';
+import { join } from 'path';
+import { vfs } from './helper';
+import { existsSync, ensureFileSync } from 'fs-extra';
 
 function genUserId() {
     return tools.hexRandom(10);
 }
 
 function initUserId() {
-    const userIdFile = path.join(homedir(), '.vscode-note', 'userId');
+    const userIdFile = join(homedir(), '.vscode-note', 'userId');
     if (!existsSync(userIdFile)) {
         ensureFileSync(userIdFile);
-        writeFileSync(userIdFile, genUserId());
+        vfs.writeFileSync(userIdFile, genUserId());
     }
-    return readFileSync(userIdFile);
+    return vfs.readFileSync(userIdFile);
 }
 
-export namespace GA {
-    export async function collect(ec: string, ea: string) {
-        postGA(ec, ea);
-    }
-}
-
-function postGA(ec: string, ea: string) {
-    const cid = initUserId();
+const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string) => {
+    if (!collect) return;
+    const cid = userId;
     const tid = 'UA-137490130-1';
     const t = 'event';
     const v = 1;
     const body = { v, tid, cid, t, ec, ea };
     const form = true;
-    got.post('https://www.google-analytics.com/collect', { form, body }).catch(console.error);
-}
+    post('https://www.google-analytics.com/collect', { form, body }).catch(console.error);
+};
+
+export const pga = postGA(initUserId());
