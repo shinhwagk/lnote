@@ -1,4 +1,4 @@
-import { DomainExplorerProvider } from './explorer/domainExplorer';
+import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { EditExplorerProvider } from './explorer/editExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { homedir } from 'os';
@@ -82,9 +82,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 }
 
 export class ActiveNote {
-    dpath: string[] = [];
     id: string = '';
     files: boolean = false;
     doc: boolean = false;
     category: string = '';
+    domainNode: DomainNode | undefined;
 }

@@ -9,6 +9,7 @@ export class NotesPanelView {
     private state: boolean = false;
     private tryCnt: number = 0;
     private viewData: twv.WVDomain | undefined;
+    private dpathCache: string[] = [];
 
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
@@ -115,7 +116,8 @@ export class NotesPanelView {
         this.panel.webview.html = this.getWebviewContent();
     }
 
-    public parseDomain() {
+    public parseDomain(dpath?: string[]) {
+        this.dpathCache = dpath || this.dpathCache;
         this.viewData = this.genViewData();
         return this;
     }
@@ -126,12 +128,12 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const notes = ext.dbFS.dch.selectNotesUnderDomain(ext.activeNote.dpath);
+        const notes = ext.dbFS.dch.selectNotesUnderDomain(this.dpathCache);
         const categories: twv.WVCategory[] = [];
         for (const nId of notes) {
             const cname = ext.dbFS
                 .readNoteMeta(nId)
-                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.domain), ext.activeNote.dpath))[0]
+                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.domain), this.dpathCache))[0]
                 .category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);
@@ -145,6 +147,6 @@ export class NotesPanelView {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }
         }
-        return { name: ext.activeNote.dpath[ext.activeNote.dpath.length - 1], categories: categories };
+        return { name: this.dpathCache[this.dpathCache.length - 1], categories: categories };
     }
 }

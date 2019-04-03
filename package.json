@@ -30,7 +30,7 @@
             "activitybar": [
                 {
                     "id": "vsnote-explorer",
-                    "title": "VSNote",
+                    "title": "Note",
                     "icon": "images/note.svg"
                 }
             ]
@@ -66,7 +66,12 @@
                     "when": "view == editExplorer"
                 },
                 {
-                    "command": "vscode-note.note.files.close",
+                    "command": "vscode-note.files.close",
+                    "group": "navigation",
+                    "when": "view == filesExplorer"
+                },
+                {
+                    "command": "vscode-note.files.refresh",
                     "group": "navigation",
                     "when": "view == filesExplorer"
                 },
@@ -101,8 +106,14 @@
                     "group": "2_orderBy"
                 },
                 {
-                    "command": "vscode-note.note.files.openTerminal",
-                    "when": "view == filesExplorer"
+                    "command": "vscode-note.files.openTerminal",
+                    "when": "view == filesExplorer",
+                    "group": "navigation"
+                },
+                {
+                    "command": "vscode-note.files.edit.open",
+                    "when": "view == filesExplorer",
+                    "group": "navigation"
                 },
                 {
                     "command": "vscode-note.note.edit.category.rename",
@@ -203,7 +214,7 @@
                 }
             },
             {
-                "command": "vscode-note.note.files.close",
+                "command": "vscode-note.files.close",
                 "title": "Close",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -251,12 +262,32 @@
                 "title": "category rename"
             },
             {
-                "command": "vscode-note.note.files.openTerminal",
-                "title": "open terminal"
+                "command": "vscode-note.files.openTerminal",
+                "title": "open terminal",
+                "icon": {
+                    "light": "images/light/terminal.svg",
+                    "dark": "images/dark/terminal.svg"
+                }
             },
             {
                 "command": "vscode-note.notes.create",
                 "title": "Create Notes"
+            },
+            {
+                "command": "vscode-note.files.edit.open",
+                "title": "open edit window",
+                "icon": {
+                    "light": "images/light/edit.svg",
+                    "dark": "images/dark/edit.svg"
+                }
+            },
+            {
+                "command": "vscode-note.files.refresh",
+                "title": "refresh",
+                "icon": {
+                    "light": "images/light/refresh.svg",
+                    "dark": "images/dark/refresh.svg"
+                }
             }
         ]
     },

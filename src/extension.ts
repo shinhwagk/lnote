@@ -1,12 +1,8 @@
-import * as path from 'path';
 import { ext, initializeExtensionVariables } from './extensionVariables';
-import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import {
     ExtensionContext,
     ViewColumn,
-    commands,
-    Uri,
-    window
+    commands
 } from 'vscode';
 import { ExtCmds } from './extensionCommands';
 
@@ -45,8 +41,10 @@ export async function activate(context: ExtensionContext) {
     /**
      * note files
      */
-    registerCommand('vscode-note.note.files.close', ExtCmds.cmdHdlNoteFilesClose);
-    registerCommand('vscode-note.note.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal)
+    registerCommand('vscode-note.files.close', ExtCmds.cmdHdlFilesClose);
+    registerCommand('vscode-note.files.edit.open', ExtCmds.cmdHdlFilesEditOpen)
+    registerCommand('vscode-note.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);
+    registerCommand('vscode-note.files.refresh', ExtCmds.cmdHdlFilesRefresh);
 
     context.subscriptions.push(
         commands.registerCommand('editExplorer.openFileResource', async (resource: any) => {

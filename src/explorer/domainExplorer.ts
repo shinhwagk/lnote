@@ -42,7 +42,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
         item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
         if (domain['.notes']) {
             item.command = {
-                arguments: [element.dpath],
+                arguments: [element],
                 command: 'vscode-note.domain.pin',
                 title: 'Show Vscode Note'
             };
