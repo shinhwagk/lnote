@@ -95,6 +95,27 @@ describe('test modify', () => {
         expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
     });
 });
+
+describe('test modify domain cascade', () => {
+    beforeAll(() => {
+        mkdirSync(testDataPath);
+        createTestFileAndDirectory();
+        dbFileSystem = new DatabaseFileSystem(testDataPath);
+    });
+
+    afterAll(() => {
+        rimraf.sync(testDataPath);
+    });
+
+    test('update tag', () => {
+        dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
+        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        resultData['adf']['acc'] = {};
+        resultData['adf']['acc']['.notes'] = resultData['adf']['abc']['.notes'];
+        delete resultData['adf']['abc']['.notes'];
+        expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
+    });
+});
 // test('update tag cascade', () => {
 //     dbFileSystem.updateNotesTagPath(['adf', 'abc'], ['adf', 'acc'], true);
 //     dbFileSystem = new DatabaseFileSystem(testDataPath);

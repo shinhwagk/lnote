@@ -40,7 +40,7 @@
                 {
                     "id": "editExplorer",
                     "name": "note edit",
-                    "when": "vscode-note.note.edit"
+                    "when": "vscode-note.note.edit-explorer"
                 },
                 {
                     "id": "filesExplorer",
@@ -84,11 +84,41 @@
                 {
                     "command": "vscode-note.note.delete",
                     "when": "view == editExplorer",
+                    "group": "4_orderBy"
+                },
+                {
+                    "command": "vscode-note.note.edit.doc",
+                    "when": "view == editExplorer && vscode-note.note.doc.exist",
+                    "group": "2_orderBy"
+                },
+                {
+                    "command": "vscode-note.note.edit.files",
+                    "when": "view == editExplorer && vscode-note.note.doc.exist",
+                    "group": "2_orderBy"
+                },
+                {
+                    "command": "vscode-note.note.edit.doc.full",
+                    "when": "view == editExplorer && vscode-note.note.doc.exist",
                     "group": "2_orderBy"
                 },
                 {
                     "command": "vscode-note.note.files.openTerminal",
                     "when": "view == filesExplorer"
+                },
+                {
+                    "command": "vscode-note.note.edit.category.rename",
+                    "when": "view == editExplorer",
+                    "group": "3_orderBy"
+                },
+                {
+                    "command": "vscode-note.note.edit.files.create",
+                    "when": "view == editExplorer && !vscode-note.note.files.exist",
+                    "group": "2_orderBy"
+                },
+                {
+                    "command": "vscode-note.note.edit.doc.create",
+                    "when": "view == editExplorer && !vscode-note.note.doc.exist",
+                    "group": "2_orderBy"
                 }
             ],
             "view/item/context": [
@@ -108,7 +138,7 @@
                     "group": "1_2_domain"
                 },
                 {
-                    "command": "vscode-note.note.create",
+                    "command": "vscode-note.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes"
                 },
                 {
@@ -133,10 +163,6 @@
         ],
         "commands": [
             {
-                "command": "vscode-note.note.add",
-                "title": "New Note"
-            },
-            {
                 "command": "vscode-note.note.delete",
                 "title": "Trash"
             },
@@ -147,6 +173,10 @@
                     "light": "images/light/add.svg",
                     "dark": "images/dark/add.svg"
                 }
+            },
+            {
+                "command": "vscode-note.domain.move",
+                "title": "Move Domain"
             },
             {
                 "command": "vscode-note.domain.rename",
@@ -197,15 +227,35 @@
                 "title": "Edit Full"
             },
             {
+                "command": "vscode-note.note.edit.doc",
+                "title": "doc index"
+            },
+            {
+                "command": "vscode-note.note.edit.doc.full",
+                "title": "doc full"
+            },
+            {
+                "command": "vscode-note.note.edit.files",
+                "title": "files"
+            },
+            {
+                "command": "vscode-note.note.edit.doc.create",
+                "title": "doc create"
+            },
+            {
+                "command": "vscode-note.note.edit.files.create",
+                "title": "files create"
+            },
+            {
+                "command": "vscode-note.note.edit.category.rename",
+                "title": "category rename"
+            },
+            {
                 "command": "vscode-note.note.files.openTerminal",
                 "title": "open terminal"
             },
             {
-                "command": "vscode-note.domain.move",
-                "title": "Move Domain"
-            },
-            {
-                "command": "vscode-note.note.create",
+                "command": "vscode-note.notes.create",
                 "title": "Create Notes"
             }
         ]
@@ -224,6 +274,7 @@
         "@babel/core": "^7.4.0",
         "@babel/preset-react": "^7.0.0",
         "@types/fs-extra": "^5.0.5",
+        "@types/got": "^9.4.1",
         "@types/jest": "^24.0.11",
         "@types/js-yaml": "^3.12.0",
         "@types/node": "^11.12.2",
@@ -257,6 +308,7 @@
         "@fortawesome/react-fontawesome": "^0.1.4",
         "bootstrap": "^4.3.1",
         "fs-extra": "^7.0.1",
+        "got": "^9.6.0",
         "js-yaml": "^3.13.0",
         "object-path": "^0.11.4",
         "react": "^16.8.6",

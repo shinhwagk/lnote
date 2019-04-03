@@ -16,8 +16,10 @@ const vscode: vscode = acquireVsCodeApi();
 
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
-const editNote = (id: string) => () => vscode.postMessage({ command: 'edit', data: id });
-const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
+const editNote = (id: string, category: string) => () =>
+    vscode.postMessage({ command: 'edit', data: { id, category } });
+const editContentFile = (id: string, n: string) => () =>
+    vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
@@ -33,14 +35,14 @@ function renderNoteFiles(props: { id: string }) {
     return (
         <a onClick={viewFiles(props.id)}>
             <FontAwesomeIcon inverse={true} icon={faFileAlt} />
-            <span>{' '}</span>
+            <span> </span>
         </a>
     );
 }
 
-function VSNNotes(props: twv.WVNote) {
+function VSNNotes(props: WVNote) {
     const contents = props.contents.map((c, i) => (
-        <div className='col' onDoubleClick={editContentFile(props.nId, (i + 1).toString())}>
+        <div className="col" onDoubleClick={editContentFile(props.nId, (i + 1).toString())}>
             <pre>{c}</pre>
         </div>
     ));
@@ -48,17 +50,15 @@ function VSNNotes(props: twv.WVNote) {
     const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId}</span>;
     const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span />;
     return (
-        <div className='row'>
-            <div className='col col-1'>
-                <pre>
-                    {isDoc}
-                </pre>
+        <div className="row">
+            <div className="col col-1">
+                <pre>{isDoc}</pre>
             </div>
             {contents}
-            <div className='col col-1'>
+            <div className="col col-1">
                 <pre>
                     {isFiles}
-                    <a onClick={editNote(props.nId)}>
+                    <a onClick={editNote(props.nId, props.category)}>
                         <FontAwesomeIcon inverse={true} icon={faPen} />
                     </a>
                 </pre>
@@ -68,27 +68,32 @@ function VSNNotes(props: twv.WVNote) {
 }
 
 function VSNCategory(props: twv.WVCategory) {
-    const listnote = props.notes.map((note: twv.WVNote) =>
-        <VSNNotes nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} />
-    );
+    const listnote = props.notes.map((note: twv.WVNote) => (
+        <VSNNotes
+            category={props.name}
+            nId={note.nId}
+            contents={note.contents}
+            doc={note.doc}
+            files={note.files}
+        />
+    ));
 
     return (
-        <div className='card bg-dark text-white'>
-            <div className='card-header'>{props.name + ' '}
+        <div className="card bg-dark text-white">
+            <div className="card-header">
+                {props.name + ' '}
                 <a onClick={addNote(props.name!)}>
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </div>
-            <div className='card-body'>
-                <div className='container-fluid'>{listnote}</div>
-
+            <div className="card-body">
+                <div className="container-fluid">{listnote}</div>
             </div>
         </div>
     );
 }
 
 function VNSDomain(props: twv.WVDomain) {
-
     const categories = props.categories.map((category: twv.WVCategory) => (
         <div>
             <VSNCategory name={category.name} notes={category.notes} />
@@ -98,7 +103,8 @@ function VNSDomain(props: twv.WVDomain) {
 
     return (
         <div>
-            <h1>{props.name + ' '}
+            <h1>
+                {props.name + ' '}
                 <a onClick={addCategory()}>
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
@@ -109,14 +115,17 @@ function VNSDomain(props: twv.WVDomain) {
     );
 }
 
-window.addEventListener('message', (event) => {
+window.addEventListener('message', event => {
     const message: twv.DomainData = event.data;
 
     switch (message.command) {
         case 'data':
             const name = message.data.name;
             const categories = message.data.categories;
-            ReactDOM.render(<VNSDomain name={name} categories={categories} />, document.getElementById('root'));
+            ReactDOM.render(
+                <VNSDomain name={name} categories={categories} />,
+                document.getElementById('root')
+            );
             break;
         default:
             ReactDOM.render(<h1>loading...{message}</h1>, document.getElementById('root'));
@@ -125,3 +134,11 @@ window.addEventListener('message', (event) => {
 
 vscode.postMessage({ command: 'ready' });
 console.log('web view ready.');
+
+interface WVNote {
+    category: string;
+    nId: string;
+    contents: string[];
+    doc: boolean;
+    files: boolean;
+}

@@ -1,5 +1,6 @@
 import * as fse from 'fs-extra';
 import * as jsyaml from 'js-yaml';
+import { randomBytes } from 'crypto';
 
 export namespace vfs {
     export function readFileSync(path: string): string {
@@ -44,5 +45,9 @@ export namespace vpath {
 export namespace tools {
     export function arrayEqual(a1: any[], a2: any[]) {
         return JSON.stringify(a1) == JSON.stringify(a2);
+    }
+
+    export function hexRandom(len: number): string {
+        return randomBytes(len).toString('hex');
     }
 }

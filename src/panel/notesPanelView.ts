@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
-import { DatabaseFileSystem } from '../database';
 import { ToWebView as twv } from './notesMessage';
 import { tools, vpath } from '../helper';
 
@@ -10,14 +9,6 @@ export class NotesPanelView {
     private state: boolean = false;
     private tryCnt: number = 0;
     private viewData: twv.WVDomain | undefined;
-    private dfs: DatabaseFileSystem;
-    private ctx: vscode.ExtensionContext;
-    private dpath: string[] = [];
-
-    constructor(ctx: vscode.ExtensionContext, dfs: DatabaseFileSystem) {
-        this.dfs = dfs;
-        this.ctx = ctx;
-    }
 
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
@@ -73,17 +64,17 @@ export class NotesPanelView {
                 console.log('vsnote webview closed.');
             },
             null,
-            this.ctx.subscriptions
+            ext.context.subscriptions
         );
         this.panel.onDidChangeViewState(
             () => {
                 if (this.panel && this.panel.visible) {
-                    this.parseDomain(this.dpath);
+                    this.parseDomain();
                     this.showNotesPlanView();
                 }
             },
             null,
-            this.ctx.subscriptions
+            ext.context.subscriptions
         );
         this.panel.webview.onDidReceiveMessage(
             message => {
@@ -92,7 +83,11 @@ export class NotesPanelView {
                         this.state = true;
                         break;
                     case 'edit':
-                        vscode.commands.executeCommand('vscode-note.note.edit', message.data);
+                        vscode.commands.executeCommand(
+                            'vscode-note.note.edit',
+                            message.data.id,
+                            message.data.category
+                        );
                         break;
                     case 'edit-contentFile':
                         const id = message.data.id;
@@ -115,13 +110,12 @@ export class NotesPanelView {
                 }
             },
             undefined,
-            this.ctx.subscriptions
+            ext.context.subscriptions
         );
         this.panel.webview.html = this.getWebviewContent();
     }
 
-    public parseDomain(dpath?: string[]) {
-        this.dpath = dpath || this.dpath;
+    public parseDomain() {
         this.viewData = this.genViewData();
         return this;
     }
@@ -132,16 +126,16 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const dpath = this.dpath;
-        const notes = this.dfs.dch.selectNotesUnderDomain(dpath);
+        const notes = ext.dbFS.dch.selectNotesUnderDomain(ext.activeNote.dpath);
         const categories: twv.WVCategory[] = [];
         for (const nId of notes) {
-            const cname = this.dfs
+            const cname = ext.dbFS
                 .readNoteMeta(nId)
-                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.tag), dpath))[0].category;
-            const contents: string[] = this.dfs.selectNoteContents(nId);
-            const isDoc = this.dfs.selectDocExist(nId);
-            const isFiles = this.dfs.selectFilesExist(nId);
+                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.tag), ext.activeNote.dpath))[0]
+                .category;
+            const contents: string[] = ext.dbFS.selectNoteContents(nId);
+            const isDoc = ext.dbFS.selectDocExist(nId);
+            const isFiles = ext.dbFS.selectFilesExist(nId);
 
             if (categories.filter(c => c.name === cname).length >= 1) {
                 categories
@@ -151,6 +145,6 @@ export class NotesPanelView {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }
         }
-        return { name: dpath[dpath.length - 1], categories: categories };
+        return { name: ext.activeNote.dpath[ext.activeNote.dpath.length - 1], categories: categories };
     }
 }
