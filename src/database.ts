@@ -105,10 +105,10 @@ export class DatabaseFileSystem {
             'tags:\n    - domain: /powershell/install\n      category: install'
         );
         vfs.mkdirsSync(this.getNoteDocPath(nId));
-        vfs.writeFileSync(this.getNoteDocIndexFile(nId, 'README.md'), 'example.');
+        vfs.writeFileSync(this.getNoteDocIndexFile(nId, 'README.md'), '# example. \n example.');
         vfs.mkdirsSync(this.getNoteFilesPath(nId));
-        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_01.txt'), 'example 01.');
-        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_02.txt'), 'example 02.');
+        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_01.sh'), 'echo aa');
+        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_02.ts'), 'console.log("aa")');
     }
 
     initialize(): void {
