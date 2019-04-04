@@ -1,6 +1,6 @@
 import { readdirSync, mkdirSync, existsSync, removeSync, renameSync, ensureFileSync } from 'fs-extra';
 import * as objectPath from 'object-path';
-import { noNoteDirs, metaFileName } from './constants';
+import { nonNoteData, metaFileName } from './constants';
 import { vpath, vfs, tools } from './helper';
 import * as path from 'path';
 
@@ -42,7 +42,7 @@ export class DatabaseFileSystem {
 
     private cacheAllNotes() {
         this.dch.cleanCache();
-        const notes = readdirSync(this.dbDirPath).filter(f => noNoteDirs.filter(nn => nn === f).length === 0);
+        const notes = readdirSync(this.dbDirPath).filter(f => nonNoteData.filter(nn => nn === f).length === 0);
         this.insertNotesByMeta(...notes);
     }
 

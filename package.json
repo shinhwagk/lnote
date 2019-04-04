@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -171,7 +171,7 @@
                     "vscode-note.ga": {
                         "type": "boolean",
                         "default": "true",
-                        "description": "ga collect"
+                        "description": "switch ga collect"
                     }
                 }
             }

@@ -29,7 +29,7 @@ export function getConfigure<T>(name: string, defaultValue: T): T {
 }
 
 function getDbDirPath() {
-    return untildify(getConfigure('dbpath', path.join(homedir(), '.vscode-note')));
+    return untildify(getConfigure('dbpath', path.join(homedir(), 'vscode-note')));
 }
 
 function listenerConfigure(ctx: ExtensionContext) {
