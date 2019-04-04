@@ -1,6 +1,6 @@
 import * as https from 'https';
 import { tools } from './helper';
-import { homedir, platform } from 'os';
+import { homedir } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
