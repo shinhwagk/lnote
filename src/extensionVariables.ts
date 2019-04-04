@@ -32,7 +32,6 @@ function getDbDirPath() {
     return untildify(getConfigure('dbpath', path.join(homedir(), '.vscode-note')));
 }
 
-
 function listenerConfigure(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
