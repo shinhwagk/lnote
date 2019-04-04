@@ -5,6 +5,7 @@ import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
 import * as querystring from 'querystring';
+import { version } from '../package.json';
 
 function genUserId() {
     return tools.hexRandom(10);
@@ -21,11 +22,12 @@ function initUserId() {
 
 const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string) => {
     if (!collect) return Promise.resolve();
-    const cid = userId;
+    const cid = version;
+    const uid = userId;
     const tid = 'UA-137490130-1';
     const t = 'event';
     const v = 1;
-    const body = { v, tid, cid, t, ec, ea };
+    const body = { v, tid, cid, uid, t, ec, ea };
     const data = querystring.stringify(body);
 
     return new Promise<void>((resolve, reject) => {
