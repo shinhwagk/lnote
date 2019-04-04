@@ -49,6 +49,9 @@ const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string
     });
 };
 
-export const pga = (collect: boolean) => (ec: string, ea: string) =>
-    postGA(initUserId())(collect)(ec, ea).catch(e => console.error(`ga error: ${e}`));
+const _pga = postGA(initUserId());
+
+export const pga = (collect: boolean) => (ec: string, ea: string) => {
+    _pga(collect)(ec, ea).catch(e => console.error(`ga error: ${e}`));
+}
 

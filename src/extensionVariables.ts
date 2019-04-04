@@ -21,7 +21,7 @@ export namespace ext {
     export let dbFS: DatabaseFileSystem;
     // export let gitNotes: GitNotes;
     export let outputChannel: OutputChannel;
-    export let ga: any;
+    export let ga: (ec: string, ea: string) => void;
 }
 
 export function getConfigure<T>(name: string, defaultValue: T): T {
