@@ -12,7 +12,7 @@ function genUserId() {
 }
 
 function initUserId() {
-    const userIdFile = join(homedir(), '.vscode-note', 'userId');
+    const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!existsSync(userIdFile)) {
         ensureFileSync(userIdFile);
         vfs.writeFileSync(userIdFile, genUserId());
@@ -20,14 +20,16 @@ function initUserId() {
     return vfs.readFileSync(userIdFile);
 }
 
-const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string) => {
+const postGA = (clientId: string) => (collect: boolean) => (ec: string, ea: string) => {
     if (!collect) return Promise.resolve();
-    const cid = `${platform()}-${version}`;
-    const uid = userId;
+    const cid = clientId;
     const tid = 'UA-137490130-1';
     const t = 'event';
     const v = 1;
-    const body = { v, tid, cid, uid, t, ec, ea };
+    const an = 'vscode-note';
+    const av = version;
+    const body = { v, tid, cid, t, ec, ea, an, av };
+
     const data = querystring.stringify(body);
 
     return new Promise<void>((resolve, reject) => {
