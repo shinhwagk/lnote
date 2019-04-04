@@ -43,8 +43,8 @@ export namespace vpath {
 }
 
 export namespace tools {
-    export function arrayEqual(a1: any[], a2: any[]) {
-        return JSON.stringify(a1) == JSON.stringify(a2);
+    export function stringArrayEqual(a1: string[], a2: string[]) {
+        return JSON.stringify(a1) === JSON.stringify(a2);
     }
 
     export function hexRandom(len: number): string {

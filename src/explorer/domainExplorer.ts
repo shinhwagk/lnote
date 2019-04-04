@@ -1,17 +1,13 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 import { ext } from '../extensionVariables';
+import { vpath } from '../helper';
 
-export class DomainNode {
-    constructor(parent: DomainNode | undefined, dpath: string[]) {
-        this.dpath = dpath; // domain path
-        this.parent = parent;
-    }
-    dpath: string[];
-    parent: DomainNode | undefined;
+export type DomainNode = string;
 
-    static create(parent: DomainNode | undefined, dpath: string[]) {
-        return new DomainNode(parent, dpath);
-    }
+function domainNodeParent(dn: DomainNode) {
+    const tdn = vpath.splitPath(dn);
+    tdn.pop();
+    return tdn.join('/');
 }
 
 export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
@@ -19,24 +15,24 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     readonly onDidChangeTreeData: Event<DomainNode> = this._onDidChangeTreeData.event;
 
     public refresh(dn?: DomainNode, parent: boolean = false): void {
-        if (dn) {
-            if (parent) {
-                this._onDidChangeTreeData.fire(dn.parent);
-                return;
-            }
-            this._onDidChangeTreeData.fire(dn);
-        } else {
-            this._onDidChangeTreeData.fire();
+        if (!dn) {
+            this._onDidChangeTreeData.fire(); return;
         }
+        if (parent) {
+            this._onDidChangeTreeData.fire(domainNodeParent(dn));
+            return;
+        }
+        this._onDidChangeTreeData.fire(dn);
     }
 
     public getTreeItem(element: DomainNode): TreeItem {
-        const domain = ext.dbFS.dch.selectDomain(element.dpath);
+        const dpath = vpath.splitPath(element);
+        const domain = ext.dbFS.dch.selectDomain(dpath);
         const childDomainNumber = Object.keys(domain).filter(name => name != '.notes').length;
-        const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(element.dpath).length;
-        const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(element.dpath).length;
+        const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(dpath).length;
+        const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(dpath).length;
         const item: TreeItem = new TreeItem(
-            element.dpath[element.dpath.length - 1],
+            dpath[dpath.length - 1],
             childDomainNumber >= 1 ? 1 : 0
         );
         item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
@@ -53,14 +49,14 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     }
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
-        const dpath: string[] = element ? element.dpath : [];
+        const dpath: string[] = element ? vpath.splitPath(element) : [];
         return Object.keys(ext.dbFS.dch.selectDomain(dpath))
             .filter(t => t !== '.notes')
             .sort()
-            .map(name => DomainNode.create(element, dpath.concat(name)));
+            .map(name => dpath.concat(name).join('/'));
     }
 
     public getParent(element: DomainNode): ProviderResult<DomainNode> {
-        return element.parent;
+        return domainNodeParent(element);
     }
 }

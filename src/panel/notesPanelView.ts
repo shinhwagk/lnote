@@ -133,7 +133,7 @@ export class NotesPanelView {
         for (const nId of notes) {
             const cname = ext.dbFS
                 .readNoteMeta(nId)
-                .tags.filter(tag => tools.arrayEqual(vpath.splitPath(tag.domain), this.dpathCache))[0]
+                .tags.filter(tag => tools.stringArrayEqual(vpath.splitPath(tag.domain), this.dpathCache))[0]
                 .category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);

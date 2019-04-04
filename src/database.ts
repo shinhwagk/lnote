@@ -171,10 +171,10 @@ export class DatabaseFileSystem {
         for (let i = 0; i < noteMeta.tags.length; i++) {
             const metaPath = vpath.splitPath(noteMeta.tags[i].domain);
             if (cascade) {
-                if (tools.arrayEqual(orgDpath, metaPath.slice(0, orgDpath.length)))
+                if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length)))
                     noteMeta.tags[i].domain = newDpath.concat(metaPath.slice(orgDpath.length)).join('/');
             } else {
-                if (tools.arrayEqual(orgDpath, metaPath)) noteMeta.tags[i].domain = newDpath.join('/');
+                if (tools.stringArrayEqual(orgDpath, metaPath)) noteMeta.tags[i].domain = newDpath.join('/');
             }
         }
         this.writeNoteMeta(nId, noteMeta);

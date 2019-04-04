@@ -1,4 +1,4 @@
-import { extensions, window } from 'vscode';
+import { extensions } from 'vscode';
 import { GitExtension } from '../typings/git';
 
 export class GitNotes {
@@ -23,7 +23,7 @@ export class GitNotes {
     }
 
     async commit(message: string) {
-
+        return message;
     }
 
     async add() {
