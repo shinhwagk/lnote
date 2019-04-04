@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.9.5",
+    "version": "0.9.6",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -165,7 +165,7 @@
                 "properties": {
                     "vscode-note.dbpath": {
                         "type": "string",
-                        "default": "~/.vscode-note",
+                        "default": "~/vscode-note",
                         "description": "note data location"
                     },
                     "vscode-note.ga": {
