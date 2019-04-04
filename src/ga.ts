@@ -1,6 +1,6 @@
 import * as https from 'https';
 import { tools } from './helper';
-import { homedir } from 'os';
+import { homedir, platform } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
@@ -22,7 +22,7 @@ function initUserId() {
 
 const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string) => {
     if (!collect) return Promise.resolve();
-    const cid = version;
+    const cid = `${platform()}-${version}`;
     const uid = userId;
     const tid = 'UA-137490130-1';
     const t = 'event';
