@@ -8,7 +8,6 @@ import { section } from './constants';
 import { DatabaseFileSystem } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
-import { GitNotes } from './gitNotes';
 import { pga } from './ga';
 
 export namespace ext {
@@ -20,7 +19,7 @@ export namespace ext {
     export let dbDirPath: string;
     export let activeNote: ActiveNote;
     export let dbFS: DatabaseFileSystem;
-    export let gitNotes: GitNotes;
+    // export let gitNotes: GitNotes;
     export let outputChannel: OutputChannel;
     export let ga: any;
 }
@@ -38,7 +37,8 @@ function listenerConfigure(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
             if (e.affectsConfiguration(section)) {
-                ext.dbFS.changeDbDirPath(getDbDirPath());
+                ext.dbFS = new DatabaseFileSystem(getDbDirPath());
+                ext.dbDirPath = getDbDirPath();
                 ext.ga = pga(getConfigure('ga', true));
             }
         })
@@ -52,11 +52,11 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // delete soon
     ext.dbDirPath = getDbDirPath();
 
-    ext.ga = pga(getConfigure('ga', true));
-
     ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
 
-    ext.gitNotes = new GitNotes(ext.dbDirPath);
+    ext.ga = pga(getConfigure('ga', true));
+
+    // ext.gitNotes = new GitNotes(ext.dbDirPath);
     ext.outputChannel = window.createOutputChannel('vscode-note');
 
     ext.activeNote = new ActiveNote();
