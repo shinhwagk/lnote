@@ -42,7 +42,7 @@ export async function activate(context: ExtensionContext) {
      * note files
      */
     registerCommand('vscode-note.files.close', ExtCmds.cmdHdlFilesClose);
-    registerCommand('vscode-note.files.edit.open', ExtCmds.cmdHdlFilesEditOpen)
+    registerCommand('vscode-note.files.edit.open', ExtCmds.cmdHdlFilesEditOpen);
     registerCommand('vscode-note.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);
     registerCommand('vscode-note.files.refresh', ExtCmds.cmdHdlFilesRefresh);
 

@@ -16,7 +16,7 @@ export class NotesPanelView {
         return vscode.Uri.file(file)
             .with({ scheme: 'vscode-resource' })
             .toString();
-    };
+    }
 
     private getWebviewContent() {
         return `<!DOCTYPE html>

@@ -55,8 +55,8 @@ export namespace ExtCmds {
         ext.ga('note', 'edit-close');
     }
     export async function cmdHdlNoteColRemove(f: TreeItem) {
-        const nu = basename(f.resourceUri!.fsPath)[0]
-        ext.dbFS.deleteNoteCol(ext.activeNote.id, Number(nu))
+        const nu = basename(f.resourceUri!.fsPath)[0];
+        ext.dbFS.deleteNoteCol(ext.activeNote.id, Number(nu));
         ext.editProvider.refresh();
         ext.ga('note', 'col-delete');
     }

@@ -75,12 +75,12 @@ export class DatabaseFileSystem {
         readdirSync(this.getNotePath(nId))
             .filter(f => this.contentFileNameRegex.test(f))
             .map(f => this.contentFileNameRegex.exec(f)![1])
-            .map(f => this.getNoteContentFile(nId, f));
+            .map(f => this.getNoteContentFile(nId, f))
 
     selectDocIndexFile = (nId: string) => {
         const indexFile = readdirSync(this.getNoteDocPath(nId)).filter(f => /^README\.*/.test(f))[0];
         return this.getNoteDocIndexFile(nId, indexFile);
-    };
+    }
 
     writeNoteMeta = (id: string, meta: Tags) => vfs.writeYamlSync(this.getNoteMetaFile(id), meta);
 
