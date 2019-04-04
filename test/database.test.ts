@@ -108,14 +108,14 @@ describe('test modify domain cascade', () => {
     });
 
     test('update tag', () => {
+        const resultData = JSON.parse(
+            '{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'
+        );
         dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
-
         dbFileSystem = new DatabaseFileSystem(testDataPath);
-        console.log(1, JSON.stringify(dbFileSystem.dch.selectDomain()));
         resultData['adf']['acc'] = { 'abc': { '.notes': [] } };
-        resultData['adf']['abc']['.notes'].forEach((n: string) => resultData['adf']['acc']['abc']['.notes'].push(n));
+        resultData['adf']['acc']['abc'] = resultData['adf']['abc'];
         delete resultData['adf']['abc'];
-        console.log(2, JSON.stringify(resultData))
         expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
     });
 });
