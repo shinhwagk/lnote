@@ -5,6 +5,7 @@ import {
     commands
 } from 'vscode';
 import { ExtCmds } from './extensionCommands';
+import { DatabaseFileSystem } from './database';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -54,6 +55,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.domain.refresh', async () => {
+            ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
             ext.domainProvider.refresh();
         })
     );
