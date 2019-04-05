@@ -1,14 +1,21 @@
 import { extensions } from 'vscode';
 import { GitExtension } from '../typings/git';
+import { getConfigure } from './extensionVariables';
 
 export class GitNotes {
 
     dbDirPath: string;
     gitBin: string | undefined = undefined;
+    github: string;
 
-    constructor(dbDirPath: string) {
+    constructor(dbDirPath: string, _github: string) {
         this.dbDirPath = dbDirPath;
         this.registerGitBin();
+        this.github = getConfigure('github', '');
+    }
+
+    checkInitGit() {
+
     }
 
     registerGitBin() {
