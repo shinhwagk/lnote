@@ -8,7 +8,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 * each ***domain***(directory tree) node can be a ***notes***.
 * each ***notes*** consists of one or more ***category***.
 * each ***category*** consists of one or more ***note***.
-* each ***note*** consits of one or more ***short doc***, ***doc***(markdown/html), ***files***(attachment)
+* each ***note*** consists of one or more ***short doc***, ***doc***(markdown/html), ***files***(attachment)
 
 ## Usages
 
