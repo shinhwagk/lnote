@@ -31,6 +31,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
                     arguments: [uri],
                     title: basename(uri.path)
                 };
+                item.contextValue = 'file';
                 return item;
             }
         });

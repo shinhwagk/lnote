@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.9.9",
+    "version": "0.9.10",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -14,6 +14,8 @@
         "url": "https://github.com/shinhwagk/vscode-note"
     },
     "categories": [
+        "Snippets",
+        "SCM Providers",
         "Other"
     ],
     "keywords": [
@@ -155,13 +157,21 @@
                     "command": "vscode-note.note.edit.col.remove",
                     "when": "view == editExplorer && viewItem == editNoteNode",
                     "group": "inline"
+                },
+                {
+                    "command": "vscode-note.files.file.url.raw",
+                    "when": "view == filesExplorer && viewItem == file"
+                },
+                {
+                    "command": "vscode-note.files.file.url",
+                    "when": "view == filesExplorer && viewItem == file"
                 }
             ]
         },
         "configuration": [
             {
                 "type": "object",
-                "title": "VScode Note",
+                "title": "vscode-note",
                 "properties": {
                     "vscode-note.dbpath": {
                         "type": "string",
@@ -171,7 +181,11 @@
                     "vscode-note.ga": {
                         "type": "boolean",
                         "default": "true",
-                        "description": "switch ga collect"
+                        "description": "open ga collect"
+                    },
+                    "vscode-note.github": {
+                        "type": "string",
+                        "description": "github remote"
                     }
                 }
             }
@@ -288,6 +302,14 @@
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"
                 }
+            },
+            {
+                "command": "vscode-note.files.file.url.raw",
+                "title": "github raw url"
+            },
+            {
+                "command": "vscode-note.files.file.url",
+                "title": "github url"
             }
         ]
     },
