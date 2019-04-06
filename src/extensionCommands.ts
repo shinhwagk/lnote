@@ -110,7 +110,7 @@ export namespace ExtCmds {
         if (!newDpath) return;
         ExtCmdsFuns.resetDomain(orgDpath, vpath.splitPath(newDpath));
         // ext.domainProvider.refresh(vpath.splitPath(newDpath), true);
-        ext.domainProvider.refresh(dn, true);
+        ext.domainProvider.refresh(dn);
         ext.ga('domain', 'move');
     }
     export async function cmdHdlDomainRename(dn: DomainNode) {
@@ -121,7 +121,7 @@ export namespace ExtCmds {
         const newDpath = orgDpath.slice();
         newDpath[newDpath.length - 1] = newName;
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
-        ext.domainProvider.refresh(dn, true);
+        ext.domainProvider.refresh(dn);
         ext.ga('domain', 'rename');
     }
     export async function cmdHdlNoteOpenFolder() {

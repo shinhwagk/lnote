@@ -55,19 +55,12 @@ function getTreeItem(element: DomainNode): DomainNode {
 }
 
 export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
-    private _onDidChangeTreeData: EventEmitter<DomainNode> = new EventEmitter<DomainNode>();
-    readonly onDidChangeTreeData: Event<DomainNode> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<DomainNode | undefined> = new EventEmitter<DomainNode | undefined>();
+    readonly onDidChangeTreeData: Event<DomainNode | undefined> = this._onDidChangeTreeData.event;
 
-    public refresh(dn?: DomainNode, parent: boolean = false): void {
-        if (dn) {
-            // if (parent) {
-            //     this._onDidChangeTreeData.fire(dn.getParent());
-            //     return;
-            // }
-            this._onDidChangeTreeData.fire(dn);
-        } else {
-            this._onDidChangeTreeData.fire();
-        }
+    public refresh(dn?: DomainNode): void {
+
+        this._onDidChangeTreeData.fire(dn);
     }
 
     public getTreeItem(element: DomainNode): TreeItem {
