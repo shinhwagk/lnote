@@ -19,7 +19,7 @@ export class DomainNode extends TreeItem {
         return createDomainNodes(this, this.dpath);
     }
 
-    getParent(): ProviderResult<DomainNode> {
+    getParent(): DomainNode | undefined {
         return this.parent;
     }
 }

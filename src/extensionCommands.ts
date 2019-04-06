@@ -41,6 +41,7 @@ export namespace ExtCmds {
         const name: string | undefined = await window.showInputBox();
         if (!name) return;
         ext.dbFS.dch.createDomain(dpath, name);
+        ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true })
         ext.ga('domain', 'create');
     }
@@ -121,7 +122,7 @@ export namespace ExtCmds {
         const newDpath = orgDpath.slice();
         newDpath[newDpath.length - 1] = newName;
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
-        ext.domainProvider.refresh(dn);
+        ext.domainProvider.refresh(dn.getParent()!);
         ext.ga('domain', 'rename');
     }
     export async function cmdHdlNoteOpenFolder() {
