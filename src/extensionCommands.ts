@@ -42,7 +42,7 @@ export namespace ExtCmds {
         if (!name) return;
         ext.dbFS.dch.createDomain(dpath, name);
         ext.domainProvider.refresh(dn);
-        !dn || ext.domainTreeView.reveal(dn, { expand: true })
+        !dn || ext.domainTreeView.reveal(dn, { expand: true });
         ext.ga('domain', 'create');
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
