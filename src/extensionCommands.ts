@@ -17,9 +17,9 @@ export namespace ExtCmds {
         ext.ga('note', 'col-add');
     }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
-        ext.dbFS.dch.createNotes(vpath.splitPath(dn));
+        ext.dbFS.dch.createNotes(dn.dpath);
         ext.domainProvider.refresh(dn);
-        commands.executeCommand('vscode-note.domain.pin', vpath.splitPath(dn));
+        commands.executeCommand('vscode-note.domain.pin', dn.dpath);
         ext.ga('notes', 'create');
     }
     export async function cmdHdlNoteEditOpen(nId: string, category: string) {
@@ -37,16 +37,16 @@ export namespace ExtCmds {
         ext.ga('note', 'edit-open');
     }
     export async function cmdHdlDomainCreate(dn?: DomainNode) {
-        const dpath = dn ? vpath.splitPath(dn) : [];
+        const dpath = dn ? dn.dpath : [];
         const name: string | undefined = await window.showInputBox();
         if (!name) return;
         ext.dbFS.dch.createDomain(dpath, name);
-        ext.domainProvider.refresh(dn);
+        !dn || ext.domainTreeView.reveal(dn, { expand: true })
         ext.ga('domain', 'create');
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.activeNote.domainNode = dn;
-        ext.notesPanelView.parseDomain(vpath.splitPath(dn)).showNotesPlanView();
+        ext.notesPanelView.parseDomain(dn.dpath).showNotesPlanView();
         ext.ga('notes', 'view');
     }
     export async function cmdHdlNoteEditClose() {
@@ -63,7 +63,7 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditRemove() {
         const sqp = await window.showQuickPick(['Yes', 'No']);
         if (!sqp || sqp === 'No') return;
-        ext.dbFS.dch.removeNotes(vpath.splitPath(ext.activeNote.domainNode!), ext.activeNote.id!);
+        ext.dbFS.dch.removeNotes(ext.activeNote.domainNode!.dpath, ext.activeNote.id!);
         // ext.dbFS.removeNotes(ext.activeNote.dpath, ext.activeNote.id!);
         ext.notesPanelView.parseDomain().showNotesPlanView();
         await commands.executeCommand('setContext', 'vscode-note.edit-explorer', false);
@@ -78,7 +78,7 @@ export namespace ExtCmds {
         ext.ga('category', 'add');
     }
     export async function cmdHdlNoteAdd(category: string) {
-        const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
+        const nid: string = ext.dbFS.createNode(ext.activeNote.domainNode!.dpath, category);
         ensureFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
         await commands.executeCommand(
             'editExplorer.openFileResource',
@@ -105,16 +105,16 @@ export namespace ExtCmds {
         await commands.executeCommand('setContext', 'vscode-note.note.doc.exist', true);
     }
     export async function cmdHdlDomainMove(dn: DomainNode) {
-        const orgDpath = vpath.splitPath(dn);
+        const orgDpath = dn.dpath;
         const newDpath: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
         if (!newDpath) return;
         ExtCmdsFuns.resetDomain(orgDpath, vpath.splitPath(newDpath));
-        ext.domainProvider.refresh(newDpath, true);
+        // ext.domainProvider.refresh(vpath.splitPath(newDpath), true);
         ext.domainProvider.refresh(dn, true);
         ext.ga('domain', 'move');
     }
     export async function cmdHdlDomainRename(dn: DomainNode) {
-        const orgDpath = vpath.splitPath(dn);
+        const orgDpath = dn.dpath;
         const orgName = orgDpath[orgDpath.length - 1];
         const newName: string | undefined = await window.showInputBox({ value: orgName });
         if (!newName || orgName == newName) return;
@@ -164,7 +164,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlFilesOpenTerminal() {
         const nId = ext.activeNote.id;
-        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+        const dpath = ext.activeNote.domainNode!.dpath;
         const filePath = ext.dbFS.getNoteFilesPath(nId);
         const fileTerminal = window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
         fileTerminal.show(true);

@@ -6,13 +6,14 @@ import * as path from 'path';
 import untildify = require('untildify');
 import { section } from './constants';
 import { DatabaseFileSystem } from './database';
-import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent } from 'vscode';
+import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { pga } from './ga';
 
 export namespace ext {
     export let context: ExtensionContext;
     export let domainProvider: DomainExplorerProvider;
+    export let domainTreeView: TreeView<DomainNode>;
     export let editProvider: EditExplorerProvider;
     export let filesProvider: FilesExplorerProvider;
     export let notesPanelView: NotesPanelView;
@@ -64,9 +65,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         ext.notesPanelView = new NotesPanelView();
     }
 
-    if (!ext.domainProvider) {
+    if (!ext.domainProvider || !ext.domainTreeView) {
         ext.domainProvider = new DomainExplorerProvider();
-        window.registerTreeDataProvider('domainExplorer', ext.domainProvider);
+        ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
     }
 
     if (!ext.editProvider) {

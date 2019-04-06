@@ -1,13 +1,57 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 import { ext } from '../extensionVariables';
-import { vpath } from '../helper';
 
-export type DomainNode = string;
+export class DomainNode extends TreeItem {
+    dpath: string[] = [];
+    constructor(
+        private readonly parent: DomainNode | undefined = undefined,
+        readonly label: string,
+    ) {
+        super(label);
+        this.dpath = this.parent ? this.parent.dpath.concat(label) : [label];
+    }
 
-function domainNodeParent(dn: DomainNode) {
-    const tdn = vpath.splitPath(dn);
-    tdn.pop();
-    return tdn.join('/');
+    getTreeItem(): TreeItem {
+        return getTreeItem(this);
+    }
+
+    getChildren(): ProviderResult<DomainNode[]> {
+        return createDomainNodes(this, this.dpath);
+    }
+
+    getParent(): ProviderResult<DomainNode> {
+        return this.parent;
+    }
+}
+
+function createDomainNodes(parent: DomainNode | undefined, dpath: string[]): DomainNode[] {
+    return Object.keys(ext.dbFS.dch.selectDomain(dpath))
+        .filter(t => t !== '.notes')
+        .sort()
+        .map(name => new DomainNode(parent, name));
+}
+
+function getTreeItem(element: DomainNode): DomainNode {
+    const domain = ext.dbFS.dch.selectDomain(element.dpath);
+
+    const childDomainNumber = Object.keys(domain).filter(name => name != '.notes').length;
+    element.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
+
+    const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(element.dpath).length;
+    const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(element.dpath).length;
+
+    element.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
+
+    if (domain['.notes']) {
+        element.command = {
+            arguments: [element],
+            command: 'vscode-note.domain.pin',
+            title: 'Show Vscode Note'
+        };
+    } else {
+        element.contextValue = 'emptyNotes';
+    }
+    return element;
 }
 
 export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
@@ -15,48 +59,26 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     readonly onDidChangeTreeData: Event<DomainNode> = this._onDidChangeTreeData.event;
 
     public refresh(dn?: DomainNode, parent: boolean = false): void {
-        if (!dn) {
-            this._onDidChangeTreeData.fire(); return;
+        if (dn) {
+            // if (parent) {
+            //     this._onDidChangeTreeData.fire(dn.getParent());
+            //     return;
+            // }
+            this._onDidChangeTreeData.fire(dn);
+        } else {
+            this._onDidChangeTreeData.fire();
         }
-        if (parent) {
-            this._onDidChangeTreeData.fire(domainNodeParent(dn));
-            return;
-        }
-        this._onDidChangeTreeData.fire(dn);
     }
 
     public getTreeItem(element: DomainNode): TreeItem {
-        const dpath = vpath.splitPath(element);
-        const domain = ext.dbFS.dch.selectDomain(dpath);
-        const childDomainNumber = Object.keys(domain).filter(name => name != '.notes').length;
-        const notesTotalNumberUnderDomain = ext.dbFS.dch.selectAllNotesUnderDomain(dpath).length;
-        const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(dpath).length;
-        const item: TreeItem = new TreeItem(
-            dpath[dpath.length - 1],
-            childDomainNumber >= 1 ? 1 : 0
-        );
-        item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
-        if (domain['.notes']) {
-            item.command = {
-                arguments: [element],
-                command: 'vscode-note.domain.pin',
-                title: 'Show Vscode Note'
-            };
-        } else {
-            item.contextValue = 'emptyNotes';
-        }
-        return item;
+        return element.getTreeItem();
     }
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
-        const dpath: string[] = element ? vpath.splitPath(element) : [];
-        return Object.keys(ext.dbFS.dch.selectDomain(dpath))
-            .filter(t => t !== '.notes')
-            .sort()
-            .map(name => dpath.concat(name).join('/'));
+        return element ? element.getChildren() : createDomainNodes(undefined, []);
     }
 
     public getParent(element: DomainNode): ProviderResult<DomainNode> {
-        return domainNodeParent(element);
+        return element.getParent();
     }
 }
