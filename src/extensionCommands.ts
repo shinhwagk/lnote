@@ -43,6 +43,7 @@ export namespace ExtCmds {
         ext.dbFS.dch.createDomain(dpath, name);
         ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true })
+        ext.gitNotes.commit('add domain xxx').catch(window.showInformationMessage)
         ext.ga('domain', 'create');
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {

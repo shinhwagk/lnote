@@ -1,14 +1,14 @@
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { EditExplorerProvider } from './explorer/editExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
-import { homedir } from 'os';
+import { homedir, platform } from 'os';
 import * as path from 'path';
-import untildify = require('untildify');
 import { section } from './constants';
 import { DatabaseFileSystem } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { pga } from './ga';
+import { GitNotes } from './gitNotes';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -20,7 +20,7 @@ export namespace ext {
     export let dbDirPath: string;
     export let activeNote: ActiveNote;
     export let dbFS: DatabaseFileSystem;
-    // export let gitNotes: GitNotes;
+    export let gitNotes: GitNotes;
     export let outputChannel: OutputChannel;
     export let ga: (ec: string, ea: string) => void;
 }
@@ -30,7 +30,8 @@ export function getConfigure<T>(name: string, defaultValue: T): T {
 }
 
 function getDbDirPath() {
-    return untildify(getConfigure('dbpath', path.join(homedir(), 'vscode-note')));
+    const joinFun = platform() === 'win32' ? path.win32.join : path.join;
+    return getConfigure('dbpath', joinFun(homedir(), 'vscode-note'));
 }
 
 function listenerConfigure(ctx: ExtensionContext) {
@@ -51,12 +52,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     // delete soon
     ext.dbDirPath = getDbDirPath();
+    window.showInformationMessage(ext.dbDirPath);
 
     ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
 
     ext.ga = pga(getConfigure('ga', true));
 
-    // ext.gitNotes = new GitNotes(ext.dbDirPath);
+    ext.gitNotes = new GitNotes(ext.dbDirPath, getConfigure('github', ''));
     ext.outputChannel = window.createOutputChannel('vscode-note');
 
     ext.activeNote = new ActiveNote();

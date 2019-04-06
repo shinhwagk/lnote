@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const jsyml = require('js-yaml');
 
-const notesDir = 'D:\\OneDrive\\vscode-note';
+const notesDir = 'C:\\Users\\shinh\\vscode-note-data';
 for (const name of fs.readdirSync(notesDir)) {
     const note = path.join(notesDir, name);
     const noteYml = path.join(note, '.n.yml');
