@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.9.14",
+    "version": "0.9.15",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -151,7 +151,8 @@
                 },
                 {
                     "command": "vscode-note.notes.create",
-                    "when": "view == domainExplorer && viewItem == emptyNotes"
+                    "when": "view == domainExplorer && viewItem == emptyNotes",
+                    "group": "0_domain"
                 },
                 {
                     "command": "vscode-note.note.edit.col.remove",
@@ -342,12 +343,12 @@
         "prettier": "^1.16.4",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.23.1",
-        "ts-jest": "^24.0.1",
+        "ts-jest": "^24.0.2",
         "ts-loader": "^5.3.3",
         "ts-node": "^8.0.3",
         "tslint": "^5.15.0",
         "tslint-react": "^4.0.0",
-        "typescript": "^3.4.1",
+        "typescript": "^3.4.2",
         "typescript-tslint-plugin": "^0.3.1",
         "vscode": "^1.1.33",
         "webpack": "^4.29.6",
@@ -359,7 +360,7 @@
         "@fortawesome/react-fontawesome": "^0.1.4",
         "bootstrap": "^4.3.1",
         "fs-extra": "^7.0.1",
-        "js-yaml": "^3.13.0",
+        "js-yaml": "^3.13.1",
         "object-path": "^0.11.4",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
