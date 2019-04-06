@@ -1,9 +1,8 @@
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { EditExplorerProvider } from './explorer/editExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
-import { homedir } from 'os';
+import { homedir, platform } from 'os';
 import * as path from 'path';
-import untildify = require('untildify');
 import { section } from './constants';
 import { DatabaseFileSystem } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView } from 'vscode';
@@ -30,7 +29,9 @@ export function getConfigure<T>(name: string, defaultValue: T): T {
 }
 
 function getDbDirPath() {
-    return untildify(getConfigure('dbpath', path.join(homedir(), 'vscode-note')));
+    const joinFun = platform() === 'win32' ? path.win32.join : path.join;
+    const p = getConfigure('dbpath', path.join(homedir(), 'vscode-note'));
+    return p.startsWith('~/') ? joinFun(homedir(), p.substr(2)) : p;
 }
 
 function listenerConfigure(ctx: ExtensionContext) {

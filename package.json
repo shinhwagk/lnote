@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note extension.",
-    "version": "0.9.13",
+    "version": "0.9.14",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -334,7 +334,6 @@
         "@types/react": "^16.8.12",
         "@types/react-dom": "^16.8.3",
         "@types/rimraf": "^2.0.2",
-        "@types/untildify": "^3.0.0",
         "@types/webpack": "^4.4.27",
         "babel-loader": "^8.0.5",
         "css-loader": "^2.1.1",
@@ -364,7 +363,6 @@
         "object-path": "^0.11.4",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
-        "rimraf": "^2.6.3",
-        "untildify": "^3.0.3"
+        "rimraf": "^2.6.3"
     }
 }
