@@ -19,7 +19,7 @@ export namespace ExtCmds {
     export async function cmdHdlNotesCreate(dn: DomainNode) {
         ext.dbFS.dch.createNotes(dn.dpath);
         ext.domainProvider.refresh(dn);
-        commands.executeCommand('vscode-note.domain.pin', dn.dpath);
+        await cmdHdlDomainPin(dn);
         ext.ga('notes', 'create');
     }
     export async function cmdHdlNoteEditOpen(nId: string, category: string) {
@@ -107,11 +107,22 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainMove(dn: DomainNode) {
         const orgDpath = dn.dpath;
-        const newDpath: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
-        if (!newDpath) return;
-        ExtCmdsFuns.resetDomain(orgDpath, vpath.splitPath(newDpath));
-        // ext.domainProvider.refresh(vpath.splitPath(newDpath), true);
-        ext.domainProvider.refresh(dn);
+        const newDpathString: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
+        if (!newDpathString || orgDpath.join('/') === newDpathString) return;
+        const newDpath = vpath.splitPath(newDpathString)
+        ExtCmdsFuns.resetDomain(orgDpath, newDpath);
+
+        let fdn: DomainNode | undefined = dn;
+        for (let i = 0; i <= orgDpath.length; i++) {
+            if (orgDpath[i] !== newDpath[i]) {
+                for (let j = 0; j < newDpath.length - i; j++) {
+                    fdn = fdn ? fdn.getParent() : undefined;
+                }
+                break;
+            }
+        }
+        ext.domainProvider.refresh(fdn);
+        fdn && await ext.domainTreeView.reveal(fdn, { expand: true });
         ext.ga('domain', 'move');
     }
     export async function cmdHdlDomainRename(dn: DomainNode) {

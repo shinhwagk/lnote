@@ -41,7 +41,7 @@ function getTreeItem(element: DomainNode): DomainNode {
     const notesNumberUnderDomain = ext.dbFS.dch.selectNotesUnderDomain(element.dpath).length;
 
     element.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
-
+    element.contextValue = undefined;
     if (domain['.notes']) {
         element.command = {
             arguments: [element],
@@ -59,7 +59,6 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     readonly onDidChangeTreeData: Event<DomainNode | undefined> = this._onDidChangeTreeData.event;
 
     public refresh(dn?: DomainNode): void {
-
         this._onDidChangeTreeData.fire(dn);
     }
 
