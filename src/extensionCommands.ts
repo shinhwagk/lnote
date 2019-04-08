@@ -109,7 +109,7 @@ export namespace ExtCmds {
         const orgDpath = dn.dpath;
         const newDpathString: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
         if (!newDpathString || orgDpath.join('/') === newDpathString) return;
-        const newDpath = vpath.splitPath(newDpathString)
+        const newDpath = vpath.splitPath(newDpathString);
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
 
         let fdn: DomainNode | undefined = dn;

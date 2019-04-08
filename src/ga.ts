@@ -15,7 +15,9 @@ function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!existsSync(userIdFile)) {
         ensureFileSync(userIdFile);
-        vfs.writeFileSync(userIdFile, genUserId());
+        const userId = genUserId();
+        vfs.writeFileSync(userIdFile, userId);
+        postGA(userId)(true)('installed', 'vscode-note');
     }
     return vfs.readFileSync(userIdFile);
 }
@@ -45,9 +47,9 @@ const postGA = (clientId: string) => (collect: boolean) => (ec: string, ea: stri
             res.on('error', (err) => reject(err.message));
         });
 
+        req.on('error', (err) => reject(err.message));
         req.write(data);
         req.end();
-        req.on('error', (err) => reject(err.message));
     });
 };
 
@@ -55,5 +57,4 @@ const _pga = postGA(initUserId());
 
 export const pga = (collect: boolean) => (ec: string, ea: string) => {
     _pga(collect)(ec, ea).catch(e => console.error(`ga error: ${e}`));
-}
-
+};
