@@ -22,15 +22,15 @@ function initUserId() {
     return vfs.readFileSync(userIdFile);
 }
 
-const postGA = (clientId: string) => (collect: boolean) => (ec: string, ea: string) => {
+const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string) => {
     if (!collect) return Promise.resolve();
-    const cid = clientId;
+    const uid = userId;
     const tid = 'UA-137490130-1';
     const t = 'event';
     const v = 1;
     const an = 'vscode-note';
     const av = version;
-    const body = { v, tid, cid, t, ec, ea, an, av };
+    const body = { v, tid, uid, t, ec, ea, an, av };
 
     const data = querystring.stringify(body);
 
