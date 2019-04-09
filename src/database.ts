@@ -35,7 +35,7 @@ export class DatabaseFileSystem {
     insertNotesByMeta(...notes: string[]) {
         for (const nId of notes) {
             if (!this.checkNoteMetaExist(nId)) {
-                window.showWarningMessage(`note cache error note id '${nId}' '.n.yml' not exist.`);
+                console.warn(`note cache error note id '${nId}' '.n.yml' not exist.`);
                 continue;
             }
             const meta = this.readNoteMeta(nId);
