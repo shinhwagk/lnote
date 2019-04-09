@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.27",
+    "version": "0.9.28",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
