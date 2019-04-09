@@ -3,6 +3,7 @@ import * as objectPath from 'object-path';
 import { nonNoteData, metaFileName } from './constants';
 import { vpath, vfs, tools } from './helper';
 import * as path from 'path';
+import { window } from 'vscode';
 
 export interface Domain {
     '.notes': string[];
@@ -33,6 +34,10 @@ export class DatabaseFileSystem {
 
     insertNotesByMeta(...notes: string[]) {
         for (const nId of notes) {
+            if (!this.checkNoteMetaExist(nId)) {
+                window.showWarningMessage(`note cache error note id '${nId}' '.n.yml' not exist.`);
+                continue;
+            }
             const meta = this.readNoteMeta(nId);
             for (const tag of meta.tags) {
                 this.dch.insertNotesByDpath(vpath.splitPath(tag.domain), nId);
@@ -59,6 +64,8 @@ export class DatabaseFileSystem {
     getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
     readNoteMeta = (id: string) => vfs.readYamlSync<Tags>(this.getNoteMetaFile(id));
+
+    checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id))
 
     selectFilesExist = (nId: string) => existsSync(this.getNoteFilesPath(nId));
 
