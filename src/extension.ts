@@ -55,6 +55,7 @@ export async function activate(context: ExtensionContext) {
         if (await window.showInformationMessage('vscode-note installed.', 'Open it.', 'Not now.') === 'Open it.') {
             commands.executeCommand('workbench.view.extension.vsnote-explorer');
             ext.ga('installed', 'open it')
+            ext.notesPanelView.parseDomain(['powershell', 'install']).showNotesPlanView()
         } else {
             ext.ga('installed', 'not now')
         }

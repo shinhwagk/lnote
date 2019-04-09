@@ -108,7 +108,7 @@ export class DatabaseFileSystem {
         vfs.writeFileSync(this.getNoteContentFile(nId, '2'), 'chose install powershell');
         vfs.writeFileSync(
             path.join(notePath, metaFileName),
-            'tags:\n    - domain: /powershell/install\n      category: install'
+            'tags:\n    - domain: powershell/install\n      category: install'
         );
         vfs.mkdirsSync(this.getNoteDocPath(nId));
         vfs.writeFileSync(this.getNoteDocIndexFile(nId, 'README.md'), '# example. \n example.');
