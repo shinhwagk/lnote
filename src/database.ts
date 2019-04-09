@@ -3,7 +3,6 @@ import * as objectPath from 'object-path';
 import { nonNoteData, metaFileName } from './constants';
 import { vpath, vfs, tools } from './helper';
 import * as path from 'path';
-import { window } from 'vscode';
 
 export interface Domain {
     '.notes': string[];
