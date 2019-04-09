@@ -81,8 +81,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         ext.filesProvider = new FilesExplorerProvider();
         window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
     }
-
-    ext.ga('vscode-note', 'activate');
 }
 
 export class ActiveNote {

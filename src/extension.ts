@@ -69,6 +69,8 @@ export async function activate(context: ExtensionContext) {
             ext.domainProvider.refresh();
         })
     );
+
+    ext.ga('vscode-note', 'activate');
 }
 
 function registerCommand(command: string, callback: (...args: any[]) => any, thisArg?: any) {
