@@ -20,7 +20,7 @@ function initUserId() {
         ensureFileSync(userIdFile);
         const userId = genUserId();
         vfs.writeFileSync(userIdFile, userId);
-        postGA(userId)(true)('installed', 'vscode-note');
+        postGA(userId)(true)('vscode-note', 'installed');
     }
     return vfs.readFileSync(userIdFile);
 }
