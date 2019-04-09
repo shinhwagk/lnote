@@ -69,7 +69,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (!ext.domainProvider || !ext.domainTreeView) {
         ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-        ext.domainTreeView.onDidChangeVisibility(e => ext.ga('domain-explorer', e.visible ? 'activate' : 'deactivate'))
+        ext.domainTreeView.onDidChangeVisibility(e => ext.ga('domain-explorer', e.visible ? 'activate' : 'deactivate'));
     }
 
     if (!ext.editProvider) {
@@ -82,7 +82,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
     }
 
-    ext.ga('activate', 'vscode-note');
+    ext.ga('vscode-note', 'activate');
 }
 
 export class ActiveNote {

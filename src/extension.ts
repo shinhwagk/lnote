@@ -65,4 +65,6 @@ function registerCommand(command: string, callback: (...args: any[]) => any, thi
     ext.context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
 }
 
-export function deactivate() { }
+export function deactivate() {
+    ext.ga('vscode-note', 'deactivate');
+}
