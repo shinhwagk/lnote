@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.23",
+    "version": "0.9.24",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -32,7 +32,7 @@
             "activitybar": [
                 {
                     "id": "vsnote-explorer",
-                    "title": "Note",
+                    "title": "vscode-note",
                     "icon": "images/note.svg"
                 }
             ]
