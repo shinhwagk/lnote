@@ -7,6 +7,8 @@ import { existsSync, ensureFileSync } from 'fs-extra';
 import * as querystring from 'querystring';
 import { version } from '../package.json';
 
+export let checkFirst = false;
+
 function genUserId() {
     return tools.hexRandom(10);
 }
@@ -14,6 +16,7 @@ function genUserId() {
 function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!existsSync(userIdFile)) {
+        checkFirst = true;
         ensureFileSync(userIdFile);
         const userId = genUserId();
         vfs.writeFileSync(userIdFile, userId);

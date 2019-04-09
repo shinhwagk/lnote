@@ -2,10 +2,12 @@ import { ext, initializeExtensionVariables } from './extensionVariables';
 import {
     ExtensionContext,
     ViewColumn,
-    commands
+    commands,
+    window
 } from 'vscode';
 import { ExtCmds } from './extensionCommands';
 import { DatabaseFileSystem } from './database';
+import { checkFirst } from './ga';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -46,6 +48,14 @@ export async function activate(context: ExtensionContext) {
     registerCommand('vscode-note.files.edit.open', ExtCmds.cmdHdlFilesEditOpen);
     registerCommand('vscode-note.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);
     registerCommand('vscode-note.files.refresh', ExtCmds.cmdHdlFilesRefresh);
+    /**
+     *  extension
+     */
+    if (checkFirst) {
+        if (await window.showInformationMessage('vscode-note installed.', 'Open it.')) {
+            commands.executeCommand('workbench.view.extension.vsnote-explorer');
+        }
+    }
 
     context.subscriptions.push(
         commands.registerCommand('editExplorer.openFileResource', async (resource: any) => {
