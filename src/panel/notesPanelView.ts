@@ -100,7 +100,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.doc.show', message.data);
                         break;
                     case 'files':
-                        vscode.commands.executeCommand('vscode-note.note.files.show', message.data);
+                        vscode.commands.executeCommand('vscode-note.note.files.open', message.data);
                         break;
                     case 'add':
                         vscode.commands.executeCommand('vscode-note.note.add', message.data);
