@@ -5,26 +5,25 @@
 This extension provides a simple note-taking. Make notes closer to the vscode extensions.
 
 ## Features
-* each ***domain***(directory tree) node can be a ***notes***.
-* each ***notes*** consists of one or more ***category***.
-* each ***category*** consists of one or more ***note***.
-* each ***note*** consists of one or more ***short doc***, ***doc***(markdown/html), ***files***(attachment)
+
+-   each **_domain_**(directory tree) node can be a **_notes_**.
+-   each **_notes_** consists of one or more **_category_**.
+-   each **_category_** consists of one or more **_note_**.
+-   each **_note_** consists of one or more **_short doc_**, **_doc_**(markdown/html), **_files_**(attachment)
 
 ## Usages
 
-- create a note
-
-- Create a note related document
-
-- Create a note related files
+![demo](images/demo.gif)
 
 ## note data default directory
 
 > ~/vscode-note
-- currently recommend use onedrive to store/sync your notes.
-- future: can use github to store/sync/share your notes.
+
+-   currently recommend use onedrive to store/sync your notes.
+-   future: can use github to store/sync/share your notes.
 
 ## note data structure
+
 ```
 /path/to/your/data_directory
 ├─┬ note1
@@ -45,7 +44,3 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
   ├── 2.txt
   └── …
 ```
-
-## screenshot
-
-![Image of Git Log](images/example.png)
