@@ -19,14 +19,14 @@ export interface Tag {
 }
 
 export class DatabaseFileSystem {
-    private dbDirPath: string;
+    private notesPath: string;
     private trashPath: string;
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
     readonly dch: DomainCache = new DomainCache();
 
-    constructor(dbDirPath: string) {
-        this.dbDirPath = dbDirPath;
-        this.trashPath = path.join(dbDirPath, 'trash');
+    constructor(notesPath: string) {
+        this.notesPath = notesPath;
+        this.trashPath = path.join(notesPath, 'trash');
         this.initialize();
         this.cacheAllNotes();
     }
@@ -46,7 +46,7 @@ export class DatabaseFileSystem {
 
     private cacheAllNotes() {
         this.dch.cleanCache();
-        const notes = readdirSync(this.dbDirPath).filter(f => nonNoteData.filter(nn => nn === f).length === 0);
+        const notes = readdirSync(this.notesPath).filter(f => nonNoteData.filter(nn => nn === f).length === 0);
         this.insertNotesByMeta(...notes);
     }
 
@@ -56,7 +56,7 @@ export class DatabaseFileSystem {
 
     getNoteFilesPath = (nId: string) => path.join(this.getNotePath(nId), 'files');
 
-    getNotePath = (id: string) => path.join(this.dbDirPath, id);
+    getNotePath = (id: string) => path.join(this.notesPath, id);
 
     getTrashNotePath = (id: string) => path.join(this.trashPath, id);
 
@@ -118,8 +118,8 @@ export class DatabaseFileSystem {
     }
 
     initialize(): void {
-        if (!existsSync(this.dbDirPath)) {
-            vfs.mkdirsSync(this.dbDirPath);
+        if (!existsSync(this.notesPath)) {
+            vfs.mkdirsSync(this.notesPath);
             this.createExampleData();
         }
         if (!existsSync(this.trashPath)) mkdirSync(this.trashPath);

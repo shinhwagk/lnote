@@ -17,6 +17,7 @@ export namespace ext {
     export let filesProvider: FilesExplorerProvider;
     export let notesPanelView: NotesPanelView;
     export let dbDirPath: string;
+    export let notesPath: string;
     export let activeNote: ActiveNote;
     export let dbFS: DatabaseFileSystem;
     // export let gitNotes: GitNotes;
@@ -52,8 +53,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     // delete soon
     ext.dbDirPath = getDbDirPath();
+    ext.notesPath = path.join(ext.dbDirPath, 'notes');
 
-    ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
+    ext.dbFS = new DatabaseFileSystem(ext.notesPath);
 
     ext.ga = pga(getConfigure('ga', true));
 

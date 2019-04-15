@@ -69,7 +69,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('vscode-note.domain.refresh', async () => {
-            ext.dbFS = new DatabaseFileSystem(ext.dbDirPath);
+            ext.dbFS = new DatabaseFileSystem(ext.notesPath);
             ext.domainProvider.refresh();
         })
     );
