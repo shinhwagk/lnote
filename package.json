@@ -98,14 +98,9 @@
                     "group": "5_orderBy"
                 },
                 {
-                    "command": "vscode-note.note.edit.files",
-                    "when": "view == editExplorer && vscode-note.note.files.exist",
-                    "group": "3_orderBy"
-                },
-                {
                     "command": "vscode-note.note.edit.doc.full",
                     "when": "view == editExplorer && vscode-note.note.doc.exist",
-                    "group": "2_orderBy"
+                    "group": "3_orderBy"
                 },
                 {
                     "command": "vscode-note.files.openTerminal",
@@ -125,7 +120,7 @@
                 {
                     "command": "vscode-note.note.edit.files.create",
                     "when": "view == editExplorer && !vscode-note.note.files.exist",
-                    "group": "3_orderBy"
+                    "group": "2_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.doc.create",
@@ -258,11 +253,7 @@
             },
             {
                 "command": "vscode-note.note.edit.doc.full",
-                "title": "doc full"
-            },
-            {
-                "command": "vscode-note.note.edit.files",
-                "title": "files"
+                "title": "edit doc"
             },
             {
                 "command": "vscode-note.note.edit.doc.create",

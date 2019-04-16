@@ -11,6 +11,7 @@ export interface Domain {
 
 export interface Tags {
     tags: Tag[];
+    // doc?: 'md' | 'html'; used for doc index file
 }
 
 export interface Tag {
@@ -64,7 +65,7 @@ export class DatabaseFileSystem {
 
     readNoteMeta = (id: string) => vfs.readYamlSync<Tags>(this.getNoteMetaFile(id));
 
-    checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id))
+    checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
     selectFilesExist = (nId: string) => existsSync(this.getNoteFilesPath(nId));
 
@@ -86,8 +87,7 @@ export class DatabaseFileSystem {
     selectDocExist(nId: string): boolean {
         return (
             existsSync(this.getNoteDocIndexFile(nId, 'README.md')) ||
-            existsSync(this.getNoteDocIndexFile(nId, 'README.html')) ||
-            existsSync(this.getNoteDocIndexFile(nId, 'README.htm'))
+            existsSync(this.getNoteDocIndexFile(nId, 'README.html'))
         );
     }
 

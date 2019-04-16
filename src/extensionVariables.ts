@@ -90,5 +90,5 @@ export class ActiveNote {
     files: boolean = false;
     doc: boolean = false;
     category: string = '';
-    domainNode: DomainNode | undefined;
+    domainNode: DomainNode = '';
 }
