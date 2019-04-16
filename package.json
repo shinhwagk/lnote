@@ -98,14 +98,9 @@
                     "group": "5_orderBy"
                 },
                 {
-                    "command": "vscode-note.note.edit.files",
-                    "when": "view == editExplorer && vscode-note.note.files.exist",
-                    "group": "3_orderBy"
-                },
-                {
                     "command": "vscode-note.note.edit.doc.full",
                     "when": "view == editExplorer && vscode-note.note.doc.exist",
-                    "group": "2_orderBy"
+                    "group": "3_orderBy"
                 },
                 {
                     "command": "vscode-note.files.openTerminal",
@@ -125,7 +120,7 @@
                 {
                     "command": "vscode-note.note.edit.files.create",
                     "when": "view == editExplorer && !vscode-note.note.files.exist",
-                    "group": "3_orderBy"
+                    "group": "2_orderBy"
                 },
                 {
                     "command": "vscode-note.note.edit.doc.create",
@@ -258,11 +253,7 @@
             },
             {
                 "command": "vscode-note.note.edit.doc.full",
-                "title": "doc full"
-            },
-            {
-                "command": "vscode-note.note.edit.files",
-                "title": "files"
+                "title": "edit doc"
             },
             {
                 "command": "vscode-note.note.edit.doc.create",
@@ -330,7 +321,7 @@
         "@types/fs-extra": "^5.0.5",
         "@types/jest": "^24.0.11",
         "@types/js-yaml": "^3.12.1",
-        "@types/node": "^11.13.2",
+        "@types/node": "^11.13.4",
         "@types/object-path": "^0.11.0",
         "@types/react": "^16.8.13",
         "@types/react-dom": "^16.8.3",
@@ -348,7 +339,7 @@
         "ts-node": "^8.0.3",
         "tslint": "^5.15.0",
         "tslint-react": "^4.0.0",
-        "typescript": "^3.4.2",
+        "typescript": "^3.4.3",
         "typescript-tslint-plugin": "^0.3.1",
         "vscode": "^1.1.33",
         "webpack": "^4.29.6",
