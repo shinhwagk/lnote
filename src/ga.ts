@@ -1,9 +1,9 @@
 import * as https from 'https';
 import { tools } from './helper';
+import * as fs from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, ensureFileSync } from 'fs-extra';
 import * as querystring from 'querystring';
 import { version } from '../package.json';
 
@@ -15,9 +15,9 @@ function genUserId() {
 
 function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
-    if (!existsSync(userIdFile)) {
+    if (!fs.existsSync(userIdFile)) {
         checkFirst = true;
-        ensureFileSync(userIdFile);
+        vfs.writeFileSync(userIdFile);
         const userId = genUserId();
         vfs.writeFileSync(userIdFile, userId);
         postGA(userId)(true)('vscode-note', 'installed');

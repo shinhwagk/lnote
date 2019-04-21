@@ -1,7 +1,6 @@
 import { ext } from './extensionVariables';
 import { commands, Uri, window } from 'vscode';
-import { ensureFileSync } from 'fs-extra';
-import { vpath } from './helper';
+import { vpath, vfs } from './helper';
 import { basename } from 'path';
 import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode } from './explorer/domainExplorer';
@@ -98,7 +97,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteAdd(category: string) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
-        ensureFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
+        vfs.writeFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
         await commands.executeCommand(
             'editExplorer.openFileResource',
             Uri.file(ext.dbFS.getNoteContentFile(nid, '1'))

@@ -1,10 +1,9 @@
-import * as fse from 'fs-extra';
 import * as path from 'path';
 import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
+import * as fs from 'fs';
 import { metaFileName } from '../src/constants';
 import { DatabaseFileSystem } from '../src/database';
-import { mkdirSync } from 'fs-extra';
 
 const testDataPath = './.vscode-note';
 
@@ -38,7 +37,7 @@ const resultData = JSON.parse(
 function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
         const noteDir = path.join(testDataPath, testNote.id);
-        fse.ensureDirSync(noteDir);
+        fs.mkdirSync(noteDir);
         const noteMetaFile = path.join(noteDir, metaFileName);
         vfs.writeJsonSync(noteMetaFile, { tags: testNote.tags });
     }
@@ -48,7 +47,7 @@ let dbFileSystem: DatabaseFileSystem;
 
 describe('test select', () => {
     beforeAll(() => {
-        mkdirSync(testDataPath);
+        fs.mkdirSync(testDataPath);
         createTestFileAndDirectory();
         dbFileSystem = new DatabaseFileSystem(testDataPath);
     });
@@ -77,7 +76,7 @@ describe('test select', () => {
 
 describe('test modify', () => {
     beforeAll(() => {
-        mkdirSync(testDataPath);
+        fs.mkdirSync(testDataPath);
         createTestFileAndDirectory();
         dbFileSystem = new DatabaseFileSystem(testDataPath);
     });
@@ -98,7 +97,7 @@ describe('test modify', () => {
 
 describe('test modify domain cascade', () => {
     beforeAll(() => {
-        mkdirSync(testDataPath);
+        fs.mkdirSync(testDataPath);
         createTestFileAndDirectory();
         dbFileSystem = new DatabaseFileSystem(testDataPath);
     });
