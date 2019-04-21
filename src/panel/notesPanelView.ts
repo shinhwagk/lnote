@@ -78,32 +78,31 @@ export class NotesPanelView {
             ext.context.subscriptions
         );
         this.panel.webview.onDidReceiveMessage(
-            message => {
-                switch (message.command) {
+            msg => {
+                switch (msg.command) {
                     case 'ready':
                         this.state = true;
                         break;
                     case 'edit':
-                        vscode.commands.executeCommand(
-                            'vscode-note.note.edit.open',
-                            message.data.id,
-                            message.data.category
-                        );
+                        vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
                     case 'edit-contentFile':
-                        const id = message.data.id;
-                        const n = message.data.n;
+                        const id = msg.data.id;
+                        const n = msg.data.n;
                         const v = vscode.Uri.file(ext.dbFS.getNoteContentFile(id, n));
                         vscode.commands.executeCommand('editExplorer.openFileResource', v);
                         break;
+                    case 'edit-col':
+                        vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);
+                        break;
                     case 'doc':
-                        vscode.commands.executeCommand('vscode-note.note.doc.show', message.data);
+                        vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
                         break;
                     case 'files':
-                        vscode.commands.executeCommand('vscode-note.note.files.open', message.data);
+                        vscode.commands.executeCommand('vscode-note.note.files.open', msg.data);
                         break;
                     case 'add':
-                        vscode.commands.executeCommand('vscode-note.note.add', message.data);
+                        vscode.commands.executeCommand('vscode-note.note.add', msg.data);
                         break;
                     case 'add-category':
                         vscode.commands.executeCommand('vscode-note.category.add');

@@ -17,6 +17,8 @@ export interface Tags {
 export interface Tag {
     domain: string;
     category: string;
+    links?: string[]; // link to other note
+    sort?: number;
 }
 
 export class DatabaseFileSystem {

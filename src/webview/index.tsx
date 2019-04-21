@@ -20,6 +20,8 @@ const editNote = (id: string, category: string) => () =>
     vscode.postMessage({ command: 'edit', data: { id, category } });
 const editContentFile = (id: string, n: string) => () =>
     vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
+const editCol = (id: string, cn: string) => () =>
+    vscode.postMessage({ command: 'edit-col', data: { id, cn } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
@@ -35,14 +37,16 @@ function renderNoteFiles(props: { id: string }) {
     return (
         <a onClick={viewFiles(props.id)}>
             <FontAwesomeIcon inverse={true} icon={faFileAlt} />
-            <span> </span>
+            <span />
         </a>
     );
 }
 
 function VSNNotes(props: WVNote) {
     const contents = props.contents.map((c, i) => (
-        <div className="col" onDoubleClick={editContentFile(props.nId, (i + 1).toString())}>
+        <div className='col'
+            onDoubleClick={editContentFile(props.nId, (i + 1).toString())}
+            onContextMenu={editCol(props.nId, (i + 1).toString())}>
             <pre>{c}</pre>
         </div>
     ));
@@ -50,12 +54,12 @@ function VSNNotes(props: WVNote) {
     const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId}</span>;
     const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span />;
     return (
-        <div className="row">
-            <div className="col col-1">
+        <div className='row'>
+            <div className='col col-1'>
                 <pre>{isDoc}</pre>
             </div>
             {contents}
-            <div className="col col-1">
+            <div className='col col-1'>
                 <pre>
                     {isFiles}
                     <a onClick={editNote(props.nId, props.category)}>
@@ -79,15 +83,15 @@ function VSNCategory(props: twv.WVCategory) {
     ));
 
     return (
-        <div className="card bg-dark text-white">
-            <div className="card-header">
+        <div className='card bg-dark text-white'>
+            <div className='card-header'>
                 {props.name + ' '}
                 <a onClick={addNote(props.name!)}>
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </div>
-            <div className="card-body">
-                <div className="container-fluid">{listnote}</div>
+            <div className='card-body'>
+                <div className='container-fluid'>{listnote}</div>
             </div>
         </div>
     );

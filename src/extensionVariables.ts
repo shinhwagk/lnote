@@ -1,11 +1,10 @@
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
-import { EditExplorerProvider } from './explorer/editExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { homedir, platform } from 'os';
 import * as path from 'path';
 import { section } from './constants';
 import { DatabaseFileSystem } from './database';
-import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView } from 'vscode';
+import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { pga } from './ga';
 
@@ -13,7 +12,6 @@ export namespace ext {
     export let context: ExtensionContext;
     export let domainProvider: DomainExplorerProvider;
     export let domainTreeView: TreeView<DomainNode>;
-    export let editProvider: EditExplorerProvider;
     export let filesProvider: FilesExplorerProvider;
     export let notesPanelView: NotesPanelView;
     export let dbDirPath: string;
@@ -23,6 +21,8 @@ export namespace ext {
     // export let gitNotes: GitNotes;
     export let outputChannel: OutputChannel;
     export let ga: (ec: string, ea: string) => void;
+    export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
+    export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) => context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
 }
 
 export function getConfigure<T>(name: string, defaultValue: T): T {
@@ -74,11 +74,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         ext.domainTreeView.onDidChangeVisibility(e => ext.ga('domain-explorer', e.visible ? 'activate' : 'deactivate'));
     }
 
-    if (!ext.editProvider) {
-        ext.editProvider = new EditExplorerProvider();
-        window.createTreeView('editExplorer', { treeDataProvider: ext.editProvider });
-    }
-
     if (!ext.filesProvider) {
         ext.filesProvider = new FilesExplorerProvider();
         window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
@@ -91,4 +86,5 @@ export class ActiveNote {
     doc: boolean = false;
     category: string = '';
     domainNode: DomainNode = '';
+    dpath: string[] = [];
 }
