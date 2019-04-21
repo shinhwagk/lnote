@@ -1,5 +1,4 @@
 import * as fse from 'fs-extra';
-import * as jsyaml from 'js-yaml';
 import { randomBytes } from 'crypto';
 
 export namespace vfs {
@@ -15,21 +14,12 @@ export namespace vfs {
         return fse.writeFileSync(path, data, { encoding: 'utf-8' });
     }
 
-    export function readJsonSync(file: string) {
+    export function readJsonSync<T>(file: string): T {
         return fse.readJsonSync(file, { encoding: 'utf-8' });
     }
 
     export function mkdirsSync(...paths: string[]) {
         paths.forEach(p => fse.mkdirsSync(p));
-    }
-
-    export function readYamlSync<T>(file: string): T {
-        return jsyaml.safeLoad(readFileSync(file));
-    }
-
-    export function writeYamlSync(file: string, obj: any) {
-        fse.ensureFileSync(file);
-        writeFileSync(file, jsyaml.safeDump(obj));
     }
 }
 

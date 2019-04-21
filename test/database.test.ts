@@ -40,7 +40,7 @@ function createTestFileAndDirectory() {
         const noteDir = path.join(testDataPath, testNote.id);
         fse.ensureDirSync(noteDir);
         const noteMetaFile = path.join(noteDir, metaFileName);
-        vfs.writeYamlSync(noteMetaFile, { tags: testNote.tags });
+        vfs.writeJsonSync(noteMetaFile, { tags: testNote.tags });
     }
 }
 

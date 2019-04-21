@@ -65,7 +65,7 @@ export class DatabaseFileSystem {
 
     getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
-    readNoteMeta = (id: string) => vfs.readYamlSync<Tags>(this.getNoteMetaFile(id));
+    readNoteMeta = (id: string) => vfs.readJsonSync<Tags>(this.getNoteMetaFile(id));
 
     checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
@@ -84,7 +84,7 @@ export class DatabaseFileSystem {
         return this.getNoteDocIndexFile(nId, indexFile);
     }
 
-    writeNoteMeta = (id: string, meta: Tags) => vfs.writeYamlSync(this.getNoteMetaFile(id), meta);
+    writeNoteMeta = (id: string, meta: Tags) => vfs.writeJsonSync(this.getNoteMetaFile(id), meta);
 
     selectDocExist(nId: string): boolean {
         return (
@@ -108,9 +108,9 @@ export class DatabaseFileSystem {
         vfs.mkdirsSync(notePath);
         vfs.writeFileSync(this.getNoteContentFile(nId, '1'), 'windows');
         vfs.writeFileSync(this.getNoteContentFile(nId, '2'), 'chose install powershell');
-        vfs.writeFileSync(
+        vfs.writeJsonSync(
             path.join(notePath, metaFileName),
-            'tags:\n    - domain: powershell/install\n      category: install'
+            { tags: [{ domain: 'powershell/install', category: 'install' }] }
         );
         vfs.mkdirsSync(this.getNoteDocPath(nId));
         vfs.writeFileSync(this.getNoteDocIndexFile(nId, 'README.md'), '# example. \n example.');
