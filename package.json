@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.33",
+    "version": "0.9.34",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -65,12 +65,12 @@
                 {
                     "command": "vscode-note.files.openTerminal",
                     "when": "view == filesExplorer",
-                    "group": "navigation"
+                    "group": "navigation@3"
                 },
                 {
                     "command": "vscode-note.files.edit.open",
                     "when": "view == filesExplorer",
-                    "group": "navigation"
+                    "group": "navigation@3"
                 },
                 {
                     "command": "vscode-note.files.close",
