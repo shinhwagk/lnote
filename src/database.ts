@@ -1,4 +1,4 @@
-import { readdirSync, mkdirSync, existsSync, removeSync, renameSync, ensureFileSync } from 'fs-extra';
+import { renameSync, existsSync, readdirSync, mkdirSync } from 'fs';
 import * as objectPath from 'object-path';
 import { nonNoteData, metaFileName } from './constants';
 import { vpath, vfs, tools } from './helper';
@@ -144,7 +144,7 @@ export class DatabaseFileSystem {
 
     deleteNoteCol(nid: string, num: number) {
         const colNum = this.selectNoteContents(nid).length;
-        removeSync(this.getNoteContentFile(nid, num.toString()));
+        vfs.removeSync(this.getNoteContentFile(nid, num.toString()));
         if (num !== colNum) {
             for (let i = num + 1; i <= colNum; i++) {
                 const org = this.getNoteContentFile(nid, i.toString());
@@ -183,7 +183,7 @@ export class DatabaseFileSystem {
 
     createNoteDoc(nId: string) {
         mkdirSync(this.getNoteDocPath(nId));
-        ensureFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
+        vfs.writeFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
     }
 
     createNoteFiles(nId: string) {

@@ -1,10 +1,9 @@
-import * as fse from 'fs-extra';
 import * as path from 'path';
 import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
+import { mkdirSync } from 'fs';
 import { metaFileName } from '../src/constants';
 import { DatabaseFileSystem } from '../src/database';
-import { mkdirSync } from 'fs-extra';
 
 const testDataPath = './.vscode-note';
 
@@ -38,7 +37,7 @@ const resultData = JSON.parse(
 function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
         const noteDir = path.join(testDataPath, testNote.id);
-        fse.ensureDirSync(noteDir);
+        // fs.ensureDirSync(noteDir);
         const noteMetaFile = path.join(noteDir, metaFileName);
         vfs.writeYamlSync(noteMetaFile, { tags: testNote.tags });
     }

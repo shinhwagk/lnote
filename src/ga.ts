@@ -3,7 +3,7 @@ import { tools } from './helper';
 import { homedir } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, ensureFileSync } from 'fs-extra';
+import { existsSync } from 'fs';
 import * as querystring from 'querystring';
 import { version } from '../package.json';
 
@@ -17,7 +17,7 @@ function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!existsSync(userIdFile)) {
         checkFirst = true;
-        ensureFileSync(userIdFile);
+        // ensureFileSync(userIdFile);
         const userId = genUserId();
         vfs.writeFileSync(userIdFile, userId);
         postGA(userId)(true)('vscode-note', 'installed');

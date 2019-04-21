@@ -1,26 +1,27 @@
-import * as fse from 'fs-extra';
 import * as jsyaml from 'js-yaml';
+import * as fs from 'fs';
+import * as path from 'path';
 import { randomBytes } from 'crypto';
 
 export namespace vfs {
     export function readFileSync(path: string): string {
-        return fse.readFileSync(path, { encoding: 'utf-8' });
+        return fs.readFileSync(path, { encoding: 'utf-8' });
     }
 
     export function writeJsonSync(file: string, object: any) {
-        fse.writeJsonSync(file, object, { encoding: 'utf-8' });
+        fs.writeFileSync(file, JSON.stringify(object), { encoding: 'utf-8' });
     }
 
-    export function writeFileSync(path: string, data: string) {
-        return fse.writeFileSync(path, data, { encoding: 'utf-8' });
+    export function writeFileSync(path: string, data: string = '') {
+        return fs.writeFileSync(path, data, { encoding: 'utf-8' });
     }
 
     export function readJsonSync(file: string) {
-        return fse.readJsonSync(file, { encoding: 'utf-8' });
+        return JSON.parse(fs.readFileSync(file, { encoding: 'utf-8' }));
     }
 
     export function mkdirsSync(...paths: string[]) {
-        paths.forEach(p => fse.mkdirsSync(p));
+        paths.forEach(p => fs.mkdirSync(p));
     }
 
     export function readYamlSync<T>(file: string): T {
@@ -28,8 +29,20 @@ export namespace vfs {
     }
 
     export function writeYamlSync(file: string, obj: any) {
-        fse.ensureFileSync(file);
+        // fse.ensureFileSync(file);
+        // fs.mkdirSync()
         writeFileSync(file, jsyaml.safeDump(obj));
+    }
+    export function removeSync(file: string) {
+        fs.unlinkSync(file);
+    }
+    export function ensureFileSync(file: string) {
+        if (fs.existsSync(file)) return;
+        if (fs.existsSync(path.dirname(file))) {
+            vfs.writeFileSync(file, '');
+        } else {
+
+        }
     }
 }
 

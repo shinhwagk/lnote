@@ -1,4 +1,3 @@
-import { faFileAlt } from '@fortawesome/free-solid-svg-icons/faFileAlt';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -28,7 +27,7 @@ const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', d
 function renderNoteDoc(props: { id: string }) {
     return (
         <a onClick={viewDoc(props.id)}>
-            <span>{props.id}</span>
+            <span>{props.id.substr(0, 3)}</span>
         </a>
     );
 }
@@ -36,32 +35,35 @@ function renderNoteDoc(props: { id: string }) {
 function renderNoteFiles(props: { id: string }) {
     return (
         <a onClick={viewFiles(props.id)}>
-            <FontAwesomeIcon inverse={true} icon={faFileAlt} />
-            <span />
+            <span>{props.id.substr(3, 3)}</span>
         </a>
     );
 }
 
 function VSNNotes(props: WVNote) {
     const contents = props.contents.map((c, i) => (
-        <div className='col'
+        <div
+            className="col"
             onDoubleClick={editContentFile(props.nId, (i + 1).toString())}
-            onContextMenu={editCol(props.nId, (i + 1).toString())}>
+            onContextMenu={editCol(props.nId, (i + 1).toString())}
+        >
             <pre>{c}</pre>
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId}</span>;
-    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span />;
+    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId.substr(0, 3)}</span>;
+    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>{props.nId.substr(3, 3)}</span>;
     return (
-        <div className='row'>
-            <div className='col col-1'>
-                <pre>{isDoc}</pre>
+        <div className="row">
+            <div className="col col-1">
+                <pre>
+                    {isDoc}
+                    {isFiles}
+                </pre>
             </div>
             {contents}
-            <div className='col col-1'>
+            <div className="col col-1">
                 <pre>
-                    {isFiles}
                     <a onClick={editNote(props.nId, props.category)}>
                         <FontAwesomeIcon inverse={true} icon={faPen} />
                     </a>
@@ -83,15 +85,15 @@ function VSNCategory(props: twv.WVCategory) {
     ));
 
     return (
-        <div className='card bg-dark text-white'>
-            <div className='card-header'>
+        <div className="card bg-dark text-white">
+            <div className="card-header">
                 {props.name + ' '}
                 <a onClick={addNote(props.name!)}>
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </div>
-            <div className='card-body'>
-                <div className='container-fluid'>{listnote}</div>
+            <div className="card-body">
+                <div className="container-fluid">{listnote}</div>
             </div>
         </div>
     );
