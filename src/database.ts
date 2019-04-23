@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { renameSync, existsSync, readdirSync, mkdirSync } from 'fs';
+>>>>>>> remote-fse
 import * as objectPath from 'object-path';
 import { nonNoteData, metaFileName } from './constants';
 import { vpath, vfs, tools } from './helper';
@@ -144,7 +148,11 @@ export class DatabaseFileSystem {
 
     deleteNoteCol(nid: string, num: number) {
         const colNum = this.selectNoteContents(nid).length;
+<<<<<<< HEAD
         fs.unlinkSync(this.getNoteContentFile(nid, num.toString()));
+=======
+        vfs.removeSync(this.getNoteContentFile(nid, num.toString()));
+>>>>>>> remote-fse
         if (num !== colNum) {
             for (let i = num + 1; i <= colNum; i++) {
                 const org = this.getNoteContentFile(nid, i.toString());
@@ -182,7 +190,11 @@ export class DatabaseFileSystem {
     }
 
     createNoteDoc(nId: string) {
+<<<<<<< HEAD
         fs.mkdirSync(this.getNoteDocPath(nId));
+=======
+        mkdirSync(this.getNoteDocPath(nId));
+>>>>>>> remote-fse
         vfs.writeFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
     }
 
