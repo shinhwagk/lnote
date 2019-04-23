@@ -4,10 +4,6 @@ import * as fs from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-<<<<<<< HEAD
-=======
-import { existsSync } from 'fs';
->>>>>>> remote-fse
 import * as querystring from 'querystring';
 import { version } from '../package.json';
 
@@ -21,11 +17,7 @@ function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!fs.existsSync(userIdFile)) {
         checkFirst = true;
-<<<<<<< HEAD
         vfs.writeFileSync(userIdFile);
-=======
-        // ensureFileSync(userIdFile);
->>>>>>> remote-fse
         const userId = genUserId();
         vfs.writeFileSync(userIdFile, userId);
         postGA(userId)(true)('vscode-note', 'installed');

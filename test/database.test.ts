@@ -1,11 +1,7 @@
 import * as path from 'path';
 import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
-<<<<<<< HEAD
 import * as fs from 'fs';
-=======
-import { mkdirSync } from 'fs';
->>>>>>> remote-fse
 import { metaFileName } from '../src/constants';
 import { DatabaseFileSystem } from '../src/database';
 
@@ -41,11 +37,7 @@ const resultData = JSON.parse(
 function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
         const noteDir = path.join(testDataPath, testNote.id);
-<<<<<<< HEAD
         fs.mkdirSync(noteDir);
-=======
-        // fs.ensureDirSync(noteDir);
->>>>>>> remote-fse
         const noteMetaFile = path.join(noteDir, metaFileName);
         vfs.writeJsonSync(noteMetaFile, { tags: testNote.tags });
     }

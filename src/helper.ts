@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import * as fs from 'fs';
-=======
-import * as jsyaml from 'js-yaml';
 import * as fs from 'fs';
 import * as path from 'path';
->>>>>>> remote-fse
 import { randomBytes } from 'crypto';
 
 export namespace vfs {
@@ -12,40 +7,16 @@ export namespace vfs {
         return fs.readFileSync(path, { encoding: 'utf-8' });
     }
 
-<<<<<<< HEAD
     export function writeFileSync(path: string, data: string = '') {
         return fs.writeFileSync(path, data, { encoding: 'utf-8' });
-=======
-    export function writeJsonSync(file: string, object: any) {
-        fs.writeFileSync(file, JSON.stringify(object), { encoding: 'utf-8' });
-    }
-
-    export function writeFileSync(path: string, data: string = '') {
-        return fs.writeFileSync(path, data, { encoding: 'utf-8' });
-    }
-
-    export function readJsonSync(file: string) {
-        return JSON.parse(fs.readFileSync(file, { encoding: 'utf-8' }));
-    }
-
-    export function mkdirsSync(...paths: string[]) {
-        paths.forEach(p => fs.mkdirSync(p));
->>>>>>> remote-fse
     }
 
     export function writeJsonSync(file: string, object: any) {
         writeFileSync(file, JSON.stringify(object));
     }
 
-<<<<<<< HEAD
     export function readJsonSync<T>(file: string): T {
         return JSON.parse(readFileSync(file));
-=======
-    export function writeYamlSync(file: string, obj: any) {
-        // fse.ensureFileSync(file);
-        // fs.mkdirSync()
-        writeFileSync(file, jsyaml.safeDump(obj));
->>>>>>> remote-fse
     }
     export function removeSync(file: string) {
         fs.unlinkSync(file);

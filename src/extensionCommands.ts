@@ -97,11 +97,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteAdd(category: string) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
-<<<<<<< HEAD
         vfs.writeFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
-=======
-        vfs.ensureFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
->>>>>>> remote-fse
         await commands.executeCommand(
             'editExplorer.openFileResource',
             Uri.file(ext.dbFS.getNoteContentFile(nid, '1'))
