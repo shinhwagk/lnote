@@ -1,7 +1,10 @@
 @import '../../node_modules/bootstrap/scss/functions';
 @import '../../node_modules/bootstrap/scss/variables';
-@import '../../node_modules/bootstrap/scss/mixins';
-
+@import '../../node_modules/bootstrap/scss/mixins/hover';
+@import '../../node_modules/bootstrap/scss/mixins/border-radius';
+@import '../../node_modules/bootstrap/scss/mixins/breakpoints';
+@import '../../node_modules/bootstrap/scss/mixins/grid-framework';
+@import '../../node_modules/bootstrap/scss/mixins/grid';
 $card-border-color: $gray-600;
 $card-bg: $gray-900; // rgb(30, 30, 30)
 

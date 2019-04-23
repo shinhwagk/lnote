@@ -28,6 +28,8 @@ export class NotesPanelView {
                 </head>
                 <body>
                     <div id="root"></div>
+                    <script src="${this.assetsFile('react.production.min.js')}"></script>
+                    <script src="${this.assetsFile('react-dom.production.min.js')}"></script>
                     <script src="${this.assetsFile('main.wv.js')}"></script>
                 </body>
                 </html>`;
