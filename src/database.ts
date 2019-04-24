@@ -61,7 +61,7 @@ export class DatabaseFileSystem {
 
     getNotePath = (id: string) => path.join(this.notesPath, id);
 
-    getTrashNotePath = (id: string) => path.join(this.trashPath, id);
+    // getTrashNotePath = (id: string) => path.join(this.trashPath, id);
 
     getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
@@ -102,27 +102,9 @@ export class DatabaseFileSystem {
         return fs.existsSync(this.getNotePath(id)) ? this.genNewSeq() : id;
     }
 
-    createExampleData(): void {
-        const nId = this.genNewSeq();
-        const notePath: string = this.getNotePath(nId);
-        fs.mkdirSync(notePath);
-        vfs.writeFileSync(this.getNoteContentFile(nId, '1'), 'windows');
-        vfs.writeFileSync(this.getNoteContentFile(nId, '2'), 'chose install powershell');
-        vfs.writeJsonSync(
-            path.join(notePath, metaFileName),
-            { tags: [{ domain: 'powershell/install', category: 'install' }] }
-        );
-        fs.mkdirSync(this.getNoteDocPath(nId));
-        vfs.writeFileSync(this.getNoteDocIndexFile(nId, 'README.md'), '# example. \n example.');
-        fs.mkdirSync(this.getNoteFilesPath(nId));
-        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_01.sh'), 'echo aa');
-        vfs.writeFileSync(path.join(this.getNoteFilesPath(nId), 'example_02.ts'), 'console.log("aa")');
-    }
-
     initialize(): void {
         if (!fs.existsSync(this.notesPath)) {
             fs.mkdirSync(this.notesPath);
-            this.createExampleData();
         }
         if (!fs.existsSync(this.trashPath)) fs.mkdirSync(this.trashPath);
     }

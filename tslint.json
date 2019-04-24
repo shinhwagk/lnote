@@ -1,24 +1,13 @@
 {
     "defaultSeverity": "error",
-    "extends": [
-        "tslint-react"
-    ],
     "jsRules": {},
     "rules": {
-        "semicolon": [
-            true,
-            "always"
-        ],
-        "quotemark": [
-            true,
-            "single"
-        ],
+        "semicolon": [true, "always"],
+        "quotemark": [true, "single"],
         "jsx-key": false
     },
     "linterOptions": {
-        "exclude": [
-            "node_modules"
-        ]
+        "exclude": ["node_modules"]
     },
     "rulesDirectory": []
 }
