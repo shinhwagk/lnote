@@ -97,12 +97,12 @@ export namespace ExtCmds {
     export async function cmdHdlCategoryAdd() {
         const cname = await window.showInputBox({ value: 'default' });
         if (!cname) return;
+        await cmdHdlNoteAdd(cname, false);
         ext.notesPanelView
             .parseDomain()
             .addCategory(cname)
             .showNotesPlanView();
         ext.ga('category', 'add');
-        await cmdHdlNoteAdd(cname, false);
     }
     export async function cmdHdlNoteAdd(category: string, editFirst: boolean = true) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
@@ -114,7 +114,6 @@ export namespace ExtCmds {
             );
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
-        // await cmdHdlNoteEdit(nid, category);
         ext.ga('note', 'add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
