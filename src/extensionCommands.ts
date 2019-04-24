@@ -94,6 +94,7 @@ export namespace ExtCmds {
             .addCategory(cname)
             .showNotesPlanView();
         ext.ga('category', 'add');
+        await cmdHdlNoteAdd(cname);
     }
     export async function cmdHdlNoteAdd(category: string) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
