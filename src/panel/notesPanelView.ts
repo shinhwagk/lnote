@@ -53,6 +53,9 @@ export class NotesPanelView {
 
         this.tryCnt = 0;
         this.panel!.webview.postMessage({ command: 'data', data: this.viewData });
+        if (!this.panel!.visible) {
+            this.panel!.reveal(vscode.ViewColumn.One);
+        }
     }
 
     private initPanel() {
