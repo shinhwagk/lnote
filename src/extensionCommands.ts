@@ -114,7 +114,7 @@ export namespace ExtCmds {
             );
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
-        await cmdHdlNoteEdit(nid, category);
+        // await cmdHdlNoteEdit(nid, category);
         ext.ga('note', 'add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
