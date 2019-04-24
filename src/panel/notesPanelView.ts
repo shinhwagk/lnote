@@ -124,7 +124,7 @@ export class NotesPanelView {
     }
 
     public addCategory(name: string) {
-        this.viewData!.categories.push({ name: name, notes: [] });
+        this.viewData!.categories.unshift({ name: name, notes: [] });
         return this;
     }
 
