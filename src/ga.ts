@@ -17,7 +17,7 @@ function genUserId() {
 function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!fs.existsSync(userIdFile)) {
-        mkdirpSync(join(homedir(), '.vscode-note', 'clientId'));
+        mkdirpSync(join(homedir(), '.vscode-note'));
         checkFirst = true;
         vfs.writeFileSync(userIdFile);
         const userId = genUserId();
