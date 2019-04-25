@@ -57,6 +57,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (!existsSync(ext.dbDirPath)) {
         mkdirpSync(ext.dbDirPath);
     }
+    if (!existsSync(path.join(homedir(), '.vscode-note'))) {
+        mkdirpSync(path.join(homedir(), '.vscode-note'));
+    }
 
     ext.notesPath = path.join(ext.dbDirPath, 'notes');
 
