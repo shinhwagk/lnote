@@ -6,6 +6,7 @@ import { join } from 'path';
 import { vfs } from './helper';
 import * as querystring from 'querystring';
 import { version } from '../package.json';
+import { mkdirpSync } from 'fs-extra';
 
 export let checkFirst = false;
 
@@ -16,6 +17,7 @@ function genUserId() {
 function initUserId() {
     const userIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!fs.existsSync(userIdFile)) {
+        mkdirpSync(join(homedir(), '.vscode-note', 'clientId'));
         checkFirst = true;
         vfs.writeFileSync(userIdFile);
         const userId = genUserId();
@@ -46,13 +48,13 @@ const postGA = (userId: string) => (collect: boolean) => (ec: string, ea: string
             method: 'POST'
         };
 
-        const req = https.request(options, (res) => {
+        const req = https.request(options, res => {
             res.setEncoding('utf8');
             res.on('end', () => resolve());
-            res.on('error', (err) => reject(err.message));
+            res.on('error', err => reject(err.message));
         });
 
-        req.on('error', (err) => reject(err.message));
+        req.on('error', err => reject(err.message));
         req.write(data);
         req.end();
     });
