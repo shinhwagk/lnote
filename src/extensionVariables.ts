@@ -7,6 +7,7 @@ import { DatabaseFileSystem } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { pga } from './ga';
+import { existsSync, mkdirpSync } from 'fs-extra';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -53,6 +54,10 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     // delete soon
     ext.dbDirPath = getDbDirPath();
+    if (!existsSync(ext.dbDirPath)) {
+        mkdirpSync(ext.dbDirPath);
+    }
+
     ext.notesPath = path.join(ext.dbDirPath, 'notes');
 
     ext.dbFS = new DatabaseFileSystem(ext.notesPath);
