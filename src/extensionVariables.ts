@@ -54,14 +54,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     // delete soon
     ext.dbDirPath = getDbDirPath();
-    if (!existsSync(ext.dbDirPath)) {
-        mkdirpSync(ext.dbDirPath);
-    }
-    if (!existsSync(path.join(homedir(), '.vscode-note'))) {
-        mkdirpSync(path.join(homedir(), '.vscode-note'));
-    }
 
     ext.notesPath = path.join(ext.dbDirPath, 'notes');
+
+    if (!existsSync(ext.dbDirPath)) {
+        mkdirpSync(ext.dbDirPath);
+        copySync(path.join(ext.context.extensionPath, 'data-template'), ext.notesPath);
+    }
 
     ext.dbFS = new DatabaseFileSystem(ext.notesPath);
 
