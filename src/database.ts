@@ -1,222 +1,219 @@
 import * as objectPath from 'object-path';
-import { nonNoteData, metaFileName } from './constants';
-import { vpath, vfs, tools } from './helper';
 import * as path from 'path';
-import * as fs from 'fs';
+import { metaFileName } from './constants';
+import { tools, vfs } from './helper';
+import { existsSync, readdirSync, mkdirSync, removeSync, renameSync } from 'fs-extra';
 
 export interface Domain {
     '.notes': string[];
     [domain: string]: string[] | Domain;
 }
 
-export interface Tags {
+export interface NoteMeta {
+    version?: string;
     tags: Tag[];
-    // doc?: 'md' | 'html'; used for doc index file
+    doc?: string;
 }
 
 export interface Tag {
-    domain: string;
+    domain: string[];
     category: string;
     links?: string[]; // link to other note
-    sort?: number;
+    sort?: number; // sort at category
+    valid?: boolean; // when note deleted
 }
 
-export class DatabaseFileSystem {
-    private notesPath: string;
-    private trashPath: string;
+export class NoteDatabase {
+    public readonly dch: DomainCache = new DomainCache();
+    private readonly notesPath: string;
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
-    readonly dch: DomainCache = new DomainCache();
 
     constructor(notesPath: string) {
         this.notesPath = notesPath;
-        this.trashPath = path.join(notesPath, 'trash');
-        this.initialize();
         this.cacheAllNotes();
-    }
-
-    insertNotesByMeta(...notes: string[]) {
-        for (const nId of notes) {
-            if (!this.checkNoteMetaExist(nId)) {
-                console.warn(`note cache error note id '${nId}' '.n.yml' not exist.`);
-                continue;
-            }
-            const meta = this.readNoteMeta(nId);
-            for (const tag of meta.tags) {
-                this.dch.insertNotesByDpath(vpath.splitPath(tag.domain), nId);
-            }
-        }
     }
 
     private cacheAllNotes() {
         this.dch.cleanCache();
-        const notes = fs.readdirSync(this.notesPath).filter((f: string) => nonNoteData.filter(nn => nn === f).length === 0);
-        this.insertNotesByMeta(...notes);
+        this.cacheValidNotes(...readdirSync(this.notesPath));
     }
 
-    getNoteDocIndexFile = (nId: string, indexName: string) => path.join(this.getNoteDocPath(nId), indexName);
+    public cacheValidNotes(...notes: string[]) {
+        for (const nId of notes) {
+            if (!this.checkNoteMetaExist(nId)) {
+                continue;
+            }
+            for (const tag of this.readNoteMeta(nId).tags) {
+                if (tag.valid === undefined) {
+                    this.dch.cacheNotes(tag.domain, nId);
+                } else {
+                    if (tag.valid) {
+                    }
+                }
+            }
+        }
+    }
 
-    getNoteDocPath = (nId: string) => path.join(this.getNotePath(nId), 'doc');
+    public getNoteDocIndexFile = (nId: string, indexName: string) => path.join(this.getNoteDocPath(nId), indexName);
 
-    getNoteFilesPath = (nId: string) => path.join(this.getNotePath(nId), 'files');
+    public getNoteDocPath = (nId: string) => path.join(this.getNotePath(nId), 'doc');
 
-    getNotePath = (id: string) => path.join(this.notesPath, id);
+    public getNoteFilesPath = (nId: string) => path.join(this.getNotePath(nId), 'files');
 
-    // getTrashNotePath = (id: string) => path.join(this.trashPath, id);
+    public getNotePath = (id: string) => path.join(this.notesPath, id);
 
-    getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
+    public getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
-    readNoteMeta = (id: string) => vfs.readJsonSync<Tags>(this.getNoteMetaFile(id));
+    public readNoteMeta = (id: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(id));
 
-    checkNoteMetaExist = (id: string) => fs.existsSync(this.getNoteMetaFile(id));
+    public checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
-    selectFilesExist = (nId: string) => fs.existsSync(this.getNoteFilesPath(nId));
+    public selectFilesExist = (nId: string) => existsSync(this.getNoteFilesPath(nId));
 
-    getNoteContentFile = (nId: string, cNumber: string) => path.join(this.getNotePath(nId), `${cNumber}.txt`);
+    public getNoteContentFile = (nId: string, cNumber: string) => path.join(this.getNotePath(nId), `${cNumber}.txt`);
 
-    getNoteContentFiles = (nId: string) =>
-        fs.readdirSync(this.getNotePath(nId))
+    public getNoteContentFiles = (nId: string) =>
+        readdirSync(this.getNotePath(nId))
             .filter((f: string) => this.contentFileNameRegex.test(f))
             .map((f: string) => this.contentFileNameRegex.exec(f)![1])
-            .map((f: string) => this.getNoteContentFile(nId, f))
+            .map((f: string) => this.getNoteContentFile(nId, f));
 
-    selectDocIndexFile = (nId: string) => {
-        const indexFile = fs.readdirSync(this.getNoteDocPath(nId)).filter((f: string) => /^README\.*/.test(f))[0];
+    public selectDocIndexFile = (nId: string) => {
+        const indexFile = readdirSync(this.getNoteDocPath(nId)).filter((f: string) => /^README\.*/.test(f))[0];
         return this.getNoteDocIndexFile(nId, indexFile);
+    };
+
+    public writeNoteMeta = (id: string, meta: NoteMeta) => vfs.writeJsonSync(this.getNoteMetaFile(id), meta);
+
+    public selectDocExist(nId: string): boolean {
+        return existsSync(this.getNoteDocIndexFile(nId, 'README.md')) || existsSync(this.getNoteDocIndexFile(nId, 'README.html'));
     }
 
-    writeNoteMeta = (id: string, meta: Tags) => vfs.writeJsonSync(this.getNoteMetaFile(id), meta);
-
-    selectDocExist(nId: string): boolean {
-        return (
-            fs.existsSync(this.getNoteDocIndexFile(nId, 'README.md')) ||
-            fs.existsSync(this.getNoteDocIndexFile(nId, 'README.html'))
-        );
-    }
-
-    selectNoteContents(nId: string): string[] {
+    public selectNoteContents(nId: string): string[] {
         return this.getNoteContentFiles(nId).map((f: string) => vfs.readFileSync(f));
     }
 
-    genNewSeq(): string {
+    // A hexadecimal number of 6 bytes is used for a unique note id.
+    public genNewSeq(): string {
         const id = tools.hexRandom(3);
-        return fs.existsSync(this.getNotePath(id)) ? this.genNewSeq() : id;
+        return existsSync(this.getNotePath(id)) ? this.genNewSeq() : id;
     }
 
-    initialize(): void {
-        if (!fs.existsSync(this.notesPath)) {
-            fs.mkdirSync(this.notesPath);
-        }
-        if (!fs.existsSync(this.trashPath)) fs.mkdirSync(this.trashPath);
-    }
-
-    createNode(dpath: string[], category: string = 'default'): string {
+    public createNode(dpath: string[], category: string = 'default'): string {
         const newId = this.genNewSeq();
-        fs.mkdirSync(this.getNotePath(newId));
-        this.writeNoteMeta(newId, { tags: [{ domain: dpath.join('/'), category }] });
+        mkdirSync(this.getNotePath(newId));
+        this.writeNoteMeta(newId, { tags: [{ domain: dpath, category }] });
         this.createNoteCol(newId);
-        this.dch.insertNotesByDpath(dpath, newId);
+        this.dch.cacheNotes(dpath, newId);
         return newId;
     }
 
-    createNoteCol(nid: string): string {
+    public createNoteCol(nid: string): string {
         const cnt = (this.selectNoteContents(nid).length + 1).toString();
         vfs.writeFileSync(this.getNoteContentFile(nid, cnt), '');
         return cnt;
     }
 
-    deleteNoteCol(nid: string, num: number) {
+    public deleteNoteCol(nid: string, num: number) {
         const colNum = this.selectNoteContents(nid).length;
-        fs.unlinkSync(this.getNoteContentFile(nid, num.toString()));
+        removeSync(this.getNoteContentFile(nid, num.toString()));
         if (num !== colNum) {
             for (let i = num + 1; i <= colNum; i++) {
                 const org = this.getNoteContentFile(nid, i.toString());
                 const tar = this.getNoteContentFile(nid, (i - 1).toString());
-                fs.renameSync(org, tar);
+                renameSync(org, tar);
             }
         }
     }
 
-    //     const cacheTime = statSync(storageDomainCacheFile).mtimeMs;
-    //     if(!fs.existsSync(storageDomainCacheFile) || storageTimeOut(cacheTime)) {
-    //     await initializeDomainCache();
-    // } else {
-    //     await restoreDomainCache();
-    // }
-
-    updateNotesPath(orgDpath: string[], newDpath: string[], cascade: boolean) {
-        this.dch
-            .selectAllNotesUnderDomain(orgDpath)
-            .forEach(nId => this.updateNoteTagPath(nId, orgDpath, newDpath, cascade));
+    public updateNotesPath(orgDpath: string[], newDpath: string[], cascade: boolean) {
+        this.dch.selectAllNotesUnderDomain(orgDpath).forEach(nId => this.updateNoteTagPath(nId, orgDpath, newDpath, cascade));
     }
 
-    updateNoteTagPath(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
+    public updateNoteTagPath(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
         const noteMeta = this.readNoteMeta(nId);
         for (let i = 0; i < noteMeta.tags.length; i++) {
-            const metaPath = vpath.splitPath(noteMeta.tags[i].domain);
+            const metaPath = noteMeta.tags[i].domain;
             if (cascade) {
-                if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length)))
-                    noteMeta.tags[i].domain = newDpath.concat(metaPath.slice(orgDpath.length)).join('/');
+                if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length))) {
+                    noteMeta.tags[i].domain = newDpath.concat(metaPath.slice(orgDpath.length));
+                }
             } else {
-                if (tools.stringArrayEqual(orgDpath, metaPath)) noteMeta.tags[i].domain = newDpath.join('/');
+                if (tools.stringArrayEqual(orgDpath, metaPath)) {
+                    noteMeta.tags[i].domain = newDpath;
+                }
             }
         }
         this.writeNoteMeta(nId, noteMeta);
     }
 
-    createNoteDoc(nId: string) {
-        fs.mkdirSync(this.getNoteDocPath(nId));
+    public createNoteDoc(nId: string) {
+        mkdirSync(this.getNoteDocPath(nId));
         vfs.writeFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
     }
 
-    createNoteFiles(nId: string) {
-        fs.mkdirSync(this.getNoteFilesPath(nId));
+    public createNoteFiles(nId: string) {
+        mkdirSync(this.getNoteFilesPath(nId));
+    }
+
+    public selectCategoryIndex(nId: string, dpath: string, category: string): number | undefined {
+        const tags = this.readNoteMeta(nId).tags;
+        for (let i = 0; i <= tags.length; i++) {
+            const tag = tags[i];
+            if (tag.domain.join('/') === dpath && tag.category === category) {
+                return i;
+            }
+        }
+        return undefined;
     }
 }
 
 class DomainCache {
     private cache: Domain = { '.notes': [] };
 
-    cleanCache() {
+    public cleanCache() {
         this.cache = { '.notes': [] };
     }
 
-    createDomain(dpath: string[], name: string): void {
+    public createDomain(dpath: string[], name: string): void {
         objectPath.set(this.cache, dpath.concat(name), {}, true);
     }
 
-    deleteDomain(dpath: string[]) {
+    public deleteDomain(dpath: string[]) {
         objectPath.del(this.cache, dpath);
     }
 
-    insertNotesByDpath(dpath: string[], ...notes: string[]): void {
+    public cacheNotes(dpath: string[], ...notes: string[]): void {
         const domainNotesPath = dpath.concat('.notes');
         const orgNotes = objectPath.get<string[]>(this.cache, domainNotesPath, []);
         objectPath.set(this.cache, domainNotesPath, Array.from(new Set(orgNotes.concat(notes))));
     }
 
-    removeNotes(dpath: string[], ...nId: string[]): void {
+    public removeNotes(dpath: string[], ...nId: string[]): void {
         const domainNotesPath = dpath.concat('.notes');
         const notes = objectPath.get<string[]>(this.cache, domainNotesPath, []);
         objectPath.set(this.cache, domainNotesPath, notes.filter((i: string) => !nId.includes(i)));
     }
 
-    createNotes(dpath: string[]): void {
+    public createNotes(dpath: string[]): void {
         objectPath.set(this.cache, dpath.concat('.notes'), []);
     }
 
-    selectDomain(dpath: string[] = []): Domain {
+    public selectDomain(dpath: string[] = []): Domain {
         return objectPath.get(this.cache, dpath);
     }
 
-    selectNotesUnderDomain(dpath: string[]): string[] {
+    public selectNotesUnderDomain(dpath: string[]): string[] {
         return this.selectDomain(dpath)['.notes'] || [];
     }
 
-    selectAllNotesUnderDomain(dpath: string[]): string[] {
+    public selectAllNotesUnderDomain(dpath: string[]): string[] {
         const domain = this.selectDomain(dpath);
         const childDomainNames: string[] = Object.keys(domain).filter(name => name !== '.notes');
         const notes: string[] = this.selectNotesUnderDomain(dpath);
-        if (childDomainNames.length === 0) return notes;
+        if (childDomainNames.length === 0) {
+            return notes;
+        }
 
         const totalNotes: string[] = [];
         for (const name of childDomainNames) {

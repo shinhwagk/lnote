@@ -10,17 +10,14 @@ import './index.scss';
 interface vscode {
     postMessage(message: any): void;
 }
-declare function acquireVsCodeApi(): vscode;
-const vscode: vscode = acquireVsCodeApi();
+// declare function acquireVsCodeApi(): vscode;
+declare const vscode: vscode;
 
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
-const editNote = (id: string, category: string) => () =>
-    vscode.postMessage({ command: 'edit', data: { id, category } });
-const editContentFile = (id: string, n: string) => () =>
-    vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
-const editCol = (id: string, cn: string) => () =>
-    vscode.postMessage({ command: 'edit-col', data: { id, cn } });
+const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
+const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
+const editCol = (id: string, cn: string) => () => vscode.postMessage({ command: 'edit-col', data: { id, cn } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
@@ -75,13 +72,7 @@ function VSNNotes(props: WVNote) {
 
 function VSNCategory(props: twv.WVCategory) {
     const listnote = props.notes.map((note: twv.WVNote) => (
-        <VSNNotes
-            category={props.name}
-            nId={note.nId}
-            contents={note.contents}
-            doc={note.doc}
-            files={note.files}
-        />
+        <VSNNotes category={props.name} nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} />
     ));
 
     return (
@@ -128,18 +119,12 @@ window.addEventListener('message', event => {
         case 'data':
             const name = message.data.name;
             const categories = message.data.categories;
-            ReactDOM.render(
-                <VNSDomain name={name} categories={categories} />,
-                document.getElementById('root')
-            );
+            ReactDOM.render(<VNSDomain name={name} categories={categories} />, document.getElementById('root'));
             break;
         default:
             ReactDOM.render(<h1>loading...{message}</h1>, document.getElementById('root'));
     }
 });
-
-vscode.postMessage({ command: 'ready' });
-console.log('web view ready.');
 
 interface WVNote {
     category: string;

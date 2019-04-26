@@ -1,6 +1,6 @@
 import { TreeItem, TreeDataProvider, Uri, EventEmitter, Event } from 'vscode';
 import { ext } from '../extensionVariables';
-import { readdirSync, statSync } from 'fs';
+import { readdirSync, statSync } from 'fs-extra';
 import { join, basename } from 'path';
 
 export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
@@ -16,9 +16,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const fPath: string = element
-            ? element.resourceUri!.fsPath
-            : ext.dbFS.getNoteFilesPath(ext.activeNote.id);
+        const fPath: string = element ? element.resourceUri!.fsPath : ext.dbFS.getNoteFilesPath(ext.activeNote.id);
 
         return readdirSync(fPath).map(f => {
             const uri = Uri.file(join(fPath, f));

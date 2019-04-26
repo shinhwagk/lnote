@@ -1,31 +1,30 @@
 import * as path from 'path';
-import rimraf = require('rimraf');
 import { vfs } from '../src/helper';
-import * as fs from 'fs';
 import { metaFileName } from '../src/constants';
-import { DatabaseFileSystem } from '../src/database';
+import { NoteDatabase } from '../src/database';
+import { mkdirpSync, rmdirSync } from 'fs-extra';
 
-const testDataPath = './.vscode-note';
+const testNotesPath = './vscode-note/notes';
 
 const exampleDataNotes = [
     {
         id: '1',
-        tags: [{ domain: 'adf/abc', category: 'test' }],
+        tags: [{ domain: ['adf', 'abc'], category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '2',
-        tags: [{ domain: 'adf/abc', category: 'test' }],
+        tags: [{ domain: ['adf', 'abc'], category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '3',
-        tags: [{ domain: 'adf/abc/ccc', category: 'test' }],
+        tags: [{ domain: ['adf', 'abc', 'ccc'], category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '4',
-        tags: [{ domain: 'g/abc', category: 'test' }],
+        tags: [{ domain: ['g', 'abc'], category: 'test' }],
         contents: ['adfdf', 'sdfdf']
     }
 ];
@@ -36,24 +35,24 @@ const resultData = JSON.parse(
 
 function createTestFileAndDirectory() {
     for (const testNote of exampleDataNotes) {
-        const noteDir = path.join(testDataPath, testNote.id);
-        fs.mkdirSync(noteDir);
+        const noteDir = path.join(testNotesPath, testNote.id);
+        mkdirpSync(noteDir);
         const noteMetaFile = path.join(noteDir, metaFileName);
         vfs.writeJsonSync(noteMetaFile, { tags: testNote.tags });
     }
 }
 
-let dbFileSystem: DatabaseFileSystem;
+let dbFileSystem: NoteDatabase;
 
 describe('test select', () => {
     beforeAll(() => {
-        fs.mkdirSync(testDataPath);
+        mkdirpSync(testNotesPath);
         createTestFileAndDirectory();
-        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        dbFileSystem = new NoteDatabase(testNotesPath);
     });
 
     afterAll(() => {
-        rimraf.sync(testDataPath);
+        rmdirSync(testNotesPath);
     });
 
     test('cache domain', () => {
@@ -76,18 +75,18 @@ describe('test select', () => {
 
 describe('test modify', () => {
     beforeAll(() => {
-        fs.mkdirSync(testDataPath);
+        mkdirpSync(testNotesPath);
         createTestFileAndDirectory();
-        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        dbFileSystem = new NoteDatabase(testNotesPath);
     });
 
     afterAll(() => {
-        rimraf.sync(testDataPath);
+        rmdirSync(testNotesPath);
     });
 
     test('update tag', () => {
         dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc'], false);
-        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        dbFileSystem = new NoteDatabase(testNotesPath);
         resultData['adf']['acc'] = {};
         resultData['adf']['acc']['.notes'] = resultData['adf']['abc']['.notes'];
         delete resultData['adf']['abc']['.notes'];
@@ -97,13 +96,13 @@ describe('test modify', () => {
 
 describe('test modify domain cascade', () => {
     beforeAll(() => {
-        fs.mkdirSync(testDataPath);
+        mkdirpSync(testNotesPath);
         createTestFileAndDirectory();
-        dbFileSystem = new DatabaseFileSystem(testDataPath);
+        dbFileSystem = new NoteDatabase(testNotesPath);
     });
 
     afterAll(() => {
-        rimraf.sync(testDataPath);
+        rmdirSync(testNotesPath);
     });
 
     test('update tag', () => {
@@ -111,8 +110,8 @@ describe('test modify domain cascade', () => {
             '{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'
         );
         dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
-        dbFileSystem = new DatabaseFileSystem(testDataPath);
-        resultData['adf']['acc'] = { 'abc': { '.notes': [] } };
+        dbFileSystem = new NoteDatabase(testNotesPath);
+        resultData['adf']['acc'] = { abc: { '.notes': [] } };
         resultData['adf']['acc']['abc'] = resultData['adf']['abc'];
         delete resultData['adf']['abc'];
         expect(dbFileSystem.dch.selectDomain()).toEqual(resultData);
@@ -120,7 +119,7 @@ describe('test modify domain cascade', () => {
 });
 // test('update tag cascade', () => {
 //     dbFileSystem.updateNotesTagPath(['adf', 'abc'], ['adf', 'acc'], true);
-//     dbFileSystem = new DatabaseFileSystem(testDataPath);
+//     dbFileSystem = new NoteDatabase(testDataPath);
 //     expect(dbFileSystem.dch.selectDomain())
 //         .toEqual(JSON.parse('{"adf":{"acc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'));
 // });

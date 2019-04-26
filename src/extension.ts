@@ -1,12 +1,6 @@
 import { ext, initializeExtensionVariables } from './extensionVariables';
-import {
-    ExtensionContext,
-    ViewColumn,
-    commands,
-    window,
-} from 'vscode';
+import { ExtensionContext, ViewColumn, commands } from 'vscode';
 import { ExtCmds } from './extensionCommands';
-import { checkFirst } from './ga';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -52,23 +46,16 @@ export async function activate(context: ExtensionContext) {
     /**
      *  extension
      */
-    if (checkFirst) {
-        if (await window.showInformationMessage('vscode-note installed.', 'Open it.', 'Not now.') === 'Open it.') {
-            commands.executeCommand('workbench.view.extension.vsnote-explorer');
-            ext.ga('installed', 'open it');
-            ext.notesPanelView.parseDomain(['powershell', 'install']).showNotesPlanView();
-        } else {
-            ext.ga('installed', 'not now');
-        }
-    }
+    // if (checkFirst) {
+    //     if ((await window.showInformationMessage('vscode-note installed.', 'Open it.', 'Not now.')) === 'Open it.') {
+    //         commands.executeCommand('workbench.view.extension.vsnote-explorer');
+    //         ext.notesPanelView.parseDomain(['powershell', 'install']).showNotesPlanView();
+    //     }
+    // }
 
     ext.registerCommand('editExplorer.openFileResource', async (resource: any) => {
         commands.executeCommand('vscode.open', resource, ViewColumn.Two);
     });
-
-    ext.ga('vscode-note', 'activate');
 }
 
-export function deactivate() {
-    ext.ga('vscode-note', 'deactivate');
-}
+export function deactivate() {}

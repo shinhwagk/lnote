@@ -4,18 +4,14 @@ import { vpath, vfs } from './helper';
 import { basename } from 'path';
 import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode } from './explorer/domainExplorer';
-import { DatabaseFileSystem } from './database';
 import { ctxFilesExplorer } from './constants';
+import { NoteDatabase } from './database';
 
 export namespace ExtCmds {
     export async function cmdHdlNoteEditColAdd(id: string) {
-        const colNum = ext.dbFS.createNoteCol(id);
-        await commands.executeCommand(
-            'editExplorer.openFileResource',
-            Uri.file(ext.dbFS.getNoteContentFile(id, colNum))
-        );
+        const cn = ext.dbFS.createNoteCol(id);
+        await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.dbFS.getNoteContentFile(id, cn)));
         // ext.editProvider.refresh();
-        ext.ga('note', 'col-add');
     }
     export async function cmdHdlNoteEditCol(id: string, cn: string) {
         const rst = await window.showQuickPick(['add', '------', 'delete']);
@@ -33,7 +29,6 @@ export namespace ExtCmds {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
         ext.domainProvider.refresh(dn);
         await cmdHdlDomainPin(dn);
-        ext.ga('notes', 'create');
     }
     export async function cmdHdlNoteEdit(nId: string, category: string) {
         const picks = [];
@@ -64,7 +59,6 @@ export namespace ExtCmds {
                 await cmdHdlNoteOpenFolder(nId);
                 break;
         }
-        ext.ga('note', 'edit');
     }
     export async function cmdHdlDomainCreate(dn?: DomainNode) {
         const dpath = dn ? vpath.splitPath(dn) : [];
@@ -73,19 +67,16 @@ export namespace ExtCmds {
         ext.dbFS.dch.createDomain(dpath, name);
         ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true });
-        ext.ga('domain', 'create');
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.activeNote.domainNode = dn;
         ext.notesPanelView.parseDomain(vpath.splitPath(dn)).showNotesPlanView();
         await ext.setContext(ctxFilesExplorer, false);
-        ext.ga('notes', 'view');
     }
     export async function cmdHdlNoteColRemove(id: string, cn: string) {
         //cn : column number
         ext.dbFS.deleteNoteCol(id, Number(cn));
         // ext.editProvider.refresh();
-        ext.ga('note', 'col-delete');
     }
     export async function cmdHdlNoteEditRemove() {
         const sqp = await window.showQuickPick(['Yes', 'No']);
@@ -102,37 +93,26 @@ export namespace ExtCmds {
             .parseDomain()
             .addCategory(cname)
             .showNotesPlanView();
-        ext.ga('category', 'add');
     }
     export async function cmdHdlNoteAdd(category: string, editFirst: boolean = true) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
         vfs.writeFileSync(ext.dbFS.getNoteContentFile(nid, '1'));
         if (editFirst) {
-            await commands.executeCommand(
-                'editExplorer.openFileResource',
-                Uri.file(ext.dbFS.getNoteContentFile(nid, '1'))
-            );
+            await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.dbFS.getNoteContentFile(nid, '1')));
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
-        ext.ga('note', 'add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
         ext.dbFS.createNoteFiles(id);
         ext.notesPanelView.parseDomain().showNotesPlanView();
         await cmdHdlNoteFilesOpen(id);
-        ext.ga('doc', 'files');
     }
     export async function cmdHdlNoteEditFilesClose() {
         await ext.setContext(ctxFilesExplorer, true);
-        ext.ga('files', 'close');
     }
     export async function cmdHdlNoteEditDocCreate(id: string) {
         ext.dbFS.createNoteDoc(id);
-        await commands.executeCommand(
-            'editExplorer.openFileResource',
-            Uri.file(ext.dbFS.getNoteDocIndexFile(id, 'README.md'))
-        );
-        ext.ga('doc', 'create');
+        await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.dbFS.getNoteDocIndexFile(id, 'README.md')));
     }
     export async function cmdHdlDomainMove(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
@@ -149,7 +129,6 @@ export namespace ExtCmds {
             }
         }
         ext.activeNote.dpath = newDpath;
-        ext.ga('domain', 'move');
     }
     export async function cmdHdlDomainRename(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
@@ -160,14 +139,11 @@ export namespace ExtCmds {
         newDpath[newDpath.length - 1] = newName;
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
         ext.domainProvider.refresh(orgDpath.slice(0, orgDpath.length - 1).join('/'));
-        ext.ga('domain', 'rename');
     }
     export async function cmdHdlNoteOpenFolder(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNotePath(id)), true);
-        ext.ga('note-folder', 'open');
     }
     export async function cmdHdlNoteEditCategoryRename() {
-        ext.ga('category', 'rename');
         const newCname = await window.showInputBox({ value: ext.activeNote.category });
         if (!newCname) return;
     }
@@ -179,29 +155,20 @@ export namespace ExtCmds {
         } else {
             noteDocHtmlPanel(readmeFile);
         }
-        ext.ga('doc', 'show');
     }
     export async function cmdHdlNoteFilesOpen(nId: string) {
         ext.activeNote.id = nId;
         ext.filesProvider.refresh();
         await ext.setContext(ctxFilesExplorer, true);
-        ext.ga('files', 'open');
     }
     export async function cmdHdlFilesClose() {
         await ext.setContext(ctxFilesExplorer, false);
-        ext.ga('files', 'close');
     }
     export async function cmdHdlFilesEditOpen() {
-        await commands.executeCommand(
-            'vscode.openFolder',
-            Uri.file(ext.dbFS.getNoteFilesPath(ext.activeNote.id)),
-            true
-        );
-        ext.ga('files-edit', 'open');
+        await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteFilesPath(ext.activeNote.id)), true);
     }
     export async function cmdHdlFilesRefresh() {
         ext.filesProvider.refresh();
-        ext.ga('files', 'refresh');
     }
     export async function cmdHdlFilesOpenTerminal() {
         const nId = ext.activeNote.id;
@@ -209,17 +176,19 @@ export namespace ExtCmds {
         const filePath = ext.dbFS.getNoteFilesPath(nId);
         const fileTerminal = window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
         fileTerminal.show(true);
-        ext.ga('files', 'termainl-open');
     }
     export async function cmdHdlDomainRefresh() {
-        ext.dbFS = new DatabaseFileSystem(ext.notesPath);
+        ext.dbFS = new NoteDatabase(ext.notesPath);
         ext.domainProvider.refresh();
-        ext.ga('domain', 'refresh');
     }
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
-        ext.ga('doc-edit', 'open');
     }
+    // export async function cmdHdlCategoryToDomain(category: string) {
+    //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+    //     const newDomainName = 'category';
+    //     const newCategory = 'xx';
+    // }
 }
 
 namespace ExtCmdsFuns {
@@ -234,7 +203,7 @@ namespace ExtCmdsFuns {
         ext.dbFS.updateNotesPath(orgDpath, newDpath, true);
         const notes = ext.dbFS.dch.selectAllNotesUnderDomain(orgDpath);
         ext.dbFS.dch.deleteDomain(orgDpath);
-        ext.dbFS.insertNotesByMeta(...notes);
+        ext.dbFS.cacheValidNotes(...notes);
         ext.notesPanelView.parseDomain(newDpath).showNotesPlanView();
     }
 }

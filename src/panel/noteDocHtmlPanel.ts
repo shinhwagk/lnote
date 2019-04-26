@@ -19,7 +19,7 @@ export function noteDocHtmlPanel(htmlFile: string) {
 
 function createPanel() {
     const panel = vscode.window.createWebviewPanel(viewType, title, vscode.ViewColumn.Two, {
-        localResourceRoots: [vscode.Uri.file(ext.dbDirPath)]
+        localResourceRoots: [vscode.Uri.file(ext.masterPath)]
     });
     panel.onDidDispose(() => _dispose(), null, _disposables);
     return panel;

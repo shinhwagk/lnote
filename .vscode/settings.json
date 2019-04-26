@@ -13,5 +13,6 @@
     "editor.formatOnSave": true,
     "npm.packageManager": "yarn",
     "npm.registry": "https://registry.npm.taobao.org",
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

@@ -1,13 +1,6 @@
 {
-    "defaultSeverity": "error",
-    "jsRules": {},
+    "extends": ["tslint-config-prettier"],
     "rules": {
-        "semicolon": [true, "always"],
-        "quotemark": [true, "single"],
         "jsx-key": false
-    },
-    "linterOptions": {
-        "exclude": ["node_modules"]
-    },
-    "rulesDirectory": []
+    }
 }

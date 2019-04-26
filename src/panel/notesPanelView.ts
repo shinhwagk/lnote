@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
-import { tools, vpath } from '../helper';
+import { tools } from '../helper';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -16,7 +16,7 @@ export class NotesPanelView {
         return vscode.Uri.file(file)
             .with({ scheme: 'vscode-resource' })
             .toString();
-    }
+    };
 
     private getWebviewContent() {
         return `<!DOCTYPE html>
@@ -30,7 +30,14 @@ export class NotesPanelView {
                     <div id="root"></div>
                     <script src="${this.assetsFile('react.production.min.js')}"></script>
                     <script src="${this.assetsFile('react-dom.production.min.js')}"></script>
+                    <script>
+                        const vscode = acquireVsCodeApi();
+                    </script>
                     <script src="${this.assetsFile('main.wv.js')}"></script>
+                    <script>
+                        vscode.postMessage({ command: 'ready' });
+                        console.log('web view ready.');
+                    </script>
                 </body>
                 </html>`;
     }
@@ -73,8 +80,9 @@ export class NotesPanelView {
             ext.context.subscriptions
         );
         this.panel.onDidChangeViewState(
-            () => {
-                if (this.panel && this.panel.visible) {
+            e => {
+                const panel = e.webviewPanel;
+                if (panel.visible) {
                     this.parseDomain();
                     this.showNotesPlanView();
                 }
@@ -135,18 +143,14 @@ export class NotesPanelView {
         const notes = ext.dbFS.dch.selectNotesUnderDomain(this.dpathCache);
         const categories: twv.WVCategory[] = [];
         for (const nId of notes) {
-            const cname = ext.dbFS
-                .readNoteMeta(nId)
-                .tags.filter(tag => tools.stringArrayEqual(vpath.splitPath(tag.domain), this.dpathCache))[0]
+            const cname = ext.dbFS.readNoteMeta(nId).tags.filter(tag => tools.stringArrayEqual(tag.domain, this.dpathCache))[0]
                 .category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);
             const isFiles = ext.dbFS.selectFilesExist(nId);
 
             if (categories.filter(c => c.name === cname).length >= 1) {
-                categories
-                    .filter(c => c.name === cname)[0]
-                    .notes.push({ nId, contents, doc: isDoc, files: isFiles });
+                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
             } else {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }
