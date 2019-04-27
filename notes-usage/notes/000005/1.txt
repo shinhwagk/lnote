@@ -1,1 +1,1 @@
-left click 'edit icon' can create doc, create files, rename category, open note data folder
+Domain can be a directory tree or a notes
