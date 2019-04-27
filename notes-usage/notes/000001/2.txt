@@ -1,1 +1,1 @@
-left double click this (edit col)
+double left click this (edit col)

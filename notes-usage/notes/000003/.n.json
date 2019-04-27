@@ -1,1 +1,3 @@
-{ "tags": [{ "domain": ["vscode-note", "usage"], "category": "files" }] }
+{
+  "tags": [{ "domain": ["@test", "vscode-note", "usage"], "category": "files" }]
+}
