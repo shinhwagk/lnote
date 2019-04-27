@@ -56,6 +56,7 @@ export class NotesPanelView {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
         });
+        this.panel.iconPath = vscode.Uri.file(path.join(ext.context.extensionPath, 'images/wv-icon.svg'));
         this.panel.onDidDispose(
             () => {
                 this.panel = undefined;
