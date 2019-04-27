@@ -85,7 +85,7 @@ describe('test modify', () => {
     });
 
     test('update tag', () => {
-        dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc'], false);
+        dbFileSystem.updateNotesDomain(['adf', 'abc'], ['adf', 'acc'], false);
         dbFileSystem = new NoteDatabase(testNotesPath);
         resultData['adf']['acc'] = {};
         resultData['adf']['acc']['.notes'] = resultData['adf']['abc']['.notes'];
@@ -109,7 +109,7 @@ describe('test modify domain cascade', () => {
         const resultData = JSON.parse(
             '{"adf":{"abc":{".notes":["1","2"],"ccc":{".notes":["3"]}}},"g":{"abc":{".notes":["4"]}},".notes":[]}'
         );
-        dbFileSystem.updateNotesPath(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
+        dbFileSystem.updateNotesDomain(['adf', 'abc'], ['adf', 'acc', 'abc'], true);
         dbFileSystem = new NoteDatabase(testNotesPath);
         resultData['adf']['acc'] = { abc: { '.notes': [] } };
         resultData['adf']['acc']['abc'] = resultData['adf']['abc'];

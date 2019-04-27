@@ -19,7 +19,7 @@ export interface Tag {
     domain: string[];
     category: string;
     links?: string[]; // link to other note
-    sort?: number; // sort at category
+    weight?: number; // sort at category
     valid?: boolean; // when note deleted
 }
 
@@ -94,7 +94,7 @@ export class NoteDatabase {
     }
 
     // A hexadecimal number of 6 bytes is used for a unique note id.
-    public genNewSeq(): string {
+    private genNewSeq(): string {
         const id = tools.hexRandom(3);
         return existsSync(this.getNotePath(id)) ? this.genNewSeq() : id;
     }
@@ -126,11 +126,11 @@ export class NoteDatabase {
         }
     }
 
-    public updateNotesPath(orgDpath: string[], newDpath: string[], cascade: boolean) {
-        this.dch.selectAllNotesUnderDomain(orgDpath).forEach(nId => this.updateNoteTagPath(nId, orgDpath, newDpath, cascade));
+    public updateNotesDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
+        this.dch.selectAllNotesUnderDomain(orgDpath).forEach(nId => this.updateNoteDomain(nId, orgDpath, newDpath, cascade));
     }
 
-    public updateNoteTagPath(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
+    public updateNoteDomain(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
         const noteMeta = this.readNoteMeta(nId);
         for (let i = 0; i < noteMeta.tags.length; i++) {
             const metaPath = noteMeta.tags[i].domain;
@@ -147,24 +147,46 @@ export class NoteDatabase {
         this.writeNoteMeta(nId, noteMeta);
     }
 
-    public createNoteDoc(nId: string) {
+    public createNoteDoc(nId: string, indexName: string = 'README.md') {
         mkdirSync(this.getNoteDocPath(nId));
-        vfs.writeFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
+        vfs.writeFileSync(path.join(this.getNoteDocPath(nId), indexName));
+        const meta = this.readNoteMeta(nId);
+        meta.doc = indexName;
+        this.writeNoteMeta(nId, meta);
     }
 
     public createNoteFiles(nId: string) {
         mkdirSync(this.getNoteFilesPath(nId));
     }
 
-    public selectCategoryIndex(nId: string, dpath: string, category: string): number | undefined {
+    selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
         const tags = this.readNoteMeta(nId).tags;
         for (let i = 0; i <= tags.length; i++) {
             const tag = tags[i];
-            if (tag.domain.join('/') === dpath && tag.category === category) {
+            if (tools.stringArrayEqual(tag.domain, dpath) && tag.category === category) {
                 return i;
             }
         }
         return undefined;
+    }
+
+    updateNoteCategory(nId: string, dpath: string[], oldCategory: string, newCategory: string) {
+        const idx: number | undefined = this.selectCategoryIndex(nId, dpath, oldCategory);
+        const meta = this.readNoteMeta(nId);
+        if (idx != undefined) {
+            meta.tags[idx].category = newCategory;
+        }
+        this.writeNoteMeta(nId, meta);
+    }
+
+    sortNotes(dpath: string[], ...notes: string[]): string[] {
+        const items = [];
+        for (const note of notes) {
+            const meta = this.readNoteMeta(note);
+            const tag = meta.tags.filter(t => tools.stringArrayEqual(t.domain, dpath))[0];
+            items.push({ note, weight: tag.weight || 0 });
+        }
+        return items.sort((_a, b) => b.weight).map(i => i.note);
     }
 }
 

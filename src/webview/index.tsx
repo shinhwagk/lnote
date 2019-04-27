@@ -44,7 +44,7 @@ function VSNNotes(props: WVNote) {
             onDoubleClick={editContentFile(props.nId, (i + 1).toString())}
             onContextMenu={editCol(props.nId, (i + 1).toString())}
         >
-            <pre>{c}</pre>
+            <pre className="vsn-col">{c || ' '}</pre>
         </div>
     ));
 
@@ -76,16 +76,30 @@ function VSNCategory(props: twv.WVCategory) {
     ));
 
     return (
-        <div className="card bg-dark text-white">
+        <div id={props.name} className="card bg-dark text-white">
             <div className="card-header">
                 {props.name + ' '}
-                <a onClick={addNote(props.name!)}>
+                <a onClick={addNote(props.name)}>
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </div>
             <div className="card-body">
                 <div className="container-fluid">{listnote}</div>
             </div>
+        </div>
+    );
+}
+
+function VSNCategoryTitle(props: { cnames: string[] }) {
+    const categoryList = props.cnames.map(name => (
+        <a href={'#' + name} className="badge badge-info">
+            {name}
+        </a>
+    ));
+    return (
+        <div>
+            {categoryList}
+            <p />
         </div>
     );
 }
@@ -106,7 +120,7 @@ function VNSDomain(props: twv.WVDomain) {
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </h1>
-
+            <VSNCategoryTitle cnames={props.categories.map(c => c.name)} />
             <div>{categories}</div>
         </div>
     );

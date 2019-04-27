@@ -6,8 +6,6 @@ import { tools } from '../helper';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
-    private state: boolean = false;
-    private tryCnt: number = 0;
     private viewData: twv.WVDomain | undefined;
     private dpathCache: string[] = [];
 
@@ -32,12 +30,12 @@ export class NotesPanelView {
                     <script src="${this.assetsFile('react-dom.production.min.js')}"></script>
                     <script>
                         const vscode = acquireVsCodeApi();
+                        window.onload = function() {
+                            vscode.postMessage({ command: 'get-data' });
+                            console.log('Ready to accept data.');
+                        };
                     </script>
                     <script src="${this.assetsFile('main.wv.js')}"></script>
-                    <script>
-                        vscode.postMessage({ command: 'ready' });
-                        console.log('web view ready.');
-                    </script>
                 </body>
                 </html>`;
     }
@@ -47,18 +45,6 @@ export class NotesPanelView {
             this.initPanel();
         }
 
-        if (this.tryCnt >= 200) {
-            vscode.window.showErrorMessage('webview update failse 200 times.');
-            return;
-        }
-
-        if (!this.state) {
-            setTimeout(() => this.showNotesPlanView(), 10);
-            this.tryCnt += 1;
-            return;
-        }
-
-        this.tryCnt = 0;
         this.panel!.webview.postMessage({ command: 'data', data: this.viewData });
         if (!this.panel!.visible) {
             this.panel!.reveal(vscode.ViewColumn.One);
@@ -73,7 +59,6 @@ export class NotesPanelView {
         this.panel.onDidDispose(
             () => {
                 this.panel = undefined;
-                this.state = false;
                 console.log('vsnote webview closed.');
             },
             null,
@@ -93,8 +78,8 @@ export class NotesPanelView {
         this.panel.webview.onDidReceiveMessage(
             msg => {
                 switch (msg.command) {
-                    case 'ready':
-                        this.state = true;
+                    case 'get-data':
+                        this.showNotesPlanView();
                         break;
                     case 'edit':
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
@@ -141,8 +126,9 @@ export class NotesPanelView {
 
     private genViewData(): twv.WVDomain {
         const notes = ext.dbFS.dch.selectNotesUnderDomain(this.dpathCache);
+        const sortNotes = ext.dbFS.sortNotes(this.dpathCache, ...notes);
         const categories: twv.WVCategory[] = [];
-        for (const nId of notes) {
+        for (const nId of sortNotes) {
             const cname = ext.dbFS.readNoteMeta(nId).tags.filter(tag => tools.stringArrayEqual(tag.domain, this.dpathCache))[0]
                 .category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);

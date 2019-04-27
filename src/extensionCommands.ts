@@ -52,7 +52,7 @@ export namespace ExtCmds {
                 await cmdHdlNoteEditFilesCreate(nId);
                 break;
             case 'category rename':
-                // await cmdHdlNoteEditCategoryRename(nId);
+                await cmdHdlNoteEditCategoryRename(nId, category);
                 break;
             // case 'trash': break;
             case 'open note folder':
@@ -88,11 +88,8 @@ export namespace ExtCmds {
     export async function cmdHdlCategoryAdd() {
         const cname = await window.showInputBox({ value: 'default' });
         if (!cname) return;
-        await cmdHdlNoteAdd(cname, false);
-        ext.notesPanelView
-            .parseDomain()
-            .addCategory(cname)
-            .showNotesPlanView();
+        await cmdHdlNoteAdd(cname);
+        ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlNoteAdd(category: string, editFirst: boolean = true) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
@@ -143,9 +140,18 @@ export namespace ExtCmds {
     export async function cmdHdlNoteOpenFolder(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNotePath(id)), true);
     }
-    export async function cmdHdlNoteEditCategoryRename() {
-        const newCname = await window.showInputBox({ value: ext.activeNote.category });
+    export async function cmdHdlNoteEditCategoryRename(nId: string, oldCategory: string) {
+        const newCname = await window.showInputBox({ value: oldCategory });
         if (!newCname) return;
+        const dpath = vpath.splitPath(ext.activeNote.domainNode);
+        ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
+    export async function cmdHdlCategoryRename(oldCategory: string) {
+        const newCname = await window.showInputBox({ value: oldCategory });
+        if (!newCname) return;
+        // const dpath = vpath.splitPath(ext.activeNote.domainNode);
+        // ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
     }
     export async function cmdHdlNoteDocShow(nId: string) {
         const readmeFile = ext.dbFS.selectDocIndexFile(nId);
@@ -200,7 +206,7 @@ namespace ExtCmdsFuns {
     // ) { }
 
     export function resetDomain(orgDpath: string[], newDpath: string[]) {
-        ext.dbFS.updateNotesPath(orgDpath, newDpath, true);
+        ext.dbFS.updateNotesDomain(orgDpath, newDpath, true);
         const notes = ext.dbFS.dch.selectAllNotesUnderDomain(orgDpath);
         ext.dbFS.dch.deleteDomain(orgDpath);
         ext.dbFS.cacheValidNotes(...notes);

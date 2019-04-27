@@ -5,5 +5,5 @@
 /.DS_Store
 /coverage/
 /yarn-error.log
-/.vscode-note/
+/vscode-note/
 /yarn.lock
