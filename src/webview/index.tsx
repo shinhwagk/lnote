@@ -90,19 +90,19 @@ function VSNCategory(props: twv.WVCategory) {
     );
 }
 
-function VSNCategoryTitle(props: { cnames: string[] }) {
-    const categoryList = props.cnames.map(name => (
-        <a href={'#' + name} className="badge badge-info">
-            {name}
-        </a>
-    ));
-    return (
-        <div>
-            {categoryList}
-            <p />
-        </div>
-    );
-}
+// function VSNCategoryTitle(props: { cnames: string[] }) {
+//     const categoryList = props.cnames.map(name => (
+//         <a href={'#' + name} className="badge badge-info">
+//             {name}
+//         </a>
+//     ));
+//     return (
+//         <div>
+//             {categoryList}
+//             <p />
+//         </div>
+//     );
+// }
 
 function VNSDomain(props: twv.WVDomain) {
     const categories = props.categories.map((category: twv.WVCategory) => (
@@ -120,7 +120,7 @@ function VNSDomain(props: twv.WVDomain) {
                     <FontAwesomeIcon inverse={true} icon={faPlus} />
                 </a>
             </h1>
-            <VSNCategoryTitle cnames={props.categories.map(c => c.name)} />
+            {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}
             <div>{categories}</div>
         </div>
     );
