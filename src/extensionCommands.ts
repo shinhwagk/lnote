@@ -14,7 +14,7 @@ export namespace ExtCmds {
         // ext.editProvider.refresh();
     }
     export async function cmdHdlNoteEditCol(id: string, cn: string) {
-        const rst = await window.showQuickPick(['add', '------', 'delete']);
+        const rst = await window.showQuickPick(['delete', '------', 'add']);
         if (!rst) return;
         ext.activeNote.id = id;
         if (rst === 'add') {
