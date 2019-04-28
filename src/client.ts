@@ -4,9 +4,11 @@ import { homedir, platform, release, type, hostname } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
+import { version } from '../package.json';
 
-const clientIdFile = join(homedir(), '.vscode-note', 'clientId');
-const actionsFile = join(homedir(), '.vscode-note', 'actions');
+const clientPath = join(homedir(), '.vscode-note');
+const clientIdFile = join(clientPath, 'clientId');
+const actionsFile = join(clientPath, 'actions');
 
 function genUserId() {
     return tools.hexRandom(10);
@@ -53,13 +55,14 @@ const postSlack = (body: any) => {
 };
 
 namespace ClientData {
+    const uid = initClientId();
+    const ve = version;
+    const pf = platform();
+    const re = release();
+    const ty = type();
+    const ho = hostname();
     export function base() {
-        const uid = initClientId();
-        const pf = platform();
-        const re = release();
-        const ty = type();
-        const ho = hostname();
-        return { uid, ty, pf, re, ho };
+        return { uid, ty, pf, re, ho, ve };
     }
     export function actions() {
         return initAcrions();
