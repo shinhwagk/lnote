@@ -30,7 +30,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 │ ├── 1.txt
 │ ├── 2.txt
 │ ├── *.txt
-│ ├── .n.yml
+│ ├── .n.json
 │ ├─┬ doc
 │ │ ├── README.md
 │ │ ├── images.jpg

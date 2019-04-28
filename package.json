@@ -87,7 +87,7 @@
                 {
                     "command": "vscode-note.domain.create",
                     "when": "view == domainExplorer",
-                    "group": "1_domain"
+                    "group": "0_domain"
                 },
                 {
                     "command": "vscode-note.domain.rename",
@@ -102,7 +102,7 @@
                 {
                     "command": "vscode-note.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
-                    "group": "0_domain"
+                    "group": "1_domain"
                 },
                 {
                     "command": "vscode-note.files.file.url.raw",
