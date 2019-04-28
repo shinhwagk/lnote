@@ -22,6 +22,10 @@ $card-bg: $gray-900; // rgb(30, 30, 30)
     padding: 0px;
 }
 
+.container-fluid {
+    max-width: 99%;
+}
+
 pre {
     white-space: pre-wrap;
     white-space: -o-pre-wrap;
