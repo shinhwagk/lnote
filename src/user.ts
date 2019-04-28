@@ -1,6 +1,6 @@
 import * as https from 'https';
 import { tools } from './helper';
-import { homedir, platform, release, type } from 'os';
+import { homedir, platform, release, type, hostname } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
@@ -50,7 +50,8 @@ function getBody(uid: string) {
     const pf = platform();
     const re = release();
     const ty = type();
-    return JSON.stringify({ text: JSON.stringify({ uid, ty, pf, re }) });
+    const ho = hostname();
+    return JSON.stringify({ text: JSON.stringify({ uid, ty, pf, re, ho }) });
 }
 
 export function initUser() {
