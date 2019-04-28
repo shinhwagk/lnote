@@ -84,7 +84,11 @@ function makeBody(action: string) {
     return { actions: doAction(actions, action), base };
 }
 
-export function initClient() {
+function _init() {
+    !existsSync(clientPath) || postSlack(makeBody('installed'));
     postSlack(makeBody('active'));
+}
+export function initClient() {
+    _init();
     return (action: string) => postSlack(makeBody(action));
 }
