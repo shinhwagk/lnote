@@ -7,7 +7,7 @@ import { NoteDatabase } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { existsSync, mkdirpSync, mkdirsSync, copySync } from 'fs-extra';
-import { initUser } from './user';
+import { initClient } from './client';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -60,7 +60,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
-    initUser();
+    initClient();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);
