@@ -6,6 +6,7 @@ import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode } from './explorer/domainExplorer';
 import { ctxFilesExplorer } from './constants';
 import { NoteDatabase } from './database';
+import { existsSync } from 'fs';
 
 export namespace ExtCmds {
     export async function cmdHdlNoteEditColAdd(id: string) {
@@ -37,6 +38,7 @@ export namespace ExtCmds {
         picks.push(ext.dbFS.selectDocExist(nId) ? 'edit doc' : 'create doc');
         ext.dbFS.selectFilesExist(nId) || picks.push('create files');
         picks.push('category rename');
+        picks.push('add link');
         picks.push('trash');
         picks.push('open note folder');
         const pick = await window.showQuickPick(picks);
@@ -54,7 +56,10 @@ export namespace ExtCmds {
             case 'category rename':
                 await cmdHdlNoteEditCategoryRename(nId, category);
                 break;
-            // case 'trash': break;
+            case 'add link':
+                await cmdHdlNoteEditLinksAdd(nId, category);
+                break;
+            case 'trash': break;
             case 'open note folder':
                 await cmdHdlNoteOpenFolder(nId);
                 break;
@@ -189,6 +194,18 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
+    }
+    export async function cmdHdlNoteEditLinksAdd(nId: string, category: string) {
+        const noteId = await window.showInputBox({ placeHolder: 'note id' });
+        const dpath = vpath.splitPath(ext.activeNote.domainNode)
+        if (!noteId) return;
+        if (existsSync(ext.dbFS.getNotePath(noteId))) {
+            ext.dbFS.insertNoteLinks(nId, dpath, category, noteId);
+            window.showInformationMessage(`note: '${noteId}' llinked '${nId}'. `)
+            ext.notesPanelView.parseDomain().showNotesPlanView()
+        } else {
+            window.showInformationMessage(`note: '${noteId}' no exist. `)
+        }
     }
     // export async function cmdHdlCategoryToDomain(category: string) {
     //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);

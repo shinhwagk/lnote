@@ -69,6 +69,18 @@ export class NoteDatabase {
     public checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
     public selectFilesExist = (nId: string) => existsSync(this.getNoteFilesPath(nId));
+    public selectLinksExist = (nId: string, dpath: string[], category: string) => {
+        const meta = this.readNoteMeta(nId);
+        const idx = this.selectCategoryIndex(nId, dpath, category);
+        if (idx !== undefined) {
+            const links = meta.tags[idx].links
+            if (links) {
+                return links.length >= 1 ? true : false
+            }
+            return false
+        }
+        return false
+    }
 
     public getNoteContentFile = (nId: string, cNumber: string) => path.join(this.getNotePath(nId), `${cNumber}.txt`);
 
@@ -161,9 +173,20 @@ export class NoteDatabase {
 
     selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
         const tags = this.readNoteMeta(nId).tags;
-        for (let i = 0; i <= tags.length; i++) {
+        for (let i = 0; i < tags.length; i++) {
             const tag = tags[i];
             if (tools.stringArrayEqual(tag.domain, dpath) && tag.category === category) {
+                return i;
+            }
+        }
+        return undefined;
+    }
+
+    selectDomainIndex(nId: string, dpath: string[]) {
+        const tags = this.readNoteMeta(nId).tags;
+        for (let i = 0; i < tags.length; i++) {
+            const tag = tags[i];
+            if (tools.stringArrayEqual(tag.domain, dpath)) {
                 return i;
             }
         }
@@ -187,6 +210,20 @@ export class NoteDatabase {
             items.push({ note, weight: tag.weight || 0 });
         }
         return items.sort((_a, b) => b.weight).map(i => i.note);
+    }
+
+    insertNoteLinks(nId: string, dpath: string[], category: string, linkId: string) {
+        if (nId === linkId) return;
+        const meta = this.readNoteMeta(nId);
+        const idx = this.selectCategoryIndex(nId, dpath, category);
+        if (idx !== undefined) {
+            if (meta.tags[idx].links) {
+                meta.tags[idx].links!.push(linkId)
+            } else {
+                meta.tags[idx].links = [linkId]
+            }
+            this.writeNoteMeta(nId, meta)
+        }
     }
 }
 

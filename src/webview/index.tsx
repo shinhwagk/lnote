@@ -1,5 +1,6 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { faLink } from '@fortawesome/free-solid-svg-icons/faLink'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -20,6 +21,7 @@ const editContentFile = (id: string, n: string) => () => vscode.postMessage({ co
 const editCol = (id: string, cn: string) => () => vscode.postMessage({ command: 'edit-col', data: { id, cn } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
+const viewLinks = (id: string) => () => vscode.postMessage({ command: 'links', data: id });
 
 function renderNoteDoc(props: { id: string }) {
     return (
@@ -50,6 +52,8 @@ function VSNNotes(props: WVNote) {
 
     const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId.substr(0, 3)}</span>;
     const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>{props.nId.substr(3, 3)}</span>;
+    const islinks = props.links ? <a onClick={viewLinks(props.nId)}><FontAwesomeIcon inverse={true} icon={faLink} /></a> : <span />;
+
     return (
         <div className="row">
             <div className="col col-1">
@@ -64,6 +68,8 @@ function VSNNotes(props: WVNote) {
                     <a onClick={editNote(props.nId, props.category)}>
                         <FontAwesomeIcon inverse={true} icon={faPen} />
                     </a>
+                    {' '}
+                    {islinks}
                 </pre>
             </div>
         </div>
@@ -72,7 +78,7 @@ function VSNNotes(props: WVNote) {
 
 function VSNCategory(props: twv.WVCategory) {
     const listnote = props.notes.map((note: twv.WVNote) => (
-        <VSNNotes category={props.name} nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} />
+        <VSNNotes category={props.name} nId={note.nId} contents={note.contents} doc={note.doc} files={note.files} links={note.links} />
     ));
 
     return (
@@ -146,4 +152,5 @@ interface WVNote {
     contents: string[];
     doc: boolean;
     files: boolean;
+    links: boolean;
 }

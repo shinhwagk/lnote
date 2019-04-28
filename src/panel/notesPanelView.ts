@@ -100,6 +100,9 @@ export class NotesPanelView {
                     case 'files':
                         vscode.commands.executeCommand('vscode-note.note.files.open', msg.data);
                         break;
+                    case 'links':
+                        vscode.window.showInformationMessage(`links ${msg.data} soon.`)
+                        break;
                     case 'add':
                         vscode.commands.executeCommand('vscode-note.note.add', msg.data);
                         break;
@@ -135,11 +138,11 @@ export class NotesPanelView {
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);
             const isFiles = ext.dbFS.selectFilesExist(nId);
-
+            const isLinks = ext.dbFS.selectLinksExist(nId, this.dpathCache, cname);
             if (categories.filter(c => c.name === cname).length >= 1) {
-                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles, links: isLinks });
             } else {
-                categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
+                categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles, links: isLinks }] });
             }
         }
         return { name: this.dpathCache[this.dpathCache.length - 1], categories: categories };

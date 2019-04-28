@@ -14,6 +14,7 @@ export namespace ToWebView {
         contents: string[];
         doc: boolean;
         files: boolean;
+        links: boolean;
     }
 
     export interface DomainData {
