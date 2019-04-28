@@ -29,7 +29,6 @@ export namespace ExtCmds {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
         ext.domainProvider.refresh(dn);
         await cmdHdlDomainPin(dn);
-        ext.clientActions('domain-pin');
     }
     export async function cmdHdlNoteEdit(nId: string, category: string) {
         const picks = [];
@@ -75,6 +74,7 @@ export namespace ExtCmds {
         ext.activeNote.domainNode = dn;
         ext.notesPanelView.parseDomain(vpath.splitPath(dn)).showNotesPlanView();
         await ext.setContext(ctxFilesExplorer, false);
+        ext.clientActions('domain-pin');
     }
     export async function cmdHdlNoteColRemove(id: string, cn: string) {
         //cn : column number
