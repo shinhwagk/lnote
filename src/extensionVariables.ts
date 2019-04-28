@@ -19,6 +19,7 @@ export namespace ext {
     export let notesPath: string;
     export let activeNote: ActiveNote;
     export let dbFS: NoteDatabase;
+    export let clientActions: (action: string) => void;
     export let outputChannel: OutputChannel;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
@@ -60,7 +61,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
-    initClient();
+    ext.clientActions = initClient();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);

@@ -5,35 +5,31 @@ import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, ensureFileSync } from 'fs-extra';
 
+const clientIdFile = join(homedir(), '.vscode-note', 'clientId');
+const actionsFile = join(homedir(), '.vscode-note', 'actions');
+
 function genUserId() {
     return tools.hexRandom(10);
 }
 
 function initClientId() {
-    const clientIdFile = join(homedir(), '.vscode-note', 'clientId');
     if (!existsSync(clientIdFile)) {
         ensureFileSync(clientIdFile);
         const userId = genUserId();
         vfs.writeFileSync(clientIdFile, userId);
     }
-    const userId = vfs.readFileSync(clientIdFile);
-    return userId;
+    return vfs.readFileSync(clientIdFile);
 }
 
-function initUsage() {
-    const usageFile = join(homedir(), '.vscode-note', 'usage');
-    if (!existsSync(usageFile)) {
-        ensureFileSync(usageFile);
-        vfs.writeFileSync(usageFile, '{}');
+function initAcrions() {
+    if (!existsSync(actionsFile)) {
+        ensureFileSync(actionsFile);
+        vfs.writeFileSync(actionsFile, '{}');
     }
-    const usage = JSON.parse(vfs.readFileSync(usageFile));
-    const active = usage['active'] || 0;
-    usage['active'] = active + 1;
-    vfs.writeJsonSync(usageFile, usage);
-    return usage;
+    return JSON.parse(vfs.readFileSync(actionsFile));
 }
 
-const postSlack = (body: string) => {
+const postSlack = (body: any) => {
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
             host: 'hooks.slack.com',
@@ -51,30 +47,41 @@ const postSlack = (body: string) => {
         });
 
         req.on('error', err => reject(err.message));
-        req.write(JSON.stringify({ text: body }));
+        req.write(JSON.stringify({ text: JSON.stringify(body) }));
         req.end();
     });
 };
 
 namespace ClientData {
-    export function baseInfo(uid: string) {
+    export function base() {
+        const uid = initClientId();
         const pf = platform();
         const re = release();
         const ty = type();
         const ho = hostname();
         return { uid, ty, pf, re, ho };
     }
-    export function usageInfo() {
-        return initUsage();
+    export function actions() {
+        return initAcrions();
     }
 }
 
+const doAction = (actions: any, action: string) => {
+    const cnt = actions[action] || 0;
+    actions[action] = cnt + 1;
+    vfs.writeJsonSync(actionsFile, actions);
+    const tmpAction: { [action: string]: number } = {};
+    tmpAction[action] = actions[action];
+    return tmpAction;
+};
+
+function makeBody(action: string) {
+    const actions = ClientData.actions();
+    const base = ClientData.base();
+    return { actions: doAction(actions, action), base };
+}
+
 export function initClient() {
-    const uid = initClientId();
-    const usage = ClientData.usageInfo();
-    const base = ClientData.baseInfo(uid);
-    const body = { usage, base };
-    postSlack(JSON.stringify(body))
-        .catch(e => console.log(e))
-        .then(e => console.log(e));
+    postSlack(makeBody('active'));
+    return (action: string) => postSlack(makeBody(action));
 }
