@@ -13,7 +13,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 
 ## Usages
 
-![demo](images/demo.gif)
+![demo](images/my.jpg)
 
 ## note data default directory
 
