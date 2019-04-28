@@ -29,6 +29,7 @@ export namespace ExtCmds {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
         ext.domainProvider.refresh(dn);
         await cmdHdlDomainPin(dn);
+        ext.clientActions('domain-pin');
     }
     export async function cmdHdlNoteEdit(nId: string, category: string) {
         const picks = [];
@@ -54,7 +55,9 @@ export namespace ExtCmds {
             case 'category rename':
                 await cmdHdlNoteEditCategoryRename(nId, category);
                 break;
-            // case 'trash': break;
+            case 'trash':
+                window.showInformationMessage('soon...');
+                break;
             case 'open note folder':
                 await cmdHdlNoteOpenFolder(nId);
                 break;

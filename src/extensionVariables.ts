@@ -61,6 +61,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
+    addUsageNotes(ext.notesPath);
     ext.clientActions = initClient();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
@@ -90,8 +91,11 @@ function initializeMasterDirectory(masterPath: string) {
 function initializeNotesDirectory(notesPath: string) {
     if (!existsSync(notesPath)) {
         mkdirsSync(notesPath);
-        copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
     }
+}
+
+function addUsageNotes(notesPath: string) {
+    copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
 }
 
 export class ActiveNote {
