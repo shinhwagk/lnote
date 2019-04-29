@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-const {
-  WebClient,
-  ConversationsHistoryArguments,
-  WebAPICallResult
-} = require("./node_modules/@slack/web-api");
+const { WebClient } = require("@slack/web-api");
 const { existsSync, writeFileSync, readFileSync } = require("fs");
 
 const token = process.env.SLACK_TOKEN;
