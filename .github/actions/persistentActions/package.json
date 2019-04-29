@@ -12,6 +12,7 @@
     "./bin"
   ],
   "dependencies": {
-    "@slack/web-api": "^5.0.1"
+    "@slack/web-api": "^5.0.1",
+    "date-fns": "^1.30.1"
   }
 }

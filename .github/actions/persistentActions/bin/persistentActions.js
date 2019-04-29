@@ -2,6 +2,7 @@
 
 const { WebClient } = require("@slack/web-api");
 const { existsSync, writeFileSync, readFileSync } = require("fs");
+const { getTime } = require("date-fns/get_date");
 
 const token = process.env.SLACK_TOKEN;
 const channel = process.env.SLACK_CHANNEL;
@@ -11,7 +12,17 @@ if (!token || !channel) {
   process.exit(1);
 }
 
-const oldest = "1556503200";
+function timestamp() {
+  const date = new Date();
+  const y = date.getFullYear();
+  const mo = date.getMonth();
+  const d = date.getDate();
+  const h = date.getHours();
+  const mi = date.getMinutes();
+  return getTime(new Date(y, mo, d, h, mi, 0, 000));
+}
+
+const oldest = `${timestamp()}`;
 
 const web = new WebClient(token);
 const options = { channel: channel, oldest, limit: 1 };
