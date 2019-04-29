@@ -9,6 +9,7 @@ action "persistent-actions" {
 }
 
 action "graph" {
+  needs= ["persistent-actions"]
   uses = "actions/bin/sh@master"
   args = ["echo a"]
 }
