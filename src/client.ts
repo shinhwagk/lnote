@@ -3,12 +3,15 @@ import { tools } from './helper';
 import { homedir, platform, release, type, hostname } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, ensureFileSync } from 'fs-extra';
+import { existsSync, ensureFileSync, removeSync } from 'fs-extra';
 import { version } from '../package.json';
 
 const clientPath = join(homedir(), '.vscode-note');
 const clientIdFile = join(clientPath, 'clientId');
-const actionsFile = join(clientPath, 'actions');
+const stageFile = join(clientPath, 'actions');
+
+type Actions = { [action: string]: number }
+type PostClientActions = { actions: Actions } & { base: typeof ClientBaseInfo.base }
 
 function genUserId() {
     return tools.hexRandom(10);
@@ -23,15 +26,11 @@ function initClientId() {
     return vfs.readFileSync(clientIdFile);
 }
 
-function initAcrions() {
-    if (!existsSync(actionsFile)) {
-        ensureFileSync(actionsFile);
-        vfs.writeFileSync(actionsFile, '{}');
-    }
-    return JSON.parse(vfs.readFileSync(actionsFile));
-}
+const extractStageActions = () => vfs.readJsonSync<Actions>(stageFile);
+const stageActions = (actions: Actions) => vfs.writeJsonSync(stageFile, actions);
 
-const postSlack = (body: any) => {
+const postSlack = (body: PostClientActions) => {
+    const b: string = JSON.stringify({ text: JSON.stringify(body) })
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
             host: 'hooks.slack.com',
@@ -49,47 +48,50 @@ const postSlack = (body: any) => {
         });
 
         req.on('error', err => reject(err.message));
-        req.write(JSON.stringify({ text: JSON.stringify(body) }));
+        req.write(b);
         req.end();
     });
 };
 
-namespace ClientData {
+namespace ClientBaseInfo {
     const uid = initClientId();
     const ve = version;
     const pf = platform();
     const re = release();
     const ty = type();
     const ho = hostname();
-    export function base() {
-        return { uid, ty, pf, re, ho, ve };
-    }
-    export function actions() {
-        return initAcrions();
-    }
+    export const base = { uid, ty, pf, re, ho, ve };
 }
 
-const doAction = (actions: any, action: string) => {
-    const cnt = actions[action] || 0;
-    actions[action] = cnt + 1;
-    vfs.writeJsonSync(actionsFile, actions);
-    const tmpAction: { [action: string]: number } = {};
-    tmpAction[action] = actions[action];
-    return tmpAction;
-};
+function makePostBody(actions: Actions): PostClientActions {
+    return { actions: actions, base: ClientBaseInfo.base };
+}
 
-function makeBody(action: string) {
-    const actions = ClientData.actions();
-    const base = ClientData.base();
-    return { actions: doAction(actions, action), base };
+async function sendClientActions(action: string) {
+    const pending: Actions = {};
+    if (existsSync(stageFile)) {
+        const stageActions = extractStageActions();
+        for (const a of Object.keys(stageActions)) {
+            pending[a] = stageActions[a];
+        }
+    }
+    pending[action] = pending[action] >= 0 ? pending[action] + 1 : 1;
+    try {
+        await postSlack(makePostBody(pending));
+        removeSync(stageFile);
+        return;
+    } catch (e) {
+        stageActions(pending);
+        throw e;
+    }
 }
 
 function _init() {
-    existsSync(clientPath) || postSlack(makeBody('installed'));
-    postSlack(makeBody('active'));
+    existsSync(clientPath) || sendClientActions('installed');
+    sendClientActions('active');
 }
 
 export function initClient() {
     _init();
-    return (action: string) => postSlack(makeBody(action));
+    return (action: string) => sendClientActions(action);
 }
