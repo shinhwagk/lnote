@@ -28,3 +28,13 @@ action "Publish" {
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
 }
+
+workflow "Testaaa" {
+  resolves = ["actions/bin/sh@master"]
+  on = "schedule(*/5 * * * *)"
+}
+
+action "actions/bin/sh@master" {
+  uses = "actions/bin/sh@master"
+  args = "[\"echo a\"]"
+}
