@@ -5,11 +5,15 @@ workflow "cron, persistent-actions, graph" {
 
 action "persistent-actions" {
   uses = "./.github/actions"
-  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
+  secrets = [
+    "SLACK_TOKEN",
+    "SLACK_CHANNEL",
+    "GITHUB_TOKEN",
+  ]
 }
 
 action "graph" {
-  needs= ["persistent-actions"]
+  needs = ["persistent-actions"]
   uses = "actions/bin/sh@master"
   args = ["echo a"]
 }
