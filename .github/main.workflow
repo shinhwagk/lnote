@@ -1,4 +1,4 @@
-workflow "persistent-actions, graph" {
+workflow "cron, persistent-actions, graph" {
   on = "push"
   resolves = ["graph"]
 }
