@@ -1,30 +1,11 @@
-workflow "Build, Test, and Publish" {
+workflow "pa" {
   on = "push"
   resolves = [
-    "Publish",
+    "persistent-actions",
   ]
 }
 
-action "Install" {
-  uses = "borales/actions-yarn@master"
-  args = "install"
-}
-
-action "Test" {
-  needs = ["Install"]
-  uses = "borales/actions-yarn@master"
-  args = "test"
-}
-
-action "Master" {
-  needs = "Test"
-  uses = "actions/bin/filter@master"
-  args = "branch master"
-}
-
-action "Publish" {
-  needs = ["Master"]
-  uses = "lannonbr/vsce-action@master"
-  args = "publish -p $VSCE_TOKEN"
-  secrets = ["VSCE_TOKEN"]
+action "persistent-actions" {
+  uses = "./.github/actions"
+  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
 }

@@ -1,0 +1,17 @@
+{
+  "name": "vscode-note.actions-statistics",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/shinhwagk/vscode-note",
+  "author": "shinhwagk <shanghai_sl@hotmail.com>",
+  "license": "MIT",
+  "bin": {
+    "persistentActions": "./bin/persistentActions.ts"
+  },
+  "files": [
+    "./bin"
+  ],
+  "dependencies": {
+    "@slack/web-api": "^5.0.1"
+  }
+}
