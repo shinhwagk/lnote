@@ -1,8 +1,6 @@
 workflow "pa" {
   on = "push"
-  resolves = [
-    "persistent-actions",
-  ]
+  resolves = [ "persistent-actions" ]
 }
 
 action "persistent-actions" {
