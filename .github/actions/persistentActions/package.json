@@ -6,7 +6,7 @@
   "author": "shinhwagk <shanghai_sl@hotmail.com>",
   "license": "MIT",
   "bin": {
-    "persistentActions": "./bin/persistentActions.ts"
+    "persistentActions": "./bin/persistentActions.js"
   },
   "files": [
     "./bin"
