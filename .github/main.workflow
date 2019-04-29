@@ -1,5 +1,5 @@
 workflow "cron, persistent-actions, graph" {
-  on = "schedule(* * * * *)"
+  on = "schedule(*/1 * * * *)"
   resolves = ["graph"]
 }
 
