@@ -29,7 +29,7 @@ action "Publish" {
   secrets = ["VSCE_TOKEN"]
 }
 
-workflow "statistics" {
+workflow "Statistics" {
   # on = "schedule(*/10 * * * *)"
   on = "push" 
   resolves = ["graph", "new user"]
