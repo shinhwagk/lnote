@@ -12,7 +12,7 @@ import dateFormat from 'date-fns/format';
 import { join } from 'path';
 
 namespace ARGS {
-    export const delayTime = Number(process.env.DELAY_TIME || '5'); // minute
+    export const delayTime = Number(process.env.DELAY || '5'); // minute
     export const statRange = Number(process.env.STAT_RANGE || '10'); // minute; !!! that must less than github actions schedule.
     export const clientsPath = 'clients';
     export const statTimestampFile = 'statistics-date';
