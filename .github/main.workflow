@@ -28,3 +28,26 @@ action "Publish" {
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
 }
+
+workflow "statistics" {
+  on = "schedule(*/10 * * * *)"
+  resolves = ["graph", "new user"]
+}
+
+action "persistent" {
+  uses = "./.github/persistent"
+  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
+}
+
+action "graph" {
+  needs = ["persistent"]
+  uses  = "actions/bin/sh@master"
+  args  = ["echo a"]
+}
+
+action "new user" {
+  uses  = "actions/bin/sh@master"
+  needs = ["persistent"]
+  args  = ["echo user"]
+}
+
