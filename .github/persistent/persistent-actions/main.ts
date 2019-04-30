@@ -13,13 +13,13 @@ import { join } from 'path';
 
 namespace ARGS {
     export const delayTime = Number(process.env.DELAY_TIME || '5'); // minute
-    export const statRangeInterval = Number(process.env.STAT_RANGE_INTERVAL || '10'); // minute; !!! that must less than github actions schedule.
+    export const statRange = Number(process.env.STAT_RANGE || '10'); // minute; !!! that must less than github actions schedule.
     export const clientsPath = 'clients';
     export const statTimestampFile = 'statistics-date';
     export const lastStatTime: Date = readStatTimestamp();
 
     // slack parameter
-    export const latestDate = subSeconds(addMinutes(lastStatTime, statRangeInterval), 1);
+    export const latestDate = subSeconds(addMinutes(lastStatTime, statRange), 1);
     export const oldestDate = lastStatTime;
     //
     export const activeStatTime = addMinutes(latestDate, delayTime);
@@ -40,7 +40,7 @@ function readStatTimestamp(): Date {
         let cDate = new Date();
         cDate.setMilliseconds(0);
         cDate.setSeconds(0);
-        cDate = subMinutes(cDate, ARGS.delayTime + ARGS.statRangeInterval + 10);
+        cDate = subMinutes(cDate, ARGS.delayTime + ARGS.statRange + 10);
         while (true) {
             cDate = addMinutes(cDate, 1);
             if (cDate.getMinutes() % 10 === 0) break;
