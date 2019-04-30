@@ -29,9 +29,9 @@ action "Publish" {
   secrets = ["VSCE_TOKEN"]
 }
 
-workflow "Statistics" {
-  on = "schedule(*/5 * * * *)"
+workflow "Clients Statistics" {
   resolves = ["graph", "new user"]
+  on = "schedule(*/5 * * * *)"
 }
 
 action "persistent" {
