@@ -62,6 +62,7 @@ async function storeActions(client: any) {
   if (!clientPersistentActions["base"]) {
     clientPersistentActions["base"] = client.base;
   }
+  clientPersistentActions['version'] = client.version;
   for (const action of Object.keys(client.actions)) {
     const cnt =
       clientPersistentActions.actions[action] !== undefined
