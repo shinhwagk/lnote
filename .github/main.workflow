@@ -38,7 +38,7 @@ action "persistent" {
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
-    DELAY_TIME = "5"
+    DELAY = "5"
     STAT_RANGE = "10"
   }
 }
