@@ -30,8 +30,7 @@ action "Publish" {
 }
 
 workflow "Statistics" {
-#   on = "schedule(*/5 * * * *)"
-  on = "push"
+  on = "schedule(*/5 * * * *)"
   resolves = ["graph", "new user"]
 }
 
