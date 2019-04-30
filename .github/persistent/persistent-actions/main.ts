@@ -113,6 +113,11 @@ function specialConsoleLog(log: string) {
     console.log(`##${special}##`);
 }
 
+function printClientNumber(messages: string[]) {
+    const c = new Set(messages.map(m => JSON.parse(m)).map(ca => ca.base.uid));
+    specialConsoleLog(`messages number ${c.size}`);
+}
+
 export default async function main() {
     printStatRange();
     if (!ARGS.isActiveStat) {
@@ -136,9 +141,10 @@ export default async function main() {
         limit: 100,
     };
     await collectHistoryMessage(webClient, messages, options);
-    specialConsoleLog(`messages number ${messages.length}`);
-    for (const msg of messages) {
-        const clientActions = JSON.parse(msg);
+
+    for (const clientActions of messages.map(m => JSON.parse(m))) {
         await storeActions(clientActions);
     }
+
+    printClientNumber(messages);
 }
