@@ -13,7 +13,7 @@ if (token === undefined || channel === undefined) {
 }
 
 function timestamp() {
-  const date = subMinutes(new Date(), 30);
+  const date = subMinutes(new Date(), 10);
   const y = date.getFullYear();
   const mo = date.getMonth();
   const d = date.getDate();
