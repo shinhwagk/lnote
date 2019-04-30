@@ -11,7 +11,7 @@ const clientIdFile = join(clientPath, 'clientId');
 const stageFile = join(clientPath, 'actions');
 
 type Actions = { [action: string]: number }
-type PostClientActions = { actions: Actions } & { base: typeof ClientBaseInfo.base }
+type PostClientActions = { actions: Actions } & { base: typeof ClientBaseInfo.base } & { version: string }
 
 function genUserId() {
     return tools.hexRandom(10);
@@ -55,16 +55,15 @@ const postSlack = (body: PostClientActions) => {
 
 namespace ClientBaseInfo {
     const uid = initClientId();
-    const ve = version;
     const pf = platform();
     const re = release();
     const ty = type();
     const ho = hostname();
-    export const base = { uid, ty, pf, re, ho, ve };
+    export const base = { uid, ty, pf, re, ho };
 }
 
 function makePostBody(actions: Actions): PostClientActions {
-    return { actions: actions, base: ClientBaseInfo.base };
+    return { actions: actions, base: ClientBaseInfo.base, version };
 }
 
 async function sendClientActions(action: string) {

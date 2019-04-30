@@ -59,7 +59,9 @@ async function storeActions(client: any) {
   const clientPersistentActions = JSON.parse(
     readFileSync(clientFile, { encoding: "utf-8" })
   );
-  clientPersistentActions["base"] = client.base;
+  if (!clientPersistentActions["base"]) {
+    clientPersistentActions["base"] = client.base;
+  }
   for (const action of Object.keys(client.actions)) {
     const cnt =
       clientPersistentActions.actions[action] !== undefined
