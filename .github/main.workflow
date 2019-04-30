@@ -30,13 +30,17 @@ action "Publish" {
 }
 
 workflow "Statistics" {
-  on = "schedule(*/10 * * * *)"
+  on = "schedule(*/5 * * * *)"
   resolves = ["graph", "new user"]
 }
 
 action "persistent" {
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
+  env = {
+    DELAY_TIME = "5"
+    STAT_RANGE_INTERVAL = "10"
+  }
 }
 
 action "graph" {
