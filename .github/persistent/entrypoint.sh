@@ -12,4 +12,4 @@ persistentActions
 
 git add -A
 git commit -m "update client actions"
-git push -u origin clients -v
+git push -u origin analytics -v
