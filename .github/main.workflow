@@ -39,7 +39,7 @@ action "persistent" {
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
     DELAY_TIME = "5"
-    STAT_RANGE_INTERVAL = "10"
+    STAT_RANGE = "10"
   }
 }
 
