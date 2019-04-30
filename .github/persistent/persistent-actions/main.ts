@@ -104,6 +104,15 @@ function printStatRange() {
     console.log(`statistics range: ${startDate} - ${endDate}.`);
 }
 
+function specialConsoleLog(log: string) {
+    const special = Array.from({ length: log.length })
+        .map(() => '#')
+        .join('');
+    console.log(`##${special}##}`);
+    console.log(`# ${log} #`);
+    console.log(`##${special}##}`);
+}
+
 export default async function main() {
     printStatRange();
     if (!ARGS.isActiveStat) {
@@ -127,7 +136,7 @@ export default async function main() {
         limit: 100,
     };
     await collectHistoryMessage(webClient, messages, options);
-    console.log(`messages number ${messages.length}`);
+    specialConsoleLog(`messages number ${messages.length}`);
     for (const msg of messages) {
         const clientActions = JSON.parse(msg);
         await storeActions(clientActions);
