@@ -115,7 +115,7 @@ function specialConsoleLog(log: string) {
 
 function printClientNumber(messages: string[]) {
     const c = new Set(messages.map(m => JSON.parse(m)).map(ca => ca.base.uid));
-    specialConsoleLog(`messages number ${c.size}`);
+    specialConsoleLog(`update clients number: ${c.size}`);
 }
 
 export default async function main() {
