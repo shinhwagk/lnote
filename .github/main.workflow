@@ -48,6 +48,6 @@ action "graph" {
 action "new user" {
   uses  = "actions/bin/sh@master"
   needs = ["persistent"]
-  args  = ["echo user"]
+  args  = ["echo user1"]
 }
 
