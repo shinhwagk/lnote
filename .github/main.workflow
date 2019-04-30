@@ -29,9 +29,9 @@ action "Publish" {
   secrets = ["VSCE_TOKEN"]
 }
 
-workflow "Statistics" {
-  on = "schedule(*/30 * * * *)"
+workflow "Timing Statistics" {
   resolves = ["graph", "new user"]
+  on = "schedule(*/30 * * * *)"
 }
 
 action "persistent" {
@@ -41,13 +41,12 @@ action "persistent" {
 
 action "graph" {
   needs = ["persistent"]
-  uses  = "actions/bin/sh@master"
-  args  = ["echo a"]
+  uses = "actions/bin/sh@master"
+  args = ["echo a"]
 }
 
 action "new user" {
-  uses  = "actions/bin/sh@master"
+  uses = "actions/bin/sh@master"
   needs = ["persistent"]
-  args  = ["echo user1"]
+  args = ["echo user1"]
 }
-
