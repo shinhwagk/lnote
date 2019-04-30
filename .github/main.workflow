@@ -36,5 +36,5 @@ workflow "Testaaa" {
 
 action "actions/bin/sh@master" {
   uses = "actions/bin/sh@master"
-  args = "["echo a"]"
+  args = ["echo a"]
 }
