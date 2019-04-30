@@ -72,7 +72,7 @@ async function collectHistoryMessage(web: WebClient, msgs: string[], options: Co
     try {
         await collectHistoryMessage(web, msgs, options);
     } catch (e) {
-        console.error(e.messages);
+        specialConsoleLog(e.messages);
     }
 }
 
@@ -101,27 +101,27 @@ async function storeActions(client: any) {
 function printStatRange() {
     const startDate = dateFormat(ARGS.oldestDate, 'YYYY-MM-DDTHH:mm:ss');
     const endDate = dateFormat(ARGS.latestDate, 'YYYY-MM-DDTHH:mm:ss');
-    console.log(`statistics range: ${startDate} - ${endDate}.`);
+    specialConsoleLog(`statistics range: ${startDate} - ${endDate}.`);
 }
 
 function specialConsoleLog(log: string) {
     const special = Array.from({ length: log.length })
         .map(() => '#')
         .join('');
-    console.log(`##${special}##}`);
+    console.log(`##${special}##`);
     console.log(`# ${log} #`);
-    console.log(`##${special}##}`);
+    console.log(`##${special}##`);
 }
 
 export default async function main() {
     printStatRange();
     if (!ARGS.isActiveStat) {
-        console.log('not active.');
+        specialConsoleLog('not active.');
         process.exit(0);
     }
 
     if (!SLACK_OPTIONS.isOK) {
-        console.error('env: SLACK_TOKEN or SLACK_CHANNEL no set.');
+        specialConsoleLog('env: SLACK_TOKEN or SLACK_CHANNEL no set.');
         process.exit(1);
     }
 
