@@ -52,12 +52,13 @@ action "switch to 'analytics' branch" {
 
 action "persistent" {
   needs = ["switch to 'analytics' branch"]
-  uses = "./.github/persistent"
+  uses = "actions/bin/sh@master"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
     DELAY = "5"
     STAT_RANGE = "10"
   }
+  args = ['persistentActions']
 }
 
 action "new client number" {
