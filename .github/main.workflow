@@ -71,7 +71,7 @@ action "persistent statistics" {
 action "client number" {
   uses = "actions/bin/sh@master"
   needs = ["persistent"]
-  args = ["ls ./clients | wc -l >> statistics/client_number"]
+  args = ["sed -i '/^$/d' statistics/client_number; ls ./clients | wc -l >> statistics/client_number"]
 }
 
 action "create charts" {
