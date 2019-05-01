@@ -36,11 +36,15 @@ workflow "Clients Statistics" {
     "persistent charts",
     "test",
   ]
+}
 
-  #   on = "schedule(*/5 * * * *)"
+action "switch to 'analytics' branch" {
+  uses = "srt32/git-actions@v0.0.3"
+  args = ["git checkout -b analytics origin/analytics"]
 }
 
 action "persistent" {
+  needs = ["switch to 'analytics' branch"]
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
