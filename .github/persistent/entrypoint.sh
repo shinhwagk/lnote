@@ -3,9 +3,6 @@
 git config user.name "${GITHUB_ACTOR}"
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-# git fetch origin analytics
-git checkout -b analytics origin/analytics
-
 persistentActions
 
 [[ -z $(git status -s) ]] && { echo 'no actions.'; exit 0; }
