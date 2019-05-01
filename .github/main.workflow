@@ -47,7 +47,7 @@ action "install persistent-actions" {
 action "switch to 'analytics' branch" {
   needs = ["install persistent-actions"]
   uses = "srt32/git-actions@v0.0.3"
-  args = ["git clean -xfd && git checkout -b analytics origin/analytics"]
+  args = ["git reset --hard; git clean -xfd && git checkout -b analytics origin/analytics"]
 }
 
 action "persistent" {
