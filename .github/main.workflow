@@ -30,7 +30,10 @@ action "Publish" {
 }
 
 workflow "Clients Statistics" {
-  resolves = ["graph", "new user"]
+  resolves = [
+    "graph",
+    "actions/bin/sh@master",
+  ]
   on = "schedule(*/5 * * * *)"
 }
 
@@ -56,4 +59,10 @@ action "new user" {
     url = "github.com"
   }
   args = ["${url}"]
+}
+
+action "actions/bin/sh@master" {
+  uses = "actions/bin/sh@master"
+  needs = ["new user"]
+  args = ["ls -l ./"]
 }
