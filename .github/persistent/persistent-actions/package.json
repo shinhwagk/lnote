@@ -12,8 +12,7 @@
     "./bin"
   ],
   "scripts": {
-    "install": "npm i",
-    "postinstall": "npm run compile",
+    "postinstall": "npm i && npm run compile",
     "compile": "webpack --config webpack.conf.js --display-modules --mode production",
     "watch": "webpack --config webpack.conf.js --display-modules --watch --mode development"
   },
