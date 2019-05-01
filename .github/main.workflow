@@ -54,12 +54,12 @@ action "graph" {
 }
 
 action "new user" {
-  uses = "actions/bin/curl@master"
+  uses = "actions/bin/sh@master"
   needs = ["persistent"]
   env = {
     url = "github.com"
   }
-  args = ["-O ${url}"]
+  args = ["echo ${url}"]
 }
 
 action "actions/bin/sh@master" {
