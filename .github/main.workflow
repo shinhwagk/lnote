@@ -58,7 +58,7 @@ action "persistent" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  args = ['persistentActions']
+  args = ["persistentActions"]
 }
 
 action "new client number" {
