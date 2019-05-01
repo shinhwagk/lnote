@@ -50,7 +50,10 @@ action "graph" {
 }
 
 action "new user" {
-  uses = "actions/bin/sh@master"
+  uses = "actions/bin/curl@master"
   needs = ["persistent"]
-  args = ["echo user1"]
+  env = {
+    url = "github.com"
+  }
+  args = ["${url}"]
 }
