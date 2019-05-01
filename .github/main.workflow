@@ -62,7 +62,8 @@ action "persistent statistics" {
     "client number",
     "new client number",
   ]
-  args = ["[ -n \"$(git status -s -- statistics/client_number)\" ] && git add statistics/client_number && git commit -m 'update statistics client_number' && git push -u origin analytics -v"]
+  args = ["echo a"]
+# [ -n \"$(git status -s -- statistics/client_number)\" ] && git add statistics/client_number && git commit -m 'update statistics client_number' && git push -u origin analytics -v
   secrets = ["GITHUB_TOKEN"]
 }
 
@@ -85,7 +86,7 @@ action "persistent charts" {
   secrets = ["GITHUB_TOKEN"]
 }
 
-action "push" {
+action "push client actions" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent client actions"]
   args = ["git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
