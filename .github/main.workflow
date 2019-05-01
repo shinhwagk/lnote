@@ -32,9 +32,9 @@ action "Publish" {
 workflow "Clients Statistics" {
   on = "push"
   resolves = [
-    "graph",
     "client number",
-    "persistent statistics",
+    "persistent charts",
+    "persistent",
   ]
 
   #   on = "schedule(*/5 * * * *)"
@@ -49,13 +49,7 @@ action "persistent" {
   }
 }
 
-action "graph" {
-  needs = ["persistent"]
-  uses = "actions/bin/sh@master"
-  args = ["echo a"]
-}
-
-action "new user" {
+action "new client number" {
   uses = "actions/bin/sh@master"
   needs = ["persistent"]
   env = {
@@ -67,8 +61,8 @@ action "new user" {
 action "persistent statistics" {
   uses = "srt32/git-actions@v0.0.3"
   needs = [
-    "new user",
     "client number",
+    "new client number",
   ]
   args = ["git checkout analytics && [ -n \"$(git status -s)\" ] && git add statistics/client_number && git commit -m 'update statistics client_number' && git push -u origin analytics -v"]
   secrets = ["GITHUB_TOKEN"]
@@ -79,3 +73,14 @@ action "client number" {
   needs = ["persistent"]
   args = ["ls ./clients | wc -l >> statistics/client_number"]
 }
+
+action "create charts" {
+  uses = "actions/bin/curl@master"
+  needs = ["persistent statistics"]
+}
+
+action "persistent charts" {
+  uses = "srt32/git-actions@v0.0.3"
+  needs = ["create charts"]
+  secrets = ["GITHUB_TOKEN"]
+}#   on = "schedule(*/5 * * * *)"
