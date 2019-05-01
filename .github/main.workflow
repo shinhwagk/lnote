@@ -34,7 +34,7 @@ workflow "Clients Statistics" {
   resolves = [
     "client number",
     "persistent charts",
-    "test",
+    "push client actions",
   ]
 }
 
