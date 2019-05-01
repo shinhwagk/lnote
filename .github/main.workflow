@@ -85,8 +85,8 @@ action "persistent charts" {
   secrets = ["GITHUB_TOKEN"]
 }
 
-action "test" {
+action "push" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent client actions"]
-  args = ["git branch"]
+  args = ["git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
 }
