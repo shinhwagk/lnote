@@ -77,10 +77,14 @@ action "client number" {
 action "create charts" {
   uses = "actions/bin/curl@master"
   needs = ["persistent statistics"]
+  secrets = ["GOOGLE_WEB_URL"]
+  args = "github.com"
+
+  #   on = "schedule(*/5 * * * *)"
 }
 
 action "persistent charts" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["create charts"]
   secrets = ["GITHUB_TOKEN"]
-}#   on = "schedule(*/5 * * * *)"
+} #   on = "schedule(*/5 * * * *)"
