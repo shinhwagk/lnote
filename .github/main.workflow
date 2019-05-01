@@ -59,7 +59,7 @@ action "new user" {
   env = {
     url = "github.com"
   }
-  args = ["${url}"]
+  args = ["-O ${url}"]
 }
 
 action "actions/bin/sh@master" {
