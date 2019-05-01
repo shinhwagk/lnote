@@ -44,26 +44,18 @@ action "install persistent-actions" {
   args = ["i --unsafe-perm=true -g .github/persistent/persistent-actions"]
 }
 
-action "switch to 'analytics' branch" {
-  needs = ["install persistent-actions"]
-  uses = "srt32/git-actions@v0.0.3"
-  args = ["git reset --hard; git clean -xfd && git checkout -b analytics origin/analytics"]
-}
-
-action "persistent" {
-  needs = ["switch to 'analytics' branch"]
+action "persistent client actions" {
   uses = "actions/bin/sh@master"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  args = ["persistentActions"]
 }
 
 action "new client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent"]
+  needs = ["persistent client actions"]
   env = {
     url = "github.com"
   }
@@ -82,7 +74,7 @@ action "persistent statistics" {
 
 action "client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent"]
+  needs = ["persistent client actions"]
   args = ["sed -i '/^$/d' statistics/client_number; ls ./clients | wc -l >> statistics/client_number"]
 }
 
@@ -101,6 +93,6 @@ action "persistent charts" {
 
 action "test" {
   uses = "srt32/git-actions@v0.0.3"
-  needs = ["persistent"]
+  needs = ["persistent client actions"]
   args = ["git branch"]
 }
