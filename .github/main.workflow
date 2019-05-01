@@ -35,13 +35,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "test",
-    "install persistent-actions",
   ]
-}
-
-action "install persistent-actions" {
-  uses = "actions/npm@master"
-  args = ["i --unsafe-perm=true -g .github/persistent/persistent-actions"]
 }
 
 action "persistent client actions" {
