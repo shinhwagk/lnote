@@ -30,11 +30,12 @@ action "Publish" {
 }
 
 workflow "Clients Statistics" {
+  on = "push"
   resolves = [
     "graph",
     "actions/bin/sh@master",
   ]
-  on = "schedule(*/5 * * * *)"
+#   on = "schedule(*/5 * * * *)"
 }
 
 action "persistent" {
