@@ -39,7 +39,7 @@ workflow "Clients Statistics" {
 }
 
 action "persistent client actions" {
-  uses = "actions/bin/sh@master"
+  uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
     DELAY = "5"
