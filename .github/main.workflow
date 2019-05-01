@@ -34,7 +34,7 @@ workflow "Clients Statistics" {
   resolves = [
     "client number",
     "persistent charts",
-    "persistent",
+    "test",
   ]
 
   #   on = "schedule(*/5 * * * *)"
@@ -79,12 +79,16 @@ action "create charts" {
   needs = ["persistent statistics"]
   secrets = ["GOOGLE_WEB_URL"]
   args = "github.com"
-
-  #   on = "schedule(*/5 * * * *)"
 }
 
 action "persistent charts" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["create charts"]
   secrets = ["GITHUB_TOKEN"]
-} #   on = "schedule(*/5 * * * *)"
+} 
+
+action "test" {
+  uses = "srt32/git-actions@v0.0.3"
+  needs = ["persistent"]
+  args = ["git branch"]
+}
