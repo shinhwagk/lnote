@@ -65,7 +65,7 @@ action "new user" {
 }
 
 action "persistent statistics" {
-  uses = "actions/bin/sh@master"
+  uses = "srt32/git-actions@v0.0.3"
   needs = [
     "new user",
     "client number",
