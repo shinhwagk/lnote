@@ -34,8 +34,10 @@ workflow "Clients Statistics" {
   resolves = [
     "graph",
     "actions/bin/sh@master",
+    "actions/bin/sh@master-1",
   ]
-#   on = "schedule(*/5 * * * *)"
+
+  #   on = "schedule(*/5 * * * *)"
 }
 
 action "persistent" {
@@ -66,4 +68,10 @@ action "actions/bin/sh@master" {
   uses = "actions/bin/sh@master"
   needs = ["new user"]
   args = ["ls -l ./"]
+}
+
+action "actions/bin/sh@master-1" {
+  uses = "actions/bin/sh@master"
+  needs = ["persistent"]
+  args = ["ls ./clients | wc -l >> statistics/client_number"]
 }
