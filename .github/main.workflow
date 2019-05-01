@@ -35,6 +35,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "test",
+    "install persistent-actions",
   ]
 }
 
@@ -46,7 +47,7 @@ action "install persistent-actions" {
 action "switch to 'analytics' branch" {
   needs = ["install persistent-actions"]
   uses = "srt32/git-actions@v0.0.3"
-  args = ["git checkout -b analytics origin/analytics"]
+  args = ["git clean -xfd && git checkout -b analytics origin/analytics"]
 }
 
 action "persistent" {
