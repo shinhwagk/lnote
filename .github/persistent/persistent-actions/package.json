@@ -12,15 +12,13 @@
     "./bin"
   ],
   "scripts": {
-    "postinstall": "id && npm i --unsafe-perm=true && npm run compile",
+    "postinstall": "npm run compile",
     "compile": "webpack --config webpack.conf.js --display-modules --mode production",
     "watch": "webpack --config webpack.conf.js --display-modules --watch --mode development"
   },
   "dependencies": {
     "@slack/web-api": "^5.0.1",
-    "date-fns": "^1.30.1"
-  },
-  "devDependencies": {
+    "date-fns": "^1.30.1",
     "@types/node": "^11.13.8",
     "ts-loader": "^5.4.4",
     "typescript": "^3.4.5",
