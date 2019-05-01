@@ -38,7 +38,13 @@ workflow "Clients Statistics" {
   ]
 }
 
+action "install persistent-actions" {
+  uses = "actions/npm@master"
+  args = ["i -g .github/persistent/persistent-actions"]
+}
+
 action "switch to 'analytics' branch" {
+  needs = ["install persistent-actions"]
   uses = "srt32/git-actions@v0.0.3"
   args = ["git checkout -b analytics origin/analytics"]
 }
@@ -89,7 +95,7 @@ action "persistent charts" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["create charts"]
   secrets = ["GITHUB_TOKEN"]
-} 
+}
 
 action "test" {
   uses = "srt32/git-actions@v0.0.3"
