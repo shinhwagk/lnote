@@ -33,8 +33,8 @@ workflow "Clients Statistics" {
   on = "push"
   resolves = [
     "graph",
-    "actions/bin/sh@master",
     "client number",
+    "persistent statistics",
   ]
 
   #   on = "schedule(*/5 * * * *)"
@@ -64,10 +64,14 @@ action "new user" {
   args = ["echo ${url}"]
 }
 
-action "actions/bin/sh@master" {
+action "persistent statistics" {
   uses = "actions/bin/sh@master"
-  needs = ["new user"]
-  args = ["ls -l ./"]
+  needs = [
+    "new user",
+    "client number",
+  ]
+  args = ["git checkout -b analytics origin/analytics && [[ -n $(git status -s) ]] && git add statistics && git commit -m 'update statistics' && git push"]
+  secrets = ["GITHUB_TOKEN"]
 }
 
 action "client number" {
