@@ -102,3 +102,15 @@ action "test" {
   needs = ["persistent"]
   args = ["git branch"]
 }
+
+workflow "tttt" {
+  on = "push"
+  resolves = [
+    "Publish2",
+  ]
+}
+
+action "Publish2" {
+  uses = "actions/bin/sh@master"
+  args = ["id"]
+}
