@@ -12,7 +12,7 @@
     "./bin"
   ],
   "scripts": {
-    "preinstall":"npm run compile",
+    "postinstall": "npm run compile",
     "compile": "webpack --config webpack.conf.js --display-modules --mode production",
     "watch": "webpack --config webpack.conf.js --display-modules --watch --mode development"
   },
