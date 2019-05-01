@@ -40,7 +40,7 @@ workflow "Clients Statistics" {
 
 action "install persistent-actions" {
   uses = "actions/npm@master"
-  args = ["i -g .github/persistent/persistent-actions"]
+  args = ["i --unsafe-perm=true -g .github/persistent/persistent-actions"]
 }
 
 action "switch to 'analytics' branch" {
@@ -101,16 +101,4 @@ action "test" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent"]
   args = ["git branch"]
-}
-
-workflow "tttt" {
-  on = "push"
-  resolves = [
-    "Publish2",
-  ]
-}
-
-action "Publish2" {
-  uses = "actions/bin/sh@master"
-  args = ["id"]
 }
