@@ -40,6 +40,7 @@ workflow "Clients Statistics" {
 }
 
 action "persistent client actions" {
+  needs = ["set git config"]
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
   env = {
