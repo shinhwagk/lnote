@@ -90,11 +90,11 @@ action "persistent charts" {
 action "push client actions" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent client actions"]
-  args = ["git config user.name shinhwagk; git config user.mail shinhwagk@users.noreply.github.com && git status -s && git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
+  args = ["git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
   secrets = ["GITHUB_TOKEN"]
 }
 
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
-  args = ["git config --global user.name ${GITHUB_ACTOR}; git config --global user.mail ${GITHUB_ACTOR}@users.noreply.github.com"]
+  args = ["git config --global user.name ${GITHUB_ACTOR}; git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
 }
