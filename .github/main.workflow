@@ -63,8 +63,8 @@ action "persistent statistics" {
     "client number",
     "new client number",
   ]
-#   args = [" [ -n \"$(git status -s -- statistics)\" ] && git add statistics && git commit -m 'update statistics' && git push -u origin analytics -v "]
-  args = ["git status -s"]
+  args = [" [ -n \"$(git status -s -- statistics)\" ] && git add statistics && git commit -m 'update statistics' && git push -u origin analytics -v"]
+#   args = ["git status -s"]
   secrets = ["GITHUB_TOKEN"]
 }
 
