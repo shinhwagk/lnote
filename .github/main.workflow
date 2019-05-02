@@ -35,7 +35,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
-    "set git config",
+    "actions/bin/sh@master",
   ]
 }
 
@@ -96,5 +96,11 @@ action "push client actions" {
 
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
-  args= ["git config --global user.name ${GITHUB_ACTOR}; git config user.mail ${GITHUB_ACTOR}@users.noreply.github.com"]
+  args = ["git config --global user.name ${GITHUB_ACTOR}; git config user.mail ${GITHUB_ACTOR}@users.noreply.github.com"]
+}
+
+action "actions/bin/sh@master" {
+  uses = "srt32/git-actions@v0.0.3"
+  needs = ["set git config"]
+  args = ["git config -l && git config --global -l"]
 }
