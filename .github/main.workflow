@@ -102,5 +102,5 @@ action "set git config" {
 action "actions/bin/sh@master" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["set git config"]
-  args = ["git config -l && echo '##############' && git config --global -l"]
+  args = ["cat ~/.gitconfig && git config -l && echo '##############' && git config --global -l"]
 }
