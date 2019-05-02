@@ -91,7 +91,7 @@ action "persistent charts" {
 action "push client actions" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent client actions"]
-  args = ["cat ~/.gitconfig && echo '###############' && git config -l && echo '###############' && git config --global -l && git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
+  args = ["cat ~/.gitconfig && echo '###############' && git config -l && echo '###############' && git config --global -l && echo '###############' && git status -s && git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
   secrets = ["GITHUB_TOKEN"]
 }
 
