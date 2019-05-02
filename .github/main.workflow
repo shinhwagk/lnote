@@ -35,7 +35,6 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
-    "maddox/actions/sleep@master",
   ]
 }
 
@@ -97,9 +96,4 @@ action "push client actions" {
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
-}
-
-action "maddox/actions/sleep@master" {
-  uses = "maddox/actions/sleep@master"
-  args = "60"
 }
