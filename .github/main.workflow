@@ -95,5 +95,5 @@ action "push client actions" {
 
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
-  args= ["git config user.name ${GITHUB_ACTOR}; git config user.mail ${GITHUB_ACTOR}@users.noreply.github.com"]
+  args= ["git config --global user.name ${GITHUB_ACTOR}; git config user.mail ${GITHUB_ACTOR}@users.noreply.github.com"]
 }
