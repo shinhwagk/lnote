@@ -42,7 +42,7 @@ workflow "Clients Statistics" {
 action "persistent client actions" {
   needs = ["set git config"]
   uses = "./.github/persistent"
-  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
+  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
     DELAY = "5"
     STAT_RANGE = "10"
@@ -92,6 +92,7 @@ action "push client actions" {
   uses = "srt32/git-actions@v0.0.3"
   needs = ["persistent client actions"]
   args = ["cat ~/.gitconfig && echo '###############' && git config -l && echo '###############' && git config --global -l && git add clients && git commit -m 'update client actions' && git push -u analytics -v"]
+  secrets = ["GITHUB_TOKEN"]
 }
 
 action "set git config" {
