@@ -34,26 +34,14 @@ workflow "Clients Statistics" {
   resolves = [
     "client number",
     "persistent charts",
-    "test",
-    "install persistent-actions",
+    "push client actions",
   ]
 }
 
-action "install persistent-actions" {
-  uses = "actions/npm@master"
-  args = ["i --unsafe-perm=true -g .github/persistent/persistent-actions"]
-}
-
-action "switch to 'analytics' branch" {
-  needs = ["install persistent-actions"]
-  uses = "srt32/git-actions@v0.0.3"
-  args = ["git clean -xfd && git checkout -b analytics origin/analytics"]
-}
-
-action "persistent" {
-  needs = ["switch to 'analytics' branch"]
+action "persistent client actions" {
+  needs = ["set git config"]
   uses = "./.github/persistent"
-  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL", "GITHUB_TOKEN"]
+  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
     DELAY = "5"
     STAT_RANGE = "10"
@@ -62,7 +50,7 @@ action "persistent" {
 
 action "new client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent"]
+  needs = ["persistent client actions"]
   env = {
     url = "github.com"
   }
@@ -75,13 +63,14 @@ action "persistent statistics" {
     "client number",
     "new client number",
   ]
-  args = ["[ -n \"$(git status -s -- statistics/client_number)\" ] && git add statistics/client_number && git commit -m 'update statistics client_number' && git push -u origin analytics -v"]
+  args = [" [ -n \"$(git status -s -- statistics)\" ] && git add statistics && git commit -m 'update statistics' && git push -u origin analytics -v"]
+#   args = ["git status -s"]
   secrets = ["GITHUB_TOKEN"]
 }
 
 action "client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent"]
+  needs = ["persistent client actions"]
   args = ["sed -i '/^$/d' statistics/client_number; ls ./clients | wc -l >> statistics/client_number"]
 }
 
@@ -98,8 +87,14 @@ action "persistent charts" {
   secrets = ["GITHUB_TOKEN"]
 }
 
-action "test" {
+action "push client actions" {
   uses = "srt32/git-actions@v0.0.3"
-  needs = ["persistent"]
-  args = ["git branch"]
+  needs = ["persistent client actions"]
+  args = ["[ -n '${git status -s}' ] && git add clients statistics-date && git commit -m 'update client actions' && git push -u origin analytics -v"]
+  secrets = ["GITHUB_TOKEN"]
+}
+
+action "set git config" {
+  uses = "srt32/git-actions@v0.0.3"
+  args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
 }

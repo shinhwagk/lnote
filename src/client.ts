@@ -3,7 +3,7 @@ import { tools } from './helper';
 import { homedir, platform, release, type, hostname } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, ensureFileSync, removeSync } from 'fs-extra';
+import { existsSync, ensureFileSync, removeSync, statSync } from 'fs-extra';
 import { version } from '../package.json';
 
 const clientPath = join(homedir(), '.vscode-note');
@@ -59,7 +59,8 @@ namespace ClientBaseInfo {
     const re = release();
     const ty = type();
     const ho = hostname();
-    export const base = { uid, ty, pf, re, ho };
+    const ct = statSync(clientIdFile).ctime.getTime().toString()
+    export const base = { uid, ty, pf, re, ho, ct };
 }
 
 function makePostBody(actions: Actions): PostClientActions {
