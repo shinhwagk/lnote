@@ -31,7 +31,8 @@ const getClientId = () => (existsSync(ClientFiles.id) ? vfs.readFileSync(ClientF
 const getPreviousVersion = (extonionsPath: string) => {
     const extonions = readdirSync(extonionsPath).filter(name => name.startsWith(identifier));
     if (extonions.length >= 2) {
-        return extonions.map(name => name.substr(identifier.length + 1)).sort(compareVersions)[0];
+        const versions = extonions.map(name => name.substr(identifier.length + 1)).sort(compareVersions);
+        return versions.slice(versions.length - 2)[0];
     } else {
         return lastVersion;
     }
