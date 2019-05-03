@@ -1,42 +1,72 @@
 import * as https from 'https';
 import { tools } from './helper';
-import { homedir, platform, release, type, hostname } from 'os';
+import { homedir, platform, release, type, hostname, arch } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, ensureFileSync, removeSync } from 'fs-extra';
+import { existsSync, readdirSync } from 'fs-extra';
 import { version } from '../package.json';
+import compareVersions from 'compare-versions';
 
-const clientPath = join(homedir(), '.vscode-note');
-const clientIdFile = join(clientPath, 'clientId');
-const stageFile = join(clientPath, 'actions');
+type ActionTimestamp = number;
+type OSInfo = { [attr: string]: string };
+type Actions = { [action: string]: ActionTimestamp[] };
 
-type Actions = { [action: string]: number }
-type PostClientActions = { actions: Actions } & { base: typeof ClientBaseInfo.base } & { version: string }
+interface VScodeNoteClient {
+    id: string;
+    version: string;
+    info?: OSInfo;
+    actions: Actions;
+    first: number;
+}
 
-function genUserId() {
+function currentTime() {
+    return new Date().getTime();
+}
+
+const clientFile = join(homedir(), '.vscode-note');
+
+type ActionsBody = { cid: string; actions: Actions };
+
+type OSInfoBody = { cid: string; info: OSInfo };
+
+function genClientId() {
     return tools.hexRandom(10);
 }
 
-function initClientId() {
-    if (!existsSync(clientIdFile)) {
-        ensureFileSync(clientIdFile);
-        const userId = genUserId();
-        vfs.writeFileSync(clientIdFile, userId);
+function initVScodeNoteClient(): VScodeNoteClient {
+    if (!existsSync(clientFile)) {
+        return {
+            id: genClientId(),
+            version: version,
+            info: ClientInfo.info,
+            actions: {},
+            first: currentTime(),
+        };
     }
-    return vfs.readFileSync(clientIdFile);
+    return vfs.readJsonSync<VScodeNoteClient>(clientFile);
 }
 
-const extractStageActions = () => vfs.readJsonSync<Actions>(stageFile);
-const stageActions = (actions: Actions) => vfs.writeJsonSync(stageFile, actions);
+function versionUpgrade(last: string) {
+    const old = vscodeNoteClient.version;
+    if (old === last) return;
+    let patchs = readdirSync('../upgrade')
+        .map(name => name.substr(0, name.length - 4))
+        .filter(patch => compareVersions(patch, old))
+        .filter(patch => !compareVersions(patch, last))
+        .map(name => name + '.js');
+    patchs = patchs.sort(compareVersions);
+    patchs.forEach(require);
+    vscodeNoteClient.version = last;
+}
 
-const postSlack = (body: PostClientActions) => {
-    const b: string = JSON.stringify({ text: JSON.stringify(body) })
+const postSlack = (body: OSInfoBody | ActionsBody) => {
+    const b: string = JSON.stringify({ text: JSON.stringify(body) });
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
             host: 'hooks.slack.com',
             path: '/services/THAUWRE2W/BJACQ46CX/vmUGK9qnTQDRNtxETMwavscn',
             method: 'POST',
-            headers: { 'Content-type': 'application/json; charset=UTF-8' }
+            headers: { 'Content-type': 'application/json; charset=UTF-8' },
         };
 
         const req = https.request(options, res => {
@@ -53,40 +83,35 @@ const postSlack = (body: PostClientActions) => {
     });
 };
 
-namespace ClientBaseInfo {
-    const uid = initClientId();
-    const pf = platform();
-    const re = release();
-    const ty = type();
-    const ho = hostname();
-    export const base = { uid, ty, pf, re, ho };
+namespace ClientInfo {
+    export const info = { type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch() };
 }
 
-function makePostBody(actions: Actions): PostClientActions {
-    return { actions: actions, base: ClientBaseInfo.base, version };
+function makePostActionsBody(actions: Actions): ActionsBody {
+    return { actions: actions, cid: vscodeNoteClient.id };
 }
 
 async function sendClientActions(action: string) {
-    const pending: Actions = {};
-    if (existsSync(stageFile)) {
-        const stageActions = extractStageActions();
-        for (const a of Object.keys(stageActions)) {
-            pending[a] = stageActions[a];
-        }
+    if (vscodeNoteClient.actions[action]) {
+        vscodeNoteClient.actions[action].push(currentTime());
+    } else {
+        vscodeNoteClient.actions[action] = [currentTime()];
     }
-    pending[action] = pending[action] >= 0 ? pending[action] + 1 : 1;
-    try {
-        await postSlack(makePostBody(pending));
-        removeSync(stageFile);
-        return;
-    } catch (e) {
-        stageActions(pending);
-        throw e;
-    }
+    await postSlack(makePostActionsBody(vscodeNoteClient.actions));
+    vscodeNoteClient.actions = {};
+    vfs.writeJsonSync(clientFile, vscodeNoteClient);
 }
 
+async function sendClientInfo(info: OSInfo) {
+    await postSlack({ cid: vscodeNoteClient.id, info });
+    delete vscodeNoteClient.info;
+    vfs.writeJsonSync(clientFile, vscodeNoteClient);
+}
+
+const vscodeNoteClient: VScodeNoteClient = initVScodeNoteClient();
 function _init() {
-    existsSync(clientPath) || sendClientActions('installed');
+    versionUpgrade(version);
+    vscodeNoteClient.info && sendClientInfo(vscodeNoteClient.info);
     sendClientActions('active');
 }
 

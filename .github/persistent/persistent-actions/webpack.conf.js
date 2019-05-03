@@ -4,7 +4,7 @@ module.exports = {
   target: "node",
   entry: "./main.ts",
   output: {
-    path: path.resolve(__dirname, "bin"),
+    path: path.resolve(__dirname, "lib"),
     libraryTarget: 'commonjs2',
     filename: "lib.js"
   },
