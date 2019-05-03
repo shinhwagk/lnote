@@ -26,7 +26,6 @@ export namespace vfs {
         if (fs.existsSync(path.dirname(file))) {
             vfs.writeFileSync(file, '');
         } else {
-
         }
     }
 }
