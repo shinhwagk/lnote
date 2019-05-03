@@ -6,6 +6,7 @@ import { vfs } from './helper';
 import { existsSync, readdirSync, removeSync } from 'fs-extra';
 import { version as lastVersion } from '../package.json';
 import compareVersions from 'compare-versions';
+import { identifier } from './constants';
 
 type ActionTimestamp = number;
 type OSInfo = { [attr: string]: string };
@@ -27,9 +28,14 @@ const getActions = () => (existsSync(ClientFiles.actions) ? vfs.readJsonSync<Act
 
 const getClientId = () => (existsSync(ClientFiles.id) ? vfs.readFileSync(ClientFiles.id) : genClientId());
 
-const getOldVersion = () => (existsSync(ClientFiles.version) ? vfs.readFileSync(ClientFiles.version) : '0.0.0');
-
-const setOldVersion = (v: string) => vfs.writeFileSync(ClientFiles.version, v);
+const getPreviousVersion = (extonionsPath: string) => {
+    const extonions = readdirSync(extonionsPath).filter(name => name.startsWith(identifier));
+    if (extonions.length >= 2) {
+        return extonions.map(name => name.substr(identifier.length + 1)).sort(compareVersions)[0];
+    } else {
+        return lastVersion;
+    }
+};
 
 const stageActions = (actions: Actions) => vfs.writeJsonSync(ClientFiles.actions, actions);
 
@@ -37,12 +43,14 @@ function getOSInfo() {
     return { type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch() };
 }
 
-function versionUpgrade(upgradeScriptsPath: string) {
-    const oldVersion: string = getOldVersion();
-    if (compareVersions(lastVersion, oldVersion) === 0) return;
+function versionUpgrade(extonionPath: string) {
+    const upgradeScriptsPath = join(extonionPath, 'upgrade');
+    const extonionsPath = join(extonionPath, '..');
+    const preVersion: string = getPreviousVersion(extonionsPath);
+    if (compareVersions(lastVersion, preVersion) === 0) return;
     const patchs = readdirSync(upgradeScriptsPath)
         .map(name => name.substr(0, name.length - 3))
-        .filter(patch => compareVersions(patch, oldVersion) === 1)
+        .filter(patch => compareVersions(patch, preVersion) === 1)
         .filter(patch => compareVersions(patch, lastVersion) <= 0)
         .sort(compareVersions)
         .map(v => v + '.js');
@@ -51,8 +59,7 @@ function versionUpgrade(upgradeScriptsPath: string) {
         eval(vfs.readFileSync(join(upgradeScriptsPath, patch)));
         console.log(`use upgrade script: ${patch}.js`);
     }
-    setOldVersion(lastVersion);
-    console.log(`update from ${oldVersion} -> ${lastVersion}`);
+    console.log(`update from ${preVersion} -> ${lastVersion}`);
 }
 
 const postSlack = (body: ClientInfoBody | ActionsBody) => {
@@ -119,8 +126,7 @@ namespace ClientFiles {
 }
 
 export function initClient(extonionPath: string) {
-    const upgradeScriptsPath = join(extonionPath, 'upgrade');
-    versionUpgrade(upgradeScriptsPath);
+    versionUpgrade(extonionPath);
     sendClientActions('active');
     return (action: string) => sendClientActions(action);
 }
