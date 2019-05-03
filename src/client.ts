@@ -3,63 +3,59 @@ import { tools } from './helper';
 import { homedir, platform, release, type, hostname, arch } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, readdirSync } from 'fs-extra';
-import { version } from '../package.json';
+import { existsSync, readdirSync, removeSync } from 'fs-extra';
+import { version as lastVersion } from '../package.json';
 import compareVersions from 'compare-versions';
 
 type ActionTimestamp = number;
 type OSInfo = { [attr: string]: string };
 type Actions = { [action: string]: ActionTimestamp[] };
 
-interface VScodeNoteClient {
-    id: string;
-    version: string;
-    info?: OSInfo;
-    actions: Actions;
-    first: number;
-}
-
 function currentTime() {
     return new Date().getTime();
 }
 
-const clientFile = join(homedir(), '.vscode-note');
+type ActionsBody = { cid: string; action: string; timestamp: number; version: string };
 
-type ActionsBody = { cid: string; actions: Actions };
-
-type OSInfoBody = { cid: string; info: OSInfo };
+type ClientInfoBody = { cid: string; info: OSInfo; timestamp: number; version: string };
 
 function genClientId() {
     return tools.hexRandom(10);
 }
 
-function initVScodeNoteClient(): VScodeNoteClient {
-    if (!existsSync(clientFile)) {
-        return {
-            id: genClientId(),
-            version: version,
-            info: ClientInfo.info,
-            actions: {},
-            first: currentTime(),
-        };
+const getActions = () => (existsSync(ClientFiles.actions) ? vfs.readJsonSync<Actions>(ClientFiles.actions) : {});
+
+const getClientId = () => (existsSync(ClientFiles.id) ? vfs.readFileSync(ClientFiles.id) : genClientId());
+
+const getOldVersion = () => (existsSync(ClientFiles.version) ? vfs.readFileSync(ClientFiles.version) : '0.0.0');
+
+const setOldVersion = (v: string) => vfs.writeFileSync(ClientFiles.version, v);
+
+const stageActions = (actions: Actions) => vfs.writeJsonSync(ClientFiles.actions, actions);
+
+function getOSInfo() {
+    return { type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch() };
+}
+
+function versionUpgrade(upgradeScriptsPath: string) {
+    const oldVersion: string = getOldVersion();
+    if (compareVersions(lastVersion, oldVersion) === 0) return;
+    const patchs = readdirSync(upgradeScriptsPath)
+        .map(name => name.substr(0, name.length - 3))
+        .filter(patch => compareVersions(patch, oldVersion) === 1)
+        .filter(patch => compareVersions(patch, lastVersion) <= 0)
+        .sort(compareVersions)
+        .map(v => v + '.js');
+    for (const patch of patchs) {
+        console.log(join(upgradeScriptsPath, patch));
+        eval(vfs.readFileSync(join(upgradeScriptsPath, patch)));
+        console.log(`use upgrade script: ${patch}.js`);
     }
-    return vfs.readJsonSync<VScodeNoteClient>(clientFile);
+    setOldVersion(lastVersion);
+    console.log(`update from ${oldVersion} -> ${lastVersion}`);
 }
 
-function versionUpgrade(last: string) {
-    const old = vscodeNoteClient.version;
-    if (old === last) return;
-    let patchs = readdirSync('../upgrade')
-        .map(name => name.substr(0, name.length - 4))
-        .filter(patch => compareVersions(patch, old))
-        .filter(patch => !compareVersions(patch, last))
-        .map(name => name + '.js');
-    patchs = patchs.sort(compareVersions);
-    patchs.forEach(require);
-    vscodeNoteClient.version = last;
-}
-
-const postSlack = (body: OSInfoBody | ActionsBody) => {
+const postSlack = (body: ClientInfoBody | ActionsBody) => {
     const b: string = JSON.stringify({ text: JSON.stringify(body) });
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
@@ -83,39 +79,48 @@ const postSlack = (body: OSInfoBody | ActionsBody) => {
     });
 };
 
-namespace ClientInfo {
-    export const info = { type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch() };
+function makePostActionsBody(action: string, timestamp: number): ActionsBody {
+    return { action, timestamp, cid: getClientId(), version: lastVersion };
 }
 
-function makePostActionsBody(actions: Actions): ActionsBody {
-    return { actions: actions, cid: vscodeNoteClient.id };
+function makePostClientInfoBody(timestamp: number): ClientInfoBody {
+    return { cid: getClientId(), info: getOSInfo(), timestamp, version: lastVersion };
 }
 
 async function sendClientActions(action: string) {
-    if (vscodeNoteClient.actions[action]) {
-        vscodeNoteClient.actions[action].push(currentTime());
+    const actions = getActions();
+    if (actions[action]) {
+        actions[action].push(currentTime());
     } else {
-        vscodeNoteClient.actions[action] = [currentTime()];
+        actions[action] = [currentTime()];
     }
-    await postSlack(makePostActionsBody(vscodeNoteClient.actions));
-    vscodeNoteClient.actions = {};
-    vfs.writeJsonSync(clientFile, vscodeNoteClient);
+    try {
+        for (const [a, ts] of Object.entries(actions)) {
+            if (a === 'installed') {
+                await postSlack(makePostClientInfoBody(ts[0]));
+                continue;
+            }
+            for (const t of ts) {
+                await postSlack(makePostActionsBody(a, t));
+            }
+        }
+        removeSync(ClientFiles.actions);
+    } catch (e) {
+        stageActions(actions);
+    }
 }
 
-async function sendClientInfo(info: OSInfo) {
-    await postSlack({ cid: vscodeNoteClient.id, info });
-    delete vscodeNoteClient.info;
-    vfs.writeJsonSync(clientFile, vscodeNoteClient);
+// client file variable
+namespace ClientFiles {
+    export const home = join(homedir(), '.vscode-note');
+    export const id = join(home, 'clientId');
+    export const version = join(home, 'version');
+    export const actions = join(home, 'actions');
 }
 
-const vscodeNoteClient: VScodeNoteClient = initVScodeNoteClient();
-function _init() {
-    versionUpgrade(version);
-    vscodeNoteClient.info && sendClientInfo(vscodeNoteClient.info);
+export function initClient(extonionPath: string) {
+    const upgradeScriptsPath = join(extonionPath, 'upgrade');
+    versionUpgrade(upgradeScriptsPath);
     sendClientActions('active');
-}
-
-export function initClient() {
-    _init();
     return (action: string) => sendClientActions(action);
 }

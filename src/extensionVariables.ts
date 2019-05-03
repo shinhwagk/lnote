@@ -47,7 +47,7 @@ function listenConfigure(ctx: ExtensionContext) {
                 ext.masterPath = getMasterPath();
                 ext.dbFS = new NoteDatabase(ext.masterPath);
             }
-        })
+        }),
     );
 }
 
@@ -62,7 +62,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
     addUsageNotes(ext.notesPath);
-    ext.clientActions = initClient();
+    ext.clientActions = initClient(ext.context.extensionPath);
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);
