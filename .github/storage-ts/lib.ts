@@ -96,10 +96,10 @@ function readStorageTimestamp(): Date {
         cDate.setUTCSeconds(0);
         cDate.setUTCMinutes(0);
         cDate = subMinutes(cDate, ARGS.storageRange * 3);
-        writeFileSync(ARGS.storageTimestampFile, getTime(cDate).toString(), { encoding: 'utf-8' });
+        writeFileSync(ARGS.storageTimestampFile, dateFormat(cDate, 'YYYY-MM-DDTHH:mm:ss'), { encoding: 'utf-8' });
         return cDate;
     }
-    return toDate(Number(readFileSync(ARGS.storageTimestampFile, { encoding: 'utf-8' })));
+    return toDate(readFileSync(ARGS.storageTimestampFile, { encoding: 'utf-8' }));
 }
 
 function saveSorageTimestamp(date: Date) {
