@@ -30,7 +30,7 @@ action "Publish" {
 }
 
 workflow "Clients Statistics" {
-  on = "schedule(10 * * * *)"
+  on = "push"
   resolves = [
     "client number",
     "persistent charts",
