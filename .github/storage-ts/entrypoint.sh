@@ -2,4 +2,4 @@
 
 git checkout -b analytics origin/analytics
 
-storageTS
+storage-ts
