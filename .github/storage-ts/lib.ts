@@ -103,7 +103,7 @@ function readStorageTimestamp(): Date {
 }
 
 function saveSorageTimestamp(date: Date) {
-    writeFileSync(ARGS.storageTimestampFile, dateFormat(cDate, 'YYYY-MM-DDTHH:mm:ss'), { encoding: 'utf-8' });
+    writeFileSync(ARGS.storageTimestampFile, dateFormat(date, 'YYYY-MM-DDTHH:mm:ss'), { encoding: 'utf-8' });
 }
 
 interface WithMessagesResult extends WebAPICallResult {
