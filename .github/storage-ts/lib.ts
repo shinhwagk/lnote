@@ -159,4 +159,5 @@ export default async function main() {
         const sts = new StorageTimeSeries(slackWC);
         stop = await sts.start();
     }
+    specialConsoleLog('end storage ts.');
 }
