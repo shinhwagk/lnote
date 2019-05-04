@@ -115,7 +115,7 @@ action "set git config" {
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
 }
 
-action "push github" {
+action "push time series" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["[ -n '${git status -s -- series-data storage-timestamp}' ] && git add series-data storage-timestamp && git commit -m 'updateseries' && git push -u origin analytics -v"]
   needs = ["storage time series"]
