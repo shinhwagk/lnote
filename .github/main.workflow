@@ -41,7 +41,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
-    "push github",
+    "push time series",
   ]
 }
 
@@ -62,7 +62,7 @@ action "persistent client actions" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  needs = ["push github"]
+  needs = ["push time series"]
 }
 
 action "new client number" {
