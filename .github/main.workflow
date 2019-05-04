@@ -62,7 +62,7 @@ action "persistent client actions" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  needs = ["storage time series"]
+  needs = ["push github"]
 }
 
 action "new client number" {
