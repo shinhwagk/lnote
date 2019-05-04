@@ -21,7 +21,9 @@ type ActionsBody = { cid: string; action: string; timestamp: number; version: st
 type ClientInfoBody = { cid: string; info: OSInfo; timestamp: number; version: string };
 
 function genClientId() {
-    return tools.hexRandom(10);
+    const cid = tools.hexRandom(10);
+    vfs.writeFileSync(ClientFiles.id, cid);
+    return cid
 }
 
 const getActions = () => (existsSync(ClientFiles.actions) ? vfs.readJsonSync<Actions>(ClientFiles.actions) : {});
