@@ -56,7 +56,7 @@ action "storage ts" {
 }
 
 action "persistent client actions" {
-  needs = ["set git config"]
+  needs = ["storage ts"]
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
