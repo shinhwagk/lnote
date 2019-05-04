@@ -30,12 +30,22 @@ action "Publish" {
 }
 
 workflow "Clients Statistics" {
-  on = "push"
+  on = "schedule(10 * * * *)"
   resolves = [
     "client number",
     "persistent charts",
     "push client actions",
+    "storage ts",
   ]
+}
+
+action "storage ts" {
+  uses = "./.github/storage-ts"
+  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
+  env = {
+    DELAY = "5"
+    RANGE = "10"
+  }
 }
 
 action "persistent client actions" {
