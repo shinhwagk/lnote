@@ -21,14 +21,12 @@ type ActionsBody = { cid: string; action: string; timestamp: number; version: st
 type ClientInfoBody = { cid: string; info: OSInfo; timestamp: number; version: string };
 
 function genClientId() {
-    const cid = tools.hexRandom(10);
-    vfs.writeFileSync(ClientFiles.id, cid);
-    return cid
+    vfs.writeFileSync(ClientFiles.id, tools.hexRandom(10));
 }
 
 const getActions = () => (existsSync(ClientFiles.actions) ? vfs.readJsonSync<Actions>(ClientFiles.actions) : {});
 
-const getClientId = () => (existsSync(ClientFiles.id) ? vfs.readFileSync(ClientFiles.id) : genClientId());
+const getClientId = () => vfs.readFileSync(ClientFiles.id);
 
 const getPreviousVersion = (extonionsPath: string) => {
     const extonions = readdirSync(extonionsPath).filter(name => name.startsWith(identifier));
@@ -124,12 +122,15 @@ async function sendClientActions(action: string) {
 namespace ClientFiles {
     export const home = join(homedir(), '.vscode-note');
     export const id = join(home, 'clientId');
-    export const version = join(home, 'version');
     export const actions = join(home, 'actions');
 }
 
 export function initClient(extonionPath: string) {
-    !existsSync(ClientFiles.home) && mkdirpSync(ClientFiles.home)
+    if (!existsSync(ClientFiles.id)) {
+        mkdirpSync(ClientFiles.home);
+        genClientId()
+        stageActions({ installed: [currentTime()] })
+    }
     versionUpgrade(extonionPath);
     sendClientActions('active');
     return (action: string) => sendClientActions(action);
