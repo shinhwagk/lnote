@@ -41,7 +41,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
-    "storage ts",
+    "push github",
   ]
 }
 
@@ -112,4 +112,10 @@ action "push client actions" {
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
+}
+
+action "push github" {
+  uses = "srt32/git-actions@v0.0.3"
+  needs = ["storage ts"]
+  args = ["[ -n '${git status -s -- series-data storage-timestamp}' ] && git add series-data storage-timestamp && git commit -m 'updateseries' && git push -u origin analytics -v"]
 }
