@@ -24,7 +24,8 @@ namespace TimeSeries {
 }
 
 namespace ARGS {
-    export const storageTimestampFile = 'storage-timestamp';
+    export const seriesPath = 'series-data';
+    export const storageTimestampFile = join(seriesPath ,'storage-timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
     export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
     export const limit = 100;
@@ -129,14 +130,13 @@ async function storeSeriesData(sd: any) {
     if (!TimeSeries.instanceOfBase(sd)) return;
 
     const dataTimestamp = sd.timestamp;
-    const seriesPath = 'series-data';
-    !existsSync(seriesPath) && mkdirSync(seriesPath);
+    !existsSync(ARGS.seriesPath) && mkdirSync(ARGS.seriesPath);
 
     const date = toDate(dataTimestamp);
     date.setMilliseconds(0);
     date.setSeconds(0);
     date.setMinutes(0);
-    const hourFile = join(seriesPath, dateFormat(date, 'YYYY-MM-DDTHH'));
+    const hourFile = join(ARGS.seriesPath, dateFormat(date, 'YYYY-MM-DDTHH'));
     !existsSync(hourFile) && writeFileSync(hourFile, '', { encoding: 'utf-8' });
     appendFileSync(hourFile, JSON.stringify(sd) + '\n');
 }
