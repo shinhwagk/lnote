@@ -1,5 +1,5 @@
 {
-  "name": "vscode-note.persistent-actions",
+  "name": "vscode-note.storage-ts",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/shinhwagk/vscode-note",
