@@ -46,6 +46,7 @@ workflow "Clients Statistics" {
 }
 
 action "storage ts" {
+  needs = ["set git config"]
   uses = "./.github/storage-ts"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
