@@ -5,7 +5,13 @@ workflow "Build, Test, and Publish" {
   ]
 }
 
+action "Tag" {
+  uses = "actions/bin/filter@master"
+  args = "tag v*"
+}
+
 action "Install" {
+  needs = ["Tag"]
   uses = "borales/actions-yarn@master"
   args = "install"
 }
