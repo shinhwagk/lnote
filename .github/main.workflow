@@ -117,7 +117,7 @@ action "set git config" {
 
 action "push time series" {
   uses = "srt32/git-actions@v0.0.3"
-  args = ["[ -n '${git status -s -- series-data storage-timestamp}' ] && git add series-data storage-timestamp && git commit -m 'updateseries' && git push -u origin analytics -v"]
+  args = ["[ -n '${git status -s -- series-data}' ] && git add series-data && git commit -m 'updateseries' && git push -u origin analytics -v"]
   needs = ["storage time series"]
   secrets = ["GITHUB_TOKEN"]
 }
