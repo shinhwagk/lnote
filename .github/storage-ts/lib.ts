@@ -160,5 +160,3 @@ export default async function main() {
         stop = await sts.start();
     }
 }
-
-main();
