@@ -3,7 +3,7 @@ import { tools } from './helper';
 import { homedir, platform, release, type, hostname, arch } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
-import { existsSync, readdirSync, removeSync } from 'fs-extra';
+import { existsSync, readdirSync, removeSync, mkdirpSync } from 'fs-extra';
 import { version as lastVersion } from '../package.json';
 import compareVersions from 'compare-versions';
 import { identifier } from './constants';
@@ -127,6 +127,7 @@ namespace ClientFiles {
 }
 
 export function initClient(extonionPath: string) {
+    !existsSync(ClientFiles.home) && mkdirpSync(ClientFiles.home)
     versionUpgrade(extonionPath);
     sendClientActions('active');
     return (action: string) => sendClientActions(action);
