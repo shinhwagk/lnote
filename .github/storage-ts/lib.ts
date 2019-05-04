@@ -25,7 +25,7 @@ namespace TimeSeries {
 
 namespace ARGS {
     export const seriesPath = 'series-data';
-    export const storageTimestampFile = join(seriesPath ,'storage-timestamp');
+    export const storageTimestampFile = join(seriesPath ,'timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
     export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
     export const limit = 100;
