@@ -50,8 +50,8 @@ action "storage time series" {
   uses = "./.github/storage-ts"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
-    RANGE = "10"
     DELAY = "10"
+    RANGE = "60"
   }
 }
 
