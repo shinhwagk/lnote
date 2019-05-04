@@ -45,7 +45,7 @@ workflow "Clients Statistics" {
   ]
 }
 
-action "storage ts" {
+action "storage time series" {
   needs = ["set git config"]
   uses = "./.github/storage-ts"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
@@ -56,13 +56,13 @@ action "storage ts" {
 }
 
 action "persistent client actions" {
-  needs = ["storage ts"]
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
   env = {
     DELAY = "5"
     STAT_RANGE = "10"
   }
+  needs = ["storage time series"]
 }
 
 action "new client number" {
@@ -117,6 +117,6 @@ action "set git config" {
 
 action "push github" {
   uses = "srt32/git-actions@v0.0.3"
-  needs = ["storage ts"]
   args = ["[ -n '${git status -s -- series-data storage-timestamp}' ] && git add series-data storage-timestamp && git commit -m 'updateseries' && git push -u origin analytics -v"]
+  needs = ["storage time series"]
 }
