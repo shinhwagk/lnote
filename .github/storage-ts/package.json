@@ -6,7 +6,7 @@
   "author": "shinhwagk <shanghai_sl@hotmail.com>",
   "license": "MIT",
   "bin": {
-    "storageTS": "./bin/storageTS.js"
+    "storage-ts": "./bin/storage-ts.js"
   },
   "files": [
     "./bin"
