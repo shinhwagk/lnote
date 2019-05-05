@@ -22,14 +22,8 @@ action "Test" {
   args = "test"
 }
 
-action "Master" {
-  needs = "Test"
-  uses = "actions/bin/filter@master"
-  args = "branch master"
-}
-
 action "Publish" {
-  needs = ["Master"]
+  needs = ["Test"]
   uses = "lannonbr/vsce-action@master"
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
