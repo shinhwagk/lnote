@@ -1,1 +1,0 @@
-note id right three bytes can open files.
