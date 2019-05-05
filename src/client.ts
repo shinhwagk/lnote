@@ -126,10 +126,10 @@ namespace ClientFiles {
 }
 
 export function initClient(extonionPath: string) {
-    if (!existsSync(ClientFiles.id)) {
+    if (!existsSync(ClientFiles.home)) {
         mkdirpSync(ClientFiles.home);
-        genClientId()
-        stageActions({ installed: [currentTime()] })
+        genClientId();
+        stageActions({ installed: [currentTime()] });
     }
     versionUpgrade(extonionPath);
     sendClientActions('active');
