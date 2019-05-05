@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.74",
+    "version": "0.9.75",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -256,7 +256,7 @@
     "private": true,
     "workspaces": {
         "packages": [
-            ".github/persistent/persistent-actions"
+            ".github/storage-ts"
         ]
     }
 }
