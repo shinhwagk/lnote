@@ -86,7 +86,7 @@ function readStorageTimestamp(): Date {
         mkdirSync(ARGS.storagePath);
     }
     if (!existsSync(ARGS.storageTimestampFile)) {
-        const startDate = toDate('2019-05-05T00:00:00')
+        const startDate = toDate('2019-05-06T00:00:00')
         saveSorageTimestamp(startDate);
         return startDate;
     }
@@ -123,7 +123,7 @@ const push2FireStore = (body: string) => {
             host: firebaseUrl.host,
             path: firebaseUrl.path,
             method: 'POST',
-            headers: { 'Content-type': 'application/json; charset=UTF-8' },
+            headers: { 'Content-type': 'application/json' },
         };
 
         const req = https.request(options, res => {
