@@ -35,11 +35,10 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
-    "push time series",
   ]
 }
 
-action "storage time series" {
+action "storage messages" {
   needs = ["set git config"]
   uses = "./.github/storage-ts"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
@@ -56,7 +55,7 @@ action "persistent client actions" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  needs = ["push time series"]
+  needs = ["storage messages"]
 }
 
 action "new client number" {
@@ -107,11 +106,4 @@ action "push client actions" {
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
-}
-
-action "push time series" {
-  uses = "srt32/git-actions@v0.0.3"
-  args = ["[ -n '${git status -s -- series-data}' ] && git add series-data && git commit -m 'update series' && git push -u origin analytics -v"]
-  needs = ["storage time series"]
-  secrets = ["GITHUB_TOKEN"]
 }
