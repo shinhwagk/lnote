@@ -1,8 +1,7 @@
 import { WebClient, WebAPICallResult } from '@slack/web-api/dist/WebClient';
 import { ConversationsHistoryArguments } from '@slack/web-api/dist/methods';
-import { existsSync, writeFileSync, readFileSync, mkdirSync, appendFileSync } from 'fs';
+import { existsSync, writeFileSync, readFileSync } from 'fs';
 import getTime from 'date-fns/get_time';
-import subMinutes from 'date-fns/sub_minutes';
 import subSeconds from 'date-fns/sub_seconds';
 import addMinutes from 'date-fns/add_minutes';
 import addSeconds from 'date-fns/add_seconds';
@@ -10,22 +9,12 @@ import isPast from 'date-fns/is_past';
 import toDate from 'date-fns/parse';
 import dateFormat from 'date-fns/format';
 import { join } from 'path';
-
-namespace TimeSeries {
-    export interface Base {
-        timestamp: number;
-        cid: string;
-        version: string;
-    }
-
-    export function instanceOfBase(obj: any): obj is Base {
-        return 'timestamp' in obj && 'cid' in obj && 'version' in obj;
-    }
-}
+import * as https from 'https';
 
 namespace ARGS {
-    export const seriesPath = 'series-data';
-    export const storageTimestampFile = join(seriesPath ,'timestamp');
+    export const firebaseFucniotnsUrl = process.env.FIREBASE_FUNCSTIONS_URL;
+    export const seriesPath = 'storage';
+    export const storageTimestampFile = join(seriesPath, 'timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
     export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
     export const limit = 100;
@@ -33,9 +22,9 @@ namespace ARGS {
     export const SlackToken = process.env.SLACK_TOKEN;
     export const SlackChannel = process.env.SLACK_CHANNEL;
 
-    const isOK = !!SlackToken && !!SlackChannel;
+    const isOK = !!SlackToken && !!SlackChannel && !!firebaseFucniotnsUrl;
     if (!isOK) {
-        specialConsoleLog('env: SLACK_TOKEN or SLACK_CHANNEL no set.');
+        specialConsoleLog('env: SLACK_TOKEN or SLACK_CHANNEL or FIREBASE_FUNCSTIONS_URL no set.');
         process.exit(1);
     }
 }
@@ -48,7 +37,7 @@ class StorageTimeSeries {
     private readonly isActiveStat = isPast(this.activeStatTime);
     private readonly tsMessages: string[] = [];
 
-    constructor(private readonly webClient: WebClient) {}
+    constructor(private readonly webClient: WebClient) { }
 
     async start(): Promise<number> {
         if (!this.isActiveStat) {
@@ -67,7 +56,7 @@ class StorageTimeSeries {
 
         for (const data of this.tsMessages) {
             try {
-                await storeSeriesData(JSON.parse(data));
+                await storeSeriesData(data);
             } catch (e) {
                 console.error(e);
             }
@@ -91,13 +80,9 @@ class StorageTimeSeries {
 
 function readStorageTimestamp(): Date {
     if (!existsSync(ARGS.storageTimestampFile)) {
-        let cDate = new Date();
-        cDate.setUTCMilliseconds(0);
-        cDate.setUTCSeconds(0);
-        cDate.setUTCMinutes(0);
-        cDate = subMinutes(cDate, ARGS.storageRange * 3);
-        saveSorageTimestamp(cDate);
-        return cDate;
+        const startDate = toDate('2019-04-22T00:00:00')
+        saveSorageTimestamp(startDate);
+        return startDate;
     }
     return toDate(readFileSync(ARGS.storageTimestampFile, { encoding: 'utf-8' }));
 }
@@ -125,20 +110,29 @@ async function pullSlackMessage(web: WebClient, msgs: string[], options: Convers
         specialConsoleLog(e.messages);
     }
 }
+const httpsPost = (body: string) => {
+    return new Promise<string>((resolve, reject) => {
+        const options: https.RequestOptions = {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json; charset=UTF-8' },
+        };
 
-async function storeSeriesData(sd: any) {
-    if (!TimeSeries.instanceOfBase(sd)) return;
+        const req = https.request(ARGS.firebaseFucniotnsUrl!, options, res => {
+            let data = '';
+            res.setEncoding('utf8');
+            res.on('data', chunk => (chunk += data));
+            res.on('end', () => resolve(data));
+            res.on('error', err => reject(err.message));
+        });
 
-    const dataTimestamp = sd.timestamp;
-    !existsSync(ARGS.seriesPath) && mkdirSync(ARGS.seriesPath);
+        req.on('error', err => reject(err.message));
+        req.write(body);
+        req.end();
+    });
+};
 
-    const date = toDate(dataTimestamp);
-    date.setMilliseconds(0);
-    date.setSeconds(0);
-    date.setMinutes(0);
-    const hourFile = join(ARGS.seriesPath, dateFormat(date, 'YYYY-MM-DDTHH'));
-    !existsSync(hourFile) && writeFileSync(hourFile, '', { encoding: 'utf-8' });
-    appendFileSync(hourFile, JSON.stringify(sd) + '\n');
+async function storeSeriesData(sd: string) {
+    await httpsPost(sd)
 }
 
 function specialConsoleLog(log: string) {
