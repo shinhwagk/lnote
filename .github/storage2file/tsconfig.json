@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "esnext",
-        "outDir": "./bin",
+        "outDir": "bin",
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,

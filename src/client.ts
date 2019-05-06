@@ -7,6 +7,8 @@ import { existsSync, readdirSync, removeSync, mkdirpSync } from 'fs-extra';
 import { version as lastVersion } from '../package.json';
 import compareVersions from 'compare-versions';
 import { identifier } from './constants';
+import addHours from 'date-fns/add_hours';
+import isPast from 'date-fns/is_past';
 
 type ActionTimestamp = number;
 type OSInfo = { [attr: string]: string };
@@ -22,6 +24,19 @@ type ClientInfoBody = { cid: string; info: OSInfo; timestamp: number; version: s
 
 function genClientId() {
     vfs.writeFileSync(ClientFiles.id, tools.hexRandom(10));
+}
+
+function doActive() {
+    try {
+        !existsSync(ClientFiles.active) && vfs.writeFileSync(ClientFiles.active, currentTime().toString());
+        const lastActiveDate = Number(vfs.readFileSync(ClientFiles.active));
+        if (isPast(addHours(lastActiveDate, 24))) {
+            sendClientActions('active');
+        }
+    } catch (e) {
+        removeSync(ClientFiles.active);
+        console.error(e);
+    }
 }
 
 const getActions = () => (existsSync(ClientFiles.actions) ? vfs.readJsonSync<Actions>(ClientFiles.actions) : {});
@@ -123,6 +138,7 @@ namespace ClientFiles {
     export const home = join(homedir(), '.vscode-note');
     export const id = join(home, 'clientId');
     export const actions = join(home, 'actions');
+    export const active = join(home, 'active');
 }
 
 export function initClient(extonionPath: string) {
@@ -132,6 +148,6 @@ export function initClient(extonionPath: string) {
         stageActions({ installed: [currentTime()] });
     }
     versionUpgrade(extonionPath);
-    sendClientActions('active');
+    doActive();
     return (action: string) => sendClientActions(action);
 }
