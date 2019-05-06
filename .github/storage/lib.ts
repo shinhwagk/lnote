@@ -10,6 +10,7 @@ import toDate from 'date-fns/parse';
 import dateFormat from 'date-fns/format';
 import { join } from 'path';
 import * as https from 'https';
+import * as url from 'url';
 
 namespace ARGS {
     export const firebaseFucniotnsUrl = process.env.FIREBASE_FUNCSTIONS_URL;
@@ -116,13 +117,16 @@ async function pullSlackMessage(web: WebClient, msgs: string[], options: Convers
     }
 }
 const push2FireStore = (body: string) => {
+    const firebaseUrl = url.parse(ARGS.firebaseFucniotnsUrl!)
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
+            host: firebaseUrl.host,
+            path: firebaseUrl.path,
             method: 'POST',
             headers: { 'Content-type': 'application/json; charset=UTF-8' },
         };
 
-        const req = https.request(ARGS.firebaseFucniotnsUrl!, options, res => {
+        const req = https.request(options, res => {
             let data = '';
             res.setEncoding('utf8');
             res.on('data', chunk => (chunk += data));
