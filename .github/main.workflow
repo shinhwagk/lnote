@@ -57,7 +57,7 @@ action "storage messages" {
 
 action "storage2file" {
   needs = ["set git config"]
-  uses = "./.github/storage"
+  uses = "./.github/storage2file"
   secrets = [
     "SLACK_TOKEN",
     "SLACK_CHANNEL",
