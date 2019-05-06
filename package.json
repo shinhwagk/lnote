@@ -256,7 +256,7 @@
     "private": true,
     "workspaces": {
         "packages": [
-            ".github/storage-ts"
+            ".github/storage2file"
         ]
     }
 }

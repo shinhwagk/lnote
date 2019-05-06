@@ -13,7 +13,6 @@ import { randomBytes } from 'crypto';
 
 namespace ARGS {
     export const startDate = '2019-04-06T00:00:00';
-    export const firebaseFucniotnsUrl = process.env.FIREBASE_FUNCSTIONS_URL;
     export const storagePath = 'storage-file';
     export const storageTimestampFile = join(storagePath, 'timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
@@ -23,7 +22,7 @@ namespace ARGS {
     export const SlackToken = process.env.SLACK_TOKEN;
     export const SlackChannel = process.env.SLACK_CHANNEL;
 
-    const isOK = !!SlackToken && !!SlackChannel && !!firebaseFucniotnsUrl;
+    const isOK = !!SlackToken && !!SlackChannel;
     if (!isOK) {
         specialConsoleLog('env: SLACK_TOKEN or SLACK_CHANNEL or FIREBASE_FUNCSTIONS_URL no set.');
         process.exit(1);

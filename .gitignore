@@ -8,3 +8,4 @@ yarn-error.log
 /vscode-note/
 yarn.lock
 package-lock.json
+.github/*/bin/lib.js
