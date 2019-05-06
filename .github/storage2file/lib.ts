@@ -56,7 +56,7 @@ class StorageClientMessage {
 
         for (const data of this.tsMessages) {
             await push2File(data);
-            await cushionSleepSeconds(0.1);
+            await cushionSleepSeconds(1);
         }
         this.printStatRange();
         this.printTSNumber();

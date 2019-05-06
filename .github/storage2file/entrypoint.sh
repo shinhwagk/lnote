@@ -7,6 +7,6 @@ git checkout -b analytics origin/analytics
 
 storage
 
-git add storage
+git add storage2file
 git commit -m "update storage timestamp"
 git push -u origin analytics
