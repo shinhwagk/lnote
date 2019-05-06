@@ -1,6 +1,6 @@
 import { WebClient, WebAPICallResult } from '@slack/web-api/dist/WebClient';
 import { ConversationsHistoryArguments } from '@slack/web-api/dist/methods';
-import { existsSync, writeFileSync, readFileSync } from 'fs';
+import { existsSync, writeFileSync, readFileSync, mkdirSync } from 'fs';
 import getTime from 'date-fns/get_time';
 import subSeconds from 'date-fns/sub_seconds';
 import addMinutes from 'date-fns/add_minutes';
@@ -13,8 +13,8 @@ import * as https from 'https';
 
 namespace ARGS {
     export const firebaseFucniotnsUrl = process.env.FIREBASE_FUNCSTIONS_URL;
-    export const seriesPath = 'storage';
-    export const storageTimestampFile = join(seriesPath, 'timestamp');
+    export const storagePath = 'storage';
+    export const storageTimestampFile = join(storagePath, 'timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
     export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
     export const limit = 100;
@@ -29,7 +29,7 @@ namespace ARGS {
     }
 }
 
-class StorageTimeSeries {
+class StorageClientMessage {
     private readonly lastStorageTime: Date = readStorageTimestamp();
     private readonly latestDate = subSeconds(addMinutes(this.lastStorageTime, ARGS.storageRange), 1);
     private readonly oldestDate = this.lastStorageTime;
@@ -56,7 +56,7 @@ class StorageTimeSeries {
 
         for (const data of this.tsMessages) {
             try {
-                await storeSeriesData(data);
+                await push2FireStore(data);
             } catch (e) {
                 console.error(e);
             }
@@ -79,6 +79,9 @@ class StorageTimeSeries {
 }
 
 function readStorageTimestamp(): Date {
+    if (!existsSync(ARGS.storagePath)) {
+        mkdirSync(ARGS.storagePath);
+    }
     if (!existsSync(ARGS.storageTimestampFile)) {
         const startDate = toDate('2019-05-05T00:00:00')
         saveSorageTimestamp(startDate);
@@ -131,7 +134,7 @@ const httpsPost = (body: string) => {
     });
 };
 
-async function storeSeriesData(sd: string) {
+async function push2FireStore(sd: string) {
     await httpsPost(sd)
 }
 
@@ -150,7 +153,7 @@ export default async function main() {
 
     let stop = 1;
     while (stop) {
-        const sts = new StorageTimeSeries(slackWC);
+        const sts = new StorageClientMessage(slackWC);
         stop = await sts.start();
     }
     specialConsoleLog('end storage ts.');
