@@ -13,7 +13,7 @@ import { randomBytes } from 'crypto';
 
 namespace ARGS {
     export const startDate = '2019-04-06T00:00:00';
-    export const storagePath = 'storage-file';
+    export const storagePath = 'storage2file';
     export const storageTimestampFile = join(storagePath, 'timestamp');
     export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
     export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
