@@ -56,6 +56,7 @@ class StorageClientMessage {
 
         for (const data of this.tsMessages) {
             await push2FireStore(data);
+            await quotaLimitSleepSeconds(2.5);
         }
         this.printStatRange();
         this.printTSNumber();
@@ -72,6 +73,11 @@ class StorageClientMessage {
     printTSNumber() {
         specialConsoleLog(`update clients number: ${this.tsMessages.length}`);
     }
+}
+
+// firebase quota limit 50 exec/per 100s.
+function quotaLimitSleepSeconds(s: number) {
+    return new Promise(resolve => setTimeout(resolve, s * 1000));
 }
 
 function readStorageTimestamp(): Date {
