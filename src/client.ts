@@ -28,11 +28,12 @@ function genClientId() {
 
 function doActive() {
     try {
-        !existsSync(ClientFiles.active) && vfs.writeFileSync(ClientFiles.active, currentTime().toString());
-        const lastActiveDate = Number(vfs.readFileSync(ClientFiles.active));
-        if (isPast(addHours(lastActiveDate, 24))) {
+        const ct = currentTime();
+        const isFile = existsSync(ClientFiles.active);
+        const activeTime = isFile ? Number(vfs.readFileSync(ClientFiles.active)) : ct;
+        if (isPast(addHours(activeTime, 24)) || !isFile) {
             sendClientActions('active');
-            vfs.writeFileSync(ClientFiles.active, currentTime().toString());
+            vfs.writeFileSync(ClientFiles.active, ct.toString());
         }
     } catch (e) {
         removeSync(ClientFiles.active);
