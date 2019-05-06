@@ -80,7 +80,7 @@ class StorageTimeSeries {
 
 function readStorageTimestamp(): Date {
     if (!existsSync(ARGS.storageTimestampFile)) {
-        const startDate = toDate('2019-04-22T00:00:00')
+        const startDate = toDate('2019-05-05T00:00:00')
         saveSorageTimestamp(startDate);
         return startDate;
     }
