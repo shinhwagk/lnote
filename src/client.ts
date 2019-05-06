@@ -32,6 +32,7 @@ function doActive() {
         const lastActiveDate = Number(vfs.readFileSync(ClientFiles.active));
         if (isPast(addHours(lastActiveDate, 24))) {
             sendClientActions('active');
+            vfs.writeFileSync(ClientFiles.active, currentTime().toString());
         }
     } catch (e) {
         removeSync(ClientFiles.active);
