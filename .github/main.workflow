@@ -36,6 +36,7 @@ workflow "Clients Statistics" {
     "client number",
     "persistent charts",
     "push client actions",
+    "storage2file",
   ]
 }
 
@@ -46,6 +47,20 @@ action "storage messages" {
     "SLACK_TOKEN",
     "SLACK_CHANNEL",
     "FIREBASE_FUNCSTIONS_URL",
+  ]
+  env = {
+    DELAY = "10"
+    RANGE = "60"
+  }
+}
+
+action "storage2file" {
+  needs = ["set git config"]
+  uses = "./.github/storage"
+  secrets = [
+    "SLACK_TOKEN",
+    "SLACK_CHANNEL",
+    "GITHUB_TOKEN",
   ]
   env = {
     DELAY = "10"
