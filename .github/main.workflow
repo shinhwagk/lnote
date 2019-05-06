@@ -76,7 +76,7 @@ action "persistent client actions" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  needs = ["storage messages"]
+  needs = ["storage2file"]
 }
 
 action "new client number" {
