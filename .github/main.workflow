@@ -47,6 +47,7 @@ action "storage messages" {
     "SLACK_TOKEN",
     "SLACK_CHANNEL",
     "FIREBASE_FUNCSTIONS_URL",
+    "GITHUB_TOKEN",
   ]
   env = {
     DELAY = "10"
