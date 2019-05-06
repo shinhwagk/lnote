@@ -55,11 +55,7 @@ class StorageClientMessage {
         await pullSlackMessage(this.webClient, this.tsMessages, options);
 
         for (const data of this.tsMessages) {
-            try {
-                await push2FireStore(data);
-            } catch (e) {
-                console.error(e);
-            }
+            await push2FireStore(data);
         }
         this.printStatRange();
         this.printTSNumber();
@@ -113,7 +109,7 @@ async function pullSlackMessage(web: WebClient, msgs: string[], options: Convers
         specialConsoleLog(e.messages);
     }
 }
-const httpsPost = (body: string) => {
+const push2FireStore = (body: string) => {
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
             method: 'POST',
@@ -133,10 +129,6 @@ const httpsPost = (body: string) => {
         req.end();
     });
 };
-
-async function push2FireStore(sd: string) {
-    await httpsPost(sd)
-}
 
 function specialConsoleLog(log: string) {
     const special = Array.from({ length: log.length })
