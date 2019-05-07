@@ -29,6 +29,7 @@ export namespace ExtCmds {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
         ext.domainProvider.refresh(dn);
         await cmdHdlDomainPin(dn);
+        ext.clientActions('notes-create');
     }
     export async function cmdHdlNoteEdit(nId: string, category: string) {
         const picks = [];
@@ -69,6 +70,7 @@ export namespace ExtCmds {
         ext.dbFS.dch.createDomain(dpath, name);
         ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true });
+        ext.clientActions('domian-create');
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.activeNote.domainNode = dn;
@@ -93,6 +95,7 @@ export namespace ExtCmds {
         if (!cname) return;
         await cmdHdlNoteAdd(cname);
         ext.notesPanelView.parseDomain().showNotesPlanView();
+        ext.clientActions('category-add');
     }
     export async function cmdHdlNoteAdd(category: string, editFirst: boolean = true) {
         const nid: string = ext.dbFS.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
@@ -101,6 +104,7 @@ export namespace ExtCmds {
             await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.dbFS.getNoteContentFile(nid, '1')));
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
+        ext.clientActions('note-add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
         ext.dbFS.createNoteFiles(id);
