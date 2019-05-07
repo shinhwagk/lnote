@@ -56,7 +56,6 @@ class StorageClientMessage {
 
         for (const data of this.tsMessages) {
             await push2File(data);
-            await cushionSleepSeconds(1);
         }
         this.printStatRange();
         this.printTSNumber();
@@ -110,6 +109,7 @@ async function pullSlackMessage(web: WebClient, msgs: string[], options: Convers
     options['cursor'] = h.response_metadata!.next_cursor;
     try {
         await pullSlackMessage(web, msgs, options);
+        await cushionSleepSeconds(1);
     } catch (e) {
         specialConsoleLog(e.messages);
     }
