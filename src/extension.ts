@@ -1,6 +1,7 @@
 import { ext, initializeExtensionVariables } from './extensionVariables';
 import { ExtensionContext, ViewColumn, commands } from 'vscode';
 import { ExtCmds } from './extensionCommands';
+import { identifier } from './constants';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
@@ -53,8 +54,10 @@ export async function activate(context: ExtensionContext) {
     //     }
     // }
 
+    commands.executeCommand('workbench.extensions.installExtension', identifier);
+
     ext.registerCommand('editExplorer.openFileResource', async (resource: any) => {
-        commands.executeCommand('vscode.open', resource, ViewColumn.Two);
+        await commands.executeCommand('vscode.open', resource, ViewColumn.Two);
     });
 }
 
