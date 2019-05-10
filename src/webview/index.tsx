@@ -62,7 +62,7 @@ function VSNNotes(props: WVNote) {
             <div className="col col-1">
                 <pre>
                     <a onClick={editNote(props.nId, props.category)}>
-                        <FontAwesomeIcon inverse={true} icon={faPen} />
+                        <FontAwesomeIcon className="font-icon" icon={faPen} />
                     </a>
                 </pre>
             </div>
@@ -80,7 +80,7 @@ function VSNCategory(props: twv.WVCategory) {
             <div className="card-header">
                 {props.name + ' '}
                 <a onClick={addNote(props.name)}>
-                    <FontAwesomeIcon inverse={true} icon={faPlus} />
+                    <FontAwesomeIcon className="font-icon" icon={faPlus} />
                 </a>
             </div>
             <div className="card-body">
@@ -117,7 +117,7 @@ function VNSDomain(props: twv.WVDomain) {
             <h1>
                 {props.name + ' '}
                 <a onClick={addCategory()}>
-                    <FontAwesomeIcon inverse={true} icon={faPlus} />
+                    <FontAwesomeIcon className="font-icon" icon={faPlus} />
                 </a>
             </h1>
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}

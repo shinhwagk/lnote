@@ -9,15 +9,20 @@
 @import '../../node_modules/bootstrap/scss/mixins/badge';
 @import '../../node_modules/bootstrap/scss/mixins/transition';
 @import '../../node_modules/bootstrap/scss/vendor/rfs';
-$card-border-color: $gray-600;
-$card-bg: $gray-900; // rgb(30, 30, 30)
 
+$card-bg: var(--vscode-editor-background); // card background color;
+$card-border-color: var(--vscode-editor-foreground); // card border color
 @import '../../node_modules/bootstrap/scss/grid';
 @import '../../node_modules/bootstrap/scss/card';
 @import '../../node_modules/bootstrap/scss/badge';
 // @import '../../node_modules/bootstrap/scss/utilities/borders';
 // @import '../../node_modules/bootstrap/scss/transitions';
 // @import '../../node_modules/bootstrap/scss/buttons';
+
+.font-icon {
+    color: var(--vscode-editor-foreground);
+}
+
 .card-body {
     padding: 0px;
 }
