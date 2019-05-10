@@ -110,6 +110,7 @@ export namespace ExtCmds {
         ext.dbFS.createNoteFiles(id);
         ext.notesPanelView.parseDomain().showNotesPlanView();
         await cmdHdlNoteFilesOpen(id);
+        ext.clientActions('files-create');
     }
     export async function cmdHdlNoteEditFilesClose() {
         await ext.setContext(ctxFilesExplorer, true);
@@ -117,6 +118,7 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditDocCreate(id: string) {
         ext.dbFS.createNoteDoc(id);
         await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.dbFS.getNoteDocIndexFile(id, 'README.md')));
+        ext.clientActions('doc-create');
     }
     export async function cmdHdlDomainMove(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
@@ -133,6 +135,7 @@ export namespace ExtCmds {
             }
         }
         ext.activeNote.dpath = newDpath;
+        ext.clientActions('domain-move');
     }
     export async function cmdHdlDomainRename(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
@@ -143,6 +146,7 @@ export namespace ExtCmds {
         newDpath[newDpath.length - 1] = newName;
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
         ext.domainProvider.refresh(orgDpath.slice(0, orgDpath.length - 1).join('/'));
+        ext.clientActions('domain-rename');
     }
     export async function cmdHdlNoteOpenFolder(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNotePath(id)), true);
@@ -153,6 +157,7 @@ export namespace ExtCmds {
         const dpath = vpath.splitPath(ext.activeNote.domainNode);
         ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
         ext.notesPanelView.parseDomain().showNotesPlanView();
+        ext.clientActions('note-folder-open');
     }
     export async function cmdHdlCategoryRename(oldCategory: string) {
         const newCname = await window.showInputBox({ value: oldCategory });
@@ -168,14 +173,17 @@ export namespace ExtCmds {
         } else {
             noteDocHtmlPanel(readmeFile);
         }
+        ext.clientActions('note-doc-show');
     }
     export async function cmdHdlNoteFilesOpen(nId: string) {
         ext.activeNote.id = nId;
         ext.filesProvider.refresh();
         await ext.setContext(ctxFilesExplorer, true);
+        ext.clientActions('note-files-open');
     }
     export async function cmdHdlFilesClose() {
         await ext.setContext(ctxFilesExplorer, false);
+        ext.clientActions('note-files-open');
     }
     export async function cmdHdlFilesEditOpen() {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteFilesPath(ext.activeNote.id)), true);
