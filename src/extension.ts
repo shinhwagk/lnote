@@ -54,8 +54,6 @@ export async function activate(context: ExtensionContext) {
     //     }
     // }
 
-    commands.executeCommand('workbench.extensions.installExtension', identifier);
-
     ext.registerCommand('editExplorer.openFileResource', async (resource: any) => {
         await commands.executeCommand('vscode.open', resource, ViewColumn.Two);
     });
