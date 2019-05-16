@@ -1,44 +1,105 @@
-@import '../../node_modules/bootstrap/scss/functions';
-@import '../../node_modules/bootstrap/scss/variables';
-@import '../../node_modules/bootstrap/scss/mixins/hover';
-@import '../../node_modules/bootstrap/scss/mixins/border-radius';
-@import '../../node_modules/bootstrap/scss/mixins/breakpoints';
-@import '../../node_modules/bootstrap/scss/mixins/grid-framework';
-@import '../../node_modules/bootstrap/scss/mixins/grid';
-
-@import '../../node_modules/bootstrap/scss/mixins/badge';
-@import '../../node_modules/bootstrap/scss/mixins/transition';
-@import '../../node_modules/bootstrap/scss/vendor/rfs';
-
-$card-bg: var(--vscode-editor-background); // card background color;
-$card-border-color: var(--vscode-editor-foreground); // card border color
-@import '../../node_modules/bootstrap/scss/grid';
-@import '../../node_modules/bootstrap/scss/card';
-@import '../../node_modules/bootstrap/scss/badge';
-// @import '../../node_modules/bootstrap/scss/utilities/borders';
-// @import '../../node_modules/bootstrap/scss/transitions';
-// @import '../../node_modules/bootstrap/scss/buttons';
-
-.font-icon {
-    color: var(--vscode-editor-foreground);
+body {
+    // font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+    font-size: 14px;
+    font-family: var(--vscode-font-family)
+    // word-wrap: break-word;
 }
 
-.card-body {
-    padding: 0px;
-}
-
-.container-fluid {
+.grid-notes {
+    // width: 50%;
     max-width: 99%;
+    display: grid;
+    margin: 0 auto;
+    grid-row-gap: 5px;
 }
 
-pre {
+.grid-category {
+    padding: 5px;
+
+    border-radius: .25rem;
+
+    border-width: 1px;
+    border-style: solid;
+    .vscode-light & {
+        border-color: rgba(0, 0, 0, 0.18);
+    }
+
+    .vscode-dark & {
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+}
+
+.grid-category-name {
+    font-size: 18px;
+    padding-bottom: 5px;
+
+    font-weight: bold;
+
+    border-bottom-width: 0.5px;
+    border-bottom-style: solid;
+    .vscode-light & {
+        border-bottom-color: rgba(0, 0, 0, 0.69);
+        
+    }
+
+    .vscode-dark & {
+        border-bottom-color: rgba(255, 255, 255, 0.69);
+    }
+}
+
+.grid-category-body {
+    display: grid;
+    grid-row-gap: 0px;
+}
+
+.grid-note {
+    grid-template-columns: 65px 1fr 55px;
+    display: grid;
+    border-top: 1px solid;
+
+    .vscode-light & {
+        border-color: rgba(0, 0, 0, 0.18);
+    }
+
+    .vscode-dark & {
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    &:hover {
+        background-color: var(--vscode-list-hoverBackground);
+    }
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.grid-note-id {
+    text-align: center;
+}
+
+.grid-note-edit {
+    text-align: center;
+}
+
+.grid-note-content {
+    display: grid;
     white-space: pre-wrap;
-    white-space: -o-pre-wrap;
+    // white-space: -o-pre-wrap;
+    word-wrap: break-word;
 }
 
-.vsn-col {
-    border-left-style: solid;
-    border-left-color: rgb(56, 54, 54);
-    border-left-width: 1px;
-    padding-left: 2px;
+.icon {
+    .vscode-light & {
+        color: rgba(0, 0, 0, 0.6);
+    }
+
+    .vscode-dark & {
+        color: rgba(255, 255, 255, 0.6);
+    }
 }
+
+// pre {
+//     white-space: pre-wrap;
+//     white-space: -o-pre-wrap;
+//     margin: 2px;
+// }

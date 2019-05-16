@@ -142,6 +142,6 @@ export class NotesPanelView {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }
         }
-        return { name: this.dpathCache[this.dpathCache.length - 1], categories: categories };
+        return { dpath: this.dpathCache, categories: categories };
     }
 }

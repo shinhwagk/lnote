@@ -1,6 +1,6 @@
 export namespace ToWebView {
     export interface WVDomain {
-        name: string;
+        dpath: string[];
         categories: WVCategory[];
     }
 

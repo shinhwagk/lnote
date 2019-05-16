@@ -40,31 +40,30 @@ function renderNoteFiles(props: { id: string }) {
 function VSNNotes(props: WVNote) {
     const contents = props.contents.map((c, i) => (
         <div
-            className="col"
             onDoubleClick={editContentFile(props.nId, (i + 1).toString())}
             onContextMenu={editCol(props.nId, (i + 1).toString())}
         >
-            <pre className="vsn-col">{c || ' '}</pre>
+            {c || ' '}
         </div>
     ));
 
     const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId.substr(0, 3)}</span>;
     const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>{props.nId.substr(3, 3)}</span>;
+    const gridNoteContentStyle: React.CSSProperties = { gridTemplateColumns: `repeat(${contents.length}, 1fr)` };
+
     return (
-        <div className="row">
-            <div className="col col-1">
-                <pre>
-                    {isDoc}
-                    {isFiles}
-                </pre>
+        <div className="grid-note">
+            <div className="grid-note-id">
+                {isDoc}
+                {isFiles}
             </div>
-            {contents}
-            <div className="col col-1">
-                <pre>
-                    <a onClick={editNote(props.nId, props.category)}>
-                        <FontAwesomeIcon className="font-icon" icon={faPen} />
-                    </a>
-                </pre>
+            <div className="grid-note-content" style={gridNoteContentStyle}>
+                {contents}
+            </div>
+            <div className="grid-note-edit">
+                <a onClick={editNote(props.nId, props.category)}>
+                    <FontAwesomeIcon className="icon" icon={faPen} />
+                </a>
             </div>
         </div>
     );
@@ -76,16 +75,14 @@ function VSNCategory(props: twv.WVCategory) {
     ));
 
     return (
-        <div id={props.name} className="card bg-dark text-white">
-            <div className="card-header">
+        <div id={props.name} className="grid-category">
+            <div className="grid-category-name">
                 {props.name + ' '}
                 <a onClick={addNote(props.name)}>
-                    <FontAwesomeIcon className="font-icon" icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size='xs' icon={faPlus} />
                 </a>
             </div>
-            <div className="card-body">
-                <div className="container-fluid">{listnote}</div>
-            </div>
+            <div className="grid-category-body">{listnote}</div>
         </div>
     );
 }
@@ -104,7 +101,7 @@ function VSNCategory(props: twv.WVCategory) {
 //     );
 // }
 
-function VNSDomain(props: twv.WVDomain) {
+function VNSDomain(props: WVDomain) {
     const categories = props.categories.map((category: twv.WVCategory) => (
         <div>
             <VSNCategory name={category.name} notes={category.notes} />
@@ -114,26 +111,25 @@ function VNSDomain(props: twv.WVDomain) {
 
     return (
         <div>
-            <h1>
-                {props.name + ' '}
+            <h2>
+                {props.dpath.join(' / ') + ' '}
                 <a onClick={addCategory()}>
-                    <FontAwesomeIcon className="font-icon" icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size='sm' icon={faPlus} />
                 </a>
-            </h1>
+            </h2>
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}
-            <div>{categories}</div>
+            <div className="grid-notes">{categories}</div>
         </div>
     );
 }
-
 window.addEventListener('message', event => {
     const message: twv.DomainData = event.data;
 
     switch (message.command) {
         case 'data':
-            const name = message.data.name;
+            const dpath = message.data.dpath;
             const categories = message.data.categories;
-            ReactDOM.render(<VNSDomain name={name} categories={categories} />, document.getElementById('root'));
+            ReactDOM.render(<VNSDomain dpath={dpath} categories={categories} />, document.getElementById('root'));
             break;
         default:
             ReactDOM.render(<h1>loading...{message}</h1>, document.getElementById('root'));
@@ -146,4 +142,9 @@ interface WVNote {
     contents: string[];
     doc: boolean;
     files: boolean;
+}
+
+interface WVDomain {
+    dpath: string[];
+    categories: twv.WVCategory[];
 }
