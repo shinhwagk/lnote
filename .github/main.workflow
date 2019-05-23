@@ -34,7 +34,6 @@ workflow "Clients Statistics" {
   resolves = [
     "active client number",
     "create note number",
-    "GitHub Action for npm",
     "persistent statistics",
   ]
 }
@@ -69,6 +68,7 @@ action "storage2file" {
 }
 
 action "new client number" {
+  needs = [ "storage2firestore" ]
   uses = "actions/bin/sh@master"
   env = {
     url = "github.com"
@@ -81,8 +81,7 @@ action "persistent statistics" {
   needs = [
     "new client number",
     "active client number",
-    "GitHub Action for npm",
-    "create note number",
+    "create note number"
   ]
   args = [" [ -n \"$(git status -s -- statistics)\" ] && git add statistics && git commit -m 'update statistics' && git push -u origin analytics -v"]
   secrets = ["GITHUB_TOKEN"]
@@ -113,9 +112,4 @@ action "set git config" {
 action "storage2firestore" {
   uses = "actions/npm@59b64a598378f31e49cb76f27d6f3312b582f680"
   needs = ["storage2file"]
-}
-
-action "GitHub Action for npm" {
-  uses = "actions/npm@59b64a598378f31e49cb76f27d6f3312b582f680"
-  needs = ["storage2firestore"]
 }
