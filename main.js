@@ -29,10 +29,8 @@ function displayCharts(cc, ac) {
   });
 }
 
-async function main() {
+(async () => {
   const cc = await axios.get(f1);
   const ac = await axios.get(f2);
   displayCharts(cc.data, ac.data);
-}
-
-main();
+})();
