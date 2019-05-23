@@ -32,10 +32,10 @@ action "Publish" {
 workflow "Clients Statistics" {
   on = "schedule(10 * * * *)"
   resolves = [
-    "client number",
-    "persistent charts",
-    "push client actions",
-    "storage2file",
+    "active client number",
+    "create note number",
+    "GitHub Action for npm",
+    "persistent statistics",
   ]
 }
 
@@ -68,19 +68,8 @@ action "storage2file" {
   }
 }
 
-action "persistent client actions" {
-  uses = "./.github/persistent"
-  secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
-  env = {
-    DELAY = "5"
-    STAT_RANGE = "10"
-  }
-  needs = ["storage2file"]
-}
-
 action "new client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent client actions"]
   env = {
     url = "github.com"
   }
@@ -90,35 +79,28 @@ action "new client number" {
 action "persistent statistics" {
   uses = "srt32/git-actions@v0.0.3"
   needs = [
-    "client number",
     "new client number",
+    "active client number",
+    "GitHub Action for npm",
+    "create note number",
   ]
   args = [" [ -n \"$(git status -s -- statistics)\" ] && git add statistics && git commit -m 'update statistics' && git push -u origin analytics -v"]
   secrets = ["GITHUB_TOKEN"]
 }
 
-action "client number" {
+action "active client number" {
   uses = "actions/bin/sh@master"
-  needs = ["persistent client actions"]
+  needs = [
+    "storage2firestore",
+  ]
   args = ["sed -i '/^$/d' statistics/client_number; ls ./clients | wc -l >> statistics/client_number"]
 }
 
-action "create charts" {
-  uses = "actions/bin/curl@master"
-  needs = ["persistent statistics"]
-  secrets = ["GOOGLE_WEB_URL"]
-  args = "github.com"
-}
-
-action "persistent charts" {
+action "create note number" {
   uses = "srt32/git-actions@v0.0.3"
-  needs = ["create charts"]
-  secrets = ["GITHUB_TOKEN"]
-}
-
-action "push client actions" {
-  uses = "srt32/git-actions@v0.0.3"
-  needs = ["persistent client actions"]
+  needs = [
+    "storage2firestore",
+  ]
   args = ["[ -n '${git status -s}' ] && git add clients statistics-date && git commit -m 'update client actions' && git push -u origin analytics -v"]
   secrets = ["GITHUB_TOKEN"]
 }
@@ -126,4 +108,14 @@ action "push client actions" {
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
+}
+
+action "storage2firestore" {
+  uses = "actions/npm@59b64a598378f31e49cb76f27d6f3312b582f680"
+  needs = ["storage2file"]
+}
+
+action "GitHub Action for npm" {
+  uses = "actions/npm@59b64a598378f31e49cb76f27d6f3312b582f680"
+  needs = ["storage2firestore"]
 }
