@@ -1,5 +1,7 @@
 const f1 =
   "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/new-clients%4024h.json";
+const f2 =
+  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/active-clients%4024h.json";
 
 const date = new Date();
 date.setHours(0, 0, 0, 0);
@@ -11,12 +13,12 @@ const days = Array.from({ length: 30 }, (_v, i) => i)
   .map(d => new Date(d))
   .map(d => `${d.getMonth()}-${d.getDate()}`);
 
-function displayCharts(chartData) {
+function displayCharts(cc, ac) {
   const data = {
     labels: days,
     datasets: [
-      { name: "new clients", values: chartData },
-      { name: "active clients", values: chartData }
+      { name: "new clients", values: cc },
+      { name: "active clients", values: ac }
     ]
   };
   new frappe.Chart("#chart", {
@@ -26,4 +28,11 @@ function displayCharts(chartData) {
     colors: ["red"]
   });
 }
-axios.get(f1).then(response => displayCharts(response.data));
+
+async function main() {
+  const cc = await axios.get(f1);
+  const ac = await axios.get(f2);
+  displayCharts(cc.data, ac.data);
+}
+
+main();
