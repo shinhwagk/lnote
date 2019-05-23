@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "strict": true,
+    "target": "es2017"
+  },
+  "compileOnSave": true,
+  "files": ["index.ts"]
+}
