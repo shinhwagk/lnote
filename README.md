@@ -10,7 +10,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 * each ***category*** consists of one or more ***note***.
 * each ***note*** consists of one or more ***short doc***, ***doc***(markdown/html), ***files***(attachment)
 
-## Usages
+## Usages 
 
 - create a note
 
