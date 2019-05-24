@@ -6,3 +6,7 @@
 	path = gh-pages
 	url = https://github.com/shinhwagk/vscode-note
 	branch = gh-pages
+[submodule "@analytics"]
+	path = analytics
+	url = https://github.com/shinhwagk/vscode-note
+	branch = analytics
