@@ -10,3 +10,11 @@
 	path = analytics
 	url = https://github.com/shinhwagk/vscode-note
 	branch = analytics
+[submodule "@analytics@storage2file"]
+	path = analytics@storage2file
+	url = https://github.com/shinhwagk/vscode-note
+	branch = analytics@storage2file
+[submodule "dockerhub/storage2file"]
+	path = dockerhub/storage2file
+	url = https://github.com/shinhwagk/vscode-note
+	branch = dockerhub/storage2file
