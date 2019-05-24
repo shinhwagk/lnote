@@ -1,0 +1,4 @@
+[submodule "@vscode-note"]
+	path = vscode-note
+	url = https://github.com/shinhwagk/vscode-note
+	branch = vscode-note
