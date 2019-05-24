@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "vscode-note"
+		},
+		{
+			"path": "analytics"
+		},
+		{
+			"path": "gh-pages"
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true
+	}
+}
