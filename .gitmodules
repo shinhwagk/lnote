@@ -2,3 +2,7 @@
 	path = vscode-note
 	url = https://github.com/shinhwagk/vscode-note
 	branch = vscode-note
+[submodule "@gh-pages"]
+	path = gh-pages
+	url = https://github.com/shinhwagk/vscode-note
+	branch = gh-pages
