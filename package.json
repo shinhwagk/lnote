@@ -5,6 +5,9 @@
     "postinstall": "npm run compile",
     "compile": "tsc -p ."
   },
+  "bin": {
+    "storage": "./bin/storage.js"
+  },
   "engines": {
     "node": "8"
   },
