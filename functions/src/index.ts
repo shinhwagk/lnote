@@ -25,6 +25,7 @@ exports.newClient = functions.firestore
     });
   });
 
+
 exports.clientAction = functions.firestore
   .document("actions/{id}")
   .onCreate((snap, context) => {
