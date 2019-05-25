@@ -18,10 +18,22 @@ exports.newClient = functions.firestore
     const analyzesRef = db.collection("analyzes").doc(getTime(date).toString());
 
     analyzesRef.get().then(snapshot => {
-      const cnt = snapshot.exists ? snapshot.data()!.new : 0;
-      analyzesRef
-        .update({ new: cnt + 1 })
-        .then(() => console.log(`new client counter increased!`));
+      if (snapshot.exists) {
+        const cnt = snapshot.exists ? snapshot.data()!.new : 0;
+        if (snapshot.data()!.new) {
+          analyzesRef
+            .update({ new: cnt + 1 })
+            .then(() => console.log(`new client counter increased!`));
+        } else {
+          analyzesRef
+            .update({ new: 1 })
+            .then(() => console.log(`new client counter increased!`));
+        }
+      } else {
+        analyzesRef
+          .set({ new: 1 })
+          .then(() => console.log(`new client counter increased!`));
+      }
     });
   });
 
