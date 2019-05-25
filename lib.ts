@@ -1,142 +1,105 @@
-import { WebClient, WebAPICallResult } from '@slack/web-api/dist/WebClient';
-import { ConversationsHistoryArguments } from '@slack/web-api/dist/methods';
-import { existsSync, writeFileSync, readFileSync, mkdirSync } from 'fs';
-import getTime from 'date-fns/get_time';
-import subSeconds from 'date-fns/sub_seconds';
-import addMinutes from 'date-fns/add_minutes';
-import addSeconds from 'date-fns/add_seconds';
-import isPast from 'date-fns/is_past';
-import toDate from 'date-fns/parse';
-import dateFormat from 'date-fns/format';
-import { join } from 'path';
-import { randomBytes } from 'crypto';
+import * as admin from "firebase-admin";
+import { readdirSync, readFileSync, unlinkSync } from "fs";
+import { join } from "path";
 
-namespace ARGS {
-    export const startDate = '2019-04-06T00:00:00';
-    export const storagePath = 'storage2file';
-    export const storageTimestampFile = join(storagePath, 'timestamp');
-    export const storageRange = process.env.STORAGE_RANGE ? Number(process.env.RANGE) : 60; // minute
-    export const storageDelay = process.env.STORAGE_DELAY ? Number(process.env.DELAY) : 10; // minute
-    export const limit = 100;
+interface VSClinet {
+  cid: string;
+  info: { [name: string]: string };
+  timestamp: number;
+  version: string;
+}
+interface VSAction {
+  cid: string;
+  action: string;
+  timestamp: number;
+  version: string;
+}
 
-    export const SlackToken = process.env.SLACK_TOKEN;
-    export const SlackChannel = process.env.SLACK_CHANNEL;
+namespace Firestore {
+  const serviceAccountKey = process.env.SERVICE_ACCOUNT_KEY;
+  if (!serviceAccountKey) {
+    console.error(`env SERVICE_ACCOUNT_KEY no exist.`);
+    process.exit(1);
+  }
 
-    const isOK = !!SlackToken && !!SlackChannel;
-    if (!isOK) {
-        specialConsoleLog('env: SLACK_TOKEN or SLACK_CHANNEL or FIREBASE_FUNCSTIONS_URL no set.');
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(serviceAccountKey!))
+  });
+
+  const db = admin.firestore();
+
+  const cActions = db.collection("actions");
+  const cClients = db.collection("clients");
+
+  export function addAction(data: any) {
+    return cActions.add(data);
+  }
+
+  export function addClients(data: VSClinet) {
+    const docRef = cClients.doc(data.cid);
+    return docRef.set(data);
+  }
+}
+
+namespace Storage2file {
+  export const dirpath = "../storage2file";
+  export async function deleteFile(file: string) {
+    unlinkSync(join(dirpath, file));
+  }
+  export async function readFile(file: string): Promise<string> {
+    return readFileSync(join(Storage2file.dirpath, file), {
+      encoding: "utf-8"
+    });
+  }
+}
+
+// tslint:disable-next-line: no-namespace
+namespace StorageToFirestore {
+  let count = 0;
+
+  export async function main() {
+    for (const file of readdirSync(Storage2file.dirpath)) {
+      if (file === "timestamp") {
+        continue;
+      }
+      console.log(`process ${file}.`);
+      try {
+        const obj = JSON.parse(await Storage2file.readFile(file));
+        if (isClient(obj)) {
+          await Firestore.addClients(obj);
+          await Storage2file.deleteFile(file);
+          count += 1;
+          console.log(`file ${file} upload. total count: ${count}`);
+        }
+        if (isAction(obj)) {
+          await Firestore.addAction(obj);
+          await Storage2file.deleteFile(file);
+          count += 1;
+          console.log(`file ${file} upload. total count: ${count}`);
+        }
+      } catch (e) {
+        console.error(e);
         process.exit(1);
-    }
-}
-
-class StorageClientMessage {
-    private readonly lastStorageTime: Date = readStorageTimestamp();
-    private readonly latestDate = subSeconds(addMinutes(this.lastStorageTime, ARGS.storageRange), 1);
-    private readonly oldestDate = this.lastStorageTime;
-    private readonly activeStatTime = addMinutes(this.latestDate, ARGS.storageDelay);
-    private readonly isActiveStat = isPast(this.activeStatTime);
-    private readonly tsMessages: string[] = [];
-
-    constructor(private readonly webClient: WebClient) {}
-
-    async start(): Promise<number> {
-        if (!this.isActiveStat) {
-            return 0;
-        }
-
-        const latest = (getTime(this.latestDate) / 1000).toString();
-        const oldest = (getTime(this.oldestDate) / 1000).toString();
-        const options: ConversationsHistoryArguments = {
-            channel: ARGS.SlackChannel!,
-            latest: latest,
-            oldest: oldest,
-            limit: ARGS.limit,
-        };
-        await pullSlackMessage(this.webClient, this.tsMessages, options);
-
-        for (const data of this.tsMessages) {
-            await push2File(data);
-        }
-        this.printStatRange();
-        this.printTSNumber();
-        saveSorageTimestamp(addSeconds(this.latestDate, 1));
-        return 1;
+      }
     }
 
-    printStatRange() {
-        const startDate = dateFormat(this.oldestDate, 'YYYY-MM-DDTHH:mm:ss');
-        const endDate = dateFormat(this.latestDate, 'YYYY-MM-DDTHH:mm:ss');
-        specialConsoleLog(`storage range: ${startDate} - ${endDate}.`);
+    function isClient(object: any): object is VSClinet {
+      return (
+        "cid" in object &&
+        "info" in object &&
+        "timestamp" in object &&
+        "version" in object
+      );
     }
 
-    printTSNumber() {
-        specialConsoleLog(`update clients number: ${this.tsMessages.length}`);
+    function isAction(object: any): object is VSAction {
+      return (
+        "cid" in object &&
+        "action" in object &&
+        "timestamp" in object &&
+        "version" in object
+      );
     }
+  }
 }
-
-function cushionSleepSeconds(s: number) {
-    return new Promise(resolve => setTimeout(resolve, s * 1000));
-}
-
-function readStorageTimestamp(): Date {
-    if (!existsSync(ARGS.storagePath)) {
-        mkdirSync(ARGS.storagePath);
-    }
-    if (!existsSync(ARGS.storageTimestampFile)) {
-        const startDate = toDate(ARGS.startDate);
-        saveSorageTimestamp(startDate);
-        return startDate;
-    }
-    return toDate(readFileSync(ARGS.storageTimestampFile, { encoding: 'utf-8' }));
-}
-
-function saveSorageTimestamp(date: Date) {
-    writeFileSync(ARGS.storageTimestampFile, dateFormat(date, 'YYYY-MM-DDTHH:mm:ss'), { encoding: 'utf-8' });
-}
-
-interface WithMessagesResult extends WebAPICallResult {
-    messages?: { subtype: string; text: string }[];
-}
-
-async function pullSlackMessage(web: WebClient, msgs: string[], options: ConversationsHistoryArguments) {
-    const h: WithMessagesResult = await web.conversations.history(options);
-    if (!h.ok) return;
-    if (h.messages!.length === 0) return;
-    const ms = h.messages!.filter(m => m.subtype === 'bot_message');
-    if (ms.length === 0) return;
-    ms.forEach(m => msgs.push(m.text));
-    if (!h.has_more) return;
-    options['cursor'] = h.response_metadata!.next_cursor;
-    try {
-        await pullSlackMessage(web, msgs, options);
-        await cushionSleepSeconds(1);
-    } catch (e) {
-        specialConsoleLog(e.messages);
-    }
-}
-const push2File = (body: string) => {
-    const docId = randomBytes(10).toString('hex');
-    const docFile = join(ARGS.storagePath, docId);
-    writeFileSync(docFile, body, { encoding: 'utf-8' });
-};
-
-function specialConsoleLog(log: string) {
-    const special = Array.from({ length: log.length })
-        .map(() => '#')
-        .join('');
-    console.log(`##${special}##`);
-    console.log(`# ${log} #`);
-    console.log(`##${special}##`);
-}
-
-export default async function main() {
-    specialConsoleLog('start storage ts.');
-    const slackWC = new WebClient(ARGS.SlackToken!);
-
-    let stop = 1;
-    while (stop) {
-        const sts = new StorageClientMessage(slackWC);
-        stop = await sts.start();
-    }
-    specialConsoleLog('end storage ts.');
-}
+StorageToFirestore.main();
