@@ -37,6 +37,15 @@ action "storage2file" {
   }
 }
 
+action "storage2file-firestore" {
+  needs = ["storage2file"]
+  uses = "shinhwagk/vscode-note@dockerhub/storage2file-firestore"
+  secrets = [
+    "SERVICE_ACCOUNT_KEY",
+    "GITHUB_TOKEN",
+  ]
+}
+
 action "persistent client actions" {
   uses = "./.github/persistent"
   secrets = ["SLACK_TOKEN", "SLACK_CHANNEL"]
@@ -44,7 +53,7 @@ action "persistent client actions" {
     DELAY = "5"
     STAT_RANGE = "10"
   }
-  needs = ["storage2file"]
+  needs = ["storage2file-firestore"]
 }
 
 action "new client number" {
