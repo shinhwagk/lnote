@@ -45,6 +45,11 @@ exports.clientAction = functions.firestore
           analyzesRef
             .update(o)
             .then(() => console.log("Incomers counter increased!"));
+        } else {
+          o[action] = 1;
+          analyzesRef
+            .update(o)
+            .then(() => console.log("Incomers counter increased!"));
         }
       } else {
         o[action] = 1;
