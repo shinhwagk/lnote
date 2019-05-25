@@ -1,24 +1,18 @@
 {
-  "name": "vscode-note.storage2file",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/shinhwagk/vscode-note",
-  "author": "shinhwagk <shanghai_sl@hotmail.com>",
-  "license": "MIT",
-  "bin": {
-    "storage": "./bin/storage.js"
-  },
-  "files": [
-    "./bin"
-  ],
+  "name": "storage2file-firestore",
   "scripts": {
-    "postinstall": "npm run compile",
-    "compile": "tsc -p ."
+    "build": "tsc"
   },
+  "engines": {
+    "node": "8"
+  },
+  "main": "index.js",
   "dependencies": {
-    "@slack/web-api": "^5.0.1",
-    "date-fns": "^1.30.1",
-    "@types/node": "^11.13.9",
-    "typescript": "^3.4.5"
-  }
+    "firebase-admin": "^7.0.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2"
+  },
+  "private": true
 }
