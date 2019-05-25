@@ -102,4 +102,5 @@ namespace StorageToFirestore {
     }
   }
 }
-StorageToFirestore.main();
+
+export default StorageToFirestore.main;
