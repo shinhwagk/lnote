@@ -21,7 +21,7 @@ exports.newClient = functions.firestore
       const cnt = snapshot.exists ? snapshot.data()!.new : 0;
       analyzesRef
         .update({ new: cnt + 1 })
-        .then(() => console.log("Incomers counter increased!"));
+        .then(() => console.log(`new client counter increased!`));
     });
   });
 
