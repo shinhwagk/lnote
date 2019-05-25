@@ -40,7 +40,7 @@ exports.clientAction = functions.firestore
 
     analyzesRef.get().then(snapshot => {
       const o: { [action: string]: number } = {};
-      if (snapshot.exists || !snapshot.data()![action]) {
+      if (snapshot.exists && !snapshot.data()![action]) {
         if (snapshot.data()![action]) {
           o[action] = snapshot.data()![action] + 1;
           analyzesRef
