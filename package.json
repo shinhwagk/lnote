@@ -2,11 +2,15 @@
   "name": "storage2file-firestore",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc"
+    "postinstall": "npm run compile",
+    "compile": "tsc -p ."
   },
   "engines": {
     "node": "8"
   },
+  "files": [
+    "./bin"
+  ],
   "main": "index.js",
   "dependencies": {
     "firebase-admin": "^7.0.0"
@@ -14,6 +18,5 @@
   "devDependencies": {
     "tslint": "^5.12.0",
     "typescript": "^3.2.2"
-  },
-  "private": true
+  }
 }
