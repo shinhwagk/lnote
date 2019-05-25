@@ -1,6 +1,6 @@
 FROM node:8
 
-WORKDIR /storage2file
+WORKDIR /storage2file-firestore
 
 COPY package.json .
 COPY bin bin
