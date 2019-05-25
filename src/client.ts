@@ -9,7 +9,6 @@ import compareVersions from 'compare-versions';
 import { identifier } from './constants';
 import addHours from 'date-fns/add_hours';
 import isPast from 'date-fns/is_past';
-import toDate from 'date-fns/parse';
 
 type ActionTimestamp = number;
 type OSInfo = { [attr: string]: string };
