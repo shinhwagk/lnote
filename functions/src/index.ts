@@ -25,7 +25,6 @@ exports.newClient = functions.firestore
     });
   });
 
-
 exports.clientAction = functions.firestore
   .document("actions/{id}")
   .onCreate((snap, context) => {
@@ -40,7 +39,7 @@ exports.clientAction = functions.firestore
 
     analyzesRef.get().then(snapshot => {
       const o: { [action: string]: number } = {};
-      if (snapshot.exists && !snapshot.data()![action]) {
+      if (snapshot.exists) {
         if (snapshot.data()![action]) {
           o[action] = snapshot.data()![action] + 1;
           analyzesRef
@@ -50,7 +49,7 @@ exports.clientAction = functions.firestore
       } else {
         o[action] = 1;
         analyzesRef
-          .update(o)
+          .set(o)
           .then(() => console.log("Incomers counter increased!"));
       }
     });
