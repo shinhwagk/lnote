@@ -7,7 +7,7 @@ branch=(gh-pages dockerhub/storage2file-firestore dockerhub/storage2file firebas
 for b in ${branch[*]}; do
 	echo "process $b"
   if [ -d $b ]; then
-		cd "$b" && git pull &
+		cd "$b" && git pull
 	else
 		git clone --depth=1 -b "$b" "$repository" "$b" 2>/dev/null
 	fi
