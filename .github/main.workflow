@@ -25,7 +25,7 @@ action "storage messages" {
 
 action "storage2file" {
   needs = ["set git config"]
-  uses = "shinhwagk/vscode-note@dockerhub/storage2file"
+  uses = "shinhwagk/vscode-note@dockerhub@storage2file"
   secrets = [
     "SLACK_TOKEN",
     "SLACK_CHANNEL",
@@ -39,7 +39,7 @@ action "storage2file" {
 
 action "storage2file-firestore" {
   needs = ["storage2file"]
-  uses = "shinhwagk/vscode-note@dockerhub/storage2file-firestore"
+  uses = "shinhwagk/vscode-note@dockerhub@storage2file-firestore"
   secrets = [
     "SERVICE_ACCOUNT_KEY",
     "GITHUB_TOKEN",
