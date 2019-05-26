@@ -2,7 +2,7 @@
 
 repository='https://github.com/shinhwagk/vscode-note'
 
-branch=(gh-pages dockerhub@storage2file-firestore dockerhub@storage2file firebase@functions analytics vscode-note)
+branch=(gh-pages dockerhub/storage2file-firestore dockerhub/storage2file firebase/functions analytics vscode-note)
 
 for b in ${branch[*]}; do
 	echo "process $b"
