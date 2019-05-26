@@ -44,10 +44,9 @@ exports.clientAction = functions.firestore
     const ts = newValue!.timestamp;
     const date = toDate(ts);
     date.setHours(0, 0, 0, 0);
-    const rangeTS = getTime(date);
 
     const action: string = newValue!.action;
-    const analyzesRef = db.collection("analyzes").doc(rangeTS.toString());
+    const analyzesRef = db.collection("analyzes").doc(getTime(date).toString());
 
     analyzesRef.get().then(snapshot => {
       const o: { [action: string]: number } = {};
@@ -66,7 +65,7 @@ exports.clientAction = functions.firestore
       } else {
         o[action] = 1;
         analyzesRef
-          .set(o)
+          .set({})
           .then(() => console.log("Incomers counter increased!"));
       }
     });
