@@ -1,25 +1,28 @@
 {
-	"folders": [
-		{
-			"path": "vscode-note"
-		},
-		{
-			"path": "analytics"
-		},
-		{
-			"path": "gh-pages"
-		},
-		{
-			"path": "firebase@functions"
-		},
-		{
-			"path": "dockerhub@sotrage2file-filrstore"
-		},
-		{
-			"path": "dockerhub@sotrage2file"
-		}
-	],
-	"settings": {
-		"editor.formatOnSave": true
-	}
+  "folders": [
+    {
+      "path": "vscode-note"
+    },
+    {
+      "path": "analytics"
+    },
+    {
+      "path": "gh-pages"
+    },
+    {
+      "path": "firebase@functions"
+    },
+    {
+      "path": "dockerhub@storage2file-firestore"
+    },
+    {
+      "path": "dockerhub@storage2file"
+    },
+    {
+      "path": "npm@storage2file"
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true
+  }
 }
