@@ -9,12 +9,13 @@
     {
       "path": "gh-pages"
     },
-    { "name": "firebase/functions", "path": "firebase@functions" },
+    { "name": "firebase/functions", "path": "firebase/functions" },
     {
-      "name": "dockerhub/sotrage2file-filrstore",
-      "path": "dockerhub/sotrage2file-filrstore"
+      "name": "dockerhub/storage2file-filrstore",
+      "path": "dockerhub/storage2file-filrstore"
     },
-    { "name": "dockerhub/sotrage2file", "path": "dockerhub/sotrage2file" },
+    { "name": "dockerhub/storage2file", "path": "dockerhub/storage2file" },
+    { "name": "npm/storage2file", "path": "npm/storage2file" },
     { "name": "home", "path": "." }
   ],
   "settings": {
