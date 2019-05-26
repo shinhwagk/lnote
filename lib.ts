@@ -42,7 +42,7 @@ namespace Firestore {
 }
 
 namespace Storage2file {
-  export const dirpath = "../storage2file";
+  export const dirpath = "./storage2file";
   export async function deleteFile(file: string) {
     unlinkSync(join(dirpath, file));
   }
