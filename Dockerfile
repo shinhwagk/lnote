@@ -1,13 +1,6 @@
 FROM node:10
 
-WORKDIR /storage2file
-
-COPY package.json .
-COPY bin bin
-COPY lib.ts .
-COPY tsconfig.json .
-
-RUN npm i --unsafe-perm=true -g .
+RUN npm i -g github:shinhwagk/vscode-note#dockerhub/storage2file
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
