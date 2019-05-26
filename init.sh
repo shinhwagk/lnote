@@ -2,7 +2,7 @@
 
 repository='https://github.com/shinhwagk/vscode-note'
 
-branch=(vscode-note gh-pages dockerhub@storage2file-firestore dockerhub@storage2file firebase@functions)
+branch=(vscode-note gh-pages dockerhub@storage2file-firestore dockerhub@storage2file firebase@functions analytics)
 
 for b in ${branch[*]}; do
   if [ -d $b ]; then

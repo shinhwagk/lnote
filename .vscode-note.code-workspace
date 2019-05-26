@@ -8,6 +8,15 @@
 		},
 		{
 			"path": "gh-pages"
+		},
+		{
+			"path": "firebase@functions"
+		},
+		{
+			"path": "dockerhub@sotrage2file-filrstore"
+		},
+		{
+			"path": "dockerhub@sotrage2file"
 		}
 	],
 	"settings": {
