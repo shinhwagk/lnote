@@ -28,6 +28,10 @@
     {
       "name": "home",
       "path": "."
+    },
+    {
+      "name": "dockerhub@storage-charts",
+      "path": "dockerhub/storage-charts"
     }
   ],
   "settings": {
