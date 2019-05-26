@@ -10,16 +10,20 @@
       "path": "gh-pages"
     },
     {
-      "path": "firebase@functions"
+      "name": "firebase@functions",
+      "path": "firebase/functions"
     },
     {
-      "path": "dockerhub@storage2file-firestore"
+      "name": "dockerhub@storage2file-firestore",
+      "path": "dockerhub/storage2file-firestore"
     },
     {
-      "path": "dockerhub@storage2file"
+      "name": "dockerhub@storage2file",
+      "path": "dockerhub/storage2file"
     },
     {
-      "path": "npm@storage2file"
+      "name": "npm@storage2file",
+      "path": "npm/storage2file"
     }
   ],
   "settings": {
