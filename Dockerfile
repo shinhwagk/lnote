@@ -1,6 +1,6 @@
 FROM node:10
 
-RUN npm i -g github:shinhwagk/vscode-note#dockerhub/storage2file
+RUN npm i -g --unsafe-perm=true github:shinhwagk/vscode-note#npm/storage2file
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
