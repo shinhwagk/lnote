@@ -31,6 +31,9 @@
     }
   ],
   "settings": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "[github-actions]": {
+      "editor.formatOnSave": false
+    }
   }
 }
