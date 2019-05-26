@@ -24,6 +24,10 @@
     {
       "name": "npm@storage2file",
       "path": "npm/storage2file"
+    },
+    {
+      "name": "home",
+      "path": "."
     }
   ],
   "settings": {
