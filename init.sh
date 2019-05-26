@@ -2,12 +2,13 @@
 
 repository='https://github.com/shinhwagk/vscode-note'
 
-branch=(vscode-note gh-pages dockerhub@storage2file-firestore dockerhub@storage2file firebase@functions analytics)
+branch=(gh-pages dockerhub@storage2file-firestore dockerhub@storage2file firebase@functions analytics vscode-note)
 
 for b in ${branch[*]}; do
+	echo "process $b"
   if [ -d $b ]; then
 		cd "$b" && git pull &
 	else
-		git clone --depth=1 -b "$b" "$repository" "$b"
+		git clone --depth=1 -b "$b" "$repository" "$b" 2>/dev/null
 	fi
 done
