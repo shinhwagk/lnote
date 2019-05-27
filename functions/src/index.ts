@@ -22,8 +22,8 @@ exports.charts = functions.https.onRequest(async (req, res) => {
             db
                 .collection('clients')
                 .orderBy('timestamp', 'desc')
-                .where('timestamp', '>=', ts.toString())
-                .where('timestamp', '<', getTime(addDays(ts, 1)).toString())
+                .where('timestamp', '>=', ts)
+                .where('timestamp', '<', getTime(addDays(ts, 1)))
                 .get(),
         );
 
@@ -58,7 +58,6 @@ exports.charts = functions.https.onRequest(async (req, res) => {
         );
 
     res.setHeader('content-type', 'application/json');
-    // analyzesRef.orderBy("id", "desc");
     if (req.path === '/new') {
         res.send((await Promise.all(daysTs)).map(docs => docs.size));
     } else if (req.path === '/active') {
