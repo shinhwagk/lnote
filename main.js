@@ -32,8 +32,8 @@ function displayCharts(cc, ac, nc) {
 }
 
 (async () => {
-  const ndata = await axios.get(newUrl);
-  const adata = await axios.get(activeUrl);
-  const ndata = await axios.get(notesUrl);
-  displayCharts(ndata.data, adata.data, ndata.data);
+  const newdata = await axios.get(newUrl);
+  const activedata = await axios.get(activeUrl);
+  const notesdata = await axios.get(notesUrl);
+  displayCharts(newdata.data, activedata.data, notesdata.data);
 })();
