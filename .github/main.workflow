@@ -1,8 +1,8 @@
 workflow "Clients Statistics" {
-  on = "schedule(10 * * * *)"
   resolves = [
     "push charts data",
   ]
+  on = "push"
 }
 
 action "storage2file" {
