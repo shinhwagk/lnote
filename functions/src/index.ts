@@ -37,8 +37,8 @@ exports.charts = functions.https.onRequest(async (req, res) => {
                 .collection('actions')
                 .orderBy('timestamp', 'desc')
                 .where('action', '==', 'add-note')
-                .where('timestamp', '>=', ts.toString())
-                .where('timestamp', '<', getTime(addDays(ts, 1)).toString())
+                .where('timestamp', '>=', ts)
+                .where('timestamp', '<', getTime(addDays(ts, 1)))
                 .get(),
         );
 
@@ -52,8 +52,8 @@ exports.charts = functions.https.onRequest(async (req, res) => {
                 .collection('actions')
                 .orderBy('timestamp', 'desc')
                 .where('action', '==', 'active')
-                .where('timestamp', '>=', ts.toString())
-                .where('timestamp', '<', getTime(addDays(ts, 1)).toString())
+                .where('timestamp', '>=', ts)
+                .where('timestamp', '<', getTime(addDays(ts, 1)))
                 .get(),
         );
 
