@@ -49,10 +49,9 @@ exports.charts = functions.https.onRequest(async (req, res) => {
     if (req.path === '/new') {
         res.send((await Promise.all(newDocsRefs.map(d => d.get()))).map(docs => docs.size));
     } else if (req.path === '/active') {
-        console.log(JSON.stringify(await Promise.all(notesDocsRefs.map(d => d.get()))));
-        res.send((await Promise.all(notesDocsRefs.map(d => d.get()))).map(docs => docs.size));
-    } else if (req.path === '/notes') {
         res.send((await Promise.all(activeDocsRefs.map(d => d.get()))).map(docs => docs.size));
+    } else if (req.path === '/notes') {
+        res.send((await Promise.all(notesDocsRefs.map(d => d.get()))).map(docs => docs.size));
     } else {
         res.send(
             Array.from({ length: 30 })
