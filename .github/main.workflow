@@ -1,7 +1,7 @@
 workflow "Deploy Firebase Functions" {
   on = "push"
   resolves = [
-    "slack",
+    "slack"
   ]
 }
 
