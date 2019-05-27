@@ -35,7 +35,7 @@ exports.charts = functions.https.onRequest(async (req, res) => {
             db
                 .collection('actions')
                 .orderBy('timestamp', 'desc')
-                .where('action', '==', 'add-note')
+                .where('action', '==', 'note-add')
                 .where('timestamp', '>=', ts)
                 .where('timestamp', '<', getTime(addDays(ts, 1)))
                 .get(),
