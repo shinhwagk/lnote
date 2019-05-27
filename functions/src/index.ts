@@ -7,6 +7,10 @@ admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
+exports.charts = functions.https.onRequest((req, res) => {
+  res.send(req.path);
+});
+
 exports.newClient = functions.firestore
   .document("clients/{cid}")
   .onCreate((snap, context) => {
