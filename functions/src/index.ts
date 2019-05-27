@@ -11,6 +11,7 @@ const analyzesRef = db.collection("analyzes");
 
 exports.charts = functions.https.onRequest(async (req, res) => {
   const cd = new Date();
+  cd.setHours(0, 0, 0, 0);
   const daysTs = Array.from({ length: 30 })
     .map((_c, i) => i)
     .map(d => addDays(cd, d))
