@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import toDate from 'date-fns/parse';
 import getTime from 'date-fns/get_time';
 import subDays from 'date-fns/sub_days';
 import addDays from 'date-fns/add_days';
@@ -8,7 +7,7 @@ admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
-const analyzesRef = db.collection('analyzes');
+// const analyzesRef = db.collection('analyzes');
 
 exports.charts = functions.https.onRequest(async (req, res) => {
     const cd = new Date();
