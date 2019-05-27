@@ -1,11 +1,10 @@
 /out/
-node_modules/
+/node_modules/
 /.vscode-test/
-*.vsix
-.DS_Store
+/*.vsix
+/.DS_Store
 /coverage/
-yarn-error.log
+/yarn-error.log
 /vscode-note/
-yarn.lock
-package-lock.json
-.github/*/bin/lib.js
+/yarn.lock
+/package-lock.json

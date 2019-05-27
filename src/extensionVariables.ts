@@ -76,7 +76,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (!ext.domainProvider || !ext.domainTreeView) {
         ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-        ext.domainTreeView.onDidChangeVisibility(e => e.visible && ext.clientActions('domain-tree.open'));
+        ext.domainTreeView.onDidChangeVisibility(e =>
+            e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close'),
+        );
     }
 
     if (!ext.filesProvider) {
