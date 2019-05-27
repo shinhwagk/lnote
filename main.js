@@ -1,8 +1,9 @@
-const f1 =
-  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/new-clients%4024h.json";
-const f2 =
-  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/active-clients%4024h.json";
-
+const newUrl =
+  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/new.json";
+const activeUrl =
+  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/active.json";
+const notesUrl =
+  "https://raw.githubusercontent.com/shinhwagk/vscode-note/analytics/charts-data/notes.json";
 const date = new Date();
 date.setHours(0, 0, 0, 0);
 const dateTimestamp = date.getTime();
@@ -13,12 +14,13 @@ const days = Array.from({ length: 30 }, (_v, i) => i)
   .map(d => new Date(d))
   .map(d => `${d.getMonth()}-${d.getDate()}`);
 
-function displayCharts(cc, ac) {
+function displayCharts(cc, ac, nc) {
   const data = {
     labels: days,
     datasets: [
       { name: "new clients", values: cc },
-      { name: "active clients", values: ac }
+      { name: "active clients", values: ac },
+      { name: "create notes", values: nc }
     ]
   };
   new frappe.Chart("#chart", {
@@ -30,7 +32,8 @@ function displayCharts(cc, ac) {
 }
 
 (async () => {
-  const cc = await axios.get(f1);
-  const ac = await axios.get(f2);
-  displayCharts(cc.data, ac.data);
+  const ndata = await axios.get(newUrl);
+  const adata = await axios.get(activeUrl);
+  const ndata = await axios.get(notesUrl);
+  displayCharts(ndata.data, adata.data, ndata.data);
 })();
