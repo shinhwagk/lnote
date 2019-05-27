@@ -11,14 +11,14 @@
     },
     { "name": "firebase/functions", "path": "firebase/functions" },
     {
-      "name": "dockerhub/storage2file-filrstore",
-      "path": "dockerhub/storage2file-filrstore"
+      "name": "dockerhub/storage2file-firestore",
+      "path": "dockerhub/storage2file-firestore"
     },
     { "name": "dockerhub/storage2file", "path": "dockerhub/storage2file" },
     { "name": "npm/storage2file", "path": "npm/storage2file" },
     { "name": "home", "path": "." }
   ],
   "settings": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
   }
 }
