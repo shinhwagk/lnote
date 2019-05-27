@@ -2,13 +2,47 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import toDate from "date-fns/parse";
 import getTime from "date-fns/get_time";
-
+import addDays from "date-fns/add_days";
 admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
 
-exports.charts = functions.https.onRequest((req, res) => {
-  res.send(req.path);
+const analyzesRef = db.collection("analyzes");
+
+exports.charts = functions.https.onRequest(async (req, res) => {
+  const cd = new Date();
+  const daysTs = Array.from({ length: 30 })
+    .map((_c, i) => i)
+    .map(d => addDays(cd, d))
+    .map(d => getTime(d))
+    .map(ts =>
+      db
+        .collection("analyzes")
+        .doc(ts.toString())
+        .get()
+    );
+
+  res.setHeader("content-type", "application/json");
+  // analyzesRef.orderBy("id", "desc");
+  if (req.path === "/new") {
+    res.send(
+      (await Promise.all(daysTs)).map(doc =>
+        doc.exists ? doc.data()!.new || 0 : 0
+      )
+    );
+  } else if (req.path === "/active") {
+    res.send(
+      (await Promise.all(daysTs)).map(doc =>
+        doc.exists ? doc.data()!.active || 0 : 0
+      )
+    );
+  } else if (req.path === "/notes") {
+    res.send(
+      (await Promise.all(daysTs)).map(doc =>
+        doc.exists ? doc.data()!.notes || 0 : 0
+      )
+    );
+  }
 });
 
 exports.newClient = functions.firestore
@@ -19,22 +53,22 @@ exports.newClient = functions.firestore
     const date = toDate(ts);
     date.setHours(0, 0, 0, 0);
 
-    const analyzesRef = db.collection("analyzes").doc(getTime(date).toString());
+    const analyzesTSRef = analyzesRef.doc(getTime(date).toString());
 
-    analyzesRef.get().then(snapshot => {
+    analyzesTSRef.get().then(snapshot => {
       if (snapshot.exists) {
         const cnt = snapshot.exists ? snapshot.data()!.new : 0;
         if (snapshot.data()!.new) {
-          analyzesRef
+          analyzesTSRef
             .update({ new: cnt + 1 })
             .then(() => console.log(`new client counter increased!`));
         } else {
-          analyzesRef
+          analyzesTSRef
             .update({ new: 1 })
             .then(() => console.log(`new client counter increased!`));
         }
       } else {
-        analyzesRef
+        analyzesTSRef
           .set({ new: 1 })
           .then(() => console.log(`new client counter increased!`));
       }
@@ -50,25 +84,25 @@ exports.clientAction = functions.firestore
     date.setHours(0, 0, 0, 0);
 
     const action: string = newValue!.action;
-    const analyzesRef = db.collection("analyzes").doc(getTime(date).toString());
+    const analyzesTSRef = analyzesRef.doc(getTime(date).toString());
 
-    analyzesRef.get().then(snapshot => {
+    analyzesTSRef.get().then(snapshot => {
       const o: { [action: string]: number } = {};
       if (snapshot.exists) {
         if (snapshot.data()![action]) {
           o[action] = snapshot.data()![action] + 1;
-          analyzesRef
+          analyzesTSRef
             .update(o)
             .then(() => console.log("Incomers counter increased!"));
         } else {
           o[action] = 1;
-          analyzesRef
+          analyzesTSRef
             .update(o)
             .then(() => console.log("Incomers counter increased!"));
         }
       } else {
         o[action] = 1;
-        analyzesRef
+        analyzesTSRef
           .set({})
           .then(() => console.log("Incomers counter increased!"));
       }
