@@ -16,6 +16,7 @@ exports.charts = functions.https.onRequest(async (req, res) => {
     .map((_c, i) => i)
     .map(d => subDays(cd, d))
     .map(d => getTime(d))
+    .reverse()
     .map(ts =>
       db
         .collection("analyzes")
