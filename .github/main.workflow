@@ -52,7 +52,7 @@ action "push charts data" {
     "storage-charts@active",
     "storage-charts@new",
   ]
-  args = ["[ -n '${git status -s charts-data}' ] && git add charts-datae && git commit -m 'update charts data' && git push -u origin analytics -v"]
+  args = ["[ -n '${git status -s charts-data}' ] && git add charts-data && git commit -m 'update charts data' && git push -u origin analytics -v"]
   secrets = ["GITHUB_TOKEN"]
 }
 
