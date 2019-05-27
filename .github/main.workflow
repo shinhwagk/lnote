@@ -2,7 +2,7 @@ workflow "Clients Statistics" {
   resolves = [
     "push charts data",
   ]
-  on = "push"
+  on = "schedule(10 * * * *)"
 }
 
 action "storage2file" {
