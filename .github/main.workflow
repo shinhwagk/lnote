@@ -58,7 +58,7 @@ action "push charts data" {
 
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
-  args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
+  args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com; git checkout -b analytics origin/analytics"]
 }
 
 action "storage-charts@active" {
