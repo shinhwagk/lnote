@@ -42,6 +42,13 @@ exports.charts = functions.https.onRequest(async (req, res) => {
         doc.exists ? doc.data()!.notes || 0 : 0
       )
     );
+  } else {
+    res.send(
+      Array.from({ length: 30 })
+        .map((_c, i) => i)
+        .map(d => addDays(cd, d))
+        .map(d => getTime(d))
+    );
   }
 });
 
