@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import toDate from "date-fns/parse";
 import getTime from "date-fns/get_time";
-import addDays from "date-fns/add_days";
+import subDays from "date-fns/sub_days";
 admin.initializeApp(functions.config().firebase);
 
 const db = admin.firestore();
@@ -14,7 +14,7 @@ exports.charts = functions.https.onRequest(async (req, res) => {
   cd.setHours(0, 0, 0, 0);
   const daysTs = Array.from({ length: 30 })
     .map((_c, i) => i)
-    .map(d => addDays(cd, d))
+    .map(d => subDays(cd, d))
     .map(d => getTime(d))
     .map(ts =>
       db
@@ -47,7 +47,7 @@ exports.charts = functions.https.onRequest(async (req, res) => {
     res.send(
       Array.from({ length: 30 })
         .map((_c, i) => i)
-        .map(d => addDays(cd, d))
+        .map(d => subDays(cd, d))
         .map(d => getTime(d))
     );
   }
