@@ -12,57 +12,44 @@ const db = admin.firestore();
 exports.charts = functions.https.onRequest(async (req, res) => {
     const cd = new Date();
     cd.setHours(0, 0, 0, 0);
-    const daysTs = Array.from({ length: 30 })
+    const last30DaysTime = Array.from({ length: 30 })
         .map((_c, i) => i)
         .map(d => subDays(cd, d))
         .map(d => getTime(d))
-        .reverse()
-        .map(ts =>
-            db
-                .collection('clients')
-                .orderBy('timestamp', 'desc')
-                .where('timestamp', '>=', ts)
-                .where('timestamp', '<', getTime(addDays(ts, 1)))
-                .get(),
-        );
+        .reverse();
+    const newDocsRefs = last30DaysTime.map(ts =>
+        db
+            .collection('clients')
+            .orderBy('timestamp', 'desc')
+            .where('timestamp', '>=', ts)
+            .where('timestamp', '<', getTime(addDays(ts, 1))),
+    );
 
-    const daysTs2 = Array.from({ length: 30 })
-        .map((_c, i) => i)
-        .map(d => subDays(cd, d))
-        .map(d => getTime(d))
-        .reverse()
-        .map(ts =>
-            db
-                .collection('actions')
-                .orderBy('timestamp', 'desc')
-                .where('action', '==', 'note-add')
-                .where('timestamp', '>=', ts)
-                .where('timestamp', '<', getTime(addDays(ts, 1)))
-                .get(),
-        );
+    const notesDocsRefs = last30DaysTime.map(ts =>
+        db
+            .collection('actions')
+            .orderBy('timestamp', 'desc')
+            .where('action', '==', 'note-add')
+            .where('timestamp', '>=', ts)
+            .where('timestamp', '<', getTime(addDays(ts, 1))),
+    );
 
-    const daysTs3 = Array.from({ length: 30 })
-        .map((_c, i) => i)
-        .map(d => subDays(cd, d))
-        .map(d => getTime(d))
-        .reverse()
-        .map(ts =>
-            db
-                .collection('actions')
-                .orderBy('timestamp', 'desc')
-                .where('action', '==', 'active')
-                .where('timestamp', '>=', ts)
-                .where('timestamp', '<', getTime(addDays(ts, 1)))
-                .get(),
-        );
+    const activeDocsRefs = last30DaysTime.map(ts =>
+        db
+            .collection('actions')
+            .orderBy('timestamp', 'desc')
+            .where('action', '==', 'active')
+            .where('timestamp', '>=', ts)
+            .where('timestamp', '<', getTime(addDays(ts, 1))),
+    );
 
     res.setHeader('content-type', 'application/json');
     if (req.path === '/new') {
-        res.send((await Promise.all(daysTs)).map(docs => docs.size));
+        res.send((await Promise.all(newDocsRefs.map(d => d.get()))).map(docs => docs.size));
     } else if (req.path === '/active') {
-        res.send((await Promise.all(daysTs2)).map(docs => docs.size));
+        res.send((await Promise.all(notesDocsRefs.map(d => d.get()))).map(docs => docs.size));
     } else if (req.path === '/notes') {
-        res.send((await Promise.all(daysTs3)).map(docs => docs.size));
+        res.send((await Promise.all(activeDocsRefs.map(d => d.get()))).map(docs => docs.size));
     } else {
         res.send(
             Array.from({ length: 30 })
