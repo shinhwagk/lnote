@@ -5,6 +5,7 @@ workflow "Clients Statistics" {
     "persistent charts",
     "push client actions",
     "storage2file",
+    "shinhwagk/vscode-note@dockerhub/storage-charts",
   ]
 }
 
@@ -104,4 +105,10 @@ action "push client actions" {
 action "set git config" {
   uses = "srt32/git-actions@v0.0.3"
   args = ["git config user.name ${GITHUB_ACTOR}; git config user.email ${GITHUB_ACTOR}@users.noreply.github.com"]
+}
+
+action "shinhwagk/vscode-note@dockerhub/storage-charts" {
+  uses = "shinhwagk/vscode-note@dockerhub/storage-charts"
+  needs = ["storage2file-firestore"]
+  secrets = ["ACTIVE_URL", "NEW_URL", "NOTES_URL"]
 }
