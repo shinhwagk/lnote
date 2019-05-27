@@ -7,7 +7,7 @@ workflow "Deploy Firebase Functions" {
 
 action "deploy" {
   uses = "w9jds/firebase-action@master"
-  args = "deploy --token $FIREBASE_TOKEN"
+  args = "deploy -f --token $FIREBASE_TOKEN"
   secrets = ["FIREBASE_TOKEN"]
 }
 
