@@ -1,25 +1,31 @@
 {
-  "folders": [
-    {
-      "path": "vscode-note"
-    },
-    {
-      "path": "analytics"
-    },
-    {
-      "path": "gh-pages"
-    },
-    { "name": "firebase/functions", "path": "firebase/functions" },
-    {
-      "name": "dockerhub/storage2file-firestore",
-      "path": "dockerhub/storage2file-firestore"
-    },
-    { "name": "dockerhub/storage2file", "path": "dockerhub/storage2file" },
-    { "name": "npm/storage2file", "path": "npm/storage2file" },
-    { "name": "home", "path": "." }
-  ],
-  "settings": {
-    "editor.formatOnSave": true,
-    "prettier.singleQuote": true
-  }
+    "folders": [
+        {
+            "path": "vscode-note"
+        },
+        {
+            "path": "analytics"
+        },
+        {
+            "path": "gh-pages"
+        },
+        { "name": "firebase/functions", "path": "firebase/functions" },
+        {
+            "name": "dockerhub/storage2file-firestore",
+            "path": "dockerhub/storage2file-firestore"
+        },
+        { "name": "dockerhub/storage2file", "path": "dockerhub/storage2file" },
+        { "name": "npm/storage2file", "path": "npm/storage2file" },
+        { "name": "home", "path": "." }
+    ],
+    "settings": {
+        "editor.formatOnSave": true,
+        "prettier.singleQuote": true,
+        "prettier.printWidth": 130,
+        "prettier.trailingComma": "all",
+        "prettier.tabWidth": 4,
+        "[github-actions]": {
+            "editor.formatOnSave": false
+        }
+    }
 }
