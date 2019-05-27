@@ -41,7 +41,7 @@ exports.charts = functions.https.onRequest(async (req, res) => {
   } else if (req.path === "/notes") {
     res.send(
       (await Promise.all(daysTs)).map(doc =>
-        doc.exists ? doc.data()!.notes || 0 : 0
+        doc.exists ? doc.data()!["note-add"] || 0 : 0
       )
     );
   } else {
