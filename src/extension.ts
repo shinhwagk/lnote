@@ -29,6 +29,7 @@ export async function activate(context: ExtensionContext) {
     ext.registerCommand('vscode-note.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
     ext.registerCommand('vscode-note.note.edit', ExtCmds.cmdHdlNoteEdit);
     ext.registerCommand('vscode-note.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
+    ext.registerCommand('vscode-note.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
     ext.registerCommand('vscode-note.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
     ext.registerCommand('vscode-note.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
     ext.registerCommand('vscode-note.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);

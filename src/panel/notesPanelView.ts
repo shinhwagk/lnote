@@ -86,10 +86,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
                     case 'edit-contentFile':
-                        const id = msg.data.id;
-                        const n = msg.data.n;
-                        const v = vscode.Uri.file(ext.dbFS.getNoteContentFile(id, n));
-                        vscode.commands.executeCommand('editExplorer.openFileResource', v);
+                        vscode.commands.executeCommand('vscode-note.note.edit.col.content', msg.data.id, msg.data.n);
                         break;
                     case 'edit-col':
                         vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);

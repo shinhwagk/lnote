@@ -25,6 +25,11 @@ export namespace ExtCmds {
         }
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
+    export async function cmdHdlNoteEditColContent(id: string, n: string) {
+        const v = Uri.file(ext.dbFS.getNoteContentFile(id, n));
+        commands.executeCommand('editExplorer.openFileResource', v);
+        ext.clientActions('edit-col-content');
+    }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
         ext.domainProvider.refresh(dn);
