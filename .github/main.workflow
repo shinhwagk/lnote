@@ -1,8 +1,6 @@
 workflow "Build, Test, and Publish" {
   on = "push"
-  resolves = [
-    "Publish",
-  ]
+  resolves = ["Slack"]
 }
 
 action "Tag" {
@@ -27,4 +25,11 @@ action "Publish" {
   uses = "lannonbr/vsce-action@master"
   args = "publish -p $VSCE_TOKEN"
   secrets = ["VSCE_TOKEN"]
+}
+
+action "Slack" {
+  uses = "Ilshidur/action-slack@f37693b4e0589604815219454efd5cb9b404fb85"
+  needs = ["Publish"]
+  args = "publish extension success."
+  secrets = ["SLACK_CHANNEL"]
 }
