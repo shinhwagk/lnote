@@ -28,8 +28,8 @@ action "Publish" {
 }
 
 action "Slack" {
-  uses = "Ilshidur/action-slack@f37693b4e0589604815219454efd5cb9b404fb85"
+  uses = "Ilshidur/action-slack@master"
   needs = ["Publish"]
   args = "publish extension success."
-  secrets = ["SLACK_CHANNEL"]
+  secrets = ["SLACK_WEBHOOK"]
 }
