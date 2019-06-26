@@ -7,7 +7,7 @@
 - vscode-note
 - analytics
 - gh-pages
-- firebase/functions 
+- firebase/functions
 - dockerhub/storage2file-firestore
-- dockerhub/storage2file 
-- npm/storage2file" 
+- dockerhub/storage2file
+- npm/storage2file
