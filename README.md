@@ -22,10 +22,10 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 
 ## Usages
 
-1. [create domain and create category with note](##1)
-2. [create short documnt](##2)
-3. [create document](##3)
-4. [create files](##4)
+1. [create domain and create category with note](###1)
+2. [create short documnt](###2)
+3. [create document](###3)
+4. [create files](###4)
 
 ### 1 create domain and create category with note
 ![1](https://raw.githubusercontent.com/shinhwagk/vscode-note/vscode-note/images/1.gif)
