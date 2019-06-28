@@ -23,8 +23,8 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 ## Usages
 
 1. [create domain and create category with note](#1-create-domain-and-create-category-with-note)
-2. [create short documnt](#2create-short-documnt)
-3. [create document](#3create-document)
+2. [create short documnt](#2-create-short-documnt)
+3. [create document](#3-create-document)
 4. [create files](#4-create-files)
 
 ### 1 create domain and create category with note
