@@ -155,6 +155,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteOpenFolder(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNotePath(id)), true);
+        ext.clientActions('note-folder-open');
     }
     export async function cmdHdlNoteEditCategoryRename(nId: string, oldCategory: string) {
         const newCname = await window.showInputBox({ value: oldCategory });
@@ -162,11 +163,12 @@ export namespace ExtCmds {
         const dpath = vpath.splitPath(ext.activeNote.domainNode);
         ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
         ext.notesPanelView.parseDomain().showNotesPlanView();
-        ext.clientActions('note-folder-open');
+        ext.clientActions('note-category-rename');
     }
     export async function cmdHdlCategoryRename(oldCategory: string) {
         const newCname = await window.showInputBox({ value: oldCategory });
         if (!newCname) return;
+        ext.clientActions('category-rename');
         // const dpath = vpath.splitPath(ext.activeNote.domainNode);
         // ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
     }
@@ -188,13 +190,15 @@ export namespace ExtCmds {
     }
     export async function cmdHdlFilesClose() {
         await ext.setContext(ctxFilesExplorer, false);
-        ext.clientActions('note-files-open');
+        ext.clientActions('note-files-close');
     }
     export async function cmdHdlFilesEditOpen() {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteFilesPath(ext.activeNote.id)), true);
+        ext.clientActions('note-files-edit');
     }
     export async function cmdHdlFilesRefresh() {
         ext.filesProvider.refresh();
+        ext.clientActions('note-files-refresh');
     }
     export async function cmdHdlFilesOpenTerminal() {
         const nId = ext.activeNote.id;
@@ -202,13 +206,16 @@ export namespace ExtCmds {
         const filePath = ext.dbFS.getNoteFilesPath(nId);
         const fileTerminal = window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
         fileTerminal.show(true);
+        ext.clientActions('note-files-terminal');
     }
     export async function cmdHdlDomainRefresh() {
         ext.dbFS = new NoteDatabase(ext.notesPath);
         ext.domainProvider.refresh();
+        ext.clientActions('domain-refresh');
     }
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
+        ext.clientActions('note-doc-edit');
     }
     // export async function cmdHdlCategoryToDomain(category: string) {
     //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);
