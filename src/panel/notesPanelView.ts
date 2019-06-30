@@ -6,8 +6,9 @@ import { tools } from '../helper';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
-    private viewData: twv.WVDomain | undefined;
+    private viewData: twv.WVDomain = { dpath: [], categories: [] };
     private dpathCache: string[] = [];
+    // private notes: string[] = [];
 
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
@@ -38,6 +39,17 @@ export class NotesPanelView {
                     <script src="${this.assetsFile('main.wv.js')}"></script>
                 </body>
                 </html>`;
+    }
+
+    filterViewData(reg: string) {
+        const categories = this.viewData!.categories.filter(
+            n => n.notes.filter(c => c.contents.join('').length).filter(c => new RegExp(reg).test(c.contents.join(''))).length,
+        );
+        if (this.viewData) {
+            this.viewData.categories = categories;
+        }
+        console.log(JSON.stringify(categories));
+        return this;
     }
 
     showNotesPlanView(): void {
@@ -105,6 +117,9 @@ export class NotesPanelView {
                         break;
                     case 'add-category':
                         vscode.commands.executeCommand('vscode-note.category.add');
+                        break;
+                    case 'search-notes':
+                        vscode.commands.executeCommand('vscode-note.notes.search');
                         break;
                 }
             },

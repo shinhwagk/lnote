@@ -14,6 +14,7 @@ interface vscode {
 declare const vscode: vscode;
 
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
+const searchNote = () => () => vscode.postMessage({ command: 'search-notes' });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
 const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
 const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
@@ -79,7 +80,7 @@ function VSNCategory(props: twv.WVCategory) {
             <div className="grid-category-name">
                 {props.name + ' '}
                 <a onClick={addNote(props.name)}>
-                    <FontAwesomeIcon className="icon" size='xs' icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size="xs" icon={faPlus} />
                 </a>
             </div>
             <div className="grid-category-body">{listnote}</div>
@@ -114,7 +115,10 @@ function VNSDomain(props: WVDomain) {
             <h2>
                 {props.dpath.join(' / ') + ' '}
                 <a onClick={addCategory()}>
-                    <FontAwesomeIcon className="icon" size='sm' icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
+                </a>
+                <a onClick={searchNote()}>
+                    <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
                 </a>
             </h2>
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}

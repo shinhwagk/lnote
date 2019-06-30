@@ -22,6 +22,17 @@ export namespace ToWebView {
     }
 }
 
+export namespace Temp {
+    export interface VVNote {
+        nId: string;
+        contents: string[];
+        doc: boolean;
+        files: boolean;
+        domain: string[];
+        category: string;
+    }
+}
+
 // export namespace ToExtension {
 //     export interface WebReady {
 //         command: 'ready';

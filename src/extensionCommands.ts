@@ -205,6 +205,19 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
     }
+    export async function cmdHdlNotesSearch() {
+        const ib = window.createInputBox();
+        ib.show();
+        ext.context.subscriptions.push(
+            ib.onDidChangeValue(e => {
+                ext.notesPanelView
+                    .parseDomain()
+                    .filterViewData(e)
+                    .showNotesPlanView();
+                window.showInformationMessage(e);
+            }),
+        );
+    }
     // export async function cmdHdlCategoryToDomain(category: string) {
     //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);
     //     const newDomainName = 'category';
