@@ -188,10 +188,11 @@ export namespace ExtCmds {
     }
     export async function cmdHdlFilesClose() {
         await ext.setContext(ctxFilesExplorer, false);
-        ext.clientActions('note-files-open');
+        ext.clientActions('note-files-close');
     }
     export async function cmdHdlFilesEditOpen() {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteFilesPath(ext.activeNote.id)), true);
+        ext.clientActions('note-files-edit');
     }
     export async function cmdHdlFilesRefresh() {
         ext.filesProvider.refresh();
