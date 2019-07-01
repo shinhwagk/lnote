@@ -127,7 +127,9 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainMove(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
-        const newDpathString: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
+        const newDpathString: string | undefined = await window.showInputBox({
+            value: orgDpath.join('/'),
+        });
         if (!newDpathString || orgDpath.join('/') === newDpathString) return;
         const newDpath = vpath.splitPath(newDpathString);
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
@@ -145,7 +147,9 @@ export namespace ExtCmds {
     export async function cmdHdlDomainRename(dn: DomainNode) {
         const orgDpath = vpath.splitPath(dn);
         const orgName = orgDpath[orgDpath.length - 1];
-        const newName: string | undefined = await window.showInputBox({ value: orgName });
+        const newName: string | undefined = await window.showInputBox({
+            value: orgName,
+        });
         if (!newName || orgName == newName) return;
         const newDpath = orgDpath.slice();
         newDpath[newDpath.length - 1] = newName;
@@ -200,7 +204,10 @@ export namespace ExtCmds {
         const nId = ext.activeNote.id;
         const dpath = vpath.splitPath(ext.activeNote.domainNode!);
         const filePath = ext.dbFS.getNoteFilesPath(nId);
-        const fileTerminal = window.createTerminal({ name: `${dpath} - ${nId}`, cwd: filePath });
+        const fileTerminal = window.createTerminal({
+            name: `${dpath} - ${nId}`,
+            cwd: filePath,
+        });
         fileTerminal.show(true);
     }
     export async function cmdHdlDomainRefresh() {
@@ -210,11 +217,27 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
     }
-    // export async function cmdHdlCategoryToDomain(category: string) {
-    //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);
-    //     const newDomainName = 'category';
-    //     const newCategory = 'xx';
-    // }
+    export async function cmdHdlCategoryEdit(category: string) {
+        const rst = await window.showQuickPick(['rename', 'up to domain']);
+        if (rst === 'up to domain') {
+            await CategoryToDomain(category);
+        } else if (rst === 'rename') {
+        } else {
+            return;
+        }
+    }
+    async function CategoryToDomain(category: string) {
+        const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! + '/' + category });
+        if (!name) return;
+        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+        const newDomainName = 'category';
+        const newCategory = 'xx';
+    }
+    async function DomainToCategory(category: string) {
+        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+        const newDomainName = 'category';
+        const newCategory = 'xx';
+    }
 }
 
 namespace ExtCmdsFuns {

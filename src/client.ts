@@ -4,9 +4,9 @@ import { homedir, platform, release, type, hostname, arch } from 'os';
 import { join } from 'path';
 import { vfs } from './helper';
 import { existsSync, readdirSync, removeSync, mkdirpSync } from 'fs-extra';
-import { version as lastVersion } from '../package.json';
+
 import compareVersions from 'compare-versions';
-import { identifier } from './constants';
+import { identifier, version as lastVersion } from './constants';
 import addHours from 'date-fns/add_hours';
 import isPast from 'date-fns/is_past';
 

@@ -91,6 +91,9 @@ export class NotesPanelView {
                     case 'edit-col':
                         vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);
                         break;
+                    case 'edit-category':
+                        vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
+                        break;
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
                         break;

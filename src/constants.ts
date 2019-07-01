@@ -1,3 +1,5 @@
+export { version } from '../package.json';
+
 export const metaFileName = '.n.json';
 export const section = 'vscode-note';
 export const metaVersion = '1';

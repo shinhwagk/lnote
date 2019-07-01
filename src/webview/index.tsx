@@ -18,6 +18,7 @@ const addNote = (category: string) => () => vscode.postMessage({ command: 'add',
 const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
 const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
 const editCol = (id: string, cn: string) => () => vscode.postMessage({ command: 'edit-col', data: { id, cn } });
+const editCategory = (category: string) => () => vscode.postMessage({ command: 'edit-category', data: { category } });
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
@@ -78,9 +79,11 @@ function VSNCategory(props: twv.WVCategory) {
         <div id={props.name} className="grid-category">
             <div className="grid-category-name">
                 {props.name + ' '}
-                <a onClick={addNote(props.name)}>
+                <a onClick={addNote(props.name)}
+                    onContextMenu={editCategory(props.name)}>
                     <FontAwesomeIcon className="icon" size='xs' icon={faPlus} />
                 </a>
+
             </div>
             <div className="grid-category-body">{listnote}</div>
         </div>
