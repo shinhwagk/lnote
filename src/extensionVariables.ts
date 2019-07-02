@@ -7,7 +7,7 @@ import { NoteDatabase } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { existsSync, mkdirpSync, mkdirsSync, copySync } from 'fs-extra';
-import { initClient } from './client';
+import { initClient, sendGA } from './client';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -20,6 +20,7 @@ export namespace ext {
     export let activeNote: ActiveNote;
     export let dbFS: NoteDatabase;
     export let clientActions: (action: string) => void;
+    export let sendGA: (ec: string, ea: string) => void;
     export let outputChannel: OutputChannel;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
@@ -47,7 +48,7 @@ function listenConfigure(ctx: ExtensionContext) {
                 ext.masterPath = getMasterPath();
                 ext.dbFS = new NoteDatabase(ext.masterPath);
             }
-        }),
+        })
     );
 }
 
@@ -63,6 +64,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     initializeNotesDirectory(ext.notesPath);
     addUsageNotes(ext.notesPath);
     ext.clientActions = initClient(ext.context.extensionPath);
+    ext.sendGA = sendGA();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);
@@ -77,7 +79,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
         ext.domainTreeView.onDidChangeVisibility(e =>
-            e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close'),
+            e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close')
         );
     }
 

@@ -110,6 +110,7 @@ export namespace ExtCmds {
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
         ext.clientActions('note-add');
+        ext.sendGA('note', 'add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
         ext.dbFS.createNoteFiles(id);

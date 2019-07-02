@@ -9,6 +9,7 @@ import compareVersions from 'compare-versions';
 import { identifier } from './constants';
 import addHours from 'date-fns/add_hours';
 import isPast from 'date-fns/is_past';
+import * as querystring from 'querystring';
 
 type ActionTimestamp = number;
 type OSInfo = { [attr: string]: string };
@@ -89,7 +90,7 @@ const postSlack = (body: ClientInfoBody | ActionsBody) => {
             host: 'hooks.slack.com',
             path: '/services/THAUWRE2W/BJACQ46CX/vmUGK9qnTQDRNtxETMwavscn',
             method: 'POST',
-            headers: { 'Content-type': 'application/json; charset=UTF-8' },
+            headers: { 'Content-type': 'application/json; charset=UTF-8' }
         };
 
         const req = https.request(options, res => {
@@ -154,4 +155,34 @@ export function initClient(extonionPath: string) {
     versionUpgrade(extonionPath);
     doActive();
     return (action: string) => sendClientActions(action);
+}
+
+export function sendGA() {
+    const tid = 'UA-143144958-1';
+    const t = 'event';
+    const v = 1;
+    const cid = getClientId();
+
+    return (ec: string, ea: string) => {
+        const body = { v, tid, cid, t, ec, ea };
+        const data = querystring.stringify(body);
+
+        return new Promise<void>((resolve, reject) => {
+            const options = {
+                host: 'www.google-analytics.com',
+                path: '/collect',
+                method: 'POST'
+            };
+
+            const req = https.request(options, res => {
+                res.setEncoding('utf8');
+                res.on('end', () => resolve());
+                res.on('error', err => reject(err.message));
+            });
+
+            req.write(data);
+            req.end();
+            req.on('error', err => reject(err.message));
+        }).catch(e => console.log(e));
+    };
 }
