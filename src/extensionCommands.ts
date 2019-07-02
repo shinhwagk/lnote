@@ -86,6 +86,7 @@ export namespace ExtCmds {
     export async function cmdHdlNoteColRemove(id: string, cn: string) {
         //cn : column number
         ext.dbFS.deleteNoteCol(id, Number(cn));
+        ext.clientActions('note-col-del');
         // ext.editProvider.refresh();
     }
     export async function cmdHdlNoteEditRemove() {
