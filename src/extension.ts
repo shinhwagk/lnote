@@ -1,9 +1,14 @@
 import { ext, initializeExtensionVariables } from './extensionVariables';
 import { ExtensionContext, ViewColumn, commands } from 'vscode';
 import { ExtCmds } from './extensionCommands';
+import { checkNewVersion } from './autoUpdate';
+import { identifier } from './constants';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
+    if (await checkNewVersion()) {
+        commands.executeCommand('workbench.extensions.installExtension', identifier);
+    }
 
     initializeExtensionVariables(context);
 
