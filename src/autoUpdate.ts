@@ -10,7 +10,7 @@ export function getTags() {
                 headers: { 'User-Agent': 'Awesome-Octocat-App' }
             },
             res => {
-                res.on('data', data => (body += data));
+                res.on('data', data => body += data);
                 res.on('end', () => resolve(body));
                 res.on('error', err => reject(err.message));
             }
