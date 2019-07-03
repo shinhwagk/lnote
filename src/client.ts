@@ -36,6 +36,7 @@ function doActive() {
         nextActiveTime.setHours(0, 0, 0, 0);
         if (isPast(nextActiveTime) || !isFile) {
             sendClientActions('active');
+            sendGA()('active', lastVersion);
             vfs.writeFileSync(ClientFiles.active, ct.toString());
         }
     } catch (e) {
