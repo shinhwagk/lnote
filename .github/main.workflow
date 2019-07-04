@@ -3,13 +3,13 @@ workflow "Build, Test, and Publish" {
   resolves = ["Slack"]
 }
 
-action "Tag" {
+action "Filter" {
   uses = "actions/bin/filter@master"
-  args = "tag v*"
+  args = "branch vscode-note"
 }
 
 action "Install" {
-  needs = ["Tag"]
+  needs = ["Filter"]
   uses = "borales/actions-yarn@master"
   args = "install"
 }
