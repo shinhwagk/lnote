@@ -162,10 +162,10 @@ export function sendGA() {
     const tid = 'UA-143144958-1';
     const t = 'event';
     const v = 1;
-    const cid = getClientId();
+    const uid = getClientId();
 
     return (ec: string, ea: string) => {
-        const body = { v, tid, cid, t, ec, ea };
+        const body = { v, tid, uid, t, ec, ea };
         const data = querystring.stringify(body);
 
         return new Promise<void>((resolve, reject) => {
