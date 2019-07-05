@@ -24,7 +24,6 @@ action "Publish" {
   needs = ["Test"]
   uses = "lannonbr/vsce-action@master"
   args = "publish -p $VSCE_TOKEN"
-  secrets = ["VSCE_TOKEN"]
 }
 
 action "Slack" {
