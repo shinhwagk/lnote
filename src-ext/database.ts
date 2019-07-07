@@ -3,25 +3,8 @@ import * as path from 'path';
 import { metaFileName } from './constants';
 import { tools, vfs } from './helper';
 import { existsSync, readdirSync, mkdirSync, removeSync, renameSync } from 'fs-extra';
-
-export interface Domain {
-    '.notes': string[];
-    [domain: string]: string[] | Domain;
-}
-
-export interface NoteMeta {
-    version?: string;
-    tags: Tag[];
-    doc?: string;
-}
-
-export interface Tag {
-    domain: string[];
-    category: string;
-    links?: string[]; // link to other note
-    weight?: number; // sort at category
-    valid?: boolean; // when note deleted
-}
+import { IDomain } from './moduls/IDomain'
+import { INoteMeta } from './moduls/INoteMeta';
 
 export class NoteDatabase {
     public readonly dch: DomainCache = new DomainCache();
@@ -64,7 +47,7 @@ export class NoteDatabase {
 
     public getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
-    public readNoteMeta = (id: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(id));
+    public readNoteMeta = (id: string) => vfs.readJsonSync<INoteMeta>(this.getNoteMetaFile(id));
 
     public checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
@@ -83,7 +66,7 @@ export class NoteDatabase {
         return this.getNoteDocIndexFile(nId, indexFile);
     };
 
-    public writeNoteMeta = (id: string, meta: NoteMeta) => vfs.writeJsonSync(this.getNoteMetaFile(id), meta);
+    public writeNoteMeta = (id: string, meta: INoteMeta) => vfs.writeJsonSync(this.getNoteMetaFile(id), meta);
 
     public selectDocExist(nId: string): boolean {
         return existsSync(this.getNoteDocIndexFile(nId, 'README.md')) || existsSync(this.getNoteDocIndexFile(nId, 'README.html'));
@@ -155,7 +138,7 @@ export class NoteDatabase {
         this.writeNoteMeta(nId, meta);
     }
 
-    public createNoteFiles(nId: string) {
+    public createNoteFiles(nId: string): void {
         mkdirSync(this.getNoteFilesPath(nId));
     }
 
@@ -170,10 +153,10 @@ export class NoteDatabase {
         return undefined;
     }
 
-    updateNoteCategory(nId: string, dpath: string[], oldCategory: string, newCategory: string) {
+    renameNoteCategory(nId: string, dpath: string[], oldCategory: string, newCategory: string) {
         const idx: number | undefined = this.selectCategoryIndex(nId, dpath, oldCategory);
         const meta = this.readNoteMeta(nId);
-        if (idx != undefined) {
+        if (idx !== undefined) {
             meta.tags[idx].category = newCategory;
         }
         this.writeNoteMeta(nId, meta);
@@ -191,7 +174,7 @@ export class NoteDatabase {
 }
 
 class DomainCache {
-    private cache: Domain = { '.notes': [] };
+    private cache: IDomain = { '.notes': [] };
 
     public cleanCache() {
         this.cache = { '.notes': [] };
@@ -221,7 +204,7 @@ class DomainCache {
         objectPath.set(this.cache, dpath.concat('.notes'), []);
     }
 
-    public selectDomain(dpath: string[] = []): Domain {
+    public selectDomain(dpath: string[] = []): IDomain {
         return objectPath.get(this.cache, dpath);
     }
 

@@ -3,7 +3,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ToWebView as twv } from '../panel/notesMessage';
+import { ToWebView as twv } from '../src/panel/notesMessage';
 
 import './index.scss';
 

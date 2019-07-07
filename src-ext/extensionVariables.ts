@@ -64,7 +64,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     initializeNotesDirectory(ext.notesPath);
     addUsageNotes(ext.notesPath);
     ext.clientActions = initClient(ext.context.extensionPath);
-    ext.sendGA = sendGA();
+    ext.sendGA = sendGA;
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);

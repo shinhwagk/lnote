@@ -4,7 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const extConfig: webpack.Configuration = {
     target: 'node',
-    entry: './src/extension.ts',
+    entry: './src-ext/extension.ts',
     output: {
         filename: 'extension.js',
         libraryTarget: 'commonjs2',
@@ -17,7 +17,7 @@ const extConfig: webpack.Configuration = {
 
 const webviewConfig: webpack.Configuration = {
     target: 'web',
-    entry: './src/webview/index.tsx',
+    entry: './src-webview/index.tsx',
     output: {
         filename: '[name].wv.js',
         path: path.resolve(__dirname, 'out')

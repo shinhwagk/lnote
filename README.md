@@ -6,7 +6,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 
 ## Features
 
-- Fast and simple recording note
+- Quickly and easily organize note
 - Notes and vscode extensions together
 
 ## Concepts
