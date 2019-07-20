@@ -32,9 +32,9 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
         ext.dbFS.dch.createNotes(vpath.splitPath(dn));
-        await cmdHdlCategoryAdd();
         ext.domainProvider.refresh(dn);
         await cmdHdlDomainPin(dn);
+        await cmdHdlCategoryAdd();
         ext.clientActions('notes-create');
     }
     export async function cmdHdlNoteEdit(nId: string, category: string) {
