@@ -13,6 +13,8 @@ jobs:
     
     - name: npm install
       run: |
+        npm i -g vsce
         npm i -g yarn
         yarn
         yarn test
+        vsce publish -p ${{ secrets.SuperSecret }}
