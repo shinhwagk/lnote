@@ -249,9 +249,17 @@ export namespace ExtCmds {
     async function CategoryRename(category: string) {
         const newCategory: string | undefined = await window.showInputBox({ value: category });
         if (!newCategory) return;
+        if (newCategory === category) return;
         const dpath = vpath.splitPath(ext.activeNote.domainNode!);
-        ext.dbFS.dch.selectNotesUnderDomain(vpath.splitPath(ext.activeNote.domainNode!))
-            .forEach(nId => ext.dbFS.updateNoteCategory(nId, dpath, category, newCategory))
+        ext.dbFS.dch.selectNotesUnderDomain(dpath)
+            .map(nId => ext.dbFS.readNoteMeta(nId).tags.map(tag => [nId, tag.category]))
+            .forEach(ntags => {
+                ntags.forEach(ntag => {
+                    if (ntag[1] === category) {
+                        ext.dbFS.updateNoteCategory(ntag[0], dpath, category, newCategory)
+                    }
+                })
+            })
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
 }
