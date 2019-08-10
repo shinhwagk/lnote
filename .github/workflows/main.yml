@@ -17,4 +17,4 @@ jobs:
         npm i -g yarn
         yarn
         yarn test
-        vsce publish -p ${{ secrets.SuperSecret }}
+        vsce publish -p ${{ secrets.VSCE_TOKEN }}
