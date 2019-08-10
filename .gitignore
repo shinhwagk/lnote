@@ -1,0 +1,10 @@
+/out/
+/node_modules/
+/.vscode-test/
+/*.vsix
+/.DS_Store
+/coverage/
+/yarn-error.log
+/vscode-note/
+/yarn.lock
+/package-lock.json

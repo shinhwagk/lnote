@@ -1,0 +1,2 @@
+"workbench.editor.openSideBySideDirection": "down"
+If you do this, your editor will look more comfortable.

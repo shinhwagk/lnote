@@ -1,0 +1,21 @@
+{
+    "files.exclude": {
+        "node_modules": true,
+        "out": false
+    },
+    "search.exclude": {
+        "node_modules": true,
+        "out": true
+    },
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "editor.formatOnSave": true,
+    "npm.packageManager": "yarn",
+    "npm.registry": "https://registry.npm.taobao.org",
+    "files.eol": "\n",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 130
+}
