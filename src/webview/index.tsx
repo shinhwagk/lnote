@@ -14,6 +14,7 @@ interface vscode {
 declare const vscode: vscode;
 
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
+const editCategory = (category: string) => () => vscode.postMessage({ command: 'edit-category', data: { category } });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
 const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
 const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
@@ -77,7 +78,7 @@ function VSNCategory(props: twv.WVCategory) {
     return (
         <div id={props.name} className="grid-category">
             <div className="grid-category-name">
-                {props.name + ' '}
+                <span onContextMenu={editCategory(props.name)}>{props.name + ' '}</span>
                 <a onClick={addNote(props.name)}>
                     <FontAwesomeIcon className="icon" size='xs' icon={faPlus} />
                 </a>

@@ -103,6 +103,9 @@ export class NotesPanelView {
                     case 'add-category':
                         vscode.commands.executeCommand('vscode-note.category.add');
                         break;
+                    case 'edit-category':
+                        vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
+                        break;
                 }
             },
             undefined,

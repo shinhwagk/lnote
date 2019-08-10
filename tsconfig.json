@@ -3,7 +3,10 @@
         "module": "commonjs",
         "target": "esnext",
         "outDir": "out",
-        "lib": ["esnext", "dom"],
+        "lib": [
+            "esnext",
+            "dom"
+        ],
         "sourceMap": true,
         "jsx": "preserve",
         "strict": true,
@@ -12,7 +15,10 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "noImplicitAny": true,
-        "typeRoots": ["./node_modules/@types", "./typings"],
+        "typeRoots": [
+            "./node_modules/@types",
+            "./typings"
+        ],
         "resolveJsonModule": true,
         "esModuleInterop": true
     },

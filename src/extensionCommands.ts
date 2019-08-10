@@ -220,11 +220,40 @@ export namespace ExtCmds {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
         ext.clientActions('note-doc-edit');
     }
-    // export async function cmdHdlCategoryToDomain(category: string) {
-    //     const dpath = vpath.splitPath(ext.activeNote.domainNode!);
-    //     const newDomainName = 'category';
-    //     const newCategory = 'xx';
-    // }
+    export async function cmdHdlCategoryEdit(category: string) {
+        const rst = await window.showQuickPick(['rename', 'move to other domain']);
+        if (rst === 'move to other domain') {
+            await CategoryMoveToDomain(category);
+            ext.domainProvider.refresh();
+        } else if (rst === 'rename') {
+            await CategoryRename(category);
+            ext.domainProvider.refresh();
+        } else { return; }
+    }
+    async function CategoryMoveToDomain(category: string) {
+        const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });
+        if (!name) return;
+        if (name === ext.activeNote.domainNode!) return;
+        const newDpath = vpath.splitPath(name);
+        ext.dbFS.dch.selectNotesUnderDomain(vpath.splitPath(ext.activeNote.domainNode!))
+            .map(nId => ext.dbFS.readNoteMeta(nId).tags.map(tag => [nId, tag.category]))
+            .forEach(ntags => ntags.forEach(ntag => {
+                if (ntag[1] === category) {
+                    ext.dbFS.updateNoteDomain(ntag[0], vpath.splitPath(ext.activeNote.domainNode!), newDpath, false);
+                    ext.dbFS.dch.removeNotes(vpath.splitPath(ext.activeNote.domainNode!), ntag[0])
+                    ext.dbFS.dch.cacheNotes(newDpath, ntag[0])
+                }
+            }))
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
+    async function CategoryRename(category: string) {
+        const newCategory: string | undefined = await window.showInputBox({ value: category });
+        if (!newCategory) return;
+        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+        ext.dbFS.dch.selectNotesUnderDomain(vpath.splitPath(ext.activeNote.domainNode!))
+            .forEach(nId => ext.dbFS.updateNoteCategory(nId, dpath, category, newCategory))
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
 }
 
 namespace ExtCmdsFuns {
