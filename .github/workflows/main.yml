@@ -1,0 +1,17 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/setup-node@v1
+    
+    - name: npm install
+      run: |
+        npm i -g yarn
+        yarn
+        yarn test
