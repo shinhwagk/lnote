@@ -54,7 +54,7 @@ export class NotesPanelView {
     private initPanel() {
         this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))],
+            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
         });
         this.panel.iconPath = vscode.Uri.file(path.join(ext.context.extensionPath, 'images/wv-icon.svg'));
         this.panel.onDidDispose(
@@ -63,7 +63,7 @@ export class NotesPanelView {
                 console.log('vsnote webview closed.');
             },
             null,
-            ext.context.subscriptions,
+            ext.context.subscriptions
         );
         this.panel.onDidChangeViewState(
             e => {
@@ -74,7 +74,7 @@ export class NotesPanelView {
                 }
             },
             null,
-            ext.context.subscriptions,
+            ext.context.subscriptions
         );
         this.panel.webview.onDidReceiveMessage(
             msg => {
@@ -101,7 +101,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.add', msg.data);
                         break;
                     case 'add-category':
-                        vscode.commands.executeCommand('vscode-note.category.add');
+                        vscode.commands.executeCommand('vscode-note.category.add', false);
                         break;
                     case 'edit-category':
                         vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
@@ -109,7 +109,7 @@ export class NotesPanelView {
                 }
             },
             undefined,
-            ext.context.subscriptions,
+            ext.context.subscriptions
         );
         this.panel.webview.html = this.getWebviewContent();
     }
