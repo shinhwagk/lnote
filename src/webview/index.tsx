@@ -54,7 +54,7 @@ function VSNNotes(props: WVNote) {
 
     return (
         <div className="grid-note">
-            <div className="grid-note-id">
+            <div className="grid-note-id" onContextMenu={editNote(props.nId, props.category)}>
                 {isDoc}
                 {isFiles}
             </div>
@@ -80,7 +80,7 @@ function VSNCategory(props: twv.WVCategory) {
             <div className="grid-category-name">
                 <span onContextMenu={editCategory(props.name)}>{props.name + ' '}</span>
                 <a onClick={addNote(props.name)}>
-                    <FontAwesomeIcon className="icon" size='xs' icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size="xs" icon={faPlus} />
                 </a>
             </div>
             <div className="grid-category-body">{listnote}</div>
@@ -115,7 +115,7 @@ function VNSDomain(props: WVDomain) {
             <h2>
                 {props.dpath.join(' / ') + ' '}
                 <a onClick={addCategory()}>
-                    <FontAwesomeIcon className="icon" size='sm' icon={faPlus} />
+                    <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
                 </a>
             </h2>
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}
