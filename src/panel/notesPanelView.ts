@@ -42,13 +42,23 @@ export class NotesPanelView {
     }
 
     filterViewData(reg: string) {
-        const categories = this.viewData!.categories.filter(
-            n => n.notes.filter(c => c.contents.join('').length).filter(c => new RegExp(reg).test(c.contents.join(''))).length,
-        );
-        if (this.viewData) {
-            this.viewData.categories = categories;
+        const newCategory: twv.WVCategory[] = [];
+        for (const category of this.viewData!.categories) {
+            const newNotes: twv.WVNote[] = [];
+            for (const note of category.notes) {
+                for (const content of note.contents) {
+                    const result = new RegExp(reg).test(content);
+                    if (result) {
+                        newNotes.push(note);
+                    }
+                }
+            }
+            if (newNotes.length >= 1) {
+                newCategory.push({ name: category.name, notes: newNotes });
+            }
         }
-        console.log(JSON.stringify(categories));
+        this.viewData.categories = newCategory;
+        console.log('111' + JSON.stringify(newCategory));
         return this;
     }
 
@@ -119,7 +129,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.category.add');
                         break;
                     case 'search-notes':
-                        vscode.commands.executeCommand('vscode-note.notes.search');
+                        vscode.commands.executeCommand('vscode-note.notes.search', msg.data);
                         break;
                 }
             },

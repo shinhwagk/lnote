@@ -1,5 +1,6 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -13,8 +14,8 @@ interface vscode {
 // declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
+// const searchNotes = (key: string) => () => vscode.postMessage({ command: 'search-notes', data: key });
 const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
-const searchNote = () => () => vscode.postMessage({ command: 'search-notes' });
 const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
 const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
 const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
@@ -102,13 +103,60 @@ function VSNCategory(props: twv.WVCategory) {
 //     );
 // }
 
+function filterNotes(categories: twv.WVCategory[], key: string) {
+    const newCategory: twv.WVCategory[] = [];
+    for (const category of categories) {
+        const newNotes: twv.WVNote[] = [];
+        for (const note of category.notes) {
+            for (const content of note.contents) {
+                const result = new RegExp(key).test(content);
+                if (result) {
+                    newNotes.push(note);
+                }
+            }
+        }
+        if (newNotes.length >= 1) {
+            newCategory.push({ name: category.name, notes: newNotes });
+        }
+    }
+    return newCategory;
+}
+
 function VNSDomain(props: WVDomain) {
-    const categories = props.categories.map((category: twv.WVCategory) => (
-        <div>
-            <VSNCategory name={category.name} notes={category.notes} />
-            <p />
-        </div>
-    ));
+    const [name, setName] = React.useState({ switch: false, key: '' });
+
+    let filterCategories: twv.WVCategory[] = props.categories;
+
+    const categories = () => {
+        console.log('pppp' + JSON.stringify(filterCategories));
+        return filterNotes(props.categories, name.key).map((category: twv.WVCategory) => (
+            <div>
+                <VSNCategory name={category.name} notes={category.notes} />
+                <p />
+            </div>
+        ));
+    };
+
+    const handleLogoutClick = () => {
+        console.log(name.switch);
+        if (name.switch) {
+            setName({ switch: false, key: '' });
+            filterCategories = props.categories;
+        } else {
+            setName({ switch: true, key: '' });
+        }
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setName({ switch: true, key: event.target.value });
+    };
+
+    const search = () => {
+        if (name.switch) {
+            return <input type="text" onChange={handleChange}></input>;
+        }
+        return <a></a>;
+    };
 
     return (
         <div>
@@ -117,15 +165,17 @@ function VNSDomain(props: WVDomain) {
                 <a onClick={addCategory()}>
                     <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
                 </a>
-                <a onClick={searchNote()}>
-                    <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
+                <a onClick={handleLogoutClick}>
+                    <FontAwesomeIcon className="icon" size="sm" icon={faSearch} />
                 </a>
             </h2>
+            {search()}
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}
-            <div className="grid-notes">{categories}</div>
+            <div className="grid-notes">{categories()}</div>
         </div>
     );
 }
+
 window.addEventListener('message', event => {
     const message: twv.DomainData = event.data;
 

@@ -1,6 +1,6 @@
 body {
-    font-size: .8rem;
-    font-family: var(--vscode-font-family)
+    font-size: 0.8rem;
+    font-family: var(--vscode-font-family);
 }
 
 .grid-notes {
@@ -14,7 +14,7 @@ body {
 .grid-category {
     padding: 5px;
 
-    border-radius: .25rem;
+    border-radius: 0.25rem;
 
     border-width: 1px;
     border-style: solid;
@@ -37,7 +37,6 @@ body {
     border-bottom-style: solid;
     .vscode-light & {
         border-bottom-color: rgba(0, 0, 0, 0.69);
-        
     }
 
     .vscode-dark & {
@@ -94,6 +93,15 @@ body {
     .vscode-dark & {
         color: rgba(255, 255, 255, 0.6);
     }
+}
+
+input::-webkit-input-placeholder {
+    color: red;
+}
+
+input::selection {
+    background: transparent;
+    background-color: red;
 }
 
 // pre {
