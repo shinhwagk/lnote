@@ -109,9 +109,9 @@ function filterNotes(categories: twv.WVCategory[], key: string) {
         const newNotes: twv.WVNote[] = [];
         for (const note of category.notes) {
             for (const content of note.contents) {
-                const result = new RegExp(key).test(content);
-                if (result) {
+                if (new RegExp(key).test(content)) {
                     newNotes.push(note);
+                    break;
                 }
             }
         }
@@ -126,14 +126,19 @@ function VNSDomain(props: WVDomain) {
     const [state, setState] = React.useState({ switch: false, key: '' });
 
     const categories = () => {
-        return (state.switch && state.key.length >= 1 ? filterNotes(props.categories, state.key) : props.categories).map(
-            (category: twv.WVCategory) => (
-                <div>
-                    <VSNCategory name={category.name} notes={category.notes} />
-                    <p />
-                </div>
-            )
-        );
+        if (newDomain) {
+            setState({ switch: false, key: '' });
+            newDomain = false;
+        }
+        return (state.switch && state.key.length >= 1 && !newDomain
+            ? filterNotes(props.categories, state.key)
+            : props.categories
+        ).map((category: twv.WVCategory) => (
+            <div>
+                <VSNCategory name={category.name} notes={category.notes} />
+                <p />
+            </div>
+        ));
     };
 
     const handleLogoutClick = () => {
@@ -148,7 +153,7 @@ function VNSDomain(props: WVDomain) {
         if (state.switch) {
             return (
                 <p>
-                    <input type="text" onChange={handleChange}></input>
+                    <input type="text" onChange={handleChange} autoFocus={true}></input>
                 </p>
             );
         }
@@ -179,6 +184,7 @@ window.addEventListener('message', event => {
         case 'data':
             const dpath = message.data.dpath;
             const categories = message.data.categories;
+            newDomain = true;
             ReactDOM.render(<VNSDomain dpath={dpath} categories={categories} />, document.getElementById('root'));
             break;
         default:
@@ -186,6 +192,7 @@ window.addEventListener('message', event => {
     }
 });
 
+let newDomain = true;
 interface WVNote {
     category: string;
     nId: string;
