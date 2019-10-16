@@ -1,5 +1,6 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -102,13 +103,57 @@ function VSNCategory(props: twv.WVCategory) {
 //     );
 // }
 
+function filterNotes(categories: twv.WVCategory[], key: string) {
+    const newCategory: twv.WVCategory[] = [];
+    for (const category of categories) {
+        const newNotes: twv.WVNote[] = [];
+        for (const note of category.notes) {
+            for (const content of note.contents) {
+                const result = new RegExp(key).test(content);
+                if (result) {
+                    newNotes.push(note);
+                }
+            }
+        }
+        if (newNotes.length >= 1) {
+            newCategory.push({ name: category.name, notes: newNotes });
+        }
+    }
+    return newCategory;
+}
+
 function VNSDomain(props: WVDomain) {
-    const categories = props.categories.map((category: twv.WVCategory) => (
-        <div>
-            <VSNCategory name={category.name} notes={category.notes} />
-            <p />
-        </div>
-    ));
+    const [state, setState] = React.useState({ switch: false, key: '' });
+
+    const categories = () => {
+        return (state.switch && state.key.length >= 1 ? filterNotes(props.categories, state.key) : props.categories).map(
+            (category: twv.WVCategory) => (
+                <div>
+                    <VSNCategory name={category.name} notes={category.notes} />
+                    <p />
+                </div>
+            )
+        );
+    };
+
+    const handleLogoutClick = () => {
+        setState({ switch: !state.switch, key: '' });
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState({ switch: true, key: event.target.value });
+    };
+
+    const search = () => {
+        if (state.switch) {
+            return (
+                <p>
+                    <input type="text" onChange={handleChange}></input>
+                </p>
+            );
+        }
+        return <a></a>;
+    };
 
     return (
         <div>
@@ -116,10 +161,14 @@ function VNSDomain(props: WVDomain) {
                 {props.dpath.join(' / ') + ' '}
                 <a onClick={addCategory()}>
                     <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
+                </a>{' '}
+                <a onClick={handleLogoutClick}>
+                    <FontAwesomeIcon className="icon" size="sm" icon={faSearch} />
                 </a>
             </h2>
+            {search()}
             {/* <VSNCategoryTitle cnames={props.categories.map(c => c.name)} /> */}
-            <div className="grid-notes">{categories}</div>
+            <div className="grid-notes">{categories()}</div>
         </div>
     );
 }
