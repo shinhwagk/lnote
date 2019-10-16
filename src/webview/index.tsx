@@ -123,37 +123,34 @@ function filterNotes(categories: twv.WVCategory[], key: string) {
 }
 
 function VNSDomain(props: WVDomain) {
-    const [name, setName] = React.useState({ switch: false, key: '' });
-
-    let filterCategories: twv.WVCategory[] = props.categories;
+    const [state, setState] = React.useState({ switch: false, key: '' });
 
     const categories = () => {
-        console.log('pppp' + JSON.stringify(filterCategories));
-        return filterNotes(props.categories, name.key).map((category: twv.WVCategory) => (
-            <div>
-                <VSNCategory name={category.name} notes={category.notes} />
-                <p />
-            </div>
-        ));
+        return (state.switch && state.key.length >= 1 ? filterNotes(props.categories, state.key) : props.categories).map(
+            (category: twv.WVCategory) => (
+                <div>
+                    <VSNCategory name={category.name} notes={category.notes} />
+                    <p />
+                </div>
+            ),
+        );
     };
 
     const handleLogoutClick = () => {
-        console.log(name.switch);
-        if (name.switch) {
-            setName({ switch: false, key: '' });
-            filterCategories = props.categories;
-        } else {
-            setName({ switch: true, key: '' });
-        }
+        setState({ switch: !state.switch, key: '' });
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setName({ switch: true, key: event.target.value });
+        setState({ switch: true, key: event.target.value });
     };
 
     const search = () => {
-        if (name.switch) {
-            return <input type="text" onChange={handleChange}></input>;
+        if (state.switch) {
+            return (
+                <p>
+                    <input type="text" onChange={handleChange}></input>
+                </p>
+            );
         }
         return <a></a>;
     };
@@ -164,7 +161,7 @@ function VNSDomain(props: WVDomain) {
                 {props.dpath.join(' / ') + ' '}
                 <a onClick={addCategory()}>
                     <FontAwesomeIcon className="icon" size="sm" icon={faPlus} />
-                </a>
+                </a>{' '}
                 <a onClick={handleLogoutClick}>
                     <FontAwesomeIcon className="icon" size="sm" icon={faSearch} />
                 </a>
