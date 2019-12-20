@@ -7,8 +7,7 @@ import { existsSync, readdirSync, removeSync, mkdirpSync } from 'fs-extra';
 import { version as lastVersion } from '../package.json';
 import compareVersions from 'compare-versions';
 import { identifier } from './constants';
-import addHours from 'date-fns/add_hours';
-import isPast from 'date-fns/is_past';
+import { addHours, isPast } from 'date-fns';
 import * as querystring from 'querystring';
 
 type ActionTimestamp = number;

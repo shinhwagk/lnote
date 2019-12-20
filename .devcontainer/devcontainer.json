@@ -1,0 +1,12 @@
+{
+	"name": "Node.js 12",
+	"dockerFile": "Dockerfile",
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+	"postCreateCommand": "npm i",
+	"extensions": [
+		"dbaeumer.vscode-eslint",
+		"howardzuo.vscode-npm-dependency"
+	]
+}

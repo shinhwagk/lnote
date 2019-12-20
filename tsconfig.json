@@ -21,11 +21,5 @@
         ],
         "resolveJsonModule": true,
         "esModuleInterop": true
-    },
-    "plugins": [
-        {
-            "name": "typescript-tslint-plugin",
-            "configFile": "./tslint.json"
-        }
-    ]
+    }
 }
