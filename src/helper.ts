@@ -1,29 +1,30 @@
-import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import * as path from 'path';
 import { randomBytes } from 'crypto';
 
 export namespace vfs {
+    const encoding = 'utf-8';
     export function readFileSync(path: string): string {
-        return fs.readFileSync(path, { encoding: 'utf-8' });
+        return fse.readFileSync(path, { encoding });
     }
 
     export function writeFileSync(path: string, data: string = '') {
-        return fs.writeFileSync(path, data, { encoding: 'utf-8' });
+        return fse.writeFileSync(path, data, { encoding });
     }
 
     export function writeJsonSync(file: string, object: any) {
-        writeFileSync(file, JSON.stringify(object));
+        fse.writeJsonSync(file, object, { encoding });
     }
 
     export function readJsonSync<T>(file: string): T {
-        return JSON.parse(readFileSync(file));
+        return fse.readJsonSync(file, { encoding }) as T
     }
     export function removeSync(file: string) {
-        fs.unlinkSync(file);
+        fse.removeSync(file)
     }
     export function ensureFileSync(file: string) {
-        if (fs.existsSync(file)) return;
-        if (fs.existsSync(path.dirname(file))) {
+        if (fse.existsSync(file)) return;
+        if (fse.existsSync(path.dirname(file))) {
             vfs.writeFileSync(file, '');
         } else {
         }
