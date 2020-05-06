@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.119",
+    "version": "0.9.120",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -200,6 +200,10 @@
             }
         ]
     },
+    "extensionDependencies": [
+        "docsmsft.docs-markdown",
+        "docsmsft.docs-preview"
+    ],
     "scripts": {
         "vscode:prepublish": "yarn compile",
         "compile": "webpack --mode production --config webpack.config.ts --verbose --display-modules",
