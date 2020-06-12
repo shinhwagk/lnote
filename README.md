@@ -31,6 +31,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 3. [create document](#3-create-document)
 4. [create files](#4-create-files)
 5. [search notes](#5-search-notes)
+6. [domain shortcut navigation](#6-domain-shortcut-navigation)
 
 ### 1 create domain and create category with note
 ![1](https://raw.githubusercontent.com/shinhwagk/vscode-note/master/images/1.gif)
@@ -42,3 +43,5 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 ![4](https://raw.githubusercontent.com/shinhwagk/vscode-note/master/images/4.gif)
 ### 5 search notes
 ![5](https://raw.githubusercontent.com/shinhwagk/vscode-note/master/images/search.gif)
+### 6 domain shortcut navigation
+![6](https://raw.githubusercontent.com/shinhwagk/vscode-note/master/images/6.jpg)
