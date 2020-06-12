@@ -4,9 +4,9 @@ import { homedir, platform } from 'os';
 import * as path from 'path';
 import { section } from './constants';
 import { NoteDatabase } from './database';
-import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands } from 'vscode';
+import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
-import { existsSync, mkdirpSync, mkdirsSync, copySync } from 'fs-extra';
+import { existsSync, mkdirpSync, mkdirsSync, copySync, writeJsonSync } from 'fs-extra';
 import { initClient, sendGA } from './client';
 
 export namespace ext {
@@ -17,6 +17,7 @@ export namespace ext {
     export let notesPanelView: NotesPanelView;
     export let masterPath: string;
     export let notesPath: string;
+    export let shortcutsFilePath: string;
     export let activeNote: ActiveNote;
     export let dbFS: NoteDatabase;
     export let clientActions: (action: string) => void;
@@ -25,6 +26,7 @@ export namespace ext {
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
+    export let domainShortcutStatusBarItem: StatusBarItem;
 }
 
 export function getConfigure<T>(name: string, defaultValue: T): T {
@@ -39,6 +41,10 @@ function getMasterPath() {
 
 function getNotesPath() {
     return path.join(ext.masterPath, 'notes');
+}
+
+function getShortcutsFilePath() {
+    return path.join(ext.notesPath, 'shortcuts.json');
 }
 
 function listenConfigure(ctx: ExtensionContext) {
@@ -59,9 +65,11 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // delete soon
     ext.masterPath = getMasterPath();
     ext.notesPath = getNotesPath();
+    ext.shortcutsFilePath = getShortcutsFilePath()
 
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
+    initializeShortcutsFile(ext.shortcutsFilePath);
     addUsageNotes(ext.notesPath);
     ext.clientActions = initClient(ext.context.extensionPath);
     ext.sendGA = sendGA();
@@ -87,6 +95,14 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         ext.filesProvider = new FilesExplorerProvider();
         window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
     }
+
+    if (!ext.domainShortcutStatusBarItem) {
+        ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
+        ext.domainShortcutStatusBarItem.text = "$(list-unordered) Domains(Last)"
+        ext.domainShortcutStatusBarItem.command = "vscode-note.shortcuts.last"
+        ext.domainShortcutStatusBarItem.show()
+        ext.context.subscriptions.push(ext.domainShortcutStatusBarItem)
+    }
 }
 
 function initializeMasterDirectory(masterPath: string) {
@@ -96,6 +112,12 @@ function initializeMasterDirectory(masterPath: string) {
 function initializeNotesDirectory(notesPath: string) {
     if (!existsSync(notesPath)) {
         mkdirsSync(notesPath);
+    }
+}
+
+function initializeShortcutsFile(commonlyUsedFilePath: string) {
+    if (!existsSync(commonlyUsedFilePath)) {
+        writeJsonSync(commonlyUsedFilePath, { star: [], last: [] }, { encoding: 'utf-8' })
     }
 }
 

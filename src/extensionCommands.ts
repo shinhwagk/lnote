@@ -78,6 +78,7 @@ export namespace ExtCmds {
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.activeNote.domainNode = dn;
         ext.notesPanelView.parseDomain(vpath.splitPath(dn)).showNotesPlanView();
+        ext.dbFS.appendLastDomainToShortcuts(dn)
         await ext.setContext(ctxFilesExplorer, false);
     }
     export async function cmdHdlNoteColRemove(id: string, cn: string) {
@@ -215,6 +216,12 @@ export namespace ExtCmds {
         } else {
             return;
         }
+    }
+    export async function cmdHdShortcutsLast() {
+        const picks = ext.dbFS.getShortcutsList('last')
+        const pick = await window.showQuickPick(picks);
+        if (!pick) return;
+        await cmdHdlDomainPin(pick)
     }
     async function CategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });

@@ -1,7 +1,7 @@
 import * as objectPath from 'object-path';
 import * as path from 'path';
 import { metaFileName } from './constants';
-import { tools, vfs } from './helper';
+import { tools, vfs, vpath } from './helper';
 import { existsSync, readdirSync, mkdirSync, removeSync, renameSync } from 'fs-extra';
 
 export interface Domain {
@@ -23,13 +23,20 @@ export interface Tag {
     valid?: boolean; // when note deleted
 }
 
+export interface Shortcuts {
+    star: string[];
+    last: string[];
+}
+
 export class NoteDatabase {
     public readonly dch: DomainCache = new DomainCache();
     private readonly notesPath: string;
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
+    private readonly shortcutsFile: string;
 
     constructor(notesPath: string) {
         this.notesPath = notesPath;
+        this.shortcutsFile = path.join(this.notesPath, 'shortcuts.json');
         this.cacheAllNotes();
     }
 
@@ -187,6 +194,27 @@ export class NoteDatabase {
             items.push({ note, weight: tag.weight || 0 });
         }
         return items.sort((_a, b) => b.weight).map(i => i.note);
+    }
+
+    getShortcutsList(kind: 'last' | 'star'): string[] {
+        if (kind === 'last') {
+            return vfs.readJsonSync<Shortcuts>(this.shortcutsFile).last
+        } else {
+            return []
+        }
+    }
+
+    appendLastDomainToShortcuts(domain: string): void {
+        const maxLast = 10;
+        let last = this.getShortcutsList('last')
+        const dns = this.dch.selectNotesUnderDomain(vpath.splitPath(domain))
+        if (dns.length === 0) { return }
+        last.push(domain);
+        last = Array.from(new Set(last))
+        while (last.length > maxLast) { last.shift() }
+        const s = vfs.readJsonSync<Shortcuts>(this.shortcutsFile)
+        s.last = last
+        vfs.writeJsonSync(this.shortcutsFile, s)
     }
 }
 
