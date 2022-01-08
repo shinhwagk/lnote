@@ -7,7 +7,7 @@ import { NoteDatabase } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
 import { existsSync, mkdirpSync, mkdirsSync, copySync, writeJsonSync } from 'fs-extra';
-import { initClient, sendGA } from './client';
+// import { initClient, sendGA } from './client';
 
 export namespace ext {
     export let context: ExtensionContext;
@@ -20,8 +20,8 @@ export namespace ext {
     export let shortcutsFilePath: string;
     export let activeNote: ActiveNote;
     export let dbFS: NoteDatabase;
-    export let clientActions: (action: string) => void;
-    export let sendGA: (ec: string, ea: string) => void;
+    // export let clientActions: (action: string) => void;
+    // export let sendGA: (ec: string, ea: string) => void;
     export let outputChannel: OutputChannel;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
@@ -71,8 +71,8 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     initializeNotesDirectory(ext.notesPath);
     initializeShortcutsFile(ext.shortcutsFilePath);
     addUsageNotes(ext.notesPath);
-    ext.clientActions = initClient(ext.context.extensionPath);
-    ext.sendGA = sendGA();
+    // ext.clientActions = initClient(ext.context.extensionPath);
+    // ext.sendGA = sendGA();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
     ext.dbFS = new NoteDatabase(ext.notesPath);
@@ -86,9 +86,9 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (!ext.domainProvider || !ext.domainTreeView) {
         ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-        ext.domainTreeView.onDidChangeVisibility(e =>
-            e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close')
-        );
+        // ext.domainTreeView.onDidChangeVisibility(e =>
+        //     e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close')
+        // );
     }
 
     if (!ext.filesProvider) {

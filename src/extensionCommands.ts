@@ -60,7 +60,7 @@ export namespace ExtCmds {
                 await cmdHdlNoteEditCategoryRename(nId, category);
                 break;
             case 'trash':
-                window.showInformationMessage('soon...');
+                await cmdHdlNoteEditTrash(nId);
                 break;
             case 'open note folder':
                 await cmdHdlNoteOpenFolder(nId);
@@ -111,7 +111,7 @@ export namespace ExtCmds {
         }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
 
-        ext.sendGA('note', 'add');
+        // ext.sendGA('note', 'add');
     }
     export async function cmdHdlNoteEditFilesCreate(id: string) {
         ext.dbFS.createNoteFiles(id);
@@ -222,6 +222,12 @@ export namespace ExtCmds {
         const pick = await window.showQuickPick(picks);
         if (!pick) return;
         await cmdHdlDomainPin(pick)
+    }
+    export async function cmdHdlNoteEditTrash(id: string) {
+        const dpath = vpath.splitPath(ext.activeNote.domainNode);
+        ext.dbFS.updateNoteDomain(id, dpath, ["@Trash"].concat(dpath), false);
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+        ext.domainProvider.refresh();
     }
     async function CategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });

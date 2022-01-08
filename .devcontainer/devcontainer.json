@@ -1,12 +1,12 @@
 {
-	"name": "Node.js 12",
-	"dockerFile": "Dockerfile",
-	"settings": {
-		"terminal.integrated.shell.linux": "/bin/bash"
+	"name": "vscode-note",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { "VARIANT": "14" }
 	},
-	"postCreateCommand": "npm i",
 	"extensions": [
 		"dbaeumer.vscode-eslint",
 		"howardzuo.vscode-npm-dependency"
-	]
+	],
+	"remoteUser": "node"
 }
