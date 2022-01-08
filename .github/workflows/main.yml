@@ -17,7 +17,4 @@ jobs:
     - name: deploy to market
       run: |
         npm i -g vsce
-        npm i -g yarn
-        yarn
-        yarn test
-        vsce publish -p ${{ secrets.VSCE_TOKEN }} --yarn
+        vsce publish -p ${{ secrets.VSCE_TOKEN }}
