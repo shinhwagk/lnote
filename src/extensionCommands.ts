@@ -226,8 +226,8 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditTrash(id: string) {
         const dpath = vpath.splitPath(ext.activeNote.domainNode);
         ext.dbFS.updateNoteDomain(id, dpath, ["@Trash"].concat(dpath), false);
-        ext.notesPanelView.parseDomain().showNotesPlanView();
         ext.domainProvider.refresh();
+        ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     async function CategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });
