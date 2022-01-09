@@ -1,4 +1,6 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
+import { faFolder } from '@fortawesome/free-solid-svg-icons/faFolder';
+import { faFileWord } from '@fortawesome/free-solid-svg-icons/faFileWord';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,17 +27,17 @@ const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', d
 
 function renderNoteDoc(props: { id: string }) {
     return (
-        <a onClick={viewDoc(props.id)}>
-            <span>{props.id.substr(0, 3)}</span>
-        </a>
+        <span onClick={viewDoc(props.id)}>
+            <FontAwesomeIcon className="icon" icon={faFileWord} />
+        </span>
     );
 }
 
 function renderNoteFiles(props: { id: string }) {
     return (
-        <a onClick={viewFiles(props.id)}>
-            <span>{props.id.substr(3, 3)}</span>
-        </a>
+        <span onClick={viewFiles(props.id)}>
+            <FontAwesomeIcon className="icon" icon={faFolder} />
+        </span>
     );
 }
 
@@ -49,14 +51,15 @@ function VSNNotes(props: WVNote) {
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId.substr(0, 3)}</span>;
-    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>{props.nId.substr(3, 3)}</span>;
+    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>&nbsp;&nbsp;&nbsp;</span>;
+    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>&nbsp;&nbsp;&nbsp;</span>;
     const gridNoteContentStyle: React.CSSProperties = { gridTemplateColumns: `repeat(${contents.length}, 1fr)` };
 
     return (
         <div className="grid-note">
             <div className="grid-note-id" onContextMenu={editNote(props.nId, props.category)}>
                 {isDoc}
+                <span>&nbsp;&nbsp;</span>
                 {isFiles}
             </div>
             <div className="grid-note-content" style={gridNoteContentStyle}>
