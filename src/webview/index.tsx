@@ -1,6 +1,7 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 import { faFolder } from '@fortawesome/free-solid-svg-icons/faFolder';
 import { faFileWord } from '@fortawesome/free-solid-svg-icons/faFileWord';
+import { faEllipsisH } from '@fortawesome/free-solid-svg-icons/faEllipsisH';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,18 +26,22 @@ const editCol = (id: string, cn: string) => () => vscode.postMessage({ command: 
 const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
 const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
 
-function renderNoteDoc(props: { id: string }) {
+function renderNoteDoc(props: { id: string, isExist:boolean }) {
+    const icon = props.isExist ? faFileWord : faEllipsisH;
+    const click = props.isExist ? viewDoc(props.id) : undefined;
     return (
-        <span onClick={viewDoc(props.id)}>
-            <FontAwesomeIcon className="icon" icon={faFileWord} />
+        <span onClick={click}>
+            <FontAwesomeIcon className="icon" icon={icon} />
         </span>
     );
 }
 
-function renderNoteFiles(props: { id: string }) {
+function renderNoteFiles(props: { id: string, isExist:boolean }) {
+    const icon = props.isExist ? faFolder : faEllipsisH;
+    const click = props.isExist ? viewFiles(props.id) : undefined;
     return (
-        <span onClick={viewFiles(props.id)}>
-            <FontAwesomeIcon className="icon" icon={faFolder} />
+        <span onClick={click}>
+            <FontAwesomeIcon className="icon" icon={icon} />
         </span>
     );
 }
@@ -51,16 +56,14 @@ function VSNNotes(props: WVNote) {
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>&nbsp;&nbsp;&nbsp;</span>;
-    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>&nbsp;&nbsp;&nbsp;</span>;
     const gridNoteContentStyle: React.CSSProperties = { gridTemplateColumns: `repeat(${contents.length}, 1fr)` };
 
     return (
         <div className="grid-note">
             <div className="grid-note-id" onContextMenu={editNote(props.nId, props.category)}>
-                {isDoc}
+                {renderNoteDoc({id: props.nId, isExist:props.doc})}
                 <span>&nbsp;&nbsp;</span>
-                {isFiles}
+                {renderNoteFiles({id: props.nId, isExist:props.files})}
             </div>
             <div className="grid-note-content" style={gridNoteContentStyle}>
                 {contents}
