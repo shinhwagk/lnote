@@ -8,7 +8,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     public readonly onDidChangeTreeData: Event<TreeItem> = this._onDidChangeTreeData.event;
 
     public refresh(): void {
-        this._onDidChangeTreeData.fire();
+        // this._onDidChangeTreeData.fire();
     }
 
     async getTreeItem(element: TreeItem): Promise<TreeItem> {

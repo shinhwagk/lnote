@@ -8,7 +8,6 @@
             "dom"
         ],
         "sourceMap": true,
-        "jsx": "preserve",
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
@@ -16,10 +15,16 @@
         "noUnusedLocals": true,
         "noImplicitAny": true,
         "typeRoots": [
-            "./node_modules/@types",
-            "./typings"
+            // "./node_modules/@types",
+            // "./typings"
         ],
         "resolveJsonModule": true,
         "esModuleInterop": true
-    }
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "src"
+    ]
 }

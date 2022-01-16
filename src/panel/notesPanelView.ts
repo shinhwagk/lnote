@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
 import { tools } from '../helper';
+import { ExtCmds } from '../extensionCommands';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -16,18 +17,23 @@ export class NotesPanelView {
             .toString();
     };
 
+    // const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
     private getWebviewContent() {
+        const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
+        console.log(stylesPathMainPath.fsPath)
+        const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
+        const nonce = getNonce();
         return `<!DOCTYPE html>
                 <html lang="en">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <link href="${stylesMainUri}" rel="stylesheet">
+				    <script nonce="${nonce}" src="https://kit.fontawesome.com/61b8139299.js" crossorigin="anonymous" ></script>
                     <title>vscode-note</title>
                 </head>
                 <body>
                     <div id="root"></div>
-                    <script src="${this.assetsFile('react.production.min.js')}"></script>
-                    <script src="${this.assetsFile('react-dom.production.min.js')}"></script>
                     <script>
                         const vscode = acquireVsCodeApi();
                         window.onload = function() {
@@ -35,7 +41,7 @@ export class NotesPanelView {
                             console.log('Ready to accept data.');
                         };
                     </script>
-                    <script src="${this.assetsFile('main.wv.js')}"></script>
+                    <script nonce="${nonce}" src="${this.assetsFile('main.js')}"></script>
                 </body>
                 </html>`;
     }
@@ -54,9 +60,9 @@ export class NotesPanelView {
     private initPanel() {
         this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.file(path.join(ext.context.extensionPath, 'out'))]
+            localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')]
         });
-        this.panel.iconPath = vscode.Uri.file(path.join(ext.context.extensionPath, 'images/wv-icon.svg'));
+        this.panel.iconPath = vscode.Uri.joinPath(ext.context.extensionUri, 'images/wv-icon.svg');
         this.panel.onDidDispose(
             () => {
                 this.panel = undefined;
@@ -86,10 +92,16 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
                     case 'edit-contentFile':
-                        vscode.commands.executeCommand('vscode-note.note.edit.col.content', msg.data.id, msg.data.n);
+                        ExtCmds.cmdHdlNoteEditColContent(msg.data.id, msg.data.n)
                         break;
                     case 'edit-col':
                         vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);
+                        break;
+                    case 'edit-col-add':
+                        vscode.commands.executeCommand('vscode-note.note.edit.col.add', msg.data.id);
+                        break;
+                    case 'edit-col-remove':
+                        ExtCmds.cmdHdlNoteColRemove(msg.data.id, msg.data.cn)
                         break;
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
@@ -105,6 +117,14 @@ export class NotesPanelView {
                         break;
                     case 'edit-category':
                         vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
+                        break;
+                    case 'col-to-terminal':
+                        console.log("col-to-terminal", msg.data)
+                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx)
+                        break;
+                    case 'col-to-terminal-args':
+                        console.log("col-to-terminal", msg.data)
+                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx)
                         break;
                 }
             },
@@ -144,4 +164,13 @@ export class NotesPanelView {
         }
         return { dpath: this.dpathCache, categories: categories };
     }
+}
+
+function getNonce() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 }

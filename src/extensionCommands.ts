@@ -82,10 +82,14 @@ export namespace ExtCmds {
         await ext.setContext(ctxFilesExplorer, false);
     }
     export async function cmdHdlNoteColRemove(id: string, cn: string) {
+        console.log(id, cn)
         //cn : column number
+        if (ext.dbFS.getNoteContentFiles(id).length === 1) {
+            window.showInformationMessage("don't remove short document if only one.")
+            return
+        }
         ext.dbFS.deleteNoteCol(id, Number(cn));
-
-        // ext.editProvider.refresh();
+        cmdHdlDomainPin(ext.activeNote.domainNode)
     }
     export async function cmdHdlNoteEditRemove() {
         const sqp = await window.showQuickPick(['Yes', 'No']);
@@ -228,6 +232,18 @@ export namespace ExtCmds {
         ext.dbFS.updateNoteDomain(id, dpath, ["@Trash"].concat(dpath), false);
         cmdHdlDomainRefresh()
         ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
+    export async function cmdHdlNoteColToActiveTermianl(nid: string, cidx: string) {
+        if (window.activeTerminal) {
+            const colContent = ext.dbFS.selectNoteContents(nid)[Number(cidx)]
+            window.activeTerminal.sendText(colContent)
+        }
+    }
+    export async function cmdHdlNoteColToActiveTermianlWithArgs(nid: string, cidx: string) {
+        if (window.activeTerminal) {
+            const colContent = ext.dbFS.selectNoteContents(nid)[Number(cidx)]
+            window.activeTerminal.sendText(colContent)
+        }
     }
     async function CategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });
