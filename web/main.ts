@@ -48,7 +48,6 @@ const NoteColContextMenuActions = [
         {
             title: 'send to active terminal with args',
             onClick: (_nid: string, _colIdx: string, context: string, e: MouseEvent) => {
-                console.log('aaaaaaaaaaaaa');
                 new abc(context, e).show();
             } /*vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } }*/,
         },
@@ -137,22 +136,12 @@ class VNNote {
         const d_cion = this.note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
         const f_cion = this.note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
-        const d_d = document.createElement('i');
-        d_d.className = `fas ${d_cion} fa-sm`;
-        d_d.onclick = () => {
-            vscode.postMessage({ command: 'doc', data: nid });
-        };
-        const d_f = document.createElement('i');
-        d_f.className = `fas ${f_cion} fa-sm`;
-        d_f.onclick = () => {
-            vscode.postMessage({ command: 'files', data: nid });
-        };
         const d_space = document.createElement('span');
-        d_space.innerHTML = '&nbsp;&nbsp;';
+        d_space.appendChild(elemSpaces(2));
 
-        d_note_id.appendChild(d_d);
+        d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'doc', data: nid })));
         d_note_id.appendChild(d_space);
-        d_note_id.appendChild(d_f);
+        d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'files', data: nid })));
 
         const d_note_content = document.createElement('div');
         d_note_content.className = 'grid-note-content';
@@ -180,9 +169,7 @@ class VNNote {
             vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
         };
 
-        const d_e = document.createElement('i');
-        d_e.className = `fas fa-pen fa-sm`;
-        d_note_edit.appendChild(d_e);
+        d_note_edit.appendChild(elemIcon('fa-pen'));
 
         d_note.appendChild(d_note_id);
         d_note.appendChild(d_note_content);
@@ -191,15 +178,17 @@ class VNNote {
     }
 }
 
-function elemSpace() {
-    const s = document.createElement('span')
-    s.innerHTML = "&nbsp;"
-    return s
+function elemSpaces(num: number = 1) {
+    const s = document.createElement('span');
+    for (let i = 0; i < num; i++) {
+        s.innerHTML += '&nbsp;';
+    }
+    return s;
 }
 
 class VNCategory {
     constructor(private readonly name: string, private readonly notes: DataNote[]) { }
-    dom(): HTMLHeadingElement {
+    doms(): HTMLHeadingElement {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
 
@@ -208,15 +197,11 @@ class VNCategory {
         d_category_name.className = 'grid-category-name';
         d_category_name.oncontextmenu = (e) => {
             e.preventDefault();
+            // todo for rename
         };
-        const d_category_plus = document.createElement('i');
-        d_category_plus.className = `fas fa-plus fa-sm`;
-        d_category_plus.onclick = () => vscode.postMessage({ command: 'add', data: this.name })
 
-        d_category_name.appendChild(elemSpace())
-        d_category_name.appendChild(d_category_plus)
-
-        d_category.appendChild(d_category_name);
+        d_category_name.appendChild(elemSpaces());
+        d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
 
         const d_category_body = document.createElement('div');
         d_category_body.className = 'grid-category-body';
@@ -225,44 +210,90 @@ class VNCategory {
             const d_n = new VNNote(n).dom();
             d_category_body.appendChild(d_n);
         }
-        d_category.appendChild(d_category_body);
+
+        d_category.append(d_category_name, d_category_body);
         return d_category;
     }
 }
 
-function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null) {
+function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
     const i = document.createElement('i');
-    i.className = `fas ${name} fa-sm`
-    i.onclick = onclick
-    return i
+    i.className = `fas ${name} fa-sm`;
+    i.onclick = onclick;
+    return i;
+}
+
+function filterSearch(categories: DataCategory[], key: string) {
+    const newCategory: DataCategory[] = [];
+    for (const category of categories) {
+        const newNotes: DataNote[] = [];
+        for (const note of category.notes) {
+            for (const content of note.contents) {
+                if (new RegExp(key).test(content)) {
+                    newNotes.push(note);
+                    break;
+                }
+            }
+        }
+        if (newNotes.length >= 1) {
+            newCategory.push({ name: category.name, notes: newNotes });
+        }
+    }
+    return newCategory;
 }
 
 class VNDomain {
-    constructor(private readonly domain: DataDomain) { }
-    reader() {
+    search: boolean = false;
+    categoriesDom = document.createElement('div');
+    searchDom = this.createSerachDom();
+    constructor(private readonly domain: DataDomain) {
+        this.readerCategories();
+    }
+
+    createSerachDom() {
+        const i = document.createElement('input');
+        i.type = 'text';
+        i.style.display = 'none';
+        i.onkeydown = () => {
+            this.readerCategories(i.value);
+        };
+        return i;
+    }
+
+    readerCategories(filter: string | undefined = undefined) {
+        const _categories = this.search && filter ? filterSearch(this.domain.categories, filter) : this.domain.categories;
+        this.categoriesDom.innerHTML = ''; // remove all child
+        for (const c of _categories) {
+            this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
+            this.categoriesDom.appendChild(document.createElement('p'));
+        }
+    }
+
+    doms() {
         const e_domain = document.createElement('div');
         const e_title = document.createElement('h2');
         const e_domain_name = document.createElement('span');
-        e_domain_name.textContent = this.domain.dpath.join(' / ')
-        e_title.appendChild(e_domain_name)
-        e_title.appendChild(elemSpace())
-        e_title.appendChild(elemIcon('fa-plus', () => { vscode.postMessage({ command: 'add-category' }) }))
-        e_title.appendChild(elemSpace())
-        e_title.appendChild(elemIcon('fa-search', () => { }))
-        // e_title.innerHTML = `${this.domain.dpath.join(
-        //     ' / '
-        // )}&nbsp;<i class="fas fa-plus fa-sm">&nbsp;</i><i class="fas fa-search fa-sm"></i>`;
+        e_domain_name.textContent = this.domain.dpath.join(' / ');
+        // const e_search = elemNotesSearch();
+        e_title.appendChild(e_domain_name);
+        e_title.appendChild(elemSpaces());
+        e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add-category' })));
+        e_title.appendChild(elemSpaces());
+        e_title.appendChild(
+            elemIcon('fa-search', () => {
+                if (!this.search) {
+                    this.search = true;
+                    this.searchDom.style.display = 'block';
+                } else {
+                    this.search = false;
+                    this.searchDom.style.display = 'none';
+                    this.readerCategories();
+                }
+            })
+        );
+        e_title.appendChild(this.searchDom);
 
-        const e_categorys = document.createElement('div');
-
-        e_domain.appendChild(e_title);
-
-        for (const c of this.domain.categories) {
-            e_categorys.appendChild(new VNCategory(c.name, c.notes).dom());
-            e_categorys.appendChild(document.createElement('p'));
-        }
-
-        e_domain.appendChild(e_categorys);
+        e_domain.append(e_title, this.categoriesDom);
         return e_domain;
     }
 }
@@ -276,12 +307,14 @@ document.addEventListener(
     true
 );
 
+let domain;
+
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
     switch (message.command) {
         case 'data':
-            const domain = new VNDomain(message.data);
-            document.getElementById('root')?.replaceChildren(domain.reader());
+            domain = new VNDomain(message.data);
+            document.getElementById('root')?.replaceChildren(domain.doms());
             break;
         default:
             document.body.innerHTML = '<h1>loading...{message}</h1>';
