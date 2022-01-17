@@ -19,7 +19,7 @@ const webConfig = {
     entry: './web/main.ts',
     output: { filename: '[name].js', path: path.resolve(__dirname, 'out') },
     module: {
-        rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: './tsconfig1.json' } }],
+        rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: './tsconfig.json' } }],
     },
     plugins: [
         new CopyPlugin({
