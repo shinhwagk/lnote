@@ -1,7 +1,5 @@
-// import * as path from 'path';
-// import * as webpack from 'webpack';
-// const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const extConfig = {
     target: 'node',
@@ -9,11 +7,11 @@ const extConfig = {
     output: {
         filename: 'extension.js',
         libraryTarget: 'commonjs2',
-        path: path.resolve(__dirname, 'out')
+        path: path.resolve(__dirname, 'out'),
     },
     resolve: { extensions: ['.ts', '.js'] },
-    module: { rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: './tsconfig.json' } }] },
-    externals: { vscode: 'vscode' }
+    module: { rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: '../tsconfig.json' } }] },
+    externals: { vscode: 'vscode' },
 };
 
 const webConfig = {
@@ -21,8 +19,13 @@ const webConfig = {
     entry: './web/main.ts',
     output: { filename: '[name].js', path: path.resolve(__dirname, 'out') },
     module: {
-        rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: './tsconfig1.json' } }]
-    }
+        rules: [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: './tsconfig1.json' } }],
+    },
+    plugins: [
+        new CopyPlugin({
+            patterns: [{ from: './web/main.css' }],
+        }),
+    ],
 };
-module.exports = [webConfig, extConfig]
+module.exports = [webConfig, extConfig];
 // export default [webviewConfig];

@@ -1,10 +1,10 @@
 **/*
 
 !out/**/*.js
+!out/**/*.css
 !CHANGELOG.md
 !packages.json
 !images
 !README.md
 !icon.png
 !notes-usage
-!upgrade

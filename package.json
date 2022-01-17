@@ -2,12 +2,12 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.9.128",
+    "version": "0.10.2",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.63.0"
     },
     "repository": {
         "type": "git",
@@ -205,10 +205,9 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": "npm run compile",
+        "vscode:prepublish": " ",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
         "compile-web": "tsc -p ./web ",
         "test": "jest"
     },
@@ -220,6 +219,7 @@
         "@types/rimraf": "^3.0.2",
         "@types/vscode": "^1.63.0",
         "@vscode/test-electron": "^2.1.0",
+        "copy-webpack-plugin": "^10.2.0",
         "jest": "^27.4.7",
         "ts-jest": "^27.1.3",
         "ts-loader": "^9.2.6",
