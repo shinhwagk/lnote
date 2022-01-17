@@ -149,6 +149,7 @@ class VNNote {
 
         for (let i = 0; i <= this.note.contents.length; i++) {
             const d = document.createElement('div');
+            d.className = 'grid-note-content'
             d.ondblclick = () => {
                 vscode.postMessage({ command: 'edit-contentFile', data: { id: this.note.nId, n: i + 1 } });
             };
