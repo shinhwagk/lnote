@@ -27,5 +27,5 @@ const webConfig = {
         }),
     ],
 };
+
 module.exports = [webConfig, extConfig];
-// export default [webviewConfig];
