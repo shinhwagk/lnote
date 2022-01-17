@@ -1,12 +1,15 @@
 {
-	"name": "vscode-note",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": { "VARIANT": "14" }
-	},
-	"extensions": [
-		"dbaeumer.vscode-eslint",
-		"howardzuo.vscode-npm-dependency"
-	],
-	"remoteUser": "node"
+    "name": "vscode-note",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "14"
+        }
+    },
+    "extensions": [
+        "dbaeumer.vscode-eslint",
+        "howardzuo.vscode-npm-dependency",
+        "esbenp.prettier-vscode"
+    ],
+    "remoteUser": "node"
 }
