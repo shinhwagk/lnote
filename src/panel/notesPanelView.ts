@@ -116,7 +116,8 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.category.add', false);
                         break;
                     case 'edit-category':
-                        vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
+                        ExtCmds.cmdHdlCategoryEdit(msg.data.category)
+                        // vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
                         break;
                     case 'col-to-terminal':
                         console.log("col-to-terminal", msg.data)

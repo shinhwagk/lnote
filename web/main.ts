@@ -188,17 +188,18 @@ function elemSpaces(num: number = 1) {
 
 class VNCategory {
     constructor(private readonly name: string, private readonly notes: DataNote[]) { }
-    doms(): HTMLHeadingElement {
+    doms() {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
 
         const d_category_name = document.createElement('div');
         d_category_name.textContent = this.name;
         d_category_name.className = 'grid-category-name';
-        d_category_name.oncontextmenu = (e) => {
-            e.preventDefault();
-            // todo for rename
-        };
+        d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: name } })
+        // d_category_name.oncontextmenu = (e) => {
+        //     e.preventDefault();
+        //     // todo for rename
+        // };
 
         d_category_name.appendChild(elemSpaces());
         d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
@@ -264,7 +265,7 @@ class VNDomain {
         const _categories = this.search && filter ? filterSearch(this.domain.categories, filter) : this.domain.categories;
         this.categoriesDom.innerHTML = ''; // remove all child
         for (const c of _categories) {
-            this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
+            this.categoriesDom.appendChild((new VNCategory(c.name, c.notes)).doms());
             this.categoriesDom.appendChild(document.createElement('p'));
         }
     }
