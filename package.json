@@ -205,7 +205,7 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": " ",
+        "vscode:prepublish": "webpack",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "compile-web": "tsc -p ./web ",
