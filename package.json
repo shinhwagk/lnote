@@ -205,7 +205,7 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": "webpack",
+        "vscode:prepublish": "webpack --mode production",
         "compile": "tsc -p ./",
         "compile-web": "tsc -p ./web/tsconfig.json",
         "compile-web-watch": "tsc -p ./web/tsconfig.json -w",
