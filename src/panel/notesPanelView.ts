@@ -107,19 +107,28 @@ export class NotesPanelView {
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
                         break;
-                    case 'files':
-                        vscode.commands.executeCommand('vscode-note.note.files.open', msg.data);
+                    case 'edit-note-doc-files':
+                        ExtCmds.cmdHdlNoteEditFilesCreate(msg.data.nId);
                         break;
-                    case 'add':
-                        vscode.commands.executeCommand('vscode-note.note.add', msg.data);
+                    case 'edit-note-doc-add':
+                        ExtCmds.cmdHdlNoteEditDocCreate(msg.data.nId);
+                        break;
+                    case 'edit-note-category-rename':
+                        ExtCmds.cmdHdlNoteEditCategoryRename(msg.data.nId);
+                        break;
+                    case 'edit-note-remove':
+                        ExtCmds.cmdHdlNoteEditTrash(msg.data.nId);
+                        break;
+                    case 'edit-note-openfolder':
+                        ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
                         break;
                     case 'add-category':
                         vscode.commands.executeCommand('vscode-note.category.add', false);
                         break;
-                    case 'edit-category':
-                        ExtCmds.cmdHdlCategoryEdit(msg.data.category);
-                        // vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
-                        break;
+                    // case 'edit-category':
+                    // ExtCmds.cmdHdlCategoryEdit(msg.data.category);
+                    // vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
+                    // break;
                     case 'col-to-terminal':
                         console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);

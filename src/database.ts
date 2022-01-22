@@ -16,7 +16,6 @@ export interface NoteMeta {
     links?: string[]; // todo link to other note
     weight?: number; // todo sort at category
     valid?: boolean; // todo when note deleted
-
 }
 
 // export interface Tag {
@@ -65,7 +64,7 @@ export class NoteDatabase {
 
     public getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
 
-    public readNoteMeta = (id: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(id));
+    public readNoteMeta = (nId: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(nId));
 
     public checkNoteMetaExist = (id: string) => existsSync(this.getNoteMetaFile(id));
 
@@ -128,7 +127,7 @@ export class NoteDatabase {
     }
 
     public updateNotesDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
-        this.dch.selectAllNotesUnderDomain(orgDpath).forEach(nId => this.updateNoteDomain(nId, orgDpath, newDpath, cascade));
+        this.dch.selectAllNotesUnderDomain(orgDpath).forEach((nId) => this.updateNoteDomain(nId, orgDpath, newDpath, cascade));
     }
 
     public updateNoteDomain(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
@@ -184,28 +183,32 @@ export class NoteDatabase {
         //     // items.push({ note, weight: weight || 0 });
         // }
         // return items.sort((_a, b) => b.weight).map(i => i.note);
-        return notes
+        return notes;
     }
 
     getShortcutsList(kind: 'last' | 'star'): string[] {
         if (kind === 'last') {
-            return vfs.readJsonSync<Shortcuts>(this.shortcutsFile).last
+            return vfs.readJsonSync<Shortcuts>(this.shortcutsFile).last;
         } else {
-            return []
+            return [];
         }
     }
 
     appendLastDomainToShortcuts(domain: string): void {
         const maxLast = 10;
-        let last = this.getShortcutsList('last')
-        const dns = this.dch.selectNotesUnderDomain(vpath.splitPath(domain))
-        if (dns.length === 0) { return }
+        let last = this.getShortcutsList('last');
+        const dns = this.dch.selectNotesUnderDomain(vpath.splitPath(domain));
+        if (dns.length === 0) {
+            return;
+        }
         last.push(domain);
-        last = Array.from(new Set(last))
-        while (last.length > maxLast) { last.shift() }
-        const s = vfs.readJsonSync<Shortcuts>(this.shortcutsFile)
-        s.last = last
-        vfs.writeJsonSync(this.shortcutsFile, s)
+        last = Array.from(new Set(last));
+        while (last.length > maxLast) {
+            last.shift();
+        }
+        const s = vfs.readJsonSync<Shortcuts>(this.shortcutsFile);
+        s.last = last;
+        vfs.writeJsonSync(this.shortcutsFile, s);
     }
 }
 
@@ -233,7 +236,11 @@ class DomainCache {
     public removeNotes(dpath: string[], ...nId: string[]): void {
         const domainNotesPath = dpath.concat('.notes');
         const notes = objectPath.get<string[]>(this.cache, domainNotesPath, []);
-        objectPath.set(this.cache, domainNotesPath, notes.filter((i: string) => !nId.includes(i)));
+        objectPath.set(
+            this.cache,
+            domainNotesPath,
+            notes.filter((i: string) => !nId.includes(i))
+        );
     }
 
     public createNotes(dpath: string[]): void {
@@ -250,7 +257,7 @@ class DomainCache {
 
     public selectAllNotesUnderDomain(dpath: string[]): string[] {
         const domain = this.selectDomain(dpath);
-        const childDomainNames: string[] = Object.keys(domain).filter(name => name !== '.notes');
+        const childDomainNames: string[] = Object.keys(domain).filter((name) => name !== '.notes');
         const notes: string[] = this.selectNotesUnderDomain(dpath);
         if (childDomainNames.length === 0) {
             return notes;

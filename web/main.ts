@@ -36,27 +36,29 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'create document',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-doc-add', data: { nId: data.note.nId } }),
         },
         {
             title: 'create files',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-doc-files', data: { nId: data.note.nId } }),
         },
+    ],
+    [
         {
             title: 'category rename',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-category-rename', data: { nId: data.note.nId } }),
         },
     ],
     [
         {
             title: 'remove',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-remove', data: { nId: data.note.nId } }),
         },
     ],
     [
         {
             title: 'open note folder',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } }),
         },
     ],
 ];
@@ -67,6 +69,8 @@ const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
             title: 'category rename',
             onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
         },
+    ],
+    [
         {
             title: 'move to other domain',
             onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
@@ -150,21 +154,23 @@ class ContextMenuDom {
         }
         this.elem!.style.display = 'block';
         this.elem!.style.position = 'absolute';
-        this.elem!.style.top = (e.pageY + this.elem.clientHeight <= document.body.clientHeight
-            ? e.pageY
-            : document.body.clientHeight - this.elem.clientHeight) + 'px';
+        this.elem!.style.top =
+            (e.pageY + this.elem.clientHeight <= document.documentElement.clientHeight
+                ? e.pageY
+                : document.documentElement.clientHeight - this.elem.clientHeight) + 'px';
         this.elem!.style.left =
-            (e.pageX + this.elem.clientWidth <= document.body.offsetWidth
+            (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
                 ? e.pageX
-                : document.body.offsetWidth - this.elem.clientWidth) + 'px';
-        console.log(document.body.scrollTop, document.body.offsetHeight, document.body.scrollHeight);
+                : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
+        // console.log(document.documentElement.clientHeight);
+        // console.log(this.elem.getBoundingClientRect().bottom, this.elem.getBoundingClientRect().height);
     }
 }
 
-class NoteEditContextMenu { }
+class NoteEditContextMenu {}
 
 class VNNote {
-    constructor(private readonly note: DataNote) { }
+    constructor(private readonly note: DataNote) {}
     dom(): HTMLHeadingElement {
         const d_note = document.createElement('div');
         d_note.className = 'grid-note';
@@ -215,7 +221,7 @@ class VNNote {
 
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, NoteEditContextMenuActions, {});
+                nccm.show(ev, NoteEditContextMenuActions, { note: this.note });
             })
         );
 
@@ -235,7 +241,7 @@ function elemSpaces(num: number = 1) {
 }
 
 class VNCategory {
-    constructor(private readonly name: string, private readonly notes: DataNote[]) { }
+    constructor(private readonly name: string, private readonly notes: DataNote[]) {}
     doms() {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
