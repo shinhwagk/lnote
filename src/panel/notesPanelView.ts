@@ -92,6 +92,9 @@ export class NotesPanelView {
                     case 'edit':
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
+                    case 'note-add':
+                        ExtCmds.cmdHdlNoteAdd(msg.data.category);
+                        break;
                     case 'edit-contentFile':
                         ExtCmds.cmdHdlNoteEditColContent(msg.data.id, msg.data.n);
                         break;
@@ -102,7 +105,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.edit.col.add', msg.data.id);
                         break;
                     case 'edit-col-remove':
-                        ExtCmds.cmdHdlNoteColRemove(msg.data.id, msg.data.cn);
+                        ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
                         break;
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);

@@ -2,7 +2,7 @@ import * as objectPath from 'object-path';
 import * as path from 'path';
 import { metaFileName } from './constants';
 import { tools, vfs, vpath } from './helper';
-import { existsSync, readdirSync, mkdirSync, removeSync, renameSync } from 'fs-extra';
+import { existsSync, readdirSync, mkdirSync, renameSync } from 'fs-extra';
 
 export interface Domain {
     '.notes': string[];
@@ -114,16 +114,23 @@ export class NoteDatabase {
         return cnt;
     }
 
-    public deleteNoteCol(nid: string, num: number) {
-        const colNum = this.selectNoteContents(nid).length;
-        removeSync(this.getNoteContentFile(nid, num.toString()));
-        if (num !== colNum) {
-            for (let i = num + 1; i <= colNum; i++) {
-                const org = this.getNoteContentFile(nid, i.toString());
-                const tar = this.getNoteContentFile(nid, (i - 1).toString());
+    public deleteNoteCol(nId: string, cIdx: number) {
+        const colNum = this.selectNoteContents(nId).length;
+        // removeSync(this.getNoteContentFile(nId, num.toString()));
+        this.archiveNoteCol(nId, cIdx);
+        if (cIdx !== colNum) {
+            for (let i = cIdx + 1; i <= colNum; i++) {
+                const org = this.getNoteContentFile(nId, i.toString());
+                const tar = this.getNoteContentFile(nId, (i - 1).toString());
                 renameSync(org, tar);
             }
         }
+    }
+
+    archiveNoteCol(nId: string, cIdx: number) {
+        const ts = new Date().getTime();
+        const archiveFile = path.join(this.getNotePath(nId), `${cIdx}.${ts}.col`);
+        renameSync(this.getNoteContentFile(nId, cIdx.toString()), archiveFile);
     }
 
     public updateNotesDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {

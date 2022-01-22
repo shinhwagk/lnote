@@ -51,7 +51,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     ],
     [
         {
-            title: 'remove',
+            title: 'remove note',
             onClick: (data) => vscode.postMessage({ command: 'edit-note-remove', data: { nId: data.note.nId } }),
         },
     ],
@@ -64,6 +64,12 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
 ];
 
 const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
+    [
+        {
+            title: 'add note',
+            onClick: (data) => vscode.postMessage({ command: 'note-add', data: { category: data.category } }),
+        },
+    ],
     [
         {
             title: 'category rename',
@@ -219,9 +225,21 @@ class VNNote {
         //     vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
         // };
 
+        const delColContext: ContextMenuAction[] = [];
+        for (let i = 1; i <= this.note.contents.length; i++) {
+            delColContext.push({
+                title: `remove col ${i}`,
+                onClick: () => vscode.postMessage({ command: 'edit-col-remove', data: { nId: this.note.nId, cIdx: i } }),
+            });
+        }
+
+        const newContxt = NoteEditContextMenuActions.slice();
+        if (this.note.contents.length >= 2) {
+            newContxt.splice(2, 0, delColContext);
+        }
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, NoteEditContextMenuActions, { note: this.note });
+                nccm.show(ev, newContxt, { note: this.note });
             })
         );
 
@@ -256,7 +274,7 @@ class VNCategory {
         // };
 
         d_category_name.appendChild(elemSpaces());
-        d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
+        // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
         d_category_name.appendChild(elemSpaces());
         d_category_name.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
