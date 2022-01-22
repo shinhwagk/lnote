@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
-import { tools } from '../helper';
 import { ExtCmds } from '../extensionCommands';
 
 export class NotesPanelView {
@@ -12,15 +12,13 @@ export class NotesPanelView {
 
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
-        return vscode.Uri.file(file)
-            .with({ scheme: 'vscode-resource' })
-            .toString();
+        return vscode.Uri.file(file).with({ scheme: 'vscode-resource' }).toString();
     };
 
     // const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
     private getWebviewContent() {
         const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
-        console.log(stylesPathMainPath.fsPath)
+        console.log(stylesPathMainPath.fsPath);
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const nonce = getNonce();
         return `<!DOCTYPE html>
@@ -33,7 +31,10 @@ export class NotesPanelView {
                     <title>vscode-note</title>
                 </head>
                 <body>
-                    <div id="root"></div>
+                    <div id="root">
+                        <div id="content"></div>
+                        <ul id="contextMenu" class="contextMenu"></ul>
+                    </div>
                     <script>
                         const vscode = acquireVsCodeApi();
                         window.onload = function() {
@@ -60,7 +61,7 @@ export class NotesPanelView {
     private initPanel() {
         this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
             enableScripts: true,
-            localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')]
+            localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')],
         });
         this.panel.iconPath = vscode.Uri.joinPath(ext.context.extensionUri, 'images/wv-icon.svg');
         this.panel.onDidDispose(
@@ -72,7 +73,7 @@ export class NotesPanelView {
             ext.context.subscriptions
         );
         this.panel.onDidChangeViewState(
-            e => {
+            (e) => {
                 const panel = e.webviewPanel;
                 if (panel.visible) {
                     this.parseDomain();
@@ -83,7 +84,7 @@ export class NotesPanelView {
             ext.context.subscriptions
         );
         this.panel.webview.onDidReceiveMessage(
-            msg => {
+            (msg) => {
                 switch (msg.command) {
                     case 'get-data':
                         this.showNotesPlanView();
@@ -92,7 +93,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
                     case 'edit-contentFile':
-                        ExtCmds.cmdHdlNoteEditColContent(msg.data.id, msg.data.n)
+                        ExtCmds.cmdHdlNoteEditColContent(msg.data.id, msg.data.n);
                         break;
                     case 'edit-col':
                         vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);
@@ -101,7 +102,7 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.note.edit.col.add', msg.data.id);
                         break;
                     case 'edit-col-remove':
-                        ExtCmds.cmdHdlNoteColRemove(msg.data.id, msg.data.cn)
+                        ExtCmds.cmdHdlNoteColRemove(msg.data.id, msg.data.cn);
                         break;
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
@@ -116,16 +117,16 @@ export class NotesPanelView {
                         vscode.commands.executeCommand('vscode-note.category.add', false);
                         break;
                     case 'edit-category':
-                        ExtCmds.cmdHdlCategoryEdit(msg.data.category)
+                        ExtCmds.cmdHdlCategoryEdit(msg.data.category);
                         // vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
                         break;
                     case 'col-to-terminal':
-                        console.log("col-to-terminal", msg.data)
-                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx)
+                        console.log('col-to-terminal', msg.data);
+                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
                     case 'col-to-terminal-args':
-                        console.log("col-to-terminal", msg.data)
-                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx)
+                        console.log('col-to-terminal', msg.data);
+                        ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
                 }
             },
@@ -148,17 +149,16 @@ export class NotesPanelView {
 
     private genViewData(): twv.WVDomain {
         const notes = ext.dbFS.dch.selectNotesUnderDomain(this.dpathCache);
-        const sortNotes = ext.dbFS.sortNotes(this.dpathCache, ...notes);
+        const sortNotes = ext.dbFS.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {
-            const cname = ext.dbFS.readNoteMeta(nId).tags.filter(tag => tools.stringArrayEqual(tag.domain, this.dpathCache))[0]
-                .category;
+            const cname = ext.dbFS.readNoteMeta(nId).category;
             const contents: string[] = ext.dbFS.selectNoteContents(nId);
             const isDoc = ext.dbFS.selectDocExist(nId);
             const isFiles = ext.dbFS.selectFilesExist(nId);
 
-            if (categories.filter(c => c.name === cname).length >= 1) {
-                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+            if (categories.filter((c) => c.name === cname).length >= 1) {
+                categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
             } else {
                 categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
             }

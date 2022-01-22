@@ -6,7 +6,7 @@ import { section } from './constants';
 import { NoteDatabase } from './database';
 import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
 import { NotesPanelView } from './panel/notesPanelView';
-import { existsSync, mkdirpSync, mkdirsSync, copySync, writeJsonSync } from 'fs-extra';
+import { existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
 // import { initClient, sendGA } from './client';
 
 export namespace ext {
@@ -70,7 +70,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
     initializeShortcutsFile(ext.shortcutsFilePath);
-    addUsageNotes(ext.notesPath);
+    // addUsageNotes(ext.notesPath);
     // ext.clientActions = initClient(ext.context.extensionPath);
     // ext.sendGA = sendGA();
 
@@ -121,9 +121,9 @@ function initializeShortcutsFile(commonlyUsedFilePath: string) {
     }
 }
 
-function addUsageNotes(notesPath: string) {
-    copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
-}
+// function addUsageNotes(notesPath: string) {
+//     copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
+// }
 
 export class ActiveNote {
     id: string = '';

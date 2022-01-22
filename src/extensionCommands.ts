@@ -160,9 +160,8 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteEditCategoryRename(nId: string, oldCategory: string) {
         const newCname = await window.showInputBox({ value: oldCategory });
-        if (!newCname) return;
-        const dpath = vpath.splitPath(ext.activeNote.domainNode);
-        ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
+        if (newCname === undefined) return;
+        ext.dbFS.updateNoteCategory(nId, newCname);
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlCategoryRename(oldCategory: string) {
@@ -247,38 +246,27 @@ export namespace ExtCmds {
     }
     async function CategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });
-        if (!name) return;
+        if (name === undefined) return;
         if (name === ext.activeNote.domainNode!) return;
         const newDpath = vpath.splitPath(name);
         ext.dbFS.dch
             .selectNotesUnderDomain(vpath.splitPath(ext.activeNote.domainNode!))
-            .map(nId => ext.dbFS.readNoteMeta(nId).tags.map(tag => [nId, tag.category]))
-            .forEach(ntags =>
-                ntags.forEach(ntag => {
-                    if (ntag[1] === category) {
-                        ext.dbFS.updateNoteDomain(ntag[0], vpath.splitPath(ext.activeNote.domainNode!), newDpath, false);
-                        ext.dbFS.dch.removeNotes(vpath.splitPath(ext.activeNote.domainNode!), ntag[0]);
-                        ext.dbFS.dch.cacheNotes(newDpath, ntag[0]);
-                    }
-                })
-            );
+            .filter(nId => ext.dbFS.readNoteMeta(nId).category === category)
+            .forEach(nId => {
+                ext.dbFS.updateNoteDomain(nId, vpath.splitPath(ext.activeNote.domainNode!), newDpath, false);
+                ext.dbFS.dch.removeNotes(vpath.splitPath(ext.activeNote.domainNode!), nId);
+                ext.dbFS.dch.cacheNotes(newDpath, nId);
+
+            });
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     async function CategoryRename(category: string) {
         const newCategory: string | undefined = await window.showInputBox({ value: category });
-        if (!newCategory) return;
-        if (newCategory === category) return;
+        if (newCategory === undefined) return;
         const dpath = vpath.splitPath(ext.activeNote.domainNode!);
         ext.dbFS.dch
             .selectNotesUnderDomain(dpath)
-            .map(nId => ext.dbFS.readNoteMeta(nId).tags.map(tag => [nId, tag.category]))
-            .forEach(ntags => {
-                ntags.forEach(ntag => {
-                    if (ntag[1] === category) {
-                        ext.dbFS.updateNoteCategory(ntag[0], dpath, category, newCategory);
-                    }
-                });
-            });
+            .forEach(nId => ext.dbFS.updateNoteCategory(nId, newCategory));
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
 }

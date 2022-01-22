@@ -27,74 +27,114 @@ interface DataProtocol {
     data: DataDomain;
 }
 
-const NoteColContextMenuActions = [
+interface ContextMenuAction {
+    title: string;
+    onClick: (data: any) => void;
+}
+
+const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
-            title: 'add short document',
-            onClick: (nid: string) => vscode.postMessage({ command: 'edit-col-add', data: { id: nid } }),
+            title: 'create document',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
         },
         {
-            title: 'delete short document',
-            onClick: (nid: string, colIdx: string) =>
-                vscode.postMessage({ command: 'edit-col-remove', data: { id: nid, cn: Number(colIdx) + 1 } }),
+            title: 'create files',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+        },
+        {
+            title: 'category rename',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
         },
     ],
     [
         {
+            title: 'remove',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+        },
+    ],
+    [
+        {
+            title: 'open note folder',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+        },
+    ],
+];
+
+const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
+    [
+        {
+            title: 'category rename',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+        },
+        {
+            title: 'move to other domain',
+            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+        },
+    ],
+];
+
+const NoteColContextMenuActions: ContextMenuAction[][] = [
+    [
+        {
+            title: 'add short document',
+            onClick: (data: any) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.id } }),
+        },
+        // {
+        //     title: 'delete short document',
+        //     onClick: (data: any) =>
+        //         vscode.postMessage({ command: 'edit-col-remove', data: { id: data.id, cn: Number(data.i) + 1 } }),
+        // },
+    ],
+    [
+        {
             title: 'send to active terminal',
-            onClick: (nid: string, cIdx: string) =>
-                vscode.postMessage({ command: 'col-to-terminal', data: { id: nid, cidx: cIdx } }),
+            onClick: (data: any) => vscode.postMessage({ command: 'col-to-terminal', data: { id: data.id, cidx: data.i } }),
         },
         {
             title: 'send to active terminal with args',
-            onClick: (_nid: string, _colIdx: string, context: string, e: MouseEvent) => {
-                new abc(context, e).show();
+            onClick: (_data: any) => {
+                // new abc(context, e).show();
             } /*vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } }*/,
         },
     ],
 ];
 
-class abc {
-    constructor(private readonly _context: string, e: MouseEvent) {
-        const f = document.createElement('form');
-        f.className = 'contextMenu';
-        const args1 = document.createElement('input');
-        args1.type = 'text' + this._context;
-        args1.name = 'args1';
+// class abc {
+//     constructor(private readonly _context: string, e: MouseEvent) {
+//         const f = document.createElement('form');
+//         f.className = 'contextMenu';
+//         const args1 = document.createElement('input');
+//         args1.type = 'text' + this._context;
+//         args1.name = 'args1';
 
-        const but = document.createElement('input');
-        but.type = 'button';
-        but.name = 'button';
-        f.appendChild(args1);
-        f.appendChild(but);
-        f!.style.display = 'block';
-        f!.style.position = 'absolute';
-        f!.style.top = e.pageY + 'px';
-        f!.style.left = e.pageX + 'px';
-        document.getElementById('root')?.appendChild(f);
+//         const but = document.createElement('input');
+//         but.type = 'button';
+//         but.name = 'button';
+//         f.appendChild(args1);
+//         f.appendChild(but);
+//         f!.style.display = 'block';
+//         f!.style.position = 'absolute';
+//         f!.style.top = e.pageY + 'px';
+//         f!.style.left = e.pageX + 'px';
+//         document.getElementById('root')?.appendChild(f);
+//     }
+
+//     show() { }
+// }
+
+class ContextMenuDom {
+    private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
+    public hide() {
+        this.elem.style.display = 'none';
     }
 
-    show() { }
-}
-
-class NoteColContextMenu {
-    elem: HTMLElement | null = null;
-    constructor() { }
-
-    public close() {
-        if (this.elem !== null) {
-            this.elem.remove();
-            this.elem = null;
-        }
-    }
-
-    public show(id: string, idx: string, content: string, e: MouseEvent) {
-        this.elem = document.createElement('ul');
-        document.getElementById('root')?.appendChild(this.elem);
-        this.elem.className = 'contextMenu';
+    public show(e: MouseEvent, menus: ContextMenuAction[][], data: any) {
+        console.log('ContextMenuDom click');
+        this.elem.replaceChildren();
         let gidx = 0; // group index
-        for (const l of NoteColContextMenuActions) {
-            if (gidx >= 1 && gidx < NoteColContextMenuActions.length) {
+        for (const l of menus) {
+            if (gidx >= 1 && gidx < menus.length) {
                 const d_li = document.createElement('li');
                 d_li.className = 'contextMenuDivider';
                 this.elem.appendChild(d_li);
@@ -103,23 +143,25 @@ class NoteColContextMenu {
                 const d_li = document.createElement('li');
                 d_li.className = 'contextMenuItem';
                 d_li.textContent = i.title;
-                d_li.onclick = () => i.onClick(id, idx, content, e);
+                d_li.onclick = () => i.onClick(data);
                 this.elem.appendChild(d_li);
             }
-
             gidx += 1;
         }
-        this.elem.id = 'NoteColContextMenu';
         this.elem!.style.display = 'block';
         this.elem!.style.position = 'absolute';
-        this.elem!.style.top = e.pageY + 'px';
-        this.elem!.style.left = e.pageX + 'px';
+        this.elem!.style.top = (e.pageY + this.elem.clientHeight <= document.body.clientHeight
+            ? e.pageY
+            : document.body.clientHeight - this.elem.clientHeight) + 'px';
+        this.elem!.style.left =
+            (e.pageX + this.elem.clientWidth <= document.body.offsetWidth
+                ? e.pageX
+                : document.body.offsetWidth - this.elem.clientWidth) + 'px';
+        console.log(document.body.scrollTop, document.body.offsetHeight, document.body.scrollHeight);
     }
 }
 
 class NoteEditContextMenu { }
-
-const nccm = new NoteColContextMenu();
 
 class VNNote {
     constructor(private readonly note: DataNote) { }
@@ -149,15 +191,16 @@ class VNNote {
 
         for (let i = 0; i <= this.note.contents.length; i++) {
             const d = document.createElement('div');
-            d.className = 'grid-note-content'
+            d.className = 'grid-note-content';
             d.ondblclick = () => {
                 vscode.postMessage({ command: 'edit-contentFile', data: { id: this.note.nId, n: i + 1 } });
             };
             d.textContent = this.note.contents[i];
             d.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                nccm.close();
-                nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
+                nccm.hide();
+                // nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
+                nccm.show(e, NoteColContextMenuActions, { id: this.note.nId, i: i.toString() });
             });
             // d.oncontextmenu =
             d_note_content.appendChild(d);
@@ -166,11 +209,15 @@ class VNNote {
         const d_note_edit = document.createElement('div');
         d_note_edit.className = 'grid-note-edit';
         const nid = this.note.nId;
-        d_note_edit.onclick = () => {
-            vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
-        };
+        // d_note_edit.onclick = () => {
+        //     vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
+        // };
 
-        d_note_edit.appendChild(elemIcon('fa-pen'));
+        d_note_edit.appendChild(
+            elemIcon('fa-pen', (ev: MouseEvent) => {
+                nccm.show(ev, NoteEditContextMenuActions, {});
+            })
+        );
 
         d_note.appendChild(d_note_id);
         d_note.appendChild(d_note_content);
@@ -196,7 +243,7 @@ class VNCategory {
         const d_category_name = document.createElement('div');
         d_category_name.textContent = this.name;
         d_category_name.className = 'grid-category-name';
-        d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: name } })
+        // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
         // d_category_name.oncontextmenu = (e) => {
         //     e.preventDefault();
         //     // todo for rename
@@ -204,6 +251,12 @@ class VNCategory {
 
         d_category_name.appendChild(elemSpaces());
         d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
+        d_category_name.appendChild(elemSpaces());
+        d_category_name.appendChild(
+            elemIcon('fa-pen', (ev: MouseEvent) => {
+                nccm.show(ev, NoteCategoryEditContextMenuActions, { category: this.name });
+            })
+        );
 
         const d_category_body = document.createElement('div');
         d_category_body.className = 'grid-category-body';
@@ -266,7 +319,7 @@ class VNDomain {
         const _categories = this.search && filter ? filterSearch(this.domain.categories, filter) : this.domain.categories;
         this.categoriesDom.innerHTML = ''; // remove all child
         for (const c of _categories) {
-            this.categoriesDom.appendChild((new VNCategory(c.name, c.notes)).doms());
+            this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
             this.categoriesDom.appendChild(document.createElement('p'));
         }
     }
@@ -299,12 +352,20 @@ class VNDomain {
         return e_domain;
     }
 }
-
-document.addEventListener('click', () => nccm.elem?.remove());
+const nccm = new ContextMenuDom();
+document.addEventListener(
+    'click',
+    () => {
+        console.log('global click');
+        nccm.hide();
+    },
+    true
+);
 document.addEventListener(
     'contextmenu',
     () => {
-        nccm.close();
+        console.log('global contextmenu click');
+        nccm.hide();
     },
     true
 );
@@ -316,7 +377,7 @@ window.addEventListener('message', (event) => {
     switch (message.command) {
         case 'data':
             domain = new VNDomain(message.data);
-            document.getElementById('root')?.replaceChildren(domain.doms());
+            document.getElementById('content')?.replaceChildren(domain.doms());
             break;
         default:
             document.body.innerHTML = '<h1>loading...{message}</h1>';

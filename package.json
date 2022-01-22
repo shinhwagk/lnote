@@ -207,7 +207,8 @@
     "scripts": {
         "vscode:prepublish": "webpack",
         "compile": "tsc -p ./",
-        "compile-web": "tsc -p ./web/tsconfig.json ",
+        "compile-web": "tsc -p ./web/tsconfig.json",
+        "compile-web-watch": "tsc -p ./web/tsconfig.json -w",
         "test": "jest"
     },
     "devDependencies": {

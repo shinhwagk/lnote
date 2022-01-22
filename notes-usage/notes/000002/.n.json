@@ -1,1 +1,7 @@
-{ "tags": [{ "domain": ["vscode-note", "usage"], "category": "doc" }] }
+{
+    "domain": [
+        "vscode-note",
+        "usage"
+    ],
+    "category": "doc"
+}

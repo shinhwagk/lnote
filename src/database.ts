@@ -11,17 +11,17 @@ export interface Domain {
 
 export interface NoteMeta {
     version?: string;
-    tags: Tag[];
-    doc?: string;
-}
-
-export interface Tag {
     domain: string[];
     category: string;
-    links?: string[]; // link to other note
-    weight?: number; // sort at category
-    valid?: boolean; // when note deleted
+    links?: string[]; // todo link to other note
+    weight?: number; // todo sort at category
+    valid?: boolean; // todo when note deleted
+
 }
+
+// export interface Tag {
+
+// }
 
 export interface Shortcuts {
     star: string[];
@@ -50,14 +50,8 @@ export class NoteDatabase {
             if (!this.checkNoteMetaExist(nId)) {
                 continue;
             }
-            for (const tag of this.readNoteMeta(nId).tags) {
-                if (tag.valid === undefined) {
-                    this.dch.cacheNotes(tag.domain, nId);
-                } else {
-                    if (tag.valid) {
-                    }
-                }
-            }
+            const { domain } = this.readNoteMeta(nId);
+            this.dch.cacheNotes(domain, nId);
         }
     }
 
@@ -109,7 +103,7 @@ export class NoteDatabase {
     public createNode(dpath: string[], category: string = 'default'): string {
         const newId = this.genNewSeq();
         mkdirSync(this.getNotePath(newId));
-        this.writeNoteMeta(newId, { tags: [{ domain: dpath, category }] });
+        this.writeNoteMeta(newId, { domain: dpath, category });
         this.createNoteCol(newId);
         this.dch.cacheNotes(dpath, newId);
         return newId;
@@ -139,26 +133,26 @@ export class NoteDatabase {
 
     public updateNoteDomain(nId: string, orgDpath: string[], newDpath: string[], cascade: boolean) {
         const noteMeta = this.readNoteMeta(nId);
-        for (let i = 0; i < noteMeta.tags.length; i++) {
-            const metaPath = noteMeta.tags[i].domain;
-            if (cascade) {
-                if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length))) {
-                    noteMeta.tags[i].domain = newDpath.concat(metaPath.slice(orgDpath.length));
-                }
-            } else {
-                if (tools.stringArrayEqual(orgDpath, metaPath)) {
-                    noteMeta.tags[i].domain = newDpath;
-                }
+        // for (let i = 0; i < noteMeta.tags.length; i++) {
+        const metaPath = noteMeta.domain;
+        if (cascade) {
+            if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length))) {
+                noteMeta.domain = newDpath.concat(metaPath.slice(orgDpath.length));
+            }
+        } else {
+            if (tools.stringArrayEqual(orgDpath, metaPath)) {
+                noteMeta.domain = newDpath;
             }
         }
+        // }
         this.writeNoteMeta(nId, noteMeta);
     }
 
-    public createNoteDoc(nId: string, indexName: string = 'README.md') {
+    public createNoteDoc(nId: string) {
         mkdirSync(this.getNoteDocPath(nId));
-        vfs.writeFileSync(path.join(this.getNoteDocPath(nId), indexName));
+        vfs.writeFileSync(path.join(this.getNoteDocPath(nId), 'README.md'));
         const meta = this.readNoteMeta(nId);
-        meta.doc = indexName;
+        // meta.doc = indexName;
         this.writeNoteMeta(nId, meta);
     }
 
@@ -166,34 +160,31 @@ export class NoteDatabase {
         mkdirSync(this.getNoteFilesPath(nId));
     }
 
-    selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
-        const tags = this.readNoteMeta(nId).tags;
-        for (let i = 0; i <= tags.length; i++) {
-            const tag = tags[i];
-            if (tools.stringArrayEqual(tag.domain, dpath) && tag.category === category) {
-                return i;
-            }
-        }
-        return undefined;
+    // selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
+    //     const nm = this.readNoteMeta(nId);
+    //     for (let i = 0; i <= tags.length; i++) {
+    //         const tag = tags[i];
+    //         if (tools.stringArrayEqual(tag.domain, dpath) && tag.category === category) {
+    //             return i;
+    //         }
+    //     }
+    //     return undefined;
+    // }
+
+    updateNoteCategory(nId: string, newCategory: string) {
+        const nm = this.readNoteMeta(nId);
+        nm.category = newCategory;
+        this.writeNoteMeta(nId, nm);
     }
 
-    updateNoteCategory(nId: string, dpath: string[], oldCategory: string, newCategory: string) {
-        const idx: number | undefined = this.selectCategoryIndex(nId, dpath, oldCategory);
-        const meta = this.readNoteMeta(nId);
-        if (idx != undefined) {
-            meta.tags[idx].category = newCategory;
-        }
-        this.writeNoteMeta(nId, meta);
-    }
-
-    sortNotes(dpath: string[], ...notes: string[]): string[] {
-        const items = [];
-        for (const note of notes) {
-            const meta = this.readNoteMeta(note);
-            const tag = meta.tags.filter(t => tools.stringArrayEqual(t.domain, dpath))[0];
-            items.push({ note, weight: tag.weight || 0 });
-        }
-        return items.sort((_a, b) => b.weight).map(i => i.note);
+    sortNotes(notes: string[]): string[] {
+        // const items = [];
+        // for (const note of notes) {
+        //     const nm = this.readNoteMeta(note);
+        //     // items.push({ note, weight: weight || 0 });
+        // }
+        // return items.sort((_a, b) => b.weight).map(i => i.note);
+        return notes
     }
 
     getShortcutsList(kind: 'last' | 'star'): string[] {

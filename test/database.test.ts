@@ -9,22 +9,22 @@ const testNotesPath = './vscode-note/notes';
 const exampleDataNotes = [
     {
         id: '1',
-        tags: [{ domain: ['adf', 'abc'], category: 'test' }],
+        domain: ['adf', 'abc'], category: 'test',
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '2',
-        tags: [{ domain: ['adf', 'abc'], category: 'test' }],
+        domain: ['adf', 'abc'], category: 'test',
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '3',
-        tags: [{ domain: ['adf', 'abc', 'ccc'], category: 'test' }],
+        domain: ['adf', 'abc', 'ccc'], category: 'test',
         contents: ['adfdf', 'sdfdf']
     },
     {
         id: '4',
-        tags: [{ domain: ['g', 'abc'], category: 'test' }],
+        domain: ['g', 'abc'], category: 'test',
         contents: ['adfdf', 'sdfdf']
     }
 ];
@@ -38,7 +38,7 @@ function createTestFileAndDirectory() {
         const noteDir = path.join(testNotesPath, testNote.id);
         mkdirpSync(noteDir);
         const noteMetaFile = path.join(noteDir, metaFileName);
-        vfs.writeJsonSync(noteMetaFile, { tags: testNote.tags });
+        vfs.writeJsonSync(noteMetaFile, testNote);
     }
 }
 
