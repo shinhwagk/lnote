@@ -139,7 +139,7 @@ class ContextMenuDom {
         this.elem.style.display = 'none';
     }
 
-    public show(e: MouseEvent, menus: ContextMenuAction[][], data: any) {
+    public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
         console.log('ContextMenuDom click');
         this.elem.replaceChildren();
         let gidx = 0; // group index
@@ -160,16 +160,17 @@ class ContextMenuDom {
         }
         this.elem!.style.display = 'block';
         this.elem!.style.position = 'absolute';
+
         this.elem!.style.top =
-            (e.pageY + this.elem.clientHeight <= document.documentElement.clientHeight
+            (frameElem.getBoundingClientRect().bottom + this.elem.clientHeight <= document.documentElement.clientHeight
                 ? e.pageY
-                : document.documentElement.clientHeight - this.elem.clientHeight) + 'px';
+                : e.pageY - this.elem.clientHeight) + 'px';
         this.elem!.style.left =
             (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
                 ? e.pageX
                 : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
         // console.log(document.documentElement.clientHeight);
-        // console.log(this.elem.getBoundingClientRect().bottom, this.elem.getBoundingClientRect().height);
+        // console.log(aaa.getBoundingClientRect().bottom, aaa.getBoundingClientRect().top, e.pageY);
     }
 }
 
@@ -212,7 +213,7 @@ class VNNote {
                 e.preventDefault();
                 nccm.hide();
                 // nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
-                nccm.show(e, NoteColContextMenuActions, { id: this.note.nId, i: i.toString() });
+                nccm.show(e, d, NoteColContextMenuActions, { id: this.note.nId, i: i.toString() });
             });
             // d.oncontextmenu =
             d_note_content.appendChild(d);
@@ -239,7 +240,7 @@ class VNNote {
         }
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, newContxt, { note: this.note });
+                nccm.show(ev, d_note_edit, newContxt, { note: this.note });
             })
         );
 
@@ -278,7 +279,7 @@ class VNCategory {
         d_category_name.appendChild(elemSpaces());
         d_category_name.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, NoteCategoryEditContextMenuActions, { category: this.name });
+                nccm.show(ev, d_category_name, NoteCategoryEditContextMenuActions, { category: this.name });
             })
         );
 
