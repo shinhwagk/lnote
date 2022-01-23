@@ -126,12 +126,14 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
                         break;
                     case 'add-category':
-                        vscode.commands.executeCommand('vscode-note.category.add', false);
+                        ExtCmds.cmdHdlCategoryAdd(false);
                         break;
-                    // case 'edit-category':
-                    // ExtCmds.cmdHdlCategoryEdit(msg.data.category);
-                    // vscode.commands.executeCommand('vscode-note.category.edit', msg.data.category);
-                    // break;
+                    case 'category-rename':
+                        ExtCmds.cmdHdlCategoryRename(msg.data.category);
+                        break;
+                    case 'category-to-domain':
+                        ExtCmds.cmdHdlCategoryMoveToDomain(msg.data.category);
+                        break;
                     case 'col-to-terminal':
                         console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);

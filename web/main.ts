@@ -73,13 +73,13 @@ const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'category rename',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'category-rename', data: { category: data.category } }),
         },
     ],
     [
         {
             title: 'move to other domain',
-            onClick: (data) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.nid } }),
+            onClick: (data) => vscode.postMessage({ command: 'category-to-domain', data: { category: data.category } }),
         },
     ],
 ];

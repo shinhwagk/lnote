@@ -166,11 +166,11 @@ export namespace ExtCmds {
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlCategoryRename(oldCategory: string) {
-        const newCname = await window.showInputBox({ value: oldCategory });
-        if (!newCname) return;
-
-        // const dpath = vpath.splitPath(ext.activeNote.domainNode);
-        // ext.dbFS.updateNoteCategory(nId, dpath, oldCategory, newCname);
+        const newCategory: string | undefined = await window.showInputBox({ value: oldCategory });
+        if (newCategory === undefined) return;
+        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
+        ext.dbFS.dch.selectNotesUnderDomain(dpath).forEach((nId) => ext.dbFS.updateNoteCategory(nId, newCategory));
+        ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlNoteDocShow(nId: string) {
         const readmeFile = ext.dbFS.selectDocIndexFile(nId);
@@ -209,18 +209,18 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditDocFull(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNoteDocPath(id)), true);
     }
-    export async function cmdHdlCategoryEdit(category: string) {
-        const rst = await window.showQuickPick(['rename', 'move to other domain']);
-        if (rst === 'move to other domain') {
-            await CategoryMoveToDomain(category);
-            ext.domainProvider.refresh();
-        } else if (rst === 'rename') {
-            await CategoryRename(category);
-            ext.domainProvider.refresh();
-        } else {
-            return;
-        }
-    }
+    // export async function cmdHdlCategoryEdit(category: string) {
+    //     const rst = await window.showQuickPick(['rename', 'move to other domain']);
+    //     if (rst === 'move to other domain') {
+    //         await CategoryMoveToDomain(category);
+    //         ext.domainProvider.refresh();
+    //     } else if (rst === 'rename') {
+    //         await CategoryRename(category);
+    //         ext.domainProvider.refresh();
+    //     } else {
+    //         return;
+    //     }
+    // }
     export async function cmdHdShortcutsLast() {
         const picks = ext.dbFS.getShortcutsList('last');
         const pick = await window.showQuickPick(picks);
@@ -245,7 +245,7 @@ export namespace ExtCmds {
             window.activeTerminal.sendText(colContent);
         }
     }
-    async function CategoryMoveToDomain(category: string) {
+    export async function cmdHdlCategoryMoveToDomain(category: string) {
         const name: string | undefined = await window.showInputBox({ value: ext.activeNote.domainNode! });
         if (name === undefined) return;
         if (name === ext.activeNote.domainNode!) return;
@@ -259,13 +259,7 @@ export namespace ExtCmds {
                 ext.dbFS.dch.cacheNotes(newDpath, nId);
             });
         ext.notesPanelView.parseDomain().showNotesPlanView();
-    }
-    async function CategoryRename(category: string) {
-        const newCategory: string | undefined = await window.showInputBox({ value: category });
-        if (newCategory === undefined) return;
-        const dpath = vpath.splitPath(ext.activeNote.domainNode!);
-        ext.dbFS.dch.selectNotesUnderDomain(dpath).forEach((nId) => ext.dbFS.updateNoteCategory(nId, newCategory));
-        ext.notesPanelView.parseDomain().showNotesPlanView();
+        ext.domainProvider.refresh();
     }
 }
 

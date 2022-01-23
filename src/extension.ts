@@ -23,7 +23,6 @@ export async function activate(context: ExtensionContext) {
     ext.registerCommand('vscode-note.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
     ext.registerCommand('vscode-note.note.doc.show', ExtCmds.cmdHdlNoteDocShow);
     ext.registerCommand('vscode-note.note.add', ExtCmds.cmdHdlNoteAdd);
-    ext.registerCommand('vscode-note.category.edit', ExtCmds.cmdHdlCategoryEdit);
     /**
      * note
      */
