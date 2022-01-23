@@ -333,6 +333,7 @@ class VNDomain {
         const i = document.createElement('input');
         i.type = 'text';
         i.style.display = 'none';
+        i.focus();
         i.onkeydown = () => {
             this.readerCategories(i.value);
         };
