@@ -172,7 +172,10 @@ export namespace ExtCmds {
         const newCategory: string | undefined = await window.showInputBox({ value: oldCategory });
         if (newCategory === undefined) return;
         const dpath = vpath.splitPath(ext.activeNote.domainNode!);
-        ext.dbFS.dch.selectNotesUnderDomain(dpath).forEach((nId) => ext.dbFS.updateNoteCategory(nId, newCategory));
+        ext.dbFS.dch
+            .selectNotesUnderDomain(dpath)
+            .filter((nId) => ext.dbFS.readNoteMeta(nId).category === oldCategory)
+            .forEach((nId) => ext.dbFS.updateNoteCategory(nId, newCategory));
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlNoteDocShow(nId: string) {
