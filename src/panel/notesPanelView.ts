@@ -110,6 +110,9 @@ export class NotesPanelView {
                     case 'doc':
                         vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
                         break;
+                    case 'note-files-open':
+                        ExtCmds.cmdHdlNoteFilesOpen(msg.data);
+                        break;
                     case 'edit-note-doc-files':
                         ExtCmds.cmdHdlNoteEditFilesCreate(msg.data.nId);
                         break;

@@ -195,7 +195,7 @@ class VNNote {
 
         d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'doc', data: nid })));
         d_note_id.appendChild(d_space);
-        d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'files', data: nid })));
+        d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', data: nid })));
 
         const d_note_content = document.createElement('div');
         d_note_content.className = 'grid-note-content';
