@@ -155,6 +155,9 @@ export namespace ExtCmds {
         ExtCmdsFuns.resetDomain(orgDpath, newDpath);
         ext.domainProvider.refresh(orgDpath.slice(0, orgDpath.length - 1).join('/'));
     }
+    export async function cmdHdlDomainSearch(_dn: DomainNode) {
+        window.showInformationMessage('soon');
+    }
     export async function cmdHdlNoteOpenFolder(id: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.dbFS.getNotePath(id)), true);
     }

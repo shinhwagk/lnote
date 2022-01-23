@@ -14,6 +14,7 @@ export async function activate(context: ExtensionContext) {
     ext.registerCommand('vscode-note.domain.pin', ExtCmds.cmdHdlDomainPin);
     ext.registerCommand('vscode-note.domain.move', ExtCmds.cmdHdlDomainMove);
     ext.registerCommand('vscode-note.domain.rename', ExtCmds.cmdHdlDomainRename);
+    ext.registerCommand('vscode-note.domain.search', ExtCmds.cmdHdlDomainSearch);
     ext.registerCommand('vscode-note.notes.create', ExtCmds.cmdHdlNotesCreate);
     ext.registerCommand('vscode-note.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
     /**

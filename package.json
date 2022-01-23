@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.10.8",
+    "version": "0.10.9",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -93,6 +93,11 @@
                     "group": "2_domain"
                 },
                 {
+                    "command": "vscode-note.domain.search",
+                    "when": "view == domainExplorer",
+                    "group": "3_domain"
+                },
+                {
                     "command": "vscode-note.domain.move",
                     "when": "view == domainExplorer",
                     "group": "2_domain"
@@ -145,6 +150,10 @@
             {
                 "command": "vscode-note.domain.rename",
                 "title": "Rename Domain"
+            },
+            {
+                "command": "vscode-note.domain.search",
+                "title": "Search Domain"
             },
             {
                 "command": "vscode-note.domain.refresh",

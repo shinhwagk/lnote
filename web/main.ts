@@ -72,7 +72,7 @@ const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
     ],
     [
         {
-            title: 'category rename',
+            title: 'rename',
             onClick: (data) => vscode.postMessage({ command: 'category-rename', data: { category: data.category } }),
         },
     ],
