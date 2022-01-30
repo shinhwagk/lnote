@@ -14,6 +14,7 @@ export namespace ToWebView {
         contents: string[];
         doc: boolean;
         files: boolean;
+        labels?: string[];
     }
 
     export interface DomainData {
