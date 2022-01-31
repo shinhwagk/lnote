@@ -48,6 +48,10 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
             title: 'category rename',
             onClick: (data) => vscode.postMessage({ command: 'edit-note-category-rename', data: { nId: data.note.nId } }),
         },
+        {
+            title: 'labels',
+            onClick: (data) => vscode.postMessage({ command: 'note-edit-labels', data: { nId: data.note.nId } }),
+        },
     ],
     [
         {
@@ -106,6 +110,15 @@ const NoteColContextMenuActions: ContextMenuAction[][] = [
             onClick: (_data: any) => {
                 // new abc(context, e).show();
             } /*vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } }*/,
+        },
+    ],
+];
+
+const DomainContextMenuActions: ContextMenuAction[][] = [
+    [
+        {
+            title: 'edit labels',
+            onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-laels', data: data }),
         },
     ],
 ];
@@ -359,6 +372,13 @@ class VNDomain {
         e_title.appendChild(e_domain_name);
         e_title.appendChild(elemSpaces());
         e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add-category' })));
+        e_title.appendChild(elemSpaces());
+        e_title.appendChild(
+            elemIcon('fa-pen', (e) => {
+                console.log('1111');
+                nccm.show(e, e_title, DomainContextMenuActions, this.domain.dpath.join('/'));
+            })
+        );
         e_title.appendChild(elemSpaces());
         e_title.appendChild(
             elemIcon('fa-search', () => {

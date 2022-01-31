@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import * as objectPath from 'object-path';
-import { existsSync, readdirSync, mkdirSync, renameSync, statSync } from 'fs-extra';
+import { existsSync, readdirSync, mkdirSync, renameSync } from 'fs-extra';
 
 import { metaFileName } from './constants';
 import { tools, vfs, vpath } from './helper';
@@ -34,15 +34,14 @@ export class VNDatabase {
 export class NoteDatabase {
     private readonly notesPath: string;
     private notesCache: Map<string, string[]> = new Map(); // cache labels with nId, more notes of one label
-    private static isCache = false;
+    private notesCacheFileName = 'notes.cache.json';
 
     constructor(notesPath: string) {
         this.notesPath = notesPath;
-        this.cache();
-        this.persistence();
+        this.refresh();
     }
 
-    getNotesBylabels(labels: string[]): string[] {
+    public getNotesBylabels(labels: string[]): string[] {
         if (labels.length === 1) {
             return this.notesCache.get(labels[0]) || [];
         }
@@ -52,49 +51,88 @@ export class NoteDatabase {
         }, this.notesCache.get(labels[0])!);
     }
 
-    private getNotesCacheFile = () => vpath.join(this.notesPath, 'notes.json');
+    private getNotesCacheFile = () => path.join(this.notesPath, this.notesCacheFileName);
+    private checkNotesCacheFileExist = () => existsSync(this.getNotesCacheFile());
+    private checkNoteMetaFileExist = (nId: string) => existsSync(this.getNoteMetaFile(nId));
 
-    cache() {
+    refresh() {
         console.log('start notes cache.');
-        if (NoteDatabase.isCache) {
-            return;
-        }
-        console.log('2x', this.getNotesCacheFile(), existsSync(this.getNotesCacheFile()));
-        if (existsSync(this.getNotesCacheFile())) {
-            console.log('3x');
+        if (this.checkNotesCacheFileExist()) {
             this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.getNotesCacheFile())));
-            console.log('4x');
-            console.log('check notescache', this.notesCache.size);
             return;
         }
 
+        console.log('notes cache not exist.');
         console.log('notes cache start.');
         for (const nId of readdirSync(this.notesPath)) {
-            if (statSync(path.join(this.notesPath, nId)).isDirectory()) {
-                const nm = this.readNoteMeta(nId);
-                for (const label of nm['labels']) {
-                    if (this.notesCache.has(label)) {
-                        this.notesCache.get(label)?.push(nId);
-                    } else {
-                        this.notesCache.set(label, [nId]);
-                    }
-                }
+            if (this.checkNoteMetaFileExist(nId)) {
+                const nm = this.getNoteMeta(nId);
+                this.addNIdsToNoteCacheByLabel(nId, nm.labels, false);
             }
         }
-
-        NoteDatabase.isCache = true;
+        this.persistence();
         console.log('notes cache success.', this.notesCache.size);
     }
 
-    public persistence(): void {
-        vfs.writeJsonSync(this.getNotesCacheFile(), Object.fromEntries(this.notesCache));
+    public removeNIdsFromNoteCacheByLabel(nId: string, labels: string[], persistence: boolean = true): void {
+        for (const label of labels) {
+            if (this.notesCache.has(label)) {
+                const idx = this.notesCache.get(label)?.indexOf(nId);
+                if (idx && idx >= -1) {
+                    this.notesCache.get(label)?.splice(idx, 1);
+                }
+            }
+        }
+        if (persistence) {
+            this.persistence();
+        }
     }
 
-    public getNotePath = (id: string) => path.join(this.notesPath, id);
+    public addNIdsToNoteCacheByLabel(nId: string, labels: string[], persistence: boolean = true): void {
+        for (const label of labels) {
+            if (this.notesCache.has(label)) {
+                this.notesCache.get(label)?.push(nId);
+            } else {
+                this.notesCache.set(label, [nId]);
+            }
+        }
+        if (persistence) {
+            this.persistence();
+        }
+    }
 
-    public getNoteMetaFile = (id: string) => path.join(this.getNotePath(id), metaFileName);
+    public getNoteLabels(nId: string): string[] {
+        return this.getNoteMeta(nId).labels;
+    }
 
-    public readNoteMeta = (nId: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(nId));
+    public updateNotelabels(nId: string, labels: string[]) {
+        const nm = this.getNoteMeta(nId);
+        nm.labels = labels;
+        this.saveNoteMeta(nId, nm);
+    }
+
+    public saveNoteMeta = (nId: string, meta: NoteMeta) => vfs.writeJsonSync(this.getNoteMetaFile(nId), meta);
+
+    public persistence = () => vfs.writeJsonSync(this.getNotesCacheFile(), Object.fromEntries(this.notesCache));
+
+    public getNoteDir = (nId: string) => path.join(this.notesPath, nId);
+
+    public getNoteMetaFile = (nId: string) => path.join(this.getNoteDir(nId), metaFileName);
+
+    public getNoteMeta = (nId: string) => vfs.readJsonSync<NoteMeta>(this.getNoteMetaFile(nId));
+
+    // public appendNIdToNotesCache(nId: string, labels: string[], persistence: boolean = true) {
+    //     for (const label of labels) {
+    //         if (this.notesCache.has(label)) {
+    //             this.notesCache.get(label)?.push(nId);
+    //         } else {
+    //             this.notesCache.set(label, [nId]);
+    //         }
+    //     }
+    //     if (persistence) {
+    //         this.persistence();
+    //     }
+    // }
 }
 
 export class DomainDatabase {
@@ -103,7 +141,7 @@ export class DomainDatabase {
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
     private readonly shortcutsFile: string;
     private readonly domainCache: Domain;
-    private readonly noteDB: NoteDatabase;
+    public readonly noteDB: NoteDatabase;
 
     constructor(notesPath: string) {
         this.notesPath = notesPath;
@@ -124,7 +162,6 @@ export class DomainDatabase {
         // console.log(`labels ${domainLabels} ${domainLabels.length}`)
         if (domainLabels.length >= 1) {
             const notes = this.noteDB.getNotesBylabels(domainLabels);
-            console.log(`notes ${notes.length}`);
             // console.log(`notes ${JSON.stringify(notes)}`)
             objectPath.set(this.domainCache, dpath.concat('.notes'), notes);
         }
@@ -133,6 +170,10 @@ export class DomainDatabase {
             // console.log(keys)
             this.refreshDomain(dpath.concat(keys));
         }
+    }
+
+    public updateLabels(dpath: string[], labels: string[]) {
+        objectPath.set(this.domainCache, dpath.concat('.labels'), labels);
     }
 
     public persistence(): void {
@@ -151,7 +192,6 @@ export class DomainDatabase {
         if (!this.checkDomainFileExist()) {
             this.createDomainFile();
         }
-        console.log(this.getDomainFile());
         return vfs.readJsonSync(this.getDomainFile());
     }
     // private getDomainByDpath(dpath: string[]): Domain {
@@ -171,6 +211,10 @@ export class DomainDatabase {
             // const { domain } = this.readNoteMeta(nId);
             // this.dch.cacheNotes(domain, nId);
         }
+    }
+
+    public getDomainLabels(dpath: string[]): string[] {
+        return this.selectDomain(dpath)['.labels'];
     }
 
     public getNoteDocIndexFile = (nId: string, indexName: string) => path.join(this.getNoteDocPath(nId), indexName);
@@ -224,8 +268,10 @@ export class DomainDatabase {
         const nId = this.genNewSeq();
         mkdirSync(this.getNotePath(nId));
         this.writeNoteMeta(nId, { labels: dpath.concat([]), category }); // todo, domain + label
+
         this.createNoteCol(nId);
         this.cacheNote(dpath, nId);
+        this.noteDB.addNIdsToNoteCacheByLabel(nId, dpath.concat([]));
         return nId;
     }
 

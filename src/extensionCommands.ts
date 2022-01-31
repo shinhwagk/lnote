@@ -114,13 +114,14 @@ export namespace ExtCmds {
         await cmdHdlNoteAdd(cname);
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
-    export async function cmdHdlNoteAdd(category: string /*, editFirst: boolean = true*/) {
+    export async function cmdHdlNoteAdd(category: string, editFirst: boolean = true) {
         const nid: string = ext.domainDB.createNode(vpath.splitPath(ext.activeNote.domainNode!), category);
         vfs.writeFileSync(ext.domainDB.getNoteContentFile(nid, '1'));
-        // if (editFirst) {
-        //     await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.getNoteContentFile(nid, '1')));
-        // }
+        if (editFirst) {
+            await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.getNoteContentFile(nid, '1')));
+        }
         ext.domainProvider.refresh(ext.activeNote.domainNode);
+        ext.notesPanelView.parseDomain().showNotesPlanView();
     }
     export async function cmdHdlNoteEditFilesCreate(nId: string) {
         ext.domainDB.createNoteFiles(nId);
@@ -283,5 +284,28 @@ export namespace ExtCmds {
         ext.domainDB.dch.deleteDomain(orgDpath);
         ext.domainDB.cacheValidNotes(...notes);
         ext.notesPanelView.parseDomain(newDpath).showNotesPlanView();
+    }
+    export async function cmdHdlDomainEditLabels(DomainData: string) {
+        const labels = ext.domainDB.getDomainLabels(DomainData.split('/'));
+        const ib = await window.showInputBox({ value: labels.join(',') });
+        if (ib === undefined) return;
+        const newLabels = ib.split(',');
+        ext.domainDB.updateLabels(DomainData.split('/'), Array.from(new Set(newLabels)));
+        ext.domainDB.refresh();
+        ext.domainProvider.refresh();
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
+
+    export async function cmdHdlNoteEditLabels({ nId }: { nId: string }) {
+        const labels = ext.domainDB.noteDB.getNoteLabels(nId);
+        const ib = await window.showInputBox({ value: labels.join(',') });
+        if (ib === undefined) return;
+        const newLabels = ib.split(',');
+        ext.domainDB.noteDB.updateNotelabels(nId, newLabels);
+        ext.domainDB.noteDB.removeNIdsFromNoteCacheByLabel(nId, labels);
+        ext.domainDB.noteDB.addNIdsToNoteCacheByLabel(nId, newLabels);
+        ext.domainDB.refresh();
+        ext.domainProvider.refresh();
+        ext.notesPanelView.parseDomain().showNotesPlanView();
     }
 }

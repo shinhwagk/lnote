@@ -146,6 +146,13 @@ export class NotesPanelView {
                         console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
+                    case 'domain-edit-laels':
+                        ExtCmds.cmdHdlDomainEditLabels(msg.data);
+                        break;
+
+                    case 'note-edit-labels':
+                        ExtCmds.cmdHdlNoteEditLabels(msg.data);
+                        break;
                 }
             },
             undefined,
