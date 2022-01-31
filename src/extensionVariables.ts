@@ -1,12 +1,26 @@
-import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
-import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { homedir, platform } from 'os';
 import * as path from 'path';
-import { section } from './constants';
-import { NoteDatabase } from './database';
-import { ExtensionContext, workspace, window, OutputChannel, ConfigurationChangeEvent, TreeView, commands, StatusBarItem, StatusBarAlignment } from 'vscode';
-import { NotesPanelView } from './panel/notesPanelView';
+
 import { existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
+import {
+    ExtensionContext,
+    workspace,
+    window,
+    OutputChannel,
+    ConfigurationChangeEvent,
+    TreeView,
+    commands,
+    StatusBarItem,
+    StatusBarAlignment,
+} from 'vscode';
+
+import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
+import { FilesExplorerProvider } from './explorer/filesExplorer';
+import { section } from './constants';
+import { DomainDatabase, VNDatabase } from './database';
+
+import { NotesPanelView } from './panel/notesPanelView';
+
 // import { initClient, sendGA } from './client';
 
 export namespace ext {
@@ -19,7 +33,8 @@ export namespace ext {
     export let notesPath: string;
     export let shortcutsFilePath: string;
     export let activeNote: ActiveNote;
-    export let dbFS: NoteDatabase;
+    export let domainDB: DomainDatabase;
+    export let vnDB: VNDatabase;
     // export let clientActions: (action: string) => void;
     // export let sendGA: (ec: string, ea: string) => void;
     export let outputChannel: OutputChannel;
@@ -52,7 +67,7 @@ function listenConfigure(ctx: ExtensionContext) {
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
             if (e.affectsConfiguration(section)) {
                 ext.masterPath = getMasterPath();
-                ext.dbFS = new NoteDatabase(ext.masterPath);
+                ext.domainDB = new DomainDatabase(ext.masterPath);
             }
         })
     );
@@ -65,7 +80,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // delete soon
     ext.masterPath = getMasterPath();
     ext.notesPath = getNotesPath();
-    ext.shortcutsFilePath = getShortcutsFilePath()
+    ext.shortcutsFilePath = getShortcutsFilePath();
 
     initializeMasterDirectory(ext.masterPath);
     initializeNotesDirectory(ext.notesPath);
@@ -75,7 +90,8 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // ext.sendGA = sendGA();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
-    ext.dbFS = new NoteDatabase(ext.notesPath);
+    ext.domainDB = new DomainDatabase(ext.notesPath);
+    // ext.vnDB = new VNDatabase(ext.notesPath);
 
     ext.activeNote = new ActiveNote();
 
@@ -98,10 +114,10 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     if (!ext.domainShortcutStatusBarItem) {
         ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
-        ext.domainShortcutStatusBarItem.text = "$(list-unordered) Domains(Last)"
-        ext.domainShortcutStatusBarItem.command = "vscode-note.shortcuts.last"
-        ext.domainShortcutStatusBarItem.show()
-        ext.context.subscriptions.push(ext.domainShortcutStatusBarItem)
+        ext.domainShortcutStatusBarItem.text = '$(list-unordered) Domains(Last)';
+        ext.domainShortcutStatusBarItem.command = 'vscode-note.shortcuts.last';
+        ext.domainShortcutStatusBarItem.show();
+        ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
     }
 }
 
@@ -117,7 +133,7 @@ function initializeNotesDirectory(notesPath: string) {
 
 function initializeShortcutsFile(commonlyUsedFilePath: string) {
     if (!existsSync(commonlyUsedFilePath)) {
-        writeJsonSync(commonlyUsedFilePath, { star: [], last: [] }, { encoding: 'utf-8' })
+        writeJsonSync(commonlyUsedFilePath, { star: [], last: [] }, { encoding: 'utf-8' });
     }
 }
 

@@ -1,7 +1,9 @@
-import { TreeItem, TreeDataProvider, Uri, EventEmitter, Event } from 'vscode';
-import { ext } from '../extensionVariables';
-import { readdirSync, statSync } from 'fs-extra';
 import { join, basename } from 'path';
+
+import { TreeItem, TreeDataProvider, Uri, EventEmitter, Event } from 'vscode';
+import { readdirSync, statSync } from 'fs-extra';
+
+import { ext } from '../extensionVariables';
 
 export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: EventEmitter<TreeItem> = new EventEmitter<TreeItem>();
@@ -16,9 +18,9 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const fPath: string = element ? element.resourceUri!.fsPath : ext.dbFS.getNoteFilesPath(ext.activeNote.id);
+        const fPath: string = element ? element.resourceUri!.fsPath : ext.domainDB.getNoteFilesPath(ext.activeNote.id);
 
-        return readdirSync(fPath).map(f => {
+        return readdirSync(fPath).map((f) => {
             const uri = Uri.file(join(fPath, f));
             if (statSync(uri.fsPath).isDirectory()) {
                 return new TreeItem(uri, 1);
@@ -27,7 +29,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
                 item.command = {
                     command: 'editExplorer.openFileResource',
                     arguments: [uri],
-                    title: basename(uri.path)
+                    title: basename(uri.path),
                 };
                 item.contextValue = 'file';
                 return item;

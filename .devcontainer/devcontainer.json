@@ -11,5 +11,8 @@
         "howardzuo.vscode-npm-dependency",
         "esbenp.prettier-vscode"
     ],
+    "mounts": [
+		"source=F:\\OneDrive\\vscode-note-data,target=/opt/vscode-note,type=bind"
+	],
     "remoteUser": "node"
 }

@@ -1,6 +1,7 @@
-import * as fse from 'fs-extra';
 import * as path from 'path';
 import { randomBytes } from 'crypto';
+
+import * as fse from 'fs-extra';
 
 export namespace vfs {
     const encoding = 'utf-8';
@@ -17,10 +18,10 @@ export namespace vfs {
     }
 
     export function readJsonSync<T>(file: string): T {
-        return fse.readJsonSync(file, { encoding }) as T
+        return fse.readJsonSync(file, { encoding }) as T;
     }
     export function removeSync(file: string) {
-        fse.removeSync(file)
+        fse.removeSync(file);
     }
     export function ensureFileSync(file: string) {
         if (fse.existsSync(file)) return;
@@ -36,7 +37,12 @@ export namespace vpath {
     export function splitPath(path: string): string[] {
         const s = path.startsWith(splitStr) ? path.substr(1) : path;
         const e = s.endsWith(splitStr) ? s.substr(0, s.length - 1) : s;
-        return e.split(splitStr).filter(p => !!p);
+        return e.split(splitStr).filter((p) => !!p);
+    }
+
+    export function join(...paths: string[]): string {
+        const j = process.platform === 'win32' ? path.win32.join : path.join;
+        return j(...paths);
     }
 }
 

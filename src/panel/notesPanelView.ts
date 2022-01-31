@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import * as vscode from 'vscode';
 
 import { ext } from '../extensionVariables';
@@ -165,14 +166,14 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const notes = ext.dbFS.dch.selectNotesUnderDomain(this.dpathCache);
-        const sortNotes = ext.dbFS.sortNotes(notes);
+        const notes = ext.domainDB.selectNotesUnderDomain(this.dpathCache);
+        const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {
-            const cname = ext.dbFS.readNoteMeta(nId).category;
-            const contents: string[] = ext.dbFS.selectNoteContents(nId);
-            const isDoc = ext.dbFS.selectDocExist(nId);
-            const isFiles = ext.dbFS.selectFilesExist(nId);
+            const cname = ext.domainDB.readNoteMeta(nId).category;
+            const contents: string[] = ext.domainDB.selectNoteContents(nId);
+            const isDoc = ext.domainDB.selectDocExist(nId);
+            const isFiles = ext.domainDB.selectFilesExist(nId);
 
             if (categories.filter((c) => c.name === cname).length >= 1) {
                 categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
