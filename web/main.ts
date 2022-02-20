@@ -118,7 +118,7 @@ const DomainContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'edit labels',
-            onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-laels', data: data }),
+            onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-labels', data: data }),
         },
     ],
 ];
@@ -187,10 +187,10 @@ class ContextMenuDom {
     }
 }
 
-class NoteEditContextMenu {}
+class NoteEditContextMenu { }
 
 class VNNote {
-    constructor(private readonly note: DataNote) {}
+    constructor(private readonly note: DataNote) { }
     dom(): HTMLHeadingElement {
         const d_note = document.createElement('div');
         d_note.className = 'grid-note';
@@ -273,7 +273,7 @@ function elemSpaces(num: number = 1) {
 }
 
 class VNCategory {
-    constructor(private readonly name: string, private readonly notes: DataNote[]) {}
+    constructor(private readonly name: string, private readonly notes: DataNote[]) { }
     doms() {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
@@ -375,7 +375,6 @@ class VNDomain {
         e_title.appendChild(elemSpaces());
         e_title.appendChild(
             elemIcon('fa-pen', (e) => {
-                console.log('1111');
                 nccm.show(e, e_title, DomainContextMenuActions, this.domain.dpath.join('/'));
             })
         );
@@ -401,10 +400,7 @@ class VNDomain {
 const nccm = new ContextMenuDom();
 document.addEventListener(
     'click',
-    () => {
-        console.log('global click');
-        nccm.hide();
-    },
+    () => { nccm.hide(); },
     true
 );
 document.addEventListener(

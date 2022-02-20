@@ -1,18 +1,18 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 
 import { ext } from '../extensionVariables';
-import { metaFields } from '../constants'
+import { metaFields } from '../constants';
 
 export type DomainNode = string;
 
 export namespace Tools {
-    const splitter = "@!$";
+    const splitter = '@!$';
     export function joinDomainNode(domain: string[]): string {
-        return domain.join(splitter)
+        return domain.join(splitter);
     }
 
     export function splitDomaiNode(domain: string): string[] {
-        return domain.split(splitter)
+        return domain.split(splitter);
     }
 }
 
@@ -60,8 +60,8 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     }
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
-        const domainNode = element ? Tools.splitDomaiNode(element) : []
-        return createDomainNodes(domainNode)
+        const domainNode = element ? Tools.splitDomaiNode(element) : [];
+        return createDomainNodes(domainNode);
     }
 
     public getParent(element: DomainNode): ProviderResult<DomainNode> {

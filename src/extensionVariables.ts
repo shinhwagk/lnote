@@ -63,6 +63,7 @@ function listenConfigure(ctx: ExtensionContext) {
             if (e.affectsConfiguration(section)) {
                 ext.masterPath = getMasterPath();
                 ext.domainDB = new DomainDatabase(ext.masterPath);
+                ext.domainProvider.refresh();
             }
         })
     );

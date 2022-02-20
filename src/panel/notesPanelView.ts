@@ -147,7 +147,7 @@ export class NotesPanelView {
                         console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
-                    case 'domain-edit-laels':
+                    case 'domain-edit-labels':
                         ExtCmds.cmdHdlDomainEditLabels(msg.data);
                         break;
 

@@ -7,7 +7,7 @@ import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode, Tools } from './explorer/domainExplorer';
 import { ctxFilesExplorer } from './constants';
 import { DomainDatabase } from './database';
-import { tools, vfs } from './helper'
+import { tools, vfs } from './helper';
 
 export namespace ExtCmds {
     export async function cmdHdlNoteEditColAdd(nId: string) {
@@ -121,7 +121,10 @@ export namespace ExtCmds {
         const nId: string = ext.domainDB.appendNewDomain(Tools.splitDomaiNode(ext.globalState.dn!), category);
         vfs.writeFileSync(ext.domainDB.noteDB.getContentFile(nId, '1'));
         if (editFirst) {
-            await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, '1')));
+            await commands.executeCommand(
+                'editExplorer.openFileResource',
+                Uri.file(ext.domainDB.noteDB.getContentFile(nId, '1'))
+            );
         }
         ext.domainProvider.refresh(ext.globalState.dn);
         ext.notesPanelView.parseDomain().showNotesPlanView();
@@ -195,11 +198,10 @@ export namespace ExtCmds {
         const allLabels = ext.domainDB
             .selectNotes(domainNode)
             .filter((nId) => ext.domainDB.noteDB.getMeta(nId).category === oldCategory)
-            .map((nId) => ext.domainDB.noteDB.getMeta(nId).labels)
-        const commonLabels = allLabels.slice(1).reduce((p, c) => tools.intersections(p, c), allLabels[0])
+            .map((nId) => ext.domainDB.noteDB.getMeta(nId).labels);
+        const commonLabels = allLabels.slice(1).reduce((p, c) => tools.intersections(p, c), allLabels[0]);
         const cl: string | undefined = await window.showInputBox({ value: commonLabels.join(',') });
         if (cl === undefined) return;
-
     }
     export async function cmdHdlNoteDocShow(nId: string) {
         const readmeFile = ext.domainDB.noteDB.selectDocIndexFile(nId);
@@ -311,10 +313,10 @@ export namespace ExtCmds {
     }
 
     export async function cmdHdlNoteEditLabels({ nId }: { nId: string }) {
-        const oldLabels = ext.domainDB.noteDB.getMeta(nId).labels
+        const oldLabels = ext.domainDB.noteDB.getMeta(nId).labels;
         const ib = await window.showInputBox({ value: oldLabels.join(',') });
         if (ib === undefined) return;
-        const newLabels = Array.from(new Set(ib.split(','))).map(l => l.trim());
+        const newLabels = Array.from(new Set(ib.split(','))).map((l) => l.trim());
         ext.domainDB.noteDB.updatelabels(nId, newLabels);
         ext.domainDB.noteDB.removeCacheByLabels(nId, oldLabels);
         ext.domainDB.noteDB.appendToCache(nId, Array.from(new Set(newLabels)));

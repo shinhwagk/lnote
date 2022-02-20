@@ -5,7 +5,7 @@ import { existsSync, readdirSync, mkdirSync, renameSync, removeSync, statSync } 
 
 import { metaFileName } from './constants';
 import { tools, vfs } from './helper';
-import { Tools } from './explorer/domainExplorer'
+import { Tools } from './explorer/domainExplorer';
 
 export interface Domain {
     '.notes': string[]; // .notes as cache for .labels
@@ -40,16 +40,15 @@ export class NoteDatabase {
     private notesCacheFileName = 'notes.cache.json'; // the file can deleted;
     private readonly notesCacheFile: string;
 
-
     constructor(vsnoteDbPath: string) {
         // this.vsnoteDbPath = vsnoteDbPath
         this.notesPath = path.join(vsnoteDbPath, 'notes');
-        this.notesCacheFile = path.join(vsnoteDbPath, this.notesCacheFileName)
+        this.notesCacheFile = path.join(vsnoteDbPath, this.notesCacheFileName);
         this.refresh(false);
     }
 
     private checkCacheFileExpire(): boolean {
-        return statSync(this.notesCacheFile).ctimeMs + 60 * 60 * 1000 < (new Date).getTime();
+        return statSync(this.notesCacheFile).ctimeMs + 60 * 60 * 1000 < new Date().getTime();
     }
 
     // A hexadecimal number of 6 bytes is used for a unique note id.
@@ -58,7 +57,7 @@ export class NoteDatabase {
         return existsSync(this.getDirectory(nId)) ? this.generateNId() : nId;
     }
 
-    public getNIdsBylabels(labels: string[], exclude: string[] = ["@Trash"]): string[] {
+    public getNIdsBylabels(labels: string[], exclude: string[] = ['@Trash']): string[] {
         if (labels.length === 1) {
             return this.notesCache.get(labels[0]) || [];
         }
@@ -67,7 +66,6 @@ export class NoteDatabase {
             return nIds.filter((nId) => _nIds.indexOf(nId) !== -1);
         }, this.notesCache.get(labels[0])!);
     }
-
 
     refresh(force: boolean) {
         if (force) {
@@ -79,7 +77,7 @@ export class NoteDatabase {
             this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesCacheFile)));
             return;
         } else {
-            removeSync(this.notesCacheFile)
+            removeSync(this.notesCacheFile);
         }
 
         console.log('notes cache start.');
@@ -153,8 +151,8 @@ export class NoteDatabase {
         mkdirSync(this.getDirectory(nId));
         this.updateMeta(nId, { labels, category }); // todo, domain + label
         this.addCol(nId);
-        this.appendToCache(nId, labels)
-        return nId
+        this.appendToCache(nId, labels);
+        return nId;
     }
 
     public createDoc(nId: string) {
@@ -234,9 +232,7 @@ export class DomainDatabase {
         this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
         this.noteDB = new NoteDatabase(vsnoteDbPath);
         this.domain = vfs.readJsonSync(this.domainFile);
-        this.refresh()
-        // this.generateDomainCache();
-        // this.cacheAllNotes();
+        this.refresh();
     }
 
     public refresh(domainNode: string[] = []): void {
@@ -247,7 +243,7 @@ export class DomainDatabase {
     public refreshDomain(domainNode: string[] = []): void {
         if (domainNode.length !== 0) {
             const domainLabels = this.getDomainLabels(domainNode);
-            objectPath.set(this.domain, domainNode.concat('.notes'), []) // clear .notes cache
+            objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes cache
             if (domainLabels.length >= 1) {
                 const nIds = this.noteDB.getNIdsBylabels(domainLabels);
                 objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
@@ -265,7 +261,7 @@ export class DomainDatabase {
 
     public appendLabels(domainNode: string[], labels: string[]) {
         const sourceLabels: string[] = objectPath.get(this.domain, domainNode.concat('.labels'));
-        this.updateLabels(domainNode, Array.from(new Set(sourceLabels.concat(labels))))
+        this.updateLabels(domainNode, Array.from(new Set(sourceLabels.concat(labels))));
     }
 
     public persistence(): void {
@@ -278,15 +274,15 @@ export class DomainDatabase {
 
     public createDomain(domainNode: string[], name: string, persistence = true) {
         objectPath.set(this.domain, domainNode.concat(name), { '.labels': [], '.notes': [] }, true);
-        if (persistence) this.persistence
+        if (persistence) this.persistence;
     }
 
     public appendNewDomain(domainNode: string[], category: string = 'default'): string {
         const domainLabels = this.getDomainLabels(domainNode);
         const nId = this.noteDB.create(category, domainLabels);
         this.appendNote(domainNode, nId);
-        this.appendLabels(domainNode, domainNode.concat([]))
-        this.persistence()
+        this.appendLabels(domainNode, domainNode.concat([]));
+        this.persistence();
         return nId;
     }
 
@@ -323,11 +319,7 @@ export class DomainDatabase {
 
     // }
 
-    public removeNote(domainNode: string[], nId: string) {
-
-    }
-
-    public appendNote(domainNode: string[], nId: string,) {
+    public appendNote(domainNode: string[], nId: string) {
         objectPath.insert(this.domain, domainNode.concat('.notes'), nId);
     }
 
@@ -341,8 +333,6 @@ export class DomainDatabase {
     //     }
     //     return undefined;
     // }
-
-
 
     sortNotes(notes: string[]): string[] {
         // const items = [];
@@ -406,5 +396,4 @@ export class DomainDatabase {
         }
         return totalNotes.concat(notes);
     }
-
 }
