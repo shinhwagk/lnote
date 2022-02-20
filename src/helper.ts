@@ -32,20 +32,6 @@ export namespace vfs {
     }
 }
 
-export namespace vpath {
-    const splitStr = '/';
-    export function splitPath(path: string): string[] {
-        const s = path.startsWith(splitStr) ? path.substr(1) : path;
-        const e = s.endsWith(splitStr) ? s.substr(0, s.length - 1) : s;
-        return e.split(splitStr).filter((p) => !!p);
-    }
-
-    export function join(...paths: string[]): string {
-        const j = process.platform === 'win32' ? path.win32.join : path.join;
-        return j(...paths);
-    }
-}
-
 export namespace tools {
     export function stringArrayEqual(a1: string[], a2: string[]) {
         return JSON.stringify(a1) === JSON.stringify(a2);
@@ -54,4 +40,6 @@ export namespace tools {
     export function hexRandom(len: number): string {
         return randomBytes(len).toString('hex');
     }
+
+    export const intersections = (array1: string[], array2: string[]) => array1.filter(e => array2.indexOf(e) !== -1);
 }

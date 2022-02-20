@@ -1,1 +1,7 @@
-{"domain":["vscode-note","usage"],"category":"abc1","weight":2}
+{
+    "category": "abc1",
+    "labels": [
+        "vscode-note",
+        "usage"
+    ]
+}

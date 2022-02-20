@@ -1,1 +1,8 @@
-{"domain":["vscode-note","usage"],"category":"edit note","weight":0}
+{
+    "labels": [
+        "vscode-note",
+        "usage"
+    ],
+    "category": "edit note",
+    "weight": 0
+}

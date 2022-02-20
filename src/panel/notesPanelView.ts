@@ -124,7 +124,7 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteEditCategoryRename(msg.data.nId);
                         break;
                     case 'edit-note-remove':
-                        ExtCmds.cmdHdlNoteEditTrash(msg.data.nId);
+                        ExtCmds.cmdHdlNoteEditRemove(msg.data.nId);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
@@ -136,7 +136,8 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlCategoryRename(msg.data.category);
                         break;
                     case 'category-to-domain':
-                        ExtCmds.cmdHdlCategoryMoveToDomain(msg.data.category);
+                        vscode.window.showInformationMessage('soon');
+                        // ExtCmds.cmdHdlCategoryMoveToOtherDomain(msg.data.category);
                         break;
                     case 'col-to-terminal':
                         console.log('col-to-terminal', msg.data);
@@ -173,14 +174,14 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const notes = ext.domainDB.selectNotesUnderDomain(this.dpathCache);
+        const notes = ext.domainDB.selectNotes(this.dpathCache);
         const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {
-            const cname = ext.domainDB.readNoteMeta(nId).category;
-            const contents: string[] = ext.domainDB.selectNoteContents(nId);
-            const isDoc = ext.domainDB.selectDocExist(nId);
-            const isFiles = ext.domainDB.selectFilesExist(nId);
+            const cname = ext.domainDB.noteDB.getMeta(nId).category;
+            const contents: string[] = ext.domainDB.noteDB.selectContents(nId);
+            const isDoc = ext.domainDB.noteDB.selectDocExist(nId);
+            const isFiles = ext.domainDB.noteDB.selectFilesExist(nId);
 
             if (categories.filter((c) => c.name === cname).length >= 1) {
                 categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });

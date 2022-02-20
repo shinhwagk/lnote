@@ -30,9 +30,8 @@ export namespace ext {
     export let filesProvider: FilesExplorerProvider;
     export let notesPanelView: NotesPanelView;
     export let masterPath: string;
-    export let notesPath: string;
     export let shortcutsFilePath: string;
-    export let activeNote: ActiveNote;
+    export let globalState: GlobalState;
     export let domainDB: DomainDatabase;
     export let vnDB: VNDatabase;
     // export let clientActions: (action: string) => void;
@@ -54,12 +53,8 @@ function getMasterPath() {
     return p.startsWith('~/') ? joinFun(homedir(), p.substr(2)) : p;
 }
 
-function getNotesPath() {
-    return path.join(ext.masterPath, 'notes');
-}
-
 function getShortcutsFilePath() {
-    return path.join(ext.notesPath, 'shortcuts.json');
+    return path.join(ext.masterPath, 'shortcuts.json');
 }
 
 function listenConfigure(ctx: ExtensionContext) {
@@ -79,21 +74,21 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     // delete soon
     ext.masterPath = getMasterPath();
-    ext.notesPath = getNotesPath();
+    // ext.notesPath = getNotesPath();
     ext.shortcutsFilePath = getShortcutsFilePath();
 
     initializeMasterDirectory(ext.masterPath);
-    initializeNotesDirectory(ext.notesPath);
+    initializeNotesDirectory(path.join(ext.masterPath, 'notes'));
     initializeShortcutsFile(ext.shortcutsFilePath);
     // addUsageNotes(ext.notesPath);
     // ext.clientActions = initClient(ext.context.extensionPath);
     // ext.sendGA = sendGA();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
-    ext.domainDB = new DomainDatabase(ext.notesPath);
+    ext.domainDB = new DomainDatabase(ext.masterPath);
     // ext.vnDB = new VNDatabase(ext.notesPath);
 
-    ext.activeNote = new ActiveNote();
+    ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {
         ext.notesPanelView = new NotesPanelView();
@@ -141,11 +136,11 @@ function initializeShortcutsFile(commonlyUsedFilePath: string) {
 //     copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
 // }
 
-export class ActiveNote {
-    id: string = '';
-    files: boolean = false;
-    doc: boolean = false;
-    category: string = '';
-    domainNode: DomainNode = '';
-    dpath: string[] = [];
+export class GlobalState {
+    nId: string = '';
+    // files: boolean = false;
+    // doc: boolean = false;
+    // category: string = '';
+    dn: DomainNode = '';
+    // dpath: string[] = [];
 }

@@ -1,1 +1,8 @@
-{"domain":["@Trash","vscode-note","usage"],"category":"recommend"}
+{
+    "labels": [
+        "@Trash",
+        "vscode-note",
+        "usage"
+    ],
+    "category": "recommend"
+}

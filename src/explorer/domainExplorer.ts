@@ -1,27 +1,37 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 
 import { ext } from '../extensionVariables';
-import { vpath } from '../helper';
+import { metaFields } from '../constants'
 
 export type DomainNode = string;
 
-function createDomainNodes(dn: DomainNode): DomainNode[] {
-    const dpath = vpath.splitPath(dn);
-    return Object.keys(ext.domainDB.selectDomain(dpath))
-        .filter((name) => !['.labels', '.notes'].includes(name))
+export namespace Tools {
+    const splitter = "@!$";
+    export function joinDomainNode(domain: string[]): string {
+        return domain.join(splitter)
+    }
+
+    export function splitDomaiNode(domain: string): string[] {
+        return domain.split(splitter)
+    }
+}
+
+function createDomainNodes(domainNode: string[]): DomainNode[] {
+    return Object.keys(ext.domainDB.select(domainNode))
+        .filter((name) => !metaFields.includes(name))
         .sort()
-        .map((name) => dpath.concat(name).join('/'));
+        .map((name) => Tools.joinDomainNode(domainNode.concat(name)));
 }
 
 function getTreeItem(dn: DomainNode): TreeItem {
-    const dpath = vpath.splitPath(dn);
-    const item: TreeItem = { label: dpath[dpath.length - 1] };
-    const domain = ext.domainDB.selectDomain(dpath);
+    const domainNode = Tools.splitDomaiNode(dn);
+    const item: TreeItem = { label: domainNode[domainNode.length - 1] };
+    const domain = ext.domainDB.select(domainNode);
 
-    const childDomainNumber = Object.keys(domain).filter((name) => !['.labels', '.notes'].includes(name)).length;
+    const childDomainNumber = Object.keys(domain).filter((name) => !metaFields.includes(name)).length;
     item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
 
-    const notesTotalNumberUnderDomain = ext.domainDB.selectAllNotesUnderDomain(dpath).length;
+    const notesTotalNumberUnderDomain = ext.domainDB.selectAllNotes(domainNode).length;
     const notesNumberUnderDomain = domain['.notes'].length;
 
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
@@ -50,11 +60,12 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     }
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
-        return element ? createDomainNodes(element) : createDomainNodes('');
+        const domainNode = element ? Tools.splitDomaiNode(element) : []
+        return createDomainNodes(domainNode)
     }
 
     public getParent(element: DomainNode): ProviderResult<DomainNode> {
-        const dpath = vpath.splitPath(element);
-        return dpath.length >= 2 ? dpath.slice(0, dpath.length - 1).join('/') : undefined;
+        const domainNode = Tools.splitDomaiNode(element);
+        return domainNode.length >= 2 ? Tools.joinDomainNode(domainNode.slice(0, domainNode.length - 1)) : undefined;
     }
 }

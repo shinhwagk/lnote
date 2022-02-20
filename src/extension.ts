@@ -27,8 +27,8 @@ export async function activate(context: ExtensionContext) {
     /**
      * note
      */
-    ext.registerCommand('vscode-note.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
-    ext.registerCommand('vscode-note.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
+    // ext.registerCommand('vscode-note.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
+    // ext.registerCommand('vscode-note.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
     ext.registerCommand('vscode-note.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
     ext.registerCommand('vscode-note.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
     ext.registerCommand('vscode-note.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
@@ -64,4 +64,4 @@ export async function activate(context: ExtensionContext) {
     });
 }
 
-export function deactivate() {}
+export function deactivate() { }
