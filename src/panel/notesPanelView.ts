@@ -109,7 +109,8 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
                         break;
                     case 'doc':
-                        vscode.commands.executeCommand('vscode-note.note.doc.show', msg.data);
+                        console.log('doc', msg.data)
+                        ExtCmds.cmdHdlNoteDocShow(msg.data);
                         break;
                     case 'note-files-open':
                         ExtCmds.cmdHdlNoteFilesOpen(msg.data);
@@ -174,8 +175,8 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const notes = ext.domainDB.selectNotes(this.dpathCache);
-        const sortNotes = ext.domainDB.sortNotes(notes);
+        const sortNotes = ext.domainDB.selectNotes(this.dpathCache);
+        // const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {
             const cname = ext.domainDB.noteDB.getMeta(nId).category;

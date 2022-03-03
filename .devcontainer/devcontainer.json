@@ -7,10 +7,11 @@
         }
     },
     "extensions": [
-        "dbaeumer.vscode-eslint",
-        "howardzuo.vscode-npm-dependency",
-        "esbenp.prettier-vscode"
-    ],
+		"dbaeumer.vscode-eslint",
+		"howardzuo.vscode-npm-dependency",
+		"esbenp.prettier-vscode",
+		"shinhwagk.vscode-note"
+	],
     "mounts": [
         // "source=F:\\OneDrive\\vscode-note-data,target=/opt/vscode-note,type=bind"
     ],

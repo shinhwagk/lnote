@@ -1,7 +1,7 @@
 import { homedir, platform } from 'os';
 import * as path from 'path';
 
-import { existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
+import { copySync, existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
 import {
     ExtensionContext,
     workspace,
@@ -78,16 +78,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // ext.notesPath = getNotesPath();
     ext.shortcutsFilePath = getShortcutsFilePath();
 
-    initializeMasterDirectory(ext.masterPath);
-    initializeNotesDirectory(path.join(ext.masterPath, 'notes'));
-    initializeShortcutsFile(ext.shortcutsFilePath);
+    //initializeShortcutsFile(ext.shortcutsFilePath);
     // addUsageNotes(ext.notesPath);
     // ext.clientActions = initClient(ext.context.extensionPath);
-    // ext.sendGA = sendGA();
 
     ext.outputChannel = window.createOutputChannel('vscode-note');
+    // DomainDatabase.initDirectory();
     ext.domainDB = new DomainDatabase(ext.masterPath);
-    // ext.vnDB = new VNDatabase(ext.notesPath);
 
     ext.globalState = new GlobalState();
 
@@ -117,25 +114,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     }
 }
 
-function initializeMasterDirectory(masterPath: string) {
-    existsSync(masterPath) || mkdirpSync(masterPath);
-}
-
-function initializeNotesDirectory(notesPath: string) {
-    if (!existsSync(notesPath)) {
-        mkdirsSync(notesPath);
-    }
-}
-
-function initializeShortcutsFile(commonlyUsedFilePath: string) {
-    if (!existsSync(commonlyUsedFilePath)) {
-        writeJsonSync(commonlyUsedFilePath, { star: [], last: [] }, { encoding: 'utf-8' });
-    }
-}
-
-// function addUsageNotes(notesPath: string) {
-//     copySync(path.join(ext.context.extensionPath, 'notes-usage', 'notes'), notesPath);
-// }
 
 export class GlobalState {
     nId: string = '';

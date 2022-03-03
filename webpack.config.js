@@ -1,6 +1,10 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
+//@ts-check
+/** @typedef {import('webpack').Configuration} WebpackConfig **/
+
+/** @type WebpackConfig */
 const extConfig = {
     target: 'node',
     entry: './src/extension.ts',

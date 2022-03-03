@@ -1,3 +1,6 @@
 {
-    "recommendations": ["ms-vscode.vscode-typescript-tslint-plugin", "msjsdiag.debugger-for-chrome"]
-}
+    "recommendations": [
+        "dbaeumer.vscode-eslint", 
+        "amodio.tsl-problem-matcher"]
+  }
+  

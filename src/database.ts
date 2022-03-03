@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import * as objectPath from 'object-path';
-import { existsSync, readdirSync, mkdirSync, renameSync, removeSync, statSync } from 'fs-extra';
+import { existsSync, readdirSync, mkdirSync, renameSync, removeSync, statSync, mkdirpSync } from 'fs-extra';
 
 import { metaFileName } from './constants';
 import { tools, vfs } from './helper';
@@ -43,8 +43,13 @@ export class NoteDatabase {
     constructor(vsnoteDbPath: string) {
         // this.vsnoteDbPath = vsnoteDbPath
         this.notesPath = path.join(vsnoteDbPath, 'notes');
+        this.initDirectories()
         this.notesCacheFile = path.join(vsnoteDbPath, this.notesCacheFileName);
         this.refresh(false);
+    }
+
+    private initDirectories() {
+        existsSync(this.notesPath) || mkdirpSync(this.notesPath);
     }
 
     private checkCacheFileExpire(): boolean {
@@ -61,10 +66,11 @@ export class NoteDatabase {
         if (labels.length === 1) {
             return this.notesCache.get(labels[0]) || [];
         }
-        return labels.slice(1).reduce((nIds, label) => {
+        const nIds = labels.slice(1).reduce((nIds, label) => {
             const _nIds = this.notesCache.get(label) || [];
             return nIds.filter((nId) => _nIds.indexOf(nId) !== -1);
         }, this.notesCache.get(labels[0])!);
+        return Array.from(new Set(nIds))
     }
 
     refresh(force: boolean) {
@@ -80,8 +86,9 @@ export class NoteDatabase {
             removeSync(this.notesCacheFile);
         }
 
-        console.log('notes cache start.');
+        console.log('notes cache start.', this.notesPath);
         for (const nId of readdirSync(this.notesPath)) {
+            console.log(nId)
             const nm = this.getMeta(nId);
             this.appendToCache(nId, nm.labels, false);
         }
@@ -203,6 +210,10 @@ export class NoteDatabase {
         return this.getDocIndexFile(nId, indexFile);
     };
 
+    public selectDocReadmeFile = (nId: string) => {
+        return this.getDocIndexFile(nId, 'README.md')
+    }
+
     updateCategory(nId: string, newCategory: string) {
         const nm = this.getMeta(nId);
         nm.category = newCategory;
@@ -230,9 +241,15 @@ export class DomainDatabase {
         this.vsnoteDbPath = vsnoteDbPath;
         this.domainFile = path.join(this.vsnoteDbPath, this.domainFileName);
         this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
+        this.initDirectories()
         this.noteDB = new NoteDatabase(vsnoteDbPath);
         this.domain = vfs.readJsonSync(this.domainFile);
         this.refresh();
+    }
+
+    private initDirectories() {
+        existsSync(this.vsnoteDbPath) || mkdirpSync(this.vsnoteDbPath);
+        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, {})
     }
 
     public refresh(domainNode: string[] = []): void {
@@ -278,8 +295,8 @@ export class DomainDatabase {
     }
 
     public appendNewDomain(domainNode: string[], category: string = 'default'): string {
-        const domainLabels = this.getDomainLabels(domainNode);
-        const nId = this.noteDB.create(category, domainLabels);
+        // const domainLabels = this.getDomainLabels(domainNode);
+        const nId = this.noteDB.create(category, domainNode);
         this.appendNote(domainNode, nId);
         this.appendLabels(domainNode, domainNode.concat([]));
         this.persistence();
@@ -370,7 +387,14 @@ export class DomainDatabase {
     }
 
     public selectNotes(domainNode: string[] = []): string[] {
-        return this.select(domainNode)['.notes'];
+        const nIds = this.select(domainNode)['.notes']
+        return nIds
+        // if (domainNode[0] === '@Trash') {
+        //     return nIds
+        // } else {
+        //     // nIds.
+        // }
+
     }
 
     public select(domainNode: string[] = []): Domain {

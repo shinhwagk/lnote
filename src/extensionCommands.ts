@@ -204,7 +204,8 @@ export namespace ExtCmds {
         if (cl === undefined) return;
     }
     export async function cmdHdlNoteDocShow(nId: string) {
-        const readmeFile = ext.domainDB.noteDB.selectDocIndexFile(nId);
+        const readmeFile = ext.domainDB.noteDB.selectDocReadmeFile(nId);
+        // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'README.md')
         if (basename(readmeFile).split('.')[1] === 'md') {
             const uri = Uri.file(readmeFile);
             await commands.executeCommand('markdown.showPreviewToSide', uri);
