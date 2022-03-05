@@ -153,7 +153,7 @@ export class NoteDatabase {
             .map((f: string) => this.contentFileNameRegex.exec(f)![1])
             .map((f: string) => this.getContentFile(nId, f));
 
-    public create(category: string, labels: string[]) {
+    public create(labels: string[], category: string) {
         const nId = this.generateNId();
         mkdirSync(this.getDirectory(nId));
         this.updateMeta(nId, { labels, category }); // todo, domain + label
@@ -232,7 +232,7 @@ export class NoteDatabase {
 export class DomainDatabase {
     private readonly vsnoteDbPath: string;
     private readonly shortcutsFile: string;
-    private domain: Domain;
+    public domain: Domain;
     private readonly domainFileName = 'domain.json';
     private readonly domainFile;
     public readonly noteDB: NoteDatabase;
@@ -241,13 +241,13 @@ export class DomainDatabase {
         this.vsnoteDbPath = vsnoteDbPath;
         this.domainFile = path.join(this.vsnoteDbPath, this.domainFileName);
         this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
-        this.initDirectories()
+        this.initDomain()
         this.noteDB = new NoteDatabase(vsnoteDbPath);
         this.domain = vfs.readJsonSync(this.domainFile);
         this.refresh();
     }
 
-    private initDirectories() {
+    private initDomain() {
         existsSync(this.vsnoteDbPath) || mkdirpSync(this.vsnoteDbPath);
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, {})
     }
@@ -289,14 +289,16 @@ export class DomainDatabase {
         return this.select(domainNode)['.labels'];
     }
 
-    public createDomain(domainNode: string[], name: string, persistence = true) {
-        objectPath.set(this.domain, domainNode.concat(name), { '.labels': [], '.notes': [] }, true);
-        if (persistence) this.persistence;
+    public createDomain(dn: string[], name: string, persistence = true) {
+        console.log(dn, dn.concat(name))
+        const labels = dn.concat(name)
+        objectPath.set(this.domain, labels, { '.labels': labels, '.notes': [] }, true);
+        if (persistence) this.persistence();
     }
 
     public appendNewDomain(domainNode: string[], category: string = 'default'): string {
         // const domainLabels = this.getDomainLabels(domainNode);
-        const nId = this.noteDB.create(category, domainNode);
+        const nId = this.noteDB.create(domainNode, category);
         this.appendNote(domainNode, nId);
         this.appendLabels(domainNode, domainNode.concat([]));
         this.persistence();
@@ -336,8 +338,9 @@ export class DomainDatabase {
 
     // }
 
-    public appendNote(domainNode: string[], nId: string) {
+    public appendNote(domainNode: string[], nId: string, persistence: boolean = true) {
         objectPath.insert(this.domain, domainNode.concat('.notes'), nId);
+        persistence && this.persistence()
     }
 
     // selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
@@ -387,6 +390,7 @@ export class DomainDatabase {
     }
 
     public selectNotes(domainNode: string[] = []): string[] {
+        console.log('selectNotes', domainNode, JSON.stringify(this.domain))
         const nIds = this.select(domainNode)['.notes']
         return nIds
         // if (domainNode[0] === '@Trash') {

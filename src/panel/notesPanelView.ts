@@ -93,11 +93,11 @@ export class NotesPanelView {
                     case 'edit':
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
-                    case 'note-add':
-                        ExtCmds.cmdHdlNoteAdd(msg.data.category);
+                    case 'note-create':
+                        ExtCmds.cmdHdlNoteCreate(msg.data.category);
                         break;
                     case 'edit-contentFile':
-                        ExtCmds.cmdHdlNoteEditColContent(msg.data.id, msg.data.n);
+                        ExtCmds.cmdHdlNoteEditColContent(msg.data.nId, msg.data.n);
                         break;
                     case 'edit-col':
                         vscode.commands.executeCommand('vscode-note.note.edit.col', msg.data.id, msg.data.cn);
@@ -176,6 +176,7 @@ export class NotesPanelView {
 
     private genViewData(): twv.WVDomain {
         const sortNotes = ext.domainDB.selectNotes(this.dpathCache);
+        console.log("sort", sortNotes)
         // const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {

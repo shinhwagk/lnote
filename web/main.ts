@@ -71,7 +71,7 @@ const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'add note',
-            onClick: (data) => vscode.postMessage({ command: 'note-add', data: { category: data.category } }),
+            onClick: (data) => vscode.postMessage({ command: 'note-create', data: { category: data.category } }),
         },
     ],
     [
@@ -215,11 +215,12 @@ class VNNote {
         d_note_content.className = 'grid-note-content';
         d_note_content.style.gridTemplateColumns = `repeat(${this.note.contents.length}, 1fr)`;
 
-        for (let i = 0; i <= this.note.contents.length; i++) {
+
+        for (let i = 0; i < this.note.contents.length; i++) {
             const d = document.createElement('div');
             d.className = 'grid-note-content';
             d.ondblclick = () => {
-                vscode.postMessage({ command: 'edit-contentFile', data: { id: this.note.nId, n: i + 1 } });
+                vscode.postMessage({ command: 'edit-contentFile', data: { nId: this.note.nId, n: i + 1 } });
             };
             d.textContent = this.note.contents[i];
             d.addEventListener('contextmenu', (e) => {

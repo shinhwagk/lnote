@@ -120,6 +120,6 @@ export class GlobalState {
     // files: boolean = false;
     // doc: boolean = false;
     // category: string = '';
-    dn: DomainNode = '';
+    domainNode: DomainNode = '';
     // dpath: string[] = [];
 }
