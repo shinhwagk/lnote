@@ -62,14 +62,12 @@ export class NoteDatabase {
         return existsSync(this.getDirectory(nId)) ? this.generateNId() : nId;
     }
 
-    public getNIdsBylabels(labels: string[], exclude: string[] = ['@Trash']): string[] {
-        if (labels.length === 1) {
-            return this.notesCache.get(labels[0]) || [];
-        }
-        const nIds = labels.slice(1).reduce((nIds, label) => {
+    public getNIdsBylabels(labels: string[], exclude: string = '@Trash'): string[] {
+        const excludeNIds: string[] = this.notesCache.get(exclude) || []!;
+        const nIds = labels.reduce((nIds, label) => {
             const _nIds = this.notesCache.get(label) || [];
-            return nIds.filter((nId) => _nIds.indexOf(nId) !== -1);
-        }, this.notesCache.get(labels[0])!);
+            return nIds.filter((nId) => _nIds.includes(nId) && !excludeNIds.includes(nId));
+        }, this.notesCache.get(labels[0]) || []);
         return Array.from(new Set(nIds))
     }
 
@@ -88,9 +86,7 @@ export class NoteDatabase {
 
         console.log('notes cache start.', this.notesPath);
         for (const nId of readdirSync(this.notesPath)) {
-            console.log(nId)
-            const nm = this.getMeta(nId);
-            this.appendToCache(nId, nm.labels, false);
+            this.cacheNote(nId, false);
         }
         this.persistence();
         console.log('notes cache success.', this.notesCache.size);
@@ -99,9 +95,8 @@ export class NoteDatabase {
     public removeCacheByLabels(nId: string, labels: string[], persistence: boolean = true): void {
         for (const label of labels) {
             if (this.notesCache.has(label)) {
-                // this.notesCache.get(label)?.filter(_nId => _nid !== nId)
                 const idx = this.notesCache.get(label)?.indexOf(nId);
-                if (idx && idx >= -1) {
+                if (idx !== undefined && idx >= 0) {
                     this.notesCache.get(label)?.splice(idx, 1);
                 }
             }
@@ -109,10 +104,11 @@ export class NoteDatabase {
         if (persistence) this.persistence();
     }
 
-    public appendToCache(nId: string, labels: string[], persistence: boolean = true): void {
+    public cacheNote(nId: string, persistence: boolean = true): void {
+        const labels = this.getMeta(nId).labels
         for (const label of labels) {
-            if (this.notesCache.has(label)) {
-                this.notesCache.get(label)?.push(nId);
+            if (this.notesCache.has(label) && this.notesCache.get(label)?.includes(nId)) {
+                this.notesCache.get(label)?.push(nId)
             } else {
                 this.notesCache.set(label, [nId]);
             }
@@ -120,6 +116,7 @@ export class NoteDatabase {
         if (persistence) this.persistence();
     }
 
+    // force is cover
     public updatelabels(nId: string, labels: string[]) {
         const nm = this.getMeta(nId);
         nm.labels = labels;
@@ -158,7 +155,7 @@ export class NoteDatabase {
         mkdirSync(this.getDirectory(nId));
         this.updateMeta(nId, { labels, category }); // todo, domain + label
         this.addCol(nId);
-        this.appendToCache(nId, labels);
+        this.cacheNote(nId);
         return nId;
     }
 
@@ -249,7 +246,7 @@ export class DomainDatabase {
 
     private initDomain() {
         existsSync(this.vsnoteDbPath) || mkdirpSync(this.vsnoteDbPath);
-        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, {})
+        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { "@Trash": { '.notes': [], '.labels': [] } })
     }
 
     public refresh(domainNode: string[] = []): void {
@@ -258,22 +255,25 @@ export class DomainDatabase {
     }
 
     public refreshDomain(domainNode: string[] = []): void {
-        if (domainNode.length !== 0) {
+        if (domainNode.length === 0) {
+            for (const keys of Object.keys(this.select(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
+                this.refreshDomain(domainNode.concat(keys));
+            }
+        } else {
             const domainLabels = this.getDomainLabels(domainNode);
             objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes cache
             if (domainLabels.length >= 1) {
-                const nIds = this.noteDB.getNIdsBylabels(domainLabels);
+                const exclude = domainNode[0] === '@Trash' ? '' : '@Trash';
+                const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
                 objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
             }
-        }
-
-        for (const keys of Object.keys(this.select(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
-            this.refreshDomain(domainNode.concat(keys));
         }
     }
 
     public updateLabels(domainNode: string[], labels: string[]) {
+        console.log(domainNode, labels)
         objectPath.set(this.domain, domainNode.concat('.labels'), labels);
+        return this
     }
 
     public appendLabels(domainNode: string[], labels: string[]) {
@@ -289,11 +289,14 @@ export class DomainDatabase {
         return this.select(domainNode)['.labels'];
     }
 
-    public createDomain(dn: string[], name: string, persistence = true) {
-        console.log(dn, dn.concat(name))
-        const labels = dn.concat(name)
-        objectPath.set(this.domain, labels, { '.labels': labels, '.notes': [] }, true);
-        if (persistence) this.persistence();
+    public createDomain(dn: string[]) {
+        for (let i = 1; i <= dn.length; i++) {
+            const _dn = dn.slice(0, i)
+            if (!objectPath.has(this.domain, _dn)) {
+                objectPath.set(this.domain, dn.slice(0, i), { '.labels': [], '.notes': [] }, true);
+            }
+        }
+        return this
     }
 
     public appendNewDomain(domainNode: string[], category: string = 'default'): string {
@@ -308,6 +311,7 @@ export class DomainDatabase {
     public updateNotesOfDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
         this.selectAllNotes(orgDpath).forEach((nId) => this.updateNoteLabelsDomainByLabels(nId, orgDpath, newDpath, cascade));
     }
+
 
     public updateNoteLabelsDomainByLabels(_nId: string, oldDomainNode: string[], newDomainNode: string[], _cascade: boolean) {
         // todo remove labels

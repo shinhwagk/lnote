@@ -36,6 +36,9 @@ export namespace ExtCmds {
         // ext.domainDB.createDomain(Tools.splitDomaiNode(dn))
         // ext.domainDB.createNotes(Tools.splitDomaiNode(dn));
         // ext.domainProvider.refresh(dn);
+        const domainNode = Tools.splitDomaiNode(dn)
+        const lables = domainNode
+        ext.domainDB.updateLabels(domainNode, lables).persistence()
         await cmdHdlCategoryAdd(true);
         // await cmdHdlDomainPin(dn);
         ext.domainProvider.refresh(dn);
@@ -77,7 +80,7 @@ export namespace ExtCmds {
         const name: string | undefined = await window.showInputBox();
         if (!name) return;
         const _dn: string[] = dn ? Tools.splitDomaiNode(dn) : [];
-        ext.domainDB.createDomain(_dn, name, true);
+        ext.domainDB.createDomain(_dn.concat(name)).persistence();
         ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true });
     }
@@ -264,9 +267,14 @@ export namespace ExtCmds {
         if (!pick) return;
         await cmdHdlDomainPin(pick);
     }
-    export async function cmdHdlNoteEditRemove(nId: string) {
-        const dpath = Tools.splitDomaiNode(ext.globalState.domainNode);
-        ext.domainDB.updateNoteLabelsDomainByLabels(nId, dpath, ['@Trash'].concat(dpath), false);
+    export async function cmdHdlNoteRemove(nId: string) {
+        const dn = Tools.splitDomaiNode(ext.globalState.domainNode);
+        const noteLabels = ext.domainDB.noteDB.getMeta(nId).labels
+        ext.domainDB.noteDB.updatelabels(nId, noteLabels.concat('@Trash'));
+        ext.domainDB.noteDB.cacheNote(nId)
+        ext.domainDB.createDomain(['@Trash'].concat(dn)).persistence()
+        ext.domainDB.updateLabels(['@Trash'].concat(dn), ['@Trash'].concat(noteLabels))
+        // ext.domainDB.updateNoteLabelsDomainByLabels(nId, dn, ['@Trash'].concat(dn), false);
         cmdHdlDomainRefresh();
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
@@ -321,9 +329,17 @@ export namespace ExtCmds {
         const ib = await window.showInputBox({ value: oldLabels.join(',') });
         if (ib === undefined) return;
         const newLabels = Array.from(new Set(ib.split(','))).map((l) => l.trim());
+        // if (newLabels.includes('@Trash')) {
+        //     const dn = Tools.splitDomaiNode(ext.globalState.domainNode!)
+        //     if (ext.globalState.domainNode[0] !== '@Trash') {
+        //         ext.domainDB.appendNote(['@Trash'].concat(dn), nId)
+        //     } else {
+        //         ext.domainDB.appendNote(dn, nId)
+        //     }
+        // }
         ext.domainDB.noteDB.updatelabels(nId, newLabels);
-        ext.domainDB.noteDB.removeCacheByLabels(nId, oldLabels);
-        ext.domainDB.noteDB.appendToCache(nId, Array.from(new Set(newLabels)));
+        ext.domainDB.noteDB.removeCacheByLabels(nId, oldLabels, false);
+        ext.domainDB.noteDB.cacheNote(nId);
         ext.domainDB.refresh();
         ext.domainProvider.refresh();
         ext.notesPanelView.parseDomain().showNotesPlanView();

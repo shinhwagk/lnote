@@ -124,8 +124,8 @@ export class NotesPanelView {
                     case 'edit-note-category-rename':
                         ExtCmds.cmdHdlNoteEditCategoryRename(msg.data.nId);
                         break;
-                    case 'edit-note-remove':
-                        ExtCmds.cmdHdlNoteEditRemove(msg.data.nId);
+                    case 'note-remove':
+                        ExtCmds.cmdHdlNoteRemove(msg.data.nId);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);

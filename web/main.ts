@@ -56,7 +56,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'remove note',
-            onClick: (data) => vscode.postMessage({ command: 'edit-note-remove', data: { nId: data.note.nId } }),
+            onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } }),
         },
     ],
     [
