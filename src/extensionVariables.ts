@@ -76,7 +76,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // delete soon
     ext.masterPath = getMasterPath();
     // ext.notesPath = getNotesPath();
-    ext.shortcutsFilePath = getShortcutsFilePath();
+    // ext.shortcutsFilePath = getShortcutsFilePath();
 
     //initializeShortcutsFile(ext.shortcutsFilePath);
     // addUsageNotes(ext.notesPath);
@@ -105,13 +105,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
     }
 
-    if (!ext.domainShortcutStatusBarItem) {
-        ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
-        ext.domainShortcutStatusBarItem.text = '$(list-unordered) Domains(Last)';
-        ext.domainShortcutStatusBarItem.command = 'vscode-note.shortcuts.last';
-        ext.domainShortcutStatusBarItem.show();
-        ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
-    }
+    // if (!ext.domainShortcutStatusBarItem) {
+    //     ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
+    //     ext.domainShortcutStatusBarItem.text = '$(list-unordered) Domains(Last)';
+    //     ext.domainShortcutStatusBarItem.command = 'vscode-note.shortcuts.last';
+    //     ext.domainShortcutStatusBarItem.show();
+    //     ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
+    // }
 }
 
 

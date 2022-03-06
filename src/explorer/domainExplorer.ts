@@ -17,7 +17,7 @@ export namespace Tools {
 }
 
 function createDomainNodes(domainNode: string[]): DomainNode[] {
-    return Object.keys(ext.domainDB.select(domainNode))
+    return Object.keys(ext.domainDB.getDomain(domainNode))
         .filter((name) => !metaFields.includes(name))
         .sort()
         .map((name) => Tools.joinDomainNode(domainNode.concat(name)));
@@ -26,15 +26,16 @@ function createDomainNodes(domainNode: string[]): DomainNode[] {
 function getTreeItem(dn: DomainNode): TreeItem {
     const domainNode = Tools.splitDomaiNode(dn);
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-    const domain = ext.domainDB.select(domainNode);
+    const domain = ext.domainDB.getDomain(domainNode);
 
     const childDomainNumber = Object.keys(domain).filter((name) => !metaFields.includes(name)).length;
     item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
 
     const notesTotalNumberUnderDomain = ext.domainDB.selectAllNotes(domainNode).length;
     const notesNumberUnderDomain = domain['.notes'].length;
+    const domainLabels = domain['.labels'].join(',')
 
-    item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain}`;
+    item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} ${domainLabels}`;
     if (domain['.notes'].length >= 1) {
         item.command = {
             arguments: [dn],

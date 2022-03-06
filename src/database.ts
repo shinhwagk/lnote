@@ -18,10 +18,10 @@ export interface NoteMeta {
     labels: string[];
 }
 
-export interface Shortcuts {
-    star: string[];
-    last: string[];
-}
+// export interface Shortcuts {
+//     star: string[];
+//     last: string[];
+// }
 
 export class VNDatabase {
     readonly noteDB: NoteDatabase;
@@ -36,7 +36,7 @@ export class NoteDatabase {
     // private readonly vsnoteDbPath: string;
     private readonly contentFileNameRegex = /^([0-9])\.txt$/;
     private readonly notesPath: string;
-    private notesCache: Map<string, string[]> = new Map(); // cache labels with nId, more notes of one label
+    public notesCache: Map<string, string[]> = new Map(); // cache labels with nId, more notes of one label
     private notesCacheFileName = 'notes.cache.json'; // the file can deleted;
     private readonly notesCacheFile: string;
 
@@ -62,11 +62,11 @@ export class NoteDatabase {
         return existsSync(this.getDirectory(nId)) ? this.generateNId() : nId;
     }
 
-    public getNIdsBylabels(labels: string[], exclude: string = '@Trash'): string[] {
-        const excludeNIds: string[] = this.notesCache.get(exclude) || []!;
-        const nIds = labels.reduce((nIds, label) => {
-            const _nIds = this.notesCache.get(label) || [];
-            return nIds.filter((nId) => _nIds.includes(nId) && !excludeNIds.includes(nId));
+    public getNIdsBylabels(labels: string[], exclude: string | undefined): string[] {
+        const excludeNIds: string[] = exclude ? this.notesCache.get(exclude) || [] : [];
+        const nIds = labels.reduce((p_nIds, c_label) => {
+            const __nIds = this.notesCache.get(c_label) || [];
+            return p_nIds.filter((nId) => __nIds.includes(nId) && !excludeNIds.includes(nId));
         }, this.notesCache.get(labels[0]) || []);
         return Array.from(new Set(nIds))
     }
@@ -86,36 +86,38 @@ export class NoteDatabase {
 
         console.log('notes cache start.', this.notesPath);
         for (const nId of readdirSync(this.notesPath)) {
-            this.cacheNote(nId, false);
+            this.cache(nId);
         }
         this.persistence();
         console.log('notes cache success.', this.notesCache.size);
     }
 
-    public removeCacheByLabels(nId: string, labels: string[], persistence: boolean = true): void {
+    public removeCacheByLabels(nId: string, labels: string[]) {
         for (const label of labels) {
-            if (this.notesCache.has(label)) {
-                const idx = this.notesCache.get(label)?.indexOf(nId);
-                if (idx !== undefined && idx >= 0) {
-                    this.notesCache.get(label)?.splice(idx, 1);
-                }
-            }
+            const nIds = new Set(this.notesCache.get(label) || []);
+            nIds.delete(nId)
+            this.notesCache.set(label, Array.from(nIds))
         }
-        if (persistence) this.persistence();
+        return this
     }
 
-    public cacheNote(nId: string, persistence: boolean = true): void {
-        const labels = this.getMeta(nId).labels
-        for (const label of labels) {
-            if (this.notesCache.has(label) && this.notesCache.get(label)?.includes(nId)) {
-                this.notesCache.get(label)?.push(nId)
-            } else {
-                this.notesCache.set(label, [nId]);
-            }
+    public remove(nId: string) {
+        for (const label of this.getMeta(nId).labels) {
+            const nIds = new Set(this.notesCache.get(label) || []);
+            nIds.delete(nId)
+            this.notesCache.set(label, Array.from(nIds))
         }
-        if (persistence) this.persistence();
+        this.persistence()
     }
 
+    public cache(nId: string): void {
+        for (const label of this.getMeta(nId).labels) {
+            const nIds = new Set(this.notesCache.get(label) || [])
+            nIds.add(nId)
+            this.notesCache.set(label, Array.from(nIds))
+        }
+        this.persistence()
+    }
     // force is cover
     public updatelabels(nId: string, labels: string[]) {
         const nm = this.getMeta(nId);
@@ -135,12 +137,12 @@ export class NoteDatabase {
 
     public getMeta = (nId: string) => vfs.readJsonSync<NoteMeta>(this.getMetaFile(nId));
 
-    public addCol(nid: string): string {
-        const cnt = (this.selectContents(nid).length + 1).toString();
-        vfs.writeFileSync(this.getContentFile(nid, cnt), '');
+    public addCol(nId: string): string {
+        const cnt = (this.getNoteContents(nId).length + 1).toString();
+        vfs.writeFileSync(this.getContentFile(nId, cnt), '');
         return cnt;
     }
-    public selectContents(nId: string): string[] {
+    public getNoteContents(nId: string): string[] {
         return this.getContentFiles(nId).map((f: string) => vfs.readFileSync(f));
     }
 
@@ -155,7 +157,8 @@ export class NoteDatabase {
         mkdirSync(this.getDirectory(nId));
         this.updateMeta(nId, { labels, category }); // todo, domain + label
         this.addCol(nId);
-        this.cacheNote(nId);
+        this.cache(nId);
+        this.persistence()
         return nId;
     }
 
@@ -172,7 +175,7 @@ export class NoteDatabase {
 
     public getFilesPath = (nId: string) => path.join(this.getDirectory(nId), 'files');
     public removeCol(nId: string, cIdx: number) {
-        const colNum = this.selectContents(nId).length;
+        const colNum = this.getNoteContents(nId).length;
         // removeSync(this.getNoteContentFile(nId, num.toString()));
         this.archiveNoteCol(nId, cIdx);
         if (cIdx !== colNum) {
@@ -228,7 +231,7 @@ export class NoteDatabase {
 
 export class DomainDatabase {
     private readonly vsnoteDbPath: string;
-    private readonly shortcutsFile: string;
+    // private readonly shortcutsFile: string;
     public domain: Domain;
     private readonly domainFileName = 'domain.json';
     private readonly domainFile;
@@ -237,56 +240,55 @@ export class DomainDatabase {
     constructor(vsnoteDbPath: string) {
         this.vsnoteDbPath = vsnoteDbPath;
         this.domainFile = path.join(this.vsnoteDbPath, this.domainFileName);
-        this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
-        this.initDomain()
+        // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
+        this.init()
         this.noteDB = new NoteDatabase(vsnoteDbPath);
         this.domain = vfs.readJsonSync(this.domainFile);
         this.refresh();
+        this.persistence()
     }
 
-    private initDomain() {
+    private init() {
         existsSync(this.vsnoteDbPath) || mkdirpSync(this.vsnoteDbPath);
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { "@Trash": { '.notes': [], '.labels': [] } })
     }
 
     public refresh(domainNode: string[] = []): void {
-        this.refreshDomain(domainNode);
-        this.persistence();
+        console.log('domain refresh')
+        for (const keys of Object.keys(this.getDomain(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
+            this.refreshDomainNotes(domainNode.concat(keys));
+            this.refresh(domainNode.concat(keys));
+        }
+        this.persistence()
     }
 
-    public refreshDomain(domainNode: string[] = []): void {
-        if (domainNode.length === 0) {
-            for (const keys of Object.keys(this.select(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
-                this.refreshDomain(domainNode.concat(keys));
-            }
-        } else {
-            const domainLabels = this.getDomainLabels(domainNode);
-            objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes cache
-            if (domainLabels.length >= 1) {
-                const exclude = domainNode[0] === '@Trash' ? '' : '@Trash';
-                const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
-                objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
-            }
+    public refreshDomainNotes(domainNode: string[] = []): void {
+        const domainLabels = this.getDomainLabels(domainNode);
+        objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes cache
+        if (domainLabels.length >= 1) {
+            const exclude = domainNode[0] === '@Trash' ? undefined : '@Trash';
+            const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
+            objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
         }
     }
 
     public updateLabels(domainNode: string[], labels: string[]) {
-        console.log(domainNode, labels)
-        objectPath.set(this.domain, domainNode.concat('.labels'), labels);
-        return this
+        const _labels = Array.from(new Set(labels))
+        objectPath.set(this.domain, domainNode.concat('.labels'), _labels);
+        this.persistence()
     }
 
-    public appendLabels(domainNode: string[], labels: string[]) {
-        const sourceLabels: string[] = objectPath.get(this.domain, domainNode.concat('.labels'));
-        this.updateLabels(domainNode, Array.from(new Set(sourceLabels.concat(labels))));
-    }
+    // public appendLabels(domainNode: string[], labels: string[]) {
+    //     const sourceLabels: string[] = objectPath.get(this.domain, domainNode.concat('.labels'));
+    //     this.updateLabels(domainNode, Array.from(new Set(sourceLabels.concat(labels))));
+    // }
 
     public persistence(): void {
         vfs.writeJsonSync(this.domainFile, this.domain);
     }
 
     public getDomainLabels(domainNode: string[]): string[] {
-        return this.select(domainNode)['.labels'];
+        return this.getDomain(domainNode)['.labels'];
     }
 
     public createDomain(dn: string[]) {
@@ -296,17 +298,16 @@ export class DomainDatabase {
                 objectPath.set(this.domain, dn.slice(0, i), { '.labels': [], '.notes': [] }, true);
             }
         }
-        return this
     }
 
-    public appendNewDomain(domainNode: string[], category: string = 'default'): string {
-        // const domainLabels = this.getDomainLabels(domainNode);
-        const nId = this.noteDB.create(domainNode, category);
-        this.appendNote(domainNode, nId);
-        this.appendLabels(domainNode, domainNode.concat([]));
-        this.persistence();
-        return nId;
-    }
+    // public appendNewDomain(domainNode: string[], category: string = 'default'): string {
+    //     // const domainLabels = this.getDomainLabels(domainNode);
+    //     const nId = this.noteDB.create(domainNode, category);
+    //     // this.appendNote(domainNode, nId);
+    //     this.appendLabels(domainNode, domainNode.concat([]));
+    //     this.persistence();
+    //     return nId;
+    // }
 
     public updateNotesOfDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
         this.selectAllNotes(orgDpath).forEach((nId) => this.updateNoteLabelsDomainByLabels(nId, orgDpath, newDpath, cascade));
@@ -342,10 +343,10 @@ export class DomainDatabase {
 
     // }
 
-    public appendNote(domainNode: string[], nId: string, persistence: boolean = true) {
-        objectPath.insert(this.domain, domainNode.concat('.notes'), nId);
-        persistence && this.persistence()
-    }
+    // public appendNote(domainNode: string[], nId: string, persistence: boolean = true) {
+    //     objectPath.insert(this.domain, domainNode.concat('.notes'), nId);
+    //     persistence && this.persistence()
+    // }
 
     // selectCategoryIndex(nId: string, dpath: string[], category: string): number | undefined {
     //     const nm = this.readNoteMeta(nId);
@@ -368,44 +369,36 @@ export class DomainDatabase {
         return notes;
     }
 
-    getShortcutsList(kind: 'last' | 'star'): string[] {
-        if (kind === 'last') {
-            return vfs.readJsonSync<Shortcuts>(this.shortcutsFile).last;
-        } else {
-            return [];
-        }
+    // getShortcutsList(kind: 'last' | 'star'): string[] {
+    //     if (kind === 'last') {
+    //         return vfs.readJsonSync<Shortcuts>(this.shortcutsFile).last;
+    //     } else {
+    //         return [];
+    //     }
+    // }
+
+    // appendLastDomainToShortcuts(domain: string): void {
+    //     const maxLast = 10;
+    //     let last = this.getShortcutsList('last');
+    //     const dns = this.getDomainNotes(Tools.splitDomaiNode(domain));
+    //     if (dns.length === 0) {
+    //         return;
+    //     }
+    //     last.push(domain);
+    //     last = Array.from(new Set(last));
+    //     while (last.length > maxLast) {
+    //         last.shift();
+    //     }
+    //     const s = vfs.readJsonSync<Shortcuts>(this.shortcutsFile);
+    //     s.last = last;
+    //     vfs.writeJsonSync(this.shortcutsFile, s);
+    // }
+
+    public getDomainNotes(domainNode: string[] = []): string[] {
+        return this.getDomain(domainNode)['.notes']
     }
 
-    appendLastDomainToShortcuts(domain: string): void {
-        const maxLast = 10;
-        let last = this.getShortcutsList('last');
-        const dns = this.selectNotes(Tools.splitDomaiNode(domain));
-        if (dns.length === 0) {
-            return;
-        }
-        last.push(domain);
-        last = Array.from(new Set(last));
-        while (last.length > maxLast) {
-            last.shift();
-        }
-        const s = vfs.readJsonSync<Shortcuts>(this.shortcutsFile);
-        s.last = last;
-        vfs.writeJsonSync(this.shortcutsFile, s);
-    }
-
-    public selectNotes(domainNode: string[] = []): string[] {
-        console.log('selectNotes', domainNode, JSON.stringify(this.domain))
-        const nIds = this.select(domainNode)['.notes']
-        return nIds
-        // if (domainNode[0] === '@Trash') {
-        //     return nIds
-        // } else {
-        //     // nIds.
-        // }
-
-    }
-
-    public select(domainNode: string[] = []): Domain {
+    public getDomain(domainNode: string[] = []): Domain {
         return objectPath.get(this.domain, domainNode);
     }
 
@@ -414,7 +407,7 @@ export class DomainDatabase {
     // }
 
     public selectAllNotes(domainNode: string[]): string[] {
-        const domain = this.select(domainNode);
+        const domain = this.getDomain(domainNode);
         const childDomainNames: string[] = Object.keys(domain).filter((name) => !['.notes', '.labels'].includes(name));
         const notes: string[] = domain['.notes'];
         if (childDomainNames.length === 0) {

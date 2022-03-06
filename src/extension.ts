@@ -57,11 +57,11 @@ export async function activate(context: ExtensionContext) {
     /**
      * shortcutes
      */
-    ext.registerCommand('vscode-note.shortcuts.last', ExtCmds.cmdHdShortcutsLast);
+    // ext.registerCommand('vscode-note.shortcuts.last', ExtCmds.cmdHdShortcutsLast);
 
     ext.registerCommand('editExplorer.openFileResource', async (resource: any) => {
         await commands.executeCommand('vscode.open', resource, ViewColumn.Two);
     });
 }
 
-export function deactivate() {}
+export function deactivate() { }

@@ -22,6 +22,7 @@ export class NotesPanelView {
         console.log(stylesPathMainPath.fsPath);
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const nonce = getNonce();
+        console.log("!!!!!!!!!!!!! output htlm")
         return `<!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -175,13 +176,13 @@ export class NotesPanelView {
     }
 
     private genViewData(): twv.WVDomain {
-        const sortNotes = ext.domainDB.selectNotes(this.dpathCache);
+        const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
         console.log("sort", sortNotes)
         // const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {
             const cname = ext.domainDB.noteDB.getMeta(nId).category;
-            const contents: string[] = ext.domainDB.noteDB.selectContents(nId);
+            const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
             const isDoc = ext.domainDB.noteDB.selectDocExist(nId);
             const isFiles = ext.domainDB.noteDB.selectFilesExist(nId);
 

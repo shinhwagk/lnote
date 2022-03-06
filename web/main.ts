@@ -5,6 +5,17 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
+namespace Tools {
+    const splitter = '@!$';
+    export function joinDomainNode(domain: string[]): string {
+        return domain.join(splitter);
+    }
+
+    export function splitDomaiNode(domain: string): string[] {
+        return domain.split(splitter);
+    }
+}
+
 interface DataDomain {
     dpath: string[];
     categories: DataCategory[];
@@ -376,7 +387,7 @@ class VNDomain {
         e_title.appendChild(elemSpaces());
         e_title.appendChild(
             elemIcon('fa-pen', (e) => {
-                nccm.show(e, e_title, DomainContextMenuActions, this.domain.dpath.join('/'));
+                nccm.show(e, e_title, DomainContextMenuActions, Tools.joinDomainNode(this.domain.dpath));
             })
         );
         e_title.appendChild(elemSpaces());
