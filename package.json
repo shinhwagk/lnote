@@ -93,6 +93,16 @@
                     "group": "2_domain"
                 },
                 {
+                    "command": "vscode-note.domain.labels",
+                    "when": "view == domainExplorer",
+                    "group": "2_domain"
+                },
+                {
+                    "command": "vscode-note.domain.remove",
+                    "when": "view == domainExplorer",
+                    "group": "2_domain"
+                },
+                {
                     "command": "vscode-note.domain.search",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
@@ -137,7 +147,7 @@
         "commands": [
             {
                 "command": "vscode-note.domain.create",
-                "title": "New Domain",
+                "title": "New",
                 "icon": {
                     "light": "images/light/add.svg",
                     "dark": "images/dark/add.svg"
@@ -145,19 +155,27 @@
             },
             {
                 "command": "vscode-note.domain.move",
-                "title": "Move Domain"
+                "title": "Move"
             },
             {
                 "command": "vscode-note.domain.rename",
-                "title": "Rename Domain"
+                "title": "Rename"
+            },
+            {
+                "command": "vscode-note.domain.labels",
+                "title": "Labels"
+            },
+            {
+                "command": "vscode-note.domain.remove",
+                "title": "Remove"
             },
             {
                 "command": "vscode-note.domain.search",
-                "title": "Search Domain"
+                "title": "Search"
             },
             {
                 "command": "vscode-note.domain.refresh",
-                "title": "Domain Refresh",
+                "title": "Refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"

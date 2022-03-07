@@ -1,7 +1,7 @@
 import { homedir, platform } from 'os';
 import * as path from 'path';
 
-import { copySync, existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
+// import { copySync, existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
 import {
     ExtensionContext,
     workspace,
@@ -11,7 +11,7 @@ import {
     TreeView,
     commands,
     StatusBarItem,
-    StatusBarAlignment,
+    // StatusBarAlignment,
 } from 'vscode';
 
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
@@ -53,9 +53,9 @@ function getMasterPath() {
     return p.startsWith('~/') ? joinFun(homedir(), p.substr(2)) : p;
 }
 
-function getShortcutsFilePath() {
-    return path.join(ext.masterPath, 'shortcuts.json');
-}
+// function getShortcutsFilePath() {
+//     return path.join(ext.masterPath, 'shortcuts.json');
+// }
 
 function listenConfigure(ctx: ExtensionContext) {
     ctx.subscriptions.push(

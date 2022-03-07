@@ -5,7 +5,7 @@ import { existsSync, readdirSync, mkdirSync, renameSync, removeSync, statSync, m
 
 import { metaFileName } from './constants';
 import { tools, vfs } from './helper';
-import { Tools } from './explorer/domainExplorer';
+// import { Tools } from './explorer/domainExplorer';
 
 export interface Domain {
     '.notes': string[]; // .notes as cache for .labels
@@ -270,6 +270,7 @@ export class DomainDatabase {
             const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
             objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
         }
+        this.persistence()
     }
 
     public updateLabels(domainNode: string[], labels: string[]) {
@@ -291,6 +292,11 @@ export class DomainDatabase {
         return this.getDomain(domainNode)['.labels'];
     }
 
+    public deleteDomain(domainNode: string[]): void {
+        objectPath.del(this.domain, domainNode)
+        this.persistence()
+    }
+
     public createDomain(dn: string[]) {
         for (let i = 1; i <= dn.length; i++) {
             const _dn = dn.slice(0, i)
@@ -298,6 +304,7 @@ export class DomainDatabase {
                 objectPath.set(this.domain, dn.slice(0, i), { '.labels': [], '.notes': [] }, true);
             }
         }
+        this.persistence()
     }
 
     // public appendNewDomain(domainNode: string[], category: string = 'default'): string {
@@ -309,29 +316,29 @@ export class DomainDatabase {
     //     return nId;
     // }
 
-    public updateNotesOfDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
-        this.selectAllNotes(orgDpath).forEach((nId) => this.updateNoteLabelsDomainByLabels(nId, orgDpath, newDpath, cascade));
-    }
+    // public updateNotesOfDomain(orgDpath: string[], newDpath: string[], cascade: boolean) {
+    //     this.selectAllNotes(orgDpath).forEach((nId) => this.updateNoteLabelsDomainByLabels(nId, orgDpath, newDpath, cascade));
+    // }
 
 
-    public updateNoteLabelsDomainByLabels(_nId: string, oldDomainNode: string[], newDomainNode: string[], _cascade: boolean) {
-        // todo remove labels
-        // add new domain labels to notes
-        // const noteMeta = this.readNoteMeta(nId);
-        // // for (let i = 0; i < noteMeta.tags.length; i++) {
-        // const metaPath = noteMeta.domain;
-        // if (cascade) {
-        //     if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length))) {
-        //         noteMeta.domain = newDpath.concat(metaPath.slice(orgDpath.length));
-        //     }
-        // } else {
-        //     if (tools.stringArrayEqual(orgDpath, metaPath)) {
-        //         noteMeta.domain = newDpath;
-        //     }
-        // }
-        // // }
-        // this.writeNoteMeta(nId, noteMeta);
-    }
+    // public updateNoteLabelsDomainByLabels(_nId: string, oldDomainNode: string[], newDomainNode: string[], _cascade: boolean) {
+    //     // todo remove labels
+    //     // add new domain labels to notes
+    //     // const noteMeta = this.readNoteMeta(nId);
+    //     // // for (let i = 0; i < noteMeta.tags.length; i++) {
+    //     // const metaPath = noteMeta.domain;
+    //     // if (cascade) {
+    //     //     if (tools.stringArrayEqual(orgDpath, metaPath.slice(0, orgDpath.length))) {
+    //     //         noteMeta.domain = newDpath.concat(metaPath.slice(orgDpath.length));
+    //     //     }
+    //     // } else {
+    //     //     if (tools.stringArrayEqual(orgDpath, metaPath)) {
+    //     //         noteMeta.domain = newDpath;
+    //     //     }
+    //     // }
+    //     // // }
+    //     // this.writeNoteMeta(nId, noteMeta);
+    // }
 
     // public moveNote(nId: string, oldDomainNode: string[], newDomainNode: string[]): void {
     //     const nm = this.noteDB.getMeta(nId);
