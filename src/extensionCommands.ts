@@ -155,33 +155,33 @@ export namespace ExtCmds {
             Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'README.md'))
         );
     }
-    export async function cmdHdlDomainMove(dn: DomainNode) {
-        // const orgDpath = Tools.splitDomaiNode(dn);
-        // const newDpathString: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
-        // if (!newDpathString || orgDpath.join('/') === newDpathString) return;
-        // const newDpath = Tools.splitDomaiNode(newDpathString);
-        // // resetDomain(orgDpath, newDpath);
-        // for (let i = 0; i <= orgDpath.length; i++) {
-        //     if (orgDpath[i] !== newDpath[i]) {
-        //         const dpath = newDpath.slice(0, i);
-        //         await ext.domainProvider.refresh(dpath.join('/'));
-        //         await ext.domainTreeView.reveal(newDpath.join('/'));
-        //         break;
-        //     }
-        // }
-        // ext.globalState.dpath = newDpath;
-    }
-    export async function cmdHdlDomainRename(dn: DomainNode) {
-        const _dn = Tools.splitDomaiNode(dn);
-        window.showWarningMessage('sonn.')
-        // const orgName = _dn[_dn.length - 1];
-        // const newName: string | undefined = await window.showInputBox({ value: orgName });
-        // if (!newName || orgName == newName) return;
-        // const newDpath = _dn.slice();
-        // newDpath[newDpath.length - 1] = newName;
-        // // resetDomain(orgDpath, newDpath);
-        // ext.domainProvider.refresh(_dn.slice(0, _dn.length - 1).join('/'));
-    }
+    // export async function cmdHdlDomainMove(dn: DomainNode) {
+    //     // const orgDpath = Tools.splitDomaiNode(dn);
+    //     // const newDpathString: string | undefined = await window.showInputBox({ value: orgDpath.join('/') });
+    //     // if (!newDpathString || orgDpath.join('/') === newDpathString) return;
+    //     // const newDpath = Tools.splitDomaiNode(newDpathString);
+    //     // // resetDomain(orgDpath, newDpath);
+    //     // for (let i = 0; i <= orgDpath.length; i++) {
+    //     //     if (orgDpath[i] !== newDpath[i]) {
+    //     //         const dpath = newDpath.slice(0, i);
+    //     //         await ext.domainProvider.refresh(dpath.join('/'));
+    //     //         await ext.domainTreeView.reveal(newDpath.join('/'));
+    //     //         break;
+    //     //     }
+    //     // }
+    //     // ext.globalState.dpath = newDpath;
+    // }
+    // export async function cmdHdlDomainRename(dn: DomainNode) {
+    //     const _dn = Tools.splitDomaiNode(dn);
+    //     window.showWarningMessage('sonn.')
+    //     // const orgName = _dn[_dn.length - 1];
+    //     // const newName: string | undefined = await window.showInputBox({ value: orgName });
+    //     // if (!newName || orgName == newName) return;
+    //     // const newDpath = _dn.slice();
+    //     // newDpath[newDpath.length - 1] = newName;
+    //     // // resetDomain(orgDpath, newDpath);
+    //     // ext.domainProvider.refresh(_dn.slice(0, _dn.length - 1).join('/'));
+    // }
     export async function cmdHdlDomainRemove(dn: DomainNode) {
         const _dn = Tools.splitDomaiNode(dn)
         const notes = ext.domainDB.selectAllNotes(_dn)

@@ -13,7 +13,7 @@
 		"shinhwagk.vscode-note"
 	],
     "mounts": [
-        // "source=F:\\OneDrive\\vscode-note-data,target=/opt/vscode-note,type=bind"
+        "source=F:\\OneDrive\\vscode-note-data,target=/opt/vscode-note,type=bind"
     ],
     "remoteUser": "node"
 }
