@@ -90,7 +90,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.globalState.domainNode = dn;
-        ext.domainDB.refreshDomainNotes(Tools.splitDomaiNode(dn))
+        ext.domainDB.refreshDomainNode(Tools.splitDomaiNode(dn))
         ext.notesPanelView.parseDomain(Tools.splitDomaiNode(dn)).showNotesPlanView();
         // ext.domainDB.appendLastDomainToShortcuts(dn);
         await ext.setContext(ctxFilesExplorer, false);
@@ -130,7 +130,7 @@ export namespace ExtCmds {
         const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
         const nId: string = ext.domainDB.noteDB.create(domainNode, category);
         // ext.domainDB.noteDB.cache(nId)
-        ext.domainDB.refreshDomainNotes(domainNode)
+        ext.domainDB.refreshDomainNode(domainNode)
         ext.domainProvider.refresh(ext.globalState.domainNode);
         ext.notesPanelView.parseDomain(domainNode).showNotesPlanView();
         if (editFirst) {
@@ -184,7 +184,7 @@ export namespace ExtCmds {
     // }
     export async function cmdHdlDomainRemove(dn: DomainNode) {
         const _dn = Tools.splitDomaiNode(dn)
-        const notes = ext.domainDB.selectAllNotes(_dn)
+        const notes = ext.domainDB.getAllNotesUnderDomain(_dn)
         if (notes.length >= 1) {
             window.showWarningMessage('domain is not deleted.')
             return
@@ -307,8 +307,8 @@ export namespace ExtCmds {
         ext.domainDB.noteDB.cache(nId)
         ext.domainDB.createDomain(['@Trash'].concat(dn))
         ext.domainDB.updateLabels(['@Trash'].concat(dn), ['@Trash'].concat(labels))
-        ext.domainDB.refreshDomainNotes(dn)
-        ext.domainDB.refreshDomainNotes(['@Trash'].concat(dn))
+        ext.domainDB.refreshDomainNode(dn)
+        ext.domainDB.refreshDomainNode(['@Trash'].concat(dn))
         // window.showInformationMessage('refreshDomain success.');
         ext.domainProvider.refresh();
 

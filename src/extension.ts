@@ -1,5 +1,6 @@
-import { ext, initializeExtensionVariables } from './extensionVariables';
 import { ExtensionContext, ViewColumn, commands } from 'vscode';
+
+import { ext, initializeExtensionVariables } from './extensionVariables';
 import { ExtCmds } from './extensionCommands';
 
 export async function activate(context: ExtensionContext) {

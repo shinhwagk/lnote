@@ -33,10 +33,11 @@ export namespace ext {
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
     export let domainDB: DomainDatabase;
+    export let trashDB: DomainDatabase;
     export let vnDB: VNDatabase;
     // export let clientActions: (action: string) => void;
     // export let sendGA: (ec: string, ea: string) => void;
-    export let outputChannel: OutputChannel;
+    // export let outputChannel: OutputChannel;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -57,12 +58,13 @@ function getMasterPath() {
 //     return path.join(ext.masterPath, 'shortcuts.json');
 // }
 
-function listenConfigure(ctx: ExtensionContext) {
+function listenConfiguration(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
             if (e.affectsConfiguration(section)) {
                 ext.masterPath = getMasterPath();
                 ext.domainDB = new DomainDatabase(ext.masterPath);
+                ext.domainDB.refresh()
                 ext.domainProvider.refresh();
             }
         })
@@ -70,7 +72,7 @@ function listenConfigure(ctx: ExtensionContext) {
 }
 
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
-    listenConfigure(ctx);
+    listenConfiguration(ctx);
     ext.context = ctx;
 
     // delete soon
@@ -82,9 +84,10 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // addUsageNotes(ext.notesPath);
     // ext.clientActions = initClient(ext.context.extensionPath);
 
-    ext.outputChannel = window.createOutputChannel('vscode-note');
+    // ext.outputChannel = window.createOutputChannel('vscode-note');
     // DomainDatabase.initDirectory();
     ext.domainDB = new DomainDatabase(ext.masterPath);
+    // ext.trashDB = new DomainDatabase(ext.)
 
     ext.globalState = new GlobalState();
 
@@ -95,9 +98,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (!ext.domainProvider || !ext.domainTreeView) {
         ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-        // ext.domainTreeView.onDidChangeVisibility(e =>
-        //     e.visible ? ext.clientActions('domain-tree.open') : ext.clientActions('domain-tree.close')
-        // );
     }
 
     if (!ext.filesProvider) {

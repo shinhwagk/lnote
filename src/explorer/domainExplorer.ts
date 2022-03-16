@@ -31,7 +31,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
     const childDomainNumber = Object.keys(domain).filter((name) => !metaFields.includes(name)).length;
     item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
 
-    const notesTotalNumberUnderDomain = ext.domainDB.selectAllNotes(domainNode).length;
+    const notesTotalNumberUnderDomain = ext.domainDB.getAllNotesUnderDomain(domainNode).length;
     const notesNumberUnderDomain = domain['.notes'].length;
     const domainLabels = domain['.labels'].join(',')
 

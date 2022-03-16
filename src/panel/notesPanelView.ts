@@ -183,8 +183,8 @@ export class NotesPanelView {
         for (const nId of sortNotes) {
             const cname = ext.domainDB.noteDB.getMeta(nId).category;
             const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
-            const isDoc = ext.domainDB.noteDB.selectDocExist(nId);
-            const isFiles = ext.domainDB.noteDB.selectFilesExist(nId);
+            const isDoc = ext.domainDB.noteDB.checkDocExist(nId);
+            const isFiles = ext.domainDB.noteDB.checkFilesExist(nId);
 
             if (categories.filter((c) => c.name === cname).length >= 1) {
                 categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });

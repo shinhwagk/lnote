@@ -40,11 +40,11 @@ export class NoteDatabase {
     private notesCacheFileName = 'notes.cache.json'; // the file can deleted;
     private readonly notesCacheFile: string;
 
-    constructor(vsnoteDbPath: string) {
+    constructor(masterPath: string) {
         // this.vsnoteDbPath = vsnoteDbPath
-        this.notesPath = path.join(vsnoteDbPath, 'notes');
+        this.notesPath = path.join(masterPath, 'notes');
         this.initDirectories()
-        this.notesCacheFile = path.join(vsnoteDbPath, this.notesCacheFileName);
+        this.notesCacheFile = path.join(masterPath, this.notesCacheFileName);
         this.refresh(false);
     }
 
@@ -222,49 +222,48 @@ export class NoteDatabase {
 
     public getDocIndexFile = (nId: string, indexName: string) => path.join(this.getDocPath(nId), indexName);
 
-    public selectDocExist(nId: string): boolean {
-        return existsSync(this.getDocIndexFile(nId, 'README.md')) || existsSync(this.getDocIndexFile(nId, 'README.html'));
+    public checkDocExist(nId: string): boolean {
+        return existsSync(this.getDocIndexFile(nId, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
     }
 
-    public selectFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
+    public checkFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
 }
 
 export class DomainDatabase {
-    private readonly vsnoteDbPath: string;
+    private readonly masterPath: string;
     // private readonly shortcutsFile: string;
     public domain: Domain;
     private readonly domainFileName = 'domain.json';
     private readonly domainFile;
     public readonly noteDB: NoteDatabase;
 
-    constructor(vsnoteDbPath: string) {
-        this.vsnoteDbPath = vsnoteDbPath;
-        this.domainFile = path.join(this.vsnoteDbPath, this.domainFileName);
+    constructor(masterPath: string) {
+        this.masterPath = masterPath;
+        this.domainFile = path.join(this.masterPath, this.domainFileName);
         // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
         this.init()
-        this.noteDB = new NoteDatabase(vsnoteDbPath);
+        this.noteDB = new NoteDatabase(masterPath);
         this.domain = vfs.readJsonSync(this.domainFile);
         this.refresh();
-        this.persistence()
     }
 
     private init() {
-        existsSync(this.vsnoteDbPath) || mkdirpSync(this.vsnoteDbPath);
-        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { "@Trash": { '.notes': [], '.labels': [] } })
+        existsSync(this.masterPath) || mkdirpSync(this.masterPath);
+        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { "root": { '.notes': [], '.labels': [] } })
     }
 
     public refresh(domainNode: string[] = []): void {
         console.log('domain refresh')
         for (const keys of Object.keys(this.getDomain(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
-            this.refreshDomainNotes(domainNode.concat(keys));
+            this.refreshDomainNode(domainNode.concat(keys));
             this.refresh(domainNode.concat(keys));
         }
         this.persistence()
     }
 
-    public refreshDomainNotes(domainNode: string[] = []): void {
+    public refreshDomainNode(domainNode: string[] = []): void {
         const domainLabels = this.getDomainLabels(domainNode);
-        objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes cache
+        objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes field
         if (domainLabels.length >= 1) {
             const exclude = domainNode[0] === '@Trash' ? undefined : '@Trash';
             const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
@@ -413,17 +412,17 @@ export class DomainDatabase {
     //     return objectPath.get(this.domainCache, domainNode);
     // }
 
-    public selectAllNotes(domainNode: string[]): string[] {
+    public getAllNotesUnderDomain(domainNode: string[]): string[] {
         const domain = this.getDomain(domainNode);
         const childDomainNames: string[] = Object.keys(domain).filter((name) => !['.notes', '.labels'].includes(name));
-        const notes: string[] = domain['.notes'];
+        const notes: string[] = this.getDomainNotes(domainNode);
         if (childDomainNames.length === 0) {
             return notes;
         }
 
         const totalNotes: string[] = [];
         for (const name of childDomainNames) {
-            const childDomainNotes: string[] = this.selectAllNotes(domainNode.concat(name));
+            const childDomainNotes: string[] = this.getAllNotesUnderDomain(domainNode.concat(name));
             totalNotes.push(...childDomainNotes);
         }
         return totalNotes.concat(notes);
