@@ -100,12 +100,12 @@
                 {
                     "command": "vscode-note.domain.remove",
                     "when": "view == domainExplorer",
-                    "group": "2_domain"
+                    "group": "3_domain"
                 },
                 {
                     "command": "vscode-note.domain.search",
                     "when": "view == domainExplorer",
-                    "group": "3_domain"
+                    "group": "4_domain"
                 },
                 {
                     "command": "vscode-note.domain.move",
@@ -116,14 +116,6 @@
                     "command": "vscode-note.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
                     "group": "1_domain"
-                },
-                {
-                    "command": "vscode-note.files.file.url.raw",
-                    "when": "view == filesExplorer && viewItem == file"
-                },
-                {
-                    "command": "vscode-note.files.file.url",
-                    "when": "view == filesExplorer && viewItem == file"
                 }
             ]
         },
@@ -216,14 +208,6 @@
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"
                 }
-            },
-            {
-                "command": "vscode-note.files.file.url.raw",
-                "title": "github raw url"
-            },
-            {
-                "command": "vscode-note.files.file.url",
-                "title": "github url"
             }
         ]
     },
