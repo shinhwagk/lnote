@@ -19,10 +19,8 @@ export class NotesPanelView {
     // const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
     private getWebviewContent() {
         const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
-        console.log(stylesPathMainPath.fsPath);
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const nonce = getNonce();
-        console.log("!!!!!!!!!!!!! output htlm")
         return `<!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -110,7 +108,6 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
                         break;
                     case 'doc':
-                        console.log('doc', msg.data)
                         ExtCmds.cmdHdlNoteDocShow(msg.data);
                         break;
                     case 'note-files-open':
@@ -142,11 +139,9 @@ export class NotesPanelView {
                         // ExtCmds.cmdHdlCategoryMoveToOtherDomain(msg.data.category);
                         break;
                     case 'col-to-terminal':
-                        console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
                     case 'col-to-terminal-args':
-                        console.log('col-to-terminal', msg.data);
                         ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
                         break;
                     case 'domain-edit-labels':
@@ -177,7 +172,6 @@ export class NotesPanelView {
 
     private genViewData(): twv.WVDomain {
         const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
-        console.log("sort", sortNotes)
         // const sortNotes = ext.domainDB.sortNotes(notes);
         const categories: twv.WVCategory[] = [];
         for (const nId of sortNotes) {

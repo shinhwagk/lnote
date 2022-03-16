@@ -6,7 +6,6 @@ import {
     ExtensionContext,
     workspace,
     window,
-    OutputChannel,
     ConfigurationChangeEvent,
     TreeView,
     commands,

@@ -16,6 +16,8 @@ export interface Domain {
 export interface NoteMeta {
     category: string;
     labels: string[];
+    create?: Date,
+    modify?: Date
 }
 
 // export interface Shortcuts {
@@ -101,13 +103,18 @@ export class NoteDatabase {
         return this
     }
 
-    public remove(nId: string) {
+    public removeFromCache(nId: string) {
         for (const label of this.getMeta(nId).labels) {
             const nIds = new Set(this.notesCache.get(label) || []);
             nIds.delete(nId)
             this.notesCache.set(label, Array.from(nIds))
         }
         this.persistence()
+    }
+
+    public remove(nId: string) {
+        const nd = this.getDirectory(nId)
+        removeSync(nd)
     }
 
     public cache(nId: string): void {
@@ -127,7 +134,9 @@ export class NoteDatabase {
 
     public getDirectory = (id: string) => path.join(this.notesPath, id);
 
-    public getContentFile = (nId: string, cNumber: string) => path.join(this.getDirectory(nId), `${cNumber}.txt`);
+    public getContentFile = (nId: string, cNumber: string = '1') => path.join(this.getDirectory(nId), `${cNumber}.txt`);
+
+    public getShortDocumentContent = (nId: string, cNumber: string = '1') => vfs.readFileSync(this.getContentFile(nId, cNumber))
 
     public updateMeta = (nId: string, meta: NoteMeta) => vfs.writeJsonSync(this.getMetaFile(nId), meta);
 
@@ -241,35 +250,38 @@ export class DomainDatabase {
         this.masterPath = masterPath;
         this.domainFile = path.join(this.masterPath, this.domainFileName);
         // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
-        this.init()
+        this.initDirectories()
         this.noteDB = new NoteDatabase(masterPath);
         this.domain = vfs.readJsonSync(this.domainFile);
+        const s = (new Date()).getTime()
         this.refresh();
+        this.persistence();
+        console.log('refresh domain success. time: ' + `${(new Date()).getTime() - s}`)
     }
 
-    private init() {
+    private initDirectories() {
         existsSync(this.masterPath) || mkdirpSync(this.masterPath);
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { "root": { '.notes': [], '.labels': [] } })
     }
 
-    public refresh(domainNode: string[] = []): void {
-        console.log('domain refresh')
+    public refresh(domainNode: string[] = [], p: boolean = false): void {
         for (const keys of Object.keys(this.getDomain(domainNode)).filter((n) => !['.labels', '.notes'].includes(n))) {
-            this.refreshDomainNode(domainNode.concat(keys));
-            this.refresh(domainNode.concat(keys));
+            this.refreshDomainNode(domainNode.concat(keys), p);
+            this.refresh(domainNode.concat(keys), p);
         }
-        this.persistence()
+        if (p) this.persistence();
     }
 
-    public refreshDomainNode(domainNode: string[] = []): void {
+    public refreshDomainNode(domainNode: string[] = [], p: boolean): void {
         const domainLabels = this.getDomainLabels(domainNode);
         objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes field
         if (domainLabels.length >= 1) {
-            const exclude = domainNode[0] === '@Trash' ? undefined : '@Trash';
+            // const exclude = domainNode[0] === '@Trash' ? undefined : '@Trash';
+            const exclude = ''; // nothing,  todo
             const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
             objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
         }
-        this.persistence()
+        if (p) this.persistence();
     }
 
     public updateLabels(domainNode: string[], labels: string[]) {
