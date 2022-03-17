@@ -78,7 +78,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     ],
 ];
 
-const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
+const CategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'add note',
@@ -89,6 +89,12 @@ const NoteCategoryEditContextMenuActions: ContextMenuAction[][] = [
         {
             title: 'rename',
             onClick: (data) => vscode.postMessage({ command: 'category-rename', data: { category: data.category } }),
+        },
+    ],
+    [
+        {
+            title: 'remove',
+            onClick: (data) => vscode.postMessage({ command: 'category-remove', data: { category: data.category } }),
         },
     ],
     [
@@ -304,7 +310,7 @@ class VNCategory {
         d_category_name.appendChild(elemSpaces());
         d_category_name.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, d_category_name, NoteCategoryEditContextMenuActions, { category: this.name });
+                nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { category: this.name });
             })
         );
 
@@ -383,7 +389,7 @@ class VNDomain {
         // const e_search = elemNotesSearch();
         e_title.appendChild(e_domain_name);
         e_title.appendChild(elemSpaces());
-        e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add-category' })));
+        e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
         e_title.appendChild(elemSpaces());
         e_title.appendChild(
             elemIcon('fa-pen', (e) => {

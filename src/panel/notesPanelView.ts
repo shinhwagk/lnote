@@ -128,11 +128,14 @@ export class NotesPanelView {
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
                         break;
-                    case 'add-category':
+                    case 'category-add':
                         ExtCmds.cmdHdlCategoryAdd(false);
                         break;
                     case 'category-rename':
                         ExtCmds.cmdHdlCategoryRename(msg.data.category);
+                        break;
+                    case 'category-remove':
+                        ExtCmds.cmdHdlCategoryRemove(msg.data.category);
                         break;
                     case 'category-to-domain':
                         vscode.window.showInformationMessage('soon');

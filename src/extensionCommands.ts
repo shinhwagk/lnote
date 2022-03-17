@@ -121,6 +121,25 @@ export namespace ExtCmds {
         }
         await cmdHdlNoteCreate(cname);
     }
+    export async function cmdHdlCategoryRemove(category: string) {
+        const confirm = await window.showInputBox({ title: 'Are you absolutely sure?', placeHolder: `Please type ${category} to confirm.` })
+        if (confirm !== category) {
+            window.showInformationMessage(`Input is not '${category}'.`)
+            return
+        } else {
+            if ((await window.showInformationMessage(`Remove ${category}?`, 'Yes', 'No')) !== 'Yes') return;
+        }
+        const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
+        const nIds = ext.domainDB.getDomainNotes(domainNode)
+        nIds.filter(nId => ext.domainDB.noteDB.getMeta(nId).category === category)
+            .forEach(nId => {
+                ext.domainDB.noteDB.removeFromCache(nId);
+                ext.domainDB.noteDB.remove(nId);
+            })
+        ext.domainDB.refreshDomainNode(domainNode, true);
+        ext.domainProvider.refresh();
+        ext.notesPanelView.parseDomain().showNotesPlanView();
+    }
     export async function cmdHdlNoteCreate(category: string, editFirst: boolean = true) {
         const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
         const nId: string = ext.domainDB.noteDB.create(domainNode, category);
