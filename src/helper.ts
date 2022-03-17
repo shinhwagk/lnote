@@ -1,20 +1,20 @@
-import * as path from 'path';
+// import * as path from 'path';
 import { randomBytes } from 'crypto';
 
 import * as fse from 'fs-extra';
 
 export namespace vfs {
     const encoding = 'utf-8';
-    export function readFileSync(path: string): string {
-        return fse.readFileSync(path, { encoding });
+    export function readFileSync(file: string): string {
+        return fse.readFileSync(file, { encoding });
     }
 
-    export function writeFileSync(path: string, data: string = '') {
-        return fse.writeFileSync(path, data, { encoding });
+    export function writeFileSync(file: string, data: string = '') {
+        return fse.writeFileSync(file, data, { encoding });
     }
 
-    export function writeJsonSync(file: string, object: any) {
-        fse.writeJsonSync(file, object, { encoding });
+    export function writeJsonSync(file: string, obj: any) {
+        fse.writeJsonSync(file, obj, { encoding });
     }
 
     export function readJsonSync<T>(file: string): T {
@@ -23,13 +23,13 @@ export namespace vfs {
     export function removeSync(file: string) {
         fse.removeSync(file);
     }
-    export function ensureFileSync(file: string) {
-        if (fse.existsSync(file)) return;
-        if (fse.existsSync(path.dirname(file))) {
-            vfs.writeFileSync(file, '');
-        } else {
-        }
-    }
+    // export function ensureFileSync(file: string) {
+    //     if (fse.existsSync(file)) return;
+    //     if (fse.existsSync(path.dirname(file))) {
+    //         vfs.writeFileSync(file, '');
+    //     } else {
+    //     }
+    // }
 }
 
 export namespace tools {
@@ -41,5 +41,5 @@ export namespace tools {
         return randomBytes(len).toString('hex');
     }
 
-    export const intersections = (array1: string[], array2: string[]) => array1.filter(e => array2.indexOf(e) !== -1);
+    export const intersections = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 }

@@ -1,7 +1,3 @@
-import { homedir, platform } from 'os';
-import * as path from 'path';
-
-// import { copySync, existsSync, mkdirpSync, mkdirsSync, writeJsonSync } from 'fs-extra';
 import {
     ExtensionContext,
     workspace,
@@ -16,8 +12,7 @@ import {
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
-import { DomainDatabase, VNDatabase } from './database';
-
+import { DomainDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
 
 // import { initClient, sendGA } from './client';
@@ -32,25 +27,11 @@ export namespace ext {
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
     export let domainDB: DomainDatabase;
-    export let trashDB: DomainDatabase;
-    export let vnDB: VNDatabase;
-    // export let clientActions: (action: string) => void;
-    // export let sendGA: (ec: string, ea: string) => void;
-    // export let outputChannel: OutputChannel;
+    export let isInit = false;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
     export let domainShortcutStatusBarItem: StatusBarItem;
-}
-
-export function getConfigure<T>(name: string, defaultValue: T): T {
-    return workspace.getConfiguration(section).get(name) || defaultValue;
-}
-
-function getMasterPath() {
-    const joinFun = platform() === 'win32' ? path.win32.join : path.join;
-    const p = getConfigure('dbpath', path.join(homedir(), 'vscode-note'));
-    return p.startsWith('~/') ? joinFun(homedir(), p.substr(2)) : p;
 }
 
 // function getShortcutsFilePath() {
@@ -61,49 +42,67 @@ function listenConfiguration(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
             if (e.affectsConfiguration(section)) {
-                ext.masterPath = getMasterPath();
+                const notespath = workspace.getConfiguration(section).get<string>('notespath');
+                if (notespath === undefined || notespath === '') {
+                    window.showInformationMessage('configuretion "notespath" wrong.');
+                    return;
+                }
+                console.log('333333333333');
+                ext.masterPath = notespath;
                 ext.domainDB = new DomainDatabase(ext.masterPath);
-                ext.domainDB.refresh()
+                initializecomponents();
+                ext.domainDB.refresh();
                 ext.domainProvider.refresh();
             }
         })
     );
 }
 
+function initializecomponents() {
+    if (!ext.isInit) {
+        if (!ext.notesPanelView) {
+            ext.notesPanelView = new NotesPanelView();
+        }
+
+        if (!ext.domainProvider || !ext.domainTreeView) {
+            ext.domainProvider = new DomainExplorerProvider(ext.domainDB);
+            ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
+        }
+
+        if (!ext.filesProvider) {
+            ext.filesProvider = new FilesExplorerProvider();
+            window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
+        }
+        ext.isInit = true;
+    }
+}
+
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
-    listenConfiguration(ctx);
     ext.context = ctx;
+    listenConfiguration(ctx);
+    const notespath = workspace.getConfiguration(section).get<string>('notespath');
 
-    // delete soon
-    ext.masterPath = getMasterPath();
-    // ext.notesPath = getNotesPath();
-    // ext.shortcutsFilePath = getShortcutsFilePath();
-
-    //initializeShortcutsFile(ext.shortcutsFilePath);
-    // addUsageNotes(ext.notesPath);
-    // ext.clientActions = initClient(ext.context.extensionPath);
-
-    // ext.outputChannel = window.createOutputChannel('vscode-note');
-    // DomainDatabase.initDirectory();
+    if (notespath === undefined || notespath === '') {
+        return;
+    }
+    ext.masterPath = notespath;
     ext.domainDB = new DomainDatabase(ext.masterPath);
-    // ext.trashDB = new DomainDatabase(ext.)
-
     ext.globalState = new GlobalState();
+    initializecomponents();
 
-    if (!ext.notesPanelView) {
-        ext.notesPanelView = new NotesPanelView();
-    }
+    // if (!ext.notesPanelView) {
+    //     ext.notesPanelView = new NotesPanelView();
+    // }
 
-    if (!ext.domainProvider || !ext.domainTreeView) {
-        ext.domainProvider = new DomainExplorerProvider();
-        ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-    }
+    // if (!ext.domainProvider || !ext.domainTreeView) {
+    //     ext.domainProvider = new DomainExplorerProvider(ext.domainDB);
+    //     ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
+    // }
 
-    if (!ext.filesProvider) {
-        ext.filesProvider = new FilesExplorerProvider();
-        window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
-    }
-
+    // if (!ext.filesProvider) {
+    //     ext.filesProvider = new FilesExplorerProvider();
+    //     window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
+    // }
     // if (!ext.domainShortcutStatusBarItem) {
     //     ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
     //     ext.domainShortcutStatusBarItem.text = '$(list-unordered) Domains(Last)';
@@ -113,12 +112,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     // }
 }
 
-
 export class GlobalState {
     nId: string = '';
-    // files: boolean = false;
-    // doc: boolean = false;
-    // category: string = '';
     domainNode: DomainNode = '';
-    // dpath: string[] = [];
 }

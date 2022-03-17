@@ -1,15 +1,25 @@
 import { basename } from 'path';
 
-import { commands, Uri, window } from 'vscode';
+import { commands, Uri, window, workspace } from 'vscode';
 
 import { ext } from './extensionVariables';
 import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode, Tools } from './explorer/domainExplorer';
-import { ctxFilesExplorer } from './constants';
+import { ctxFilesExplorer, section } from './constants';
 import { DomainDatabase } from './database';
 import { tools } from './helper';
+import { existsSync, statSync } from 'fs-extra';
 
 export namespace ExtCmds {
+    export async function cmdHdlChooseLocation() {
+        // { title: 'choose vscode-notes data location.' }
+        const dl = await window.showInputBox();
+        if (dl === undefined || dl === '') return;
+        if (!existsSync(dl) || !statSync(dl).isDirectory()) {
+            window.showInformationMessage('Make sure the directory already exists.');
+        }
+        workspace.getConfiguration(section).update('notespath', dl, 1);
+    }
     export async function cmdHdlNoteEditColAdd(nId: string) {
         const cn = ext.domainDB.noteDB.addCol(nId);
         await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
@@ -36,9 +46,9 @@ export namespace ExtCmds {
         // ext.domainDB.createDomain(Tools.splitDomaiNode(dn))
         // ext.domainDB.createNotes(Tools.splitDomaiNode(dn));
         // ext.domainProvider.refresh(dn);
-        const domainNode = Tools.splitDomaiNode(dn)
-        const lables = domainNode
-        ext.domainDB.updateLabels(domainNode, lables)
+        const domainNode = Tools.splitDomaiNode(dn);
+        const lables = domainNode;
+        ext.domainDB.updateLabels(domainNode, lables);
         await cmdHdlCategoryAdd(true);
         // await cmdHdlDomainPin(dn);
         ext.domainProvider.refresh(dn);
@@ -80,13 +90,13 @@ export namespace ExtCmds {
         const _dn: string[] = dn ? Tools.splitDomaiNode(dn) : [];
         const name: string | undefined = await window.showInputBox();
         if (!name) return;
-        ext.domainDB.createDomain(_dn.concat(name))
+        ext.domainDB.createDomain(_dn.concat(name));
         ext.domainProvider.refresh(dn);
         !dn || ext.domainTreeView.reveal(dn, { expand: true });
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.globalState.domainNode = dn;
-        ext.domainDB.refreshDomainNode(Tools.splitDomaiNode(dn), true)
+        ext.domainDB.refreshDomainNodes(Tools.splitDomaiNode(dn), true);
         ext.notesPanelView.parseDomain(Tools.splitDomaiNode(dn)).showNotesPlanView();
         // ext.domainDB.appendLastDomainToShortcuts(dn);
         await ext.setContext(ctxFilesExplorer, false);
@@ -122,21 +132,23 @@ export namespace ExtCmds {
         await cmdHdlNoteCreate(cname);
     }
     export async function cmdHdlCategoryRemove(category: string) {
-        const confirm = await window.showInputBox({ title: 'Are you absolutely sure?', placeHolder: `Please type ${category} to confirm.` })
+        const confirm = await window.showInputBox({
+            title: 'Are you absolutely sure?',
+            placeHolder: `Please type ${category} to confirm.`,
+        });
         if (confirm !== category) {
-            window.showInformationMessage(`Input is not '${category}'.`)
-            return
+            window.showInformationMessage(`Input is not '${category}'.`);
+            return;
         } else {
             if ((await window.showInformationMessage(`Remove category '${category}'?`, 'Yes', 'No')) !== 'Yes') return;
         }
         const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
-        const nIds = ext.domainDB.getDomainNotes(domainNode)
-        nIds.filter(nId => ext.domainDB.noteDB.getMeta(nId).category === category)
-            .forEach(nId => {
-                ext.domainDB.noteDB.removeFromCache(nId);
-                ext.domainDB.noteDB.remove(nId);
-            })
-        ext.domainDB.refreshDomainNode(domainNode, true);
+        const nIds = ext.domainDB.getDomainNotes(domainNode);
+        nIds.filter((nId) => ext.domainDB.noteDB.getMeta(nId).category === category).forEach((nId) => {
+            ext.domainDB.noteDB.removeFromCache(nId);
+            ext.domainDB.noteDB.remove(nId);
+        });
+        ext.domainDB.refreshDomainNodes(domainNode, true);
         ext.domainProvider.refresh();
         ext.notesPanelView.parseDomain().showNotesPlanView();
     }
@@ -144,7 +156,7 @@ export namespace ExtCmds {
         const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
         const nId: string = ext.domainDB.noteDB.create(domainNode, category);
         // ext.domainDB.noteDB.cache(nId)
-        ext.domainDB.refreshDomainNode(domainNode, true)
+        ext.domainDB.refreshDomainNodes(domainNode, true);
         ext.domainProvider.refresh(ext.globalState.domainNode);
         ext.notesPanelView.parseDomain(domainNode).showNotesPlanView();
         if (editFirst) {
@@ -155,7 +167,7 @@ export namespace ExtCmds {
         }
     }
     export async function cmdHdlNoteEditFilesCreate(nId: string) {
-        ext.domainDB.noteDB.createNoteFiles(nId);
+        ext.domainDB.noteDB.createFiles(nId);
         ext.notesPanelView.parseDomain().showNotesPlanView();
         await cmdHdlNoteFilesOpen(nId);
     }
@@ -197,23 +209,23 @@ export namespace ExtCmds {
     //     // ext.domainProvider.refresh(_dn.slice(0, _dn.length - 1).join('/'));
     // }
     export async function cmdHdlDomainRemove(dn: DomainNode) {
-        const _dn = Tools.splitDomaiNode(dn)
-        const notes = ext.domainDB.getAllNotesUnderDomain(_dn)
+        const _dn = Tools.splitDomaiNode(dn);
+        const notes = ext.domainDB.getAllNotesUnderDomain(_dn);
         if (notes.length >= 1) {
-            window.showWarningMessage('The domain is not deleted, Please clear the notes under it.')
-            return
+            window.showWarningMessage('The domain is not deleted, Please clear the notes under it.');
+            return;
         }
-        ext.domainDB.deleteDomain(_dn)
-        ext.domainProvider.refresh()
+        ext.domainDB.deleteDomain(_dn);
+        ext.domainProvider.refresh();
     }
     export async function cmdHdlDomainLabels(dn: DomainNode) {
-        const _dn = Tools.splitDomaiNode(dn)
-        const notes = ext.domainDB.getDomainNotes(_dn)
+        const _dn = Tools.splitDomaiNode(dn);
+        const notes = ext.domainDB.getDomainNotes(_dn);
         if (notes.length >= 1) {
-            window.showWarningMessage('the domain have notes.')
-            return
+            window.showWarningMessage('the domain have notes.');
+            return;
         }
-        cmdHdlDomainEditLabels(dn)
+        cmdHdlDomainEditLabels(dn);
         // const oldLabels = ext.domainDB.getDomainLabels(_dn)
         // const newLabels = await window.showInputBox({ value: oldLabels.join(',') });
         // if (newLabels === undefined) return;
@@ -316,23 +328,25 @@ export namespace ExtCmds {
     export async function cmdHdlNoteRemove(nId: string) {
         const dn = Tools.splitDomaiNode(ext.globalState.domainNode);
         if (ext.domainDB.noteDB.getContentFiles(nId).length >= 2) {
-            window.showInformationMessage(`The number of short documents with note id '${nId}' must be less than 2, please edit note to delete cols.`)
-            return
+            window.showInformationMessage(
+                `The number of short documents with note id '${nId}' must be less than 2, please edit note to delete cols.`
+            );
+            return;
         } else {
             if (ext.domainDB.noteDB.getShortDocumentContent(nId, '1').trim().length >= 1) {
-                window.showInformationMessage(`The content of the short document with note id '${nId}' must be empty.`)
-                return
+                window.showInformationMessage(`The content of the short document with note id '${nId}' must be empty.`);
+                return;
             }
             if (ext.domainDB.noteDB.checkDocExist(nId) || ext.domainDB.noteDB.checkFilesExist(nId)) {
-                window.showInformationMessage(`The doc or files of the short document with note id '${nId}' must be not exist.`)
-                return
+                window.showInformationMessage(`The doc or files of the short document with note id '${nId}' must be not exist.`);
+                return;
             }
         }
-        const selection = await window.showInformationMessage('delete note?', 'Yes', 'No')
+        const selection = await window.showInformationMessage('delete note?', 'Yes', 'No');
         if (selection !== 'Yes') return;
         ext.domainDB.noteDB.removeFromCache(nId);
-        ext.domainDB.noteDB.remove(nId)
-        ext.domainDB.refreshDomainNode(dn, true);
+        ext.domainDB.noteDB.remove(nId);
+        ext.domainDB.refreshDomainNodes(dn, true);
         window.showInformationMessage(`note ${nId} deleted.`);
         ext.domainProvider.refresh();
         ext.notesPanelView.parseDomain().showNotesPlanView();

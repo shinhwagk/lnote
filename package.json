@@ -124,14 +124,9 @@
                 "type": "object",
                 "title": "vscode-note",
                 "properties": {
-                    "vscode-note.dbpath": {
+                    "vscode-note.notespath": {
                         "type": "string",
-                        "default": "~/vscode-note",
-                        "description": "note data location"
-                    },
-                    "vscode-note.github": {
-                        "type": "string",
-                        "description": "github remote"
+                        "description": "vscode-notes data location"
                     }
                 }
             }
@@ -208,6 +203,12 @@
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"
                 }
+            }
+        ],
+        "viewsWelcome": [
+            {
+                "view": "domainExplorer",
+                "contents": "Please select a location to save the notes.\n[Notes Location](command:vscode-note.choose-location)"
             }
         ]
     },

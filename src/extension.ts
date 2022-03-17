@@ -8,6 +8,12 @@ export async function activate(context: ExtensionContext) {
 
     initializeExtensionVariables(context);
 
+    // context.subscriptions.push(
+    //     commands.registerCommand('openFolderWelcome', () => {
+
+    //     })
+    // );
+    ext.registerCommand('vscode-note.choose-location', ExtCmds.cmdHdlChooseLocation);
     /**
      * domain
      */
@@ -67,4 +73,4 @@ export async function activate(context: ExtensionContext) {
     });
 }
 
-export function deactivate() { }
+export function deactivate() {}
