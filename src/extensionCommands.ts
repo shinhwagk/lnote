@@ -127,7 +127,7 @@ export namespace ExtCmds {
             window.showInformationMessage(`Input is not '${category}'.`)
             return
         } else {
-            if ((await window.showInformationMessage(`Remove ${category}?`, 'Yes', 'No')) !== 'Yes') return;
+            if ((await window.showInformationMessage(`Remove category '${category}'?`, 'Yes', 'No')) !== 'Yes') return;
         }
         const domainNode: string[] = Tools.splitDomaiNode(ext.globalState.domainNode!);
         const nIds = ext.domainDB.getDomainNotes(domainNode)
