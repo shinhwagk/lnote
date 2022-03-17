@@ -88,7 +88,7 @@ export class NoteDatabase {
 
         console.log('notes cache start.', this.notesPath);
         for (const nId of readdirSync(this.notesPath)) {
-            this.cache(nId);
+            this.cache(nId, false);
         }
         this.persistence();
         console.log('notes cache success.', this.notesCache.size);
@@ -117,13 +117,13 @@ export class NoteDatabase {
         removeSync(nd)
     }
 
-    public cache(nId: string): void {
+    public cache(nId: string, p: boolean): void {
         for (const label of this.getMeta(nId).labels) {
             const nIds = new Set(this.notesCache.get(label) || [])
             nIds.add(nId)
             this.notesCache.set(label, Array.from(nIds))
         }
-        this.persistence()
+        p && this.persistence()
     }
     // force is cover
     public updatelabels(nId: string, labels: string[]) {
@@ -166,7 +166,7 @@ export class NoteDatabase {
         mkdirSync(this.getDirectory(nId));
         this.updateMeta(nId, { labels, category }); // todo, domain + label
         this.addCol(nId);
-        this.cache(nId);
+        this.cache(nId, true);
         this.persistence()
         return nId;
     }

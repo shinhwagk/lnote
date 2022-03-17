@@ -200,7 +200,7 @@ export namespace ExtCmds {
         const _dn = Tools.splitDomaiNode(dn)
         const notes = ext.domainDB.getAllNotesUnderDomain(_dn)
         if (notes.length >= 1) {
-            window.showWarningMessage('domain is not deleted.')
+            window.showWarningMessage('The domain is not deleted, Please clear the notes under it.')
             return
         }
         ext.domainDB.deleteDomain(_dn)
@@ -398,7 +398,7 @@ export namespace ExtCmds {
         // }
         ext.domainDB.noteDB.updatelabels(nId, newLabels);
         ext.domainDB.noteDB.removeCacheByLabels(nId, oldLabels);
-        ext.domainDB.noteDB.cache(nId);
+        ext.domainDB.noteDB.cache(nId, true);
         ext.domainDB.refresh();
         ext.domainProvider.refresh();
         ext.notesPanelView.parseDomain().showNotesPlanView();
