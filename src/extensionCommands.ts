@@ -210,10 +210,16 @@ export namespace ExtCmds {
     // }
     export async function cmdHdlDomainRemove(dn: DomainNode) {
         const _dn = Tools.splitDomaiNode(dn);
-        const notes = ext.domainDB.getAllNotesUnderDomain(_dn);
-        if (notes.length >= 1) {
-            window.showWarningMessage('The domain is not deleted, Please clear the notes under it.');
+        const lastDomainName = _dn[_dn.length - 1];
+        const confirm = await window.showInputBox({
+            title: 'Are you absolutely sure?',
+            placeHolder: `Please type ${lastDomainName} to confirm.`,
+        });
+        if (confirm !== lastDomainName) {
+            window.showInformationMessage(`Input is not '${lastDomainName}'.`);
             return;
+        } else {
+            if ((await window.showInformationMessage(`Remove domain '${lastDomainName}'?`, 'Yes', 'No')) !== 'Yes') return;
         }
         ext.domainDB.deleteDomain(_dn);
         ext.domainProvider.refresh();
