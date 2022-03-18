@@ -20,23 +20,11 @@ export namespace ExtCmds {
         }
         workspace.getConfiguration(section).update('notespath', dl, 1);
     }
-    export async function cmdHdlNoteEditColAdd(nId: string) {
+    export async function cmdHdlNoteColAdd(nId: string) {
         const cn = ext.domainDB.noteDB.addCol(nId);
         await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
         // ext.editProvider.refresh();
     }
-    // export async function cmdHdlNoteEditCol(id: string, cn: string) {
-    //     const rst = await window.showQuickPick(['delete', '------', 'add']);
-    //     if (!rst) return;
-    //     ext.activeNote.nId = id;
-    //     if (rst === 'add') {
-    //         await cmdHdlNoteEditColAdd(id);
-    //     } else if (rst === 'delete') {
-    //         await cmdHdlNoteColRemove(id, cn);
-    //     } else {
-    //     }
-    //     ext.notesPanelView.parseDomain().showNotesPlanView();
-    // }
     export async function cmdHdlNoteEditColContent(nId: string, n: string) {
         const v = Uri.file(ext.domainDB.noteDB.getContentFile(nId, n));
         commands.executeCommand('editExplorer.openFileResource', v);
@@ -166,7 +154,7 @@ export namespace ExtCmds {
             );
         }
     }
-    export async function cmdHdlNoteEditFilesCreate(nId: string) {
+    export async function cmdHdlNoteFilesCreate(nId: string) {
         ext.domainDB.noteDB.createFiles(nId);
         ext.notesPanelView.parseDomain().showNotesPlanView();
         await cmdHdlNoteFilesOpen(nId);
@@ -174,7 +162,7 @@ export namespace ExtCmds {
     export async function cmdHdlNoteEditFilesClose() {
         await ext.setContext(ctxFilesExplorer, true);
     }
-    export async function cmdHdlNoteEditDocCreate(nId: string) {
+    export async function cmdHdlNoteDocCreate(nId: string) {
         ext.domainDB.noteDB.createDoc(nId);
         await commands.executeCommand(
             'editExplorer.openFileResource',
@@ -246,7 +234,7 @@ export namespace ExtCmds {
     export async function cmdHdlNoteOpenFolder(nId: string) {
         await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
     }
-    export async function cmdHdlNoteEditCategoryRename(nId: string) {
+    export async function cmdHdlNoteCategoryRename(nId: string) {
         const oldCategory = ext.domainDB.noteDB.getMeta(nId).category;
         const newCname = await window.showInputBox({ value: oldCategory });
         if (newCname === undefined) return;
