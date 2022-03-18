@@ -19,7 +19,7 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 ## Modify notes data directory location -> vscode global settings.json
 ```json
 {
-  "vscode-note.dbpath": "D:\\OneDrive\\vscode-note-data", // default: ~/vscode-note
+  "vscode-note.notespath": "D:\\OneDrive\\vscode-note-data",
 }
 ```
 - strongly recommend use onedrive(similar products) to store/sync your notes data.

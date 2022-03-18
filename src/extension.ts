@@ -38,14 +38,14 @@ export async function activate(context: ExtensionContext) {
      */
     // ext.registerCommand('vscode-note.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
     // ext.registerCommand('vscode-note.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
-    ext.registerCommand('vscode-note.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
-    ext.registerCommand('vscode-note.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
-    ext.registerCommand('vscode-note.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
+    // ext.registerCommand('vscode-note.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
+    // ext.registerCommand('vscode-note.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
+    // ext.registerCommand('vscode-note.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
     ext.registerCommand('vscode-note.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
-    ext.registerCommand('vscode-note.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
-    ext.registerCommand('vscode-note.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
-    ext.registerCommand('vscode-note.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);
-    ext.registerCommand('vscode-note.note.edit.doc.full', ExtCmds.cmdHdlNoteEditDocFull);
+    // ext.registerCommand('vscode-note.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
+    // ext.registerCommand('vscode-note.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
+    // ext.registerCommand('vscode-note.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);
+    // ext.registerCommand('vscode-note.note.edit.doc.full', ExtCmds.cmdHdlNoteEditDocFull);
     /**
      * note files
      */

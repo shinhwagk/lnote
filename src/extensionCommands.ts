@@ -12,7 +12,7 @@ import { existsSync, statSync } from 'fs-extra';
 
 export namespace ExtCmds {
     export async function cmdHdlChooseLocation() {
-        // { title: 'choose vscode-notes data location.' }
+        // { title: 'choose vscode-note data location.' }
         const dl = await window.showInputBox();
         if (dl === undefined || dl === '') return;
         if (!existsSync(dl) || !statSync(dl).isDirectory()) {
@@ -301,12 +301,12 @@ export namespace ExtCmds {
     export async function cmdHdlDomainRefresh() {
         ext.domainDB = new DomainDatabase(ext.masterPath);
         ext.domainDB.refresh();
-        window.showInformationMessage('refreshDomain success.');
+        window.showInformationMessage('refreshDomain complete.');
         ext.domainProvider.refresh();
     }
-    export async function cmdHdlNoteEditDocFull(nId: string) {
-        await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDocPath(nId)), true);
-    }
+    // export async function cmdHdlNoteEditDocFull(nId: string) {
+    //     await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDocPath(nId)), true);
+    // }
     // export async function cmdHdlCategoryEdit(category: string) {
     //     const rst = await window.showQuickPick(['rename', 'move to other domain']);
     //     if (rst === 'move to other domain') {
@@ -327,22 +327,22 @@ export namespace ExtCmds {
     // }
     export async function cmdHdlNoteRemove(nId: string) {
         const dn = Tools.splitDomaiNode(ext.globalState.domainNode);
-        if (ext.domainDB.noteDB.getContentFiles(nId).length >= 2) {
-            window.showInformationMessage(
-                `The number of short documents with note id '${nId}' must be less than 2, please edit note to delete cols.`
-            );
-            return;
-        } else {
-            if (ext.domainDB.noteDB.getShortDocumentContent(nId, '1').trim().length >= 1) {
-                window.showInformationMessage(`The content of the short document with note id '${nId}' must be empty.`);
-                return;
-            }
-            if (ext.domainDB.noteDB.checkDocExist(nId) || ext.domainDB.noteDB.checkFilesExist(nId)) {
-                window.showInformationMessage(`The doc or files of the short document with note id '${nId}' must be not exist.`);
-                return;
-            }
-        }
-        const selection = await window.showInformationMessage('delete note?', 'Yes', 'No');
+        // if (ext.domainDB.noteDB.getContentFiles(nId).length >= 2) {
+        //     window.showInformationMessage(
+        //         `The number of short documents with note id '${nId}' must be less than 2, please edit note to delete cols.`
+        //     );
+        //     return;
+        // } else {
+        //     if (ext.domainDB.noteDB.getShortDocumentContent(nId, '1').trim().length >= 1) {
+        //         window.showInformationMessage(`The content of the short document with note id '${nId}' must be empty.`);
+        //         return;
+        //     }
+        //     if (ext.domainDB.noteDB.checkDocExist(nId) || ext.domainDB.noteDB.checkFilesExist(nId)) {
+        //         window.showInformationMessage(`The doc or files of the short document with note id '${nId}' must be not exist.`);
+        //         return;
+        //     }
+        // }
+        const selection = await window.showInformationMessage(`delete note ${nId}?`, 'Yes', 'No');
         if (selection !== 'Yes') return;
         ext.domainDB.noteDB.removeFromCache(nId);
         ext.domainDB.noteDB.remove(nId);

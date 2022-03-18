@@ -2,7 +2,7 @@
     "name": "vscode-note",
     "displayName": "vscode-note",
     "description": "A simple note-taking extension.",
-    "version": "0.10.14",
+    "version": "0.11.0",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
@@ -22,7 +22,7 @@
     ],
     "license": "MIT",
     "activationEvents": [
-        "*"
+        "onView:domainExplorer"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -126,7 +126,7 @@
                 "properties": {
                     "vscode-note.notespath": {
                         "type": "string",
-                        "description": "vscode-notes data location"
+                        "description": "vscode-note data location"
                     }
                 }
             }
@@ -217,7 +217,7 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": "webpack --mode production",
+        "vscode:prepublish": "rm -fr out && webpack --mode production",
         "compile": "tsc -p ./",
         "compile-watch": "tsc -p ./ -w",
         "compile-web": "tsc -p ./web/tsconfig.json",

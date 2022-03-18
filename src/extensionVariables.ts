@@ -27,7 +27,6 @@ export namespace ext {
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
     export let domainDB: DomainDatabase;
-    export let isInit = false;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -50,31 +49,12 @@ function listenConfiguration(ctx: ExtensionContext) {
                 console.log('333333333333');
                 ext.masterPath = notespath;
                 ext.domainDB = new DomainDatabase(ext.masterPath);
-                initializecomponents();
+                // initializecomponents();
                 ext.domainDB.refresh();
                 ext.domainProvider.refresh();
             }
         })
     );
-}
-
-function initializecomponents() {
-    if (!ext.isInit) {
-        if (!ext.notesPanelView) {
-            ext.notesPanelView = new NotesPanelView();
-        }
-
-        if (!ext.domainProvider || !ext.domainTreeView) {
-            ext.domainProvider = new DomainExplorerProvider(ext.domainDB);
-            ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
-        }
-
-        if (!ext.filesProvider) {
-            ext.filesProvider = new FilesExplorerProvider();
-            window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
-        }
-        ext.isInit = true;
-    }
 }
 
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
@@ -88,7 +68,20 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     ext.masterPath = notespath;
     ext.domainDB = new DomainDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
-    initializecomponents();
+
+    if (!ext.notesPanelView) {
+        ext.notesPanelView = new NotesPanelView();
+    }
+
+    if (!ext.domainProvider || !ext.domainTreeView) {
+        ext.domainProvider = new DomainExplorerProvider(ext.domainDB);
+        ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
+    }
+
+    if (!ext.filesProvider) {
+        ext.filesProvider = new FilesExplorerProvider();
+        window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
+    }
 
     // if (!ext.notesPanelView) {
     //     ext.notesPanelView = new NotesPanelView();

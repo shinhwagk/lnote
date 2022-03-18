@@ -70,11 +70,10 @@ export class NoteDatabase {
         return existsSync(this.getDirectory(nId)) ? this.generateNId() : nId;
     }
 
-    public getNIdsBylabels(labels: string[], exclude: string | undefined): string[] {
-        const excludeNIds: string[] = exclude ? this.notesCache.get(exclude) || [] : [];
+    public getNIdsBylabels(labels: string[]): string[] {
         const nIds = labels.reduce((p_nIds, c_label) => {
             const __nIds = this.notesCache.get(c_label) || [];
-            return p_nIds.filter((nId) => __nIds.includes(nId) && !excludeNIds.includes(nId));
+            return p_nIds.filter((nId) => __nIds.includes(nId));
         }, this.notesCache.get(labels[0]) || []);
         return Array.from(new Set(nIds));
     }
@@ -281,8 +280,7 @@ export class DomainDatabase {
         const domainLabels = this.getDomainLabels(domainNode);
         objectPath.set(this.domain, domainNode.concat('.notes'), []); // clear .notes field
         if (domainLabels.length >= 1) {
-            const exclude = ''; // nothing,  todo
-            const nIds = this.noteDB.getNIdsBylabels(domainLabels, exclude);
+            const nIds = this.noteDB.getNIdsBylabels(domainLabels);
             objectPath.set(this.domain, domainNode.concat('.notes'), nIds);
         }
         if (p) this.persistence();

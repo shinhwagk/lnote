@@ -2,9 +2,16 @@
 
 # vscode-note
 
-This extension provides a simple note-taking. Make notes closer to the vscode extensions.
+This extension provides a simple note-taking.
 
-## Features
+### Features
 
-- Fast and simple recording note
-- Notes and vscode extensions together
+- Use labels to control how notes are grouped.
+
+### Modify notes data directory location -> vscode global settings.json
+```json
+{
+  "vscode-note.notespath": "D:\\OneDrive\\vscode-note-data",
+}
+```
+- strongly recommend use onedrive(similar products) to store/sync your notes data.
