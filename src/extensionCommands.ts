@@ -25,9 +25,9 @@ export namespace ExtCmds {
         // await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
         // ext.editProvider.refresh();
     }
-    export async function cmdHdlNoteEditColContent(nId: string) {
-        // const v = Uri.file(ext.domainDB.noteDB.getContentFile(nId, n));
-        // commands.executeCommand('editExplorer.openFileResource', v);
+    export async function cmdHdlNoteEditContent(nId: string) {
+        const v = Uri.file(ext.domainDB.getContentFile(Tools.splitDomaiNode(ext.globalState.domainNode), nId));
+        commands.executeCommand('editExplorer.openFileResource', v);
     }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
         ext.globalState.domainNode = dn;

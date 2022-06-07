@@ -99,7 +99,7 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteCreate(msg.data.category);
                         break;
                     case 'edit-notes':
-                        ExtCmds.cmdHdlNoteEditColContent(msg.data.nId);
+                        ExtCmds.cmdHdlNoteEditContent(msg.data.nId);
                         break;
                     case 'edit-col-add':
                         ExtCmds.cmdHdlNoteColAdd(msg.data.id);
@@ -174,6 +174,7 @@ export class NotesPanelView {
     }
 
     private genViewData(): any {
+        new RegExp(`${columnSplit}`);
         console.log(this.dpathCache);
         const categories: twv.WVCategory[] = [];
         const meta = ext.domainDB.getDomainMeta(this.dpathCache);

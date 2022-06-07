@@ -48,15 +48,15 @@ export class NoteDatabase {
         // this.refresh(false);
     }
 
-    private initDirectories() {
-        if (!existsSync(this.notesPath)) {
-            mkdirpSync(this.notesPath);
-            const nId = this.create(['root'], 'root');
-            this.createDoc(nId);
-            this.createFiles(nId);
-            vfs.writeFileSync(this.getContentFile(nId), 'hello world.');
-        }
-    }
+    // private initDirectories() {
+    //     if (!existsSync(this.notesPath)) {
+    //         mkdirpSync(this.notesPath);
+    //         const nId = this.create(['root'], 'root');
+    //         this.createDoc(nId);
+    //         this.createFiles(nId);
+    //         vfs.writeFileSync(this.getContentFile(nId), 'hello world.');
+    //     }
+    // }
 
     // private checkCacheFileExpire(): boolean {
     //     return statSync(this.notesCacheFile).ctimeMs + 60 * 60 * 1000 < new Date().getTime();
@@ -139,7 +139,7 @@ export class NoteDatabase {
 
     public getDirectory = (nId: string) => path.join(this.notesPath, nId);
 
-    public getContentFile = (nId: string, cNumber: string = '1') => path.join(this.getDirectory(nId), `${cNumber}.txt`);
+    public getContentFile = (d: string, nId: string) => path.join(this.getDirectory(nId), `${nId}.txt`);
 
     public getShortDocumentContent = (nId: string, cNumber: string = '1') => vfs.readFileSync(this.getContentFile(nId, cNumber));
 
@@ -248,14 +248,14 @@ export class DomainDatabase {
     public domainCache: Domain = {};
     private readonly domainCacheName = 'domain.cache.json';
     private readonly domainCacheFile;
-    // public readonly noteDB: NoteDatabase;
+    public readonly noteDB: NoteDatabase;
 
     constructor(masterPath: string) {
         this.masterPath = masterPath;
         this.domainCacheFile = path.join(this.masterPath, this.domainCacheName);
         // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
         this.initDirectories();
-        // this.noteDB = new NoteDatabase(masterPath);
+        this.noteDB = new NoteDatabase(masterPath);
         // this.domainCache = vfs.readJsonSync(this.domainCacheFile);
         const s = new Date().getTime();
         this.refresh();
@@ -284,6 +284,8 @@ export class DomainDatabase {
         }
     }
 
+    public getContentFile = (domainNode: string[], nId: string) =>
+        path.join(this.masterPath, domainNode.join(pathSplit), `${nId}.txt`);
     // public refreshDomainNodes(domainNode: string[] = [], p: boolean): void {
     //     const domainLabels = this.getDomainLabels(domainNode);
     //     objectPath.set(this.domainCache, domainNode.concat('.notes'), []); // clear .notes field
