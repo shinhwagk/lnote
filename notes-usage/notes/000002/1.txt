@@ -1,1 +1,0 @@
-note id left three bytes can open doc.

@@ -1,1 +1,0 @@
-Domain can be a directory tree or a notes

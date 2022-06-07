@@ -46,7 +46,6 @@ function listenConfiguration(ctx: ExtensionContext) {
                     window.showInformationMessage('configuretion "notespath" wrong.');
                     return;
                 }
-                console.log('333333333333');
                 ext.masterPath = notespath;
                 ext.domainDB = new DomainDatabase(ext.masterPath);
                 // initializecomponents();

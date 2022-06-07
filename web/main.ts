@@ -204,10 +204,10 @@ class ContextMenuDom {
     }
 }
 
-class NoteEditContextMenu { }
+class NoteEditContextMenu {}
 
 class VNNote {
-    constructor(private readonly note: DataNote) { }
+    constructor(private readonly note: DataNote) {}
     dom(): HTMLHeadingElement {
         const d_note = document.createElement('div');
         d_note.className = 'grid-note';
@@ -232,12 +232,11 @@ class VNNote {
         d_note_content.className = 'grid-note-content';
         d_note_content.style.gridTemplateColumns = `repeat(${this.note.contents.length}, 1fr)`;
 
-
         for (let i = 0; i < this.note.contents.length; i++) {
             const d = document.createElement('div');
             d.className = 'grid-note-content';
             d.ondblclick = () => {
-                vscode.postMessage({ command: 'edit-contentFile', data: { nId: this.note.nId, n: i + 1 } });
+                vscode.postMessage({ command: 'edit-notes', data: { nId: this.note.nId } });
             };
             d.textContent = this.note.contents[i];
             d.addEventListener('contextmenu', (e) => {
@@ -291,7 +290,7 @@ function elemSpaces(num: number = 1) {
 }
 
 class VNCategory {
-    constructor(private readonly name: string, private readonly notes: DataNote[]) { }
+    constructor(private readonly name: string, private readonly notes: DataNote[]) {}
     doms() {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
@@ -418,7 +417,9 @@ class VNDomain {
 const nccm = new ContextMenuDom();
 document.addEventListener(
     'click',
-    () => { nccm.hide(); },
+    () => {
+        nccm.hide();
+    },
     true
 );
 document.addEventListener(
@@ -436,6 +437,7 @@ window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
     switch (message.command) {
         case 'data':
+            console.log(message.data);
             domain = new VNDomain(message.data);
             document.getElementById('content')?.replaceChildren(domain.doms());
             break;

@@ -5,6 +5,9 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
 import { ExtCmds } from '../extensionCommands';
+import { existsSync } from 'fs-extra';
+import { readFileSync } from 'fs';
+import { columnSplit, pathSplit } from '../constants';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -95,8 +98,8 @@ export class NotesPanelView {
                     case 'note-create':
                         ExtCmds.cmdHdlNoteCreate(msg.data.category);
                         break;
-                    case 'edit-contentFile':
-                        ExtCmds.cmdHdlNoteEditColContent(msg.data.nId, msg.data.n);
+                    case 'edit-notes':
+                        ExtCmds.cmdHdlNoteEditColContent(msg.data.nId);
                         break;
                     case 'edit-col-add':
                         ExtCmds.cmdHdlNoteColAdd(msg.data.id);
@@ -170,23 +173,51 @@ export class NotesPanelView {
         return this;
     }
 
-    private genViewData(): twv.WVDomain {
-        const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
-        // const sortNotes = ext.domainDB.sortNotes(notes);
+    private genViewData(): any {
+        console.log(this.dpathCache);
         const categories: twv.WVCategory[] = [];
-        for (const nId of sortNotes) {
-            const cname = ext.domainDB.noteDB.getMeta(nId).category;
-            const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
-            const isDoc = ext.domainDB.noteDB.checkDocExist(nId);
-            const isFiles = ext.domainDB.noteDB.checkFilesExist(nId);
-
-            if (categories.filter((c) => c.name === cname).length >= 1) {
-                categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
-            } else {
-                categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
+        const meta = ext.domainDB.getDomainMeta(this.dpathCache);
+        for (const cname of Object.keys(meta)) {
+            for (const note of Array.from(new Set<string>(meta[cname]))) {
+                console.log(`/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`);
+                if (existsSync(`/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`)) {
+                    const contents = readFileSync(
+                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`,
+                        'utf8'
+                    ).split(columnSplit);
+                    const isDoc = existsSync(
+                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}_doc`
+                    );
+                    const isFiles = existsSync(
+                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}_files`
+                    );
+                    if (categories.filter((c) => c.name === cname).length >= 1) {
+                        categories
+                            .filter((c) => c.name === cname)[0]
+                            .notes.push({ nId: note, contents, doc: isDoc, files: isFiles });
+                    } else {
+                        categories.push({ name: cname, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
+                    }
+                    // categories.push({ name: cname, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
+                }
             }
         }
+        // const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
+        // // const sortNotes = ext.domainDB.sortNotes(notes);
+
+        // for (const nId of sortNotes) {
+        //     const cname = ext.domainDB.noteDB.getMeta(nId).category;
+        //     const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
+        //     const isDoc = ext.domainDB.noteDB.checkDocExist(nId);
+        //     const isFiles = ext.domainDB.noteDB.checkFilesExist(nId);
+        //     if (categories.filter((c) => c.name === cname).length >= 1) {
+        //         categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+        //     } else {
+        //         categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
+        //     }
+        // }
         return { dpath: this.dpathCache, categories: categories };
+        // return { dpath: [], categories: [] };
     }
 }
 

@@ -1,1 +1,0 @@
-right click domain can create notes, create domain, move domain, rename domain
