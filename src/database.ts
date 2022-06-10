@@ -1,21 +1,35 @@
 import * as path from 'path';
 
 import * as objectPath from 'object-path';
-import { existsSync, readdirSync, mkdirSync, renameSync, removeSync, statSync, mkdirpSync, readJsonSync } from 'fs-extra';
+import {
+    existsSync,
+    readdirSync,
+    mkdirSync,
+    renameSync,
+    removeSync,
+    statSync,
+    mkdirpSync,
+    readJsonSync,
+    readFileSync,
+} from 'fs-extra';
 
-import { metaFileName, pathSplit } from './constants';
 import { tools, vfs } from './helper';
+import { basename, dirname } from 'path';
+import { pathSplit } from './constants';
 // import { Tools } from './explorer/domainExplorer';
-
+import * as yaml from 'yaml'
 export interface Domain {
     [domain: string]: Domain;
 }
 
-export interface NoteMeta {
+export interface Note {
+    nId: string;
+    cIdx: number;
+    nIdx: number;
     category: string;
-    labels: string[];
-    create?: Date;
-    modify?: Date;
+    contents: string[];
+    isFiles: boolean;
+    isDoc: boolean;
 }
 
 // export interface Shortcuts {
@@ -42,7 +56,7 @@ export class NoteDatabase {
 
     constructor(masterPath: string) {
         // this.vsnoteDbPath = vsnoteDbPath
-        this.notesPath = path.join(masterPath, 'notes');
+        this.notesPath = path.join(masterPath);
         // this.notesCacheFile = path.join(masterPath, this.notesCacheFileName);
         // this.initDirectories();
         // this.refresh(false);
@@ -91,13 +105,12 @@ export class NoteDatabase {
 
         console.log('notes cache start.', this.notesPath);
         for (const nId of readdirSync(this.notesPath)) {
-            this.cache(nId, false);
         }
         // this.persistence();
         console.log('notes cache success.', this.notesCache.size);
     }
 
-    public buildDOmain() {}
+    public buildDOmain() { }
 
     public removeCacheByLabels(nId: string, labels: string[]) {
         for (const label of labels) {
@@ -108,34 +121,19 @@ export class NoteDatabase {
         return this;
     }
 
-    public removeFromCache(nId: string) {
-        for (const label of this.getMeta(nId).labels) {
-            const nIds = new Set(this.notesCache.get(label) || []);
-            nIds.delete(nId);
-            this.notesCache.set(label, Array.from(nIds));
-        }
-        // this.persistence();
-    }
 
     public remove(nId: string) {
         const nd = this.getDirectory(nId);
         removeSync(nd);
     }
 
-    public cache(nId: string, p: boolean): void {
-        for (const label of this.getMeta(nId).labels) {
-            const nIds = new Set(this.notesCache.get(label) || []);
-            nIds.add(nId);
-            this.notesCache.set(label, Array.from(nIds));
-        }
-        // p && this.persistence();
-    }
+
     // force is cover
-    public updatelabels(nId: string, labels: string[]) {
-        const nm = this.getMeta(nId);
-        nm.labels = labels;
-        this.updateMeta(nId, nm);
-    }
+    // public updatelabels(nId: string, labels: string[]) {
+    //     const nm = this.getMeta(nId);
+    //     // nm.labels = labels;
+    //     this.updateMeta(nId, nm);
+    // }
 
     public getDirectory = (nId: string) => path.join(this.notesPath, nId);
 
@@ -143,13 +141,13 @@ export class NoteDatabase {
 
     public getShortDocumentContent = (nId: string, cNumber: string = '1') => vfs.readFileSync(this.getContentFile(nId, cNumber));
 
-    public updateMeta = (nId: string, meta: NoteMeta) => vfs.writeJsonSync(this.getMetaFile(nId), meta);
+    // public updateMeta = (nId: string, meta: Note) => vfs.writeJsonSync(this.getMetaFile(nId), meta);
 
     // public persistence = () => vfs.writeJsonSync(this.notesCacheFile, Object.fromEntries(this.notesCache));
 
-    public getMetaFile = (nId: string) => path.join(this.getDirectory(nId), metaFileName);
+    // public getMetaFile = (nId: string) => path.join(this.getDirectory(nId), metaFileName);
 
-    public getMeta = (nId: string) => vfs.readJsonSync<NoteMeta>(this.getMetaFile(nId));
+    // public getMeta = (nId: string) => vfs.readJsonSync<Note>(this.getMetaFile(nId));
 
     public addCol(nId: string): string {
         const cnt = (this.getNoteContents(nId).length + 1).toString();
@@ -169,9 +167,9 @@ export class NoteDatabase {
     public create(labels: string[], category: string) {
         const nId = this.generateNId();
         mkdirSync(this.getDirectory(nId));
-        this.updateMeta(nId, { labels, category }); // todo, domain + label
+        // this.updateMeta(nId, { labels, category }); // todo, domain + label
         this.addCol(nId);
-        this.cache(nId, true);
+        // this.cache(nId, true);
         return nId;
     }
 
@@ -180,13 +178,11 @@ export class NoteDatabase {
         vfs.writeFileSync(path.join(this.getDocPath(nId), 'README.md'));
     }
 
-    public createFiles(nId: string) {
-        mkdirSync(this.getFilesPath(nId));
-    }
+
 
     public getDocPath = (nId: string) => path.join(this.getDirectory(nId), 'doc');
 
-    public getFilesPath = (nId: string) => path.join(this.getDirectory(nId), 'files');
+    public getFilesPath = (domainNode: string[], nId: string) => path.join(this.notesPath, domainNode.join(pathSplit), `${nId}_files`)
     public removeCol(nId: string, cIdx: number) {
         const colNum = this.getNoteContents(nId).length;
         // removeSync(this.getNoteContentFile(nId, num.toString()));
@@ -223,23 +219,23 @@ export class NoteDatabase {
         return this.getDocIndexFile(nId, indexFile);
     };
 
-    public selectDocReadmeFile = (nId: string) => {
-        return this.getDocIndexFile(nId, 'README.md');
+    public selectDocReadmeFile = (domainNode: string[], nId: string) => {
+        return path.join(this.notesPath, domainNode.join(pathSplit), `${nId}_doc`, 'README.md');
     };
 
-    updateCategory(nId: string, newCategory: string) {
-        const nm = this.getMeta(nId);
-        nm.category = newCategory;
-        this.updateMeta(nId, nm);
-    }
+    // updateCategory(nId: string, newCategory: string) {
+    //     const nm = this.getMeta(nId);
+    //     nm.category = newCategory;
+    //     this.updateMeta(nId, nm);
+    // }
 
     public getDocIndexFile = (nId: string, indexName: string) => path.join(this.getDocPath(nId), indexName);
 
-    public checkDocExist(nId: string): boolean {
-        return existsSync(this.getDocIndexFile(nId, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
-    }
+    // public checkDocExist(nId: string): boolean {
+    //     return existsSync(this.getDocIndexFile(nId, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
+    // }
 
-    public checkFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
+    // public checkFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
 }
 
 export class DomainDatabase {
@@ -284,8 +280,8 @@ export class DomainDatabase {
         }
     }
 
-    public getContentFile = (domainNode: string[], nId: string) =>
-        path.join(this.masterPath, domainNode.join(pathSplit), `${nId}.txt`);
+    public getContentFile = (domainNode: string[]) =>
+        path.join(this.masterPath, domainNode.join(pathSplit), `notes.yaml`);
     // public refreshDomainNodes(domainNode: string[] = [], p: boolean): void {
     //     const domainLabels = this.getDomainLabels(domainNode);
     //     objectPath.set(this.domainCache, domainNode.concat('.notes'), []); // clear .notes field
@@ -423,10 +419,20 @@ export class DomainDatabase {
     //     vfs.writeJsonSync(this.shortcutsFile, s);
     // }
 
-    public getDomainNotes(domainNode: string[] = []): string[] {
-        return [];
-        // return this.getDomain(domainNode)['.notes'];
+
+    public getDomainNotesFile(domainNode: string[]): string {
+        return path.join(this.getDomainDirectory(domainNode), 'notes.yaml')
     }
+
+
+    public getDomainNotes(domainNode: string[]): any {
+        return yaml.parse(readFileSync(this.getDomainNotesFile(domainNode), { encoding: 'utf8' }))
+    }
+
+    public getDomainDirectory = (domainNode: string[]) => path.join(this.masterPath, domainNode.join(pathSplit));
+
+    public getNoteFile = (domainNode: string[], fileName: string) =>
+        path.join(this.masterPath, domainNode.join(pathSplit), fileName);
 
     public getDomainMeta(domainNode: string[]): any {
         return readJsonSync(path.join(this.masterPath, domainNode.join(pathSplit), 'meta.json'), { encoding: 'utf8' });
@@ -441,20 +447,39 @@ export class DomainDatabase {
     //     return objectPath.get(this.domainCache, domainNode);
     // }
 
-    public getAllNotesUnderDomain(domainNode: string[]): string[] {
-        return [];
-        // const domain = this.getDomain(domainNode);
-        // const childDomainNames: string[] = Object.keys(domain).filter((name) => !['.notes', '.labels'].includes(name));
-        // const notes: string[] = this.getDomainNotes(domainNode);
-        // if (childDomainNames.length === 0) {
-        //     return notes;
-        // }
-
-        // const totalNotes: string[] = [];
-        // for (const name of childDomainNames) {
-        //     const childDomainNotes: string[] = this.getAllNotesUnderDomain(domainNode.concat(name));
-        //     totalNotes.push(...childDomainNotes);
-        // }
-        // return totalNotes.concat(notes);
+    public getAllNotesNumberOfDomain(domainNode: string[]): number {
+        let cnt = 0
+        for (const domainPath of readdirSync(this.masterPath)) {
+            if (domainPath.startsWith(domainNode.join(pathSplit))) {
+                for (const notes of Object.values<any[]>(this.getDomainNotes(domainPath.split(pathSplit)))) {
+                    cnt += notes.length
+                }
+            }
+        }
+        return cnt
     }
+
+    public checkDocExist(domainNode: string[], nId: string): boolean {
+        return existsSync(path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_doc`)); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
+    }
+
+    public checkFilesExist = (domainNode: string[], nId: string) => existsSync(path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_files`));
 }
+
+// public checkDocExist(nId: string): boolean {
+//     return existsSync(this.getDocIndexFile(nId, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
+// }
+
+// public checkFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
+
+// export function parseNoteFile(f: string): Note {
+//     const [cIdx, nIdx, nId] = basename(f.split('.')[0]).split('_');
+//     const noteFilePhth = dirname(f);
+//     const isDoc = existsSync(path.join(noteFilePhth, `${nId}_doc`));
+//     const isFiles = existsSync(path.join(noteFilePhth, `${nId}_files`));
+//     const arr = readFileSync(f, { encoding: 'utf8' })
+//         .split(columnSplit)
+//         .filter((e) => e !== '==+')
+//         .map((e) => e.trim());
+//     return { category: arr[0], contents: arr.slice(1), cIdx: Number(cIdx), nIdx: Number(nIdx), nId, isDoc, isFiles };
+// }

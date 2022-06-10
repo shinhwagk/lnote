@@ -5,14 +5,12 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
 import { ExtCmds } from '../extensionCommands';
-import { existsSync } from 'fs-extra';
-import { readFileSync } from 'fs';
-import { columnSplit, pathSplit } from '../constants';
+import { existsSync, readdirSync, readFileSync } from 'fs-extra';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
     private viewData: twv.WVDomain | undefined;
-    private dpathCache: string[] = [];
+    private domainNode: string[] = [];
 
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
@@ -99,7 +97,7 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteCreate(msg.data.category);
                         break;
                     case 'edit-notes':
-                        ExtCmds.cmdHdlNoteEditContent(msg.data.nId);
+                        ExtCmds.cmdHdlNoteEditContent();
                         break;
                     case 'edit-col-add':
                         ExtCmds.cmdHdlNoteColAdd(msg.data.id);
@@ -162,8 +160,8 @@ export class NotesPanelView {
         this.panel.webview.html = this.getWebviewContent();
     }
 
-    public parseDomain(dpath?: string[]) {
-        this.dpathCache = dpath || this.dpathCache;
+    public parseDomain(domainNode?: string[]) {
+        this.domainNode = domainNode || this.domainNode;
         this.viewData = this.genViewData();
         return this;
     }
@@ -174,50 +172,35 @@ export class NotesPanelView {
     }
 
     private genViewData(): any {
-        new RegExp(`${columnSplit}`);
-        console.log(this.dpathCache);
         const categories: twv.WVCategory[] = [];
-        const meta = ext.domainDB.getDomainMeta(this.dpathCache);
-        for (const cname of Object.keys(meta)) {
-            for (const note of Array.from(new Set<string>(meta[cname]))) {
-                console.log(`/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`);
-                if (existsSync(`/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`)) {
-                    const contents = readFileSync(
-                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}.txt`,
-                        'utf8'
-                    ).split(columnSplit);
-                    const isDoc = existsSync(
-                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}_doc`
-                    );
-                    const isFiles = existsSync(
-                        `/workspaces/vscode-note/notes-usage/${this.dpathCache.join(pathSplit)}/${note}_files`
-                    );
-                    if (categories.filter((c) => c.name === cname).length >= 1) {
-                        categories
-                            .filter((c) => c.name === cname)[0]
-                            .notes.push({ nId: note, contents, doc: isDoc, files: isFiles });
-                    } else {
-                        categories.push({ name: cname, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
-                    }
-                    // categories.push({ name: cname, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
+        const domainNotes = ext.domainDB.getDomainNotes(this.domainNode)
+        for (const category of Object.keys(domainNotes)) {
+            for (const note of domainNotes[category]) {
+                const isDoc = ext.domainDB.checkDocExist(this.domainNode, note.id)
+                const isFiles = ext.domainDB.checkFilesExist(this.domainNode, note.id)
+                if (categories.filter((c) => c.name === category).length >= 1) {
+                    categories.filter((c) => c.name === category)[0].notes.push({ nId: note.id, contents: note.contents, doc: isDoc, files: isFiles });
+                } else {
+                    categories.push({ name: category, notes: [{ nId: note.id, contents: note.contents, doc: isDoc, files: isFiles }] });
                 }
             }
+            // categories.push({ name: category, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
         }
         // const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
         // // const sortNotes = ext.domainDB.sortNotes(notes);
 
         // for (const nId of sortNotes) {
-        //     const cname = ext.domainDB.noteDB.getMeta(nId).category;
+        //     const category = ext.domainDB.noteDB.getMeta(nId).category;
         //     const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
         //     const isDoc = ext.domainDB.noteDB.checkDocExist(nId);
         //     const isFiles = ext.domainDB.noteDB.checkFilesExist(nId);
-        //     if (categories.filter((c) => c.name === cname).length >= 1) {
-        //         categories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+        //     if (categories.filter((c) => c.name === category).length >= 1) {
+        //         categories.filter((c) => c.name === category)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
         //     } else {
-        //         categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
+        //         categories.push({ name: category, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
         //     }
         // }
-        return { dpath: this.dpathCache, categories: categories };
+        return { dpath: this.domainNode, categories: categories };
         // return { dpath: [], categories: [] };
     }
 }

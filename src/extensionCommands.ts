@@ -10,6 +10,10 @@ import { DomainDatabase } from './database';
 import { tools } from './helper';
 import { existsSync, statSync } from 'fs-extra';
 
+workspace.onDidCloseTextDocument((x) => {
+    console.log(1111111111111, x.fileName)
+})
+
 export namespace ExtCmds {
     export async function cmdHdlChooseLocation() {
         // { title: 'choose vscode-note data location.' }
@@ -25,8 +29,8 @@ export namespace ExtCmds {
         // await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
         // ext.editProvider.refresh();
     }
-    export async function cmdHdlNoteEditContent(nId: string) {
-        const v = Uri.file(ext.domainDB.getContentFile(Tools.splitDomaiNode(ext.globalState.domainNode), nId));
+    export async function cmdHdlNoteEditContent() {
+        const v = Uri.file(ext.domainDB.getContentFile(Tools.splitDomaiNode(ext.globalState.domainNode)));
         commands.executeCommand('editExplorer.openFileResource', v);
     }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
@@ -83,15 +87,10 @@ export namespace ExtCmds {
         !dn || ext.domainTreeView.reveal(dn, { expand: true });
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
+        console.log("ssss")
         ext.globalState.domainNode = dn;
-        ext.domainDB.refresh(Tools.splitDomaiNode(dn), true);
+        // ext.domainDB.refresh(Tools.splitDomaiNode(dn), true);
         ext.notesPanelView.parseDomain(Tools.splitDomaiNode(dn)).showNotesPlanView();
-        await ext.setContext(ctxFilesExplorer, false);
-    }
-    export async function cmdHdlDomainPinLabels(dn: DomainNode) {
-        ext.globalState.domainNode = dn;
-        ext.notesPanelView.parseDomain(Tools.splitDomaiNode(dn)).showNotesPlanView();
-        // ext.domainDB.appendLastDomainToShortcuts(dn);
         await ext.setContext(ctxFilesExplorer, false);
     }
     export async function cmdHdlNoteColRemove(nId: string, cIdx: string) {
@@ -261,14 +260,14 @@ export namespace ExtCmds {
         // if (cl === undefined) return;
     }
     export async function cmdHdlNoteDocShow(nId: string) {
-        // const readmeFile = ext.domainDB.noteDB.selectDocReadmeFile(nId);
-        // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'README.md')
-        // if (basename(readmeFile).split('.')[1] === 'md') {
-        //     const uri = Uri.file(readmeFile);
-        //     await commands.executeCommand('markdown.showPreviewToSide', uri);
-        // } else {
-        //     noteDocHtmlPanel(readmeFile);
-        // }
+        const readmeFile = ext.domainDB.noteDB.selectDocReadmeFile(Tools.splitDomaiNode(ext.globalState.domainNode), nId);
+        // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'README.md')
+        if (basename(readmeFile).split('.')[1] === 'md') {
+            const uri = Uri.file(readmeFile);
+            await commands.executeCommand('markdown.showPreviewToSide', uri);
+        } else {
+            noteDocHtmlPanel(readmeFile);
+        }
     }
     export async function cmdHdlNoteFilesOpen(nId: string) {
         ext.globalState.nId = nId;

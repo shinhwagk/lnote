@@ -8,7 +8,7 @@ import { DomainDatabase } from '../database';
 export type DomainNode = string;
 
 export namespace Tools {
-    const splitter = '@!$';
+    const splitter = pathSplit;
     export function joinDomainNode(domain: string[]): string {
         return domain.join(splitter);
     }
@@ -29,17 +29,15 @@ function getTreeItem(db: DomainDatabase, dn: DomainNode): TreeItem {
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     const domain = db.getDomain(domainNode);
 
-    const isNotes = existsSync(pathff.join('/workspaces/vscode-note/notes-usage', domainNode.join(pathSplit)));
+    const isNotes = existsSync(pathff.join('/mnt/f/OneDrive/vscode-note-data/new-notes', domainNode.join(pathSplit)));
     console.log(isNotes, domainNode, domainNode.join(pathSplit));
 
     const childDomainNumber = Object.keys(domain).length;
     item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
 
-    const notesTotalNumberUnderDomain = db.getAllNotesUnderDomain(domainNode).length;
+    const notesTotalNumberUnderDomain = db.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
-        ? readdirSync(pathff.join('/workspaces/vscode-note/notes-usage', domainNode.join(pathSplit))).filter((f) =>
-              f.endsWith('.txt')
-          ).length
+        ? 10
         : 0; //domain['.notes'].length;
 
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
@@ -59,7 +57,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     private _onDidChangeTreeData: EventEmitter<DomainNode | undefined> = new EventEmitter<DomainNode | undefined>();
     readonly onDidChangeTreeData: Event<DomainNode | undefined> = this._onDidChangeTreeData.event;
 
-    constructor(private readonly db: DomainDatabase | undefined) {}
+    constructor(private readonly db: DomainDatabase | undefined) { }
 
     public refresh(dn?: DomainNode): void {
         this._onDidChangeTreeData.fire(dn);
