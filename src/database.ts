@@ -11,6 +11,7 @@ import {
     mkdirpSync,
     readJsonSync,
     readFileSync,
+    writeJSONSync,
 } from 'fs-extra';
 
 import { tools, vfs } from './helper';
@@ -434,9 +435,9 @@ export class DomainDatabase {
     public getNoteFile = (domainNode: string[], fileName: string) =>
         path.join(this.masterPath, domainNode.join(pathSplit), fileName);
 
-    public getDomainMeta(domainNode: string[]): any {
-        return readJsonSync(path.join(this.masterPath, domainNode.join(pathSplit), 'meta.json'), { encoding: 'utf8' });
-    }
+    // public getDomainMeta(domainNode: string[]): any {
+    //     return readJsonSync(path.join(this.masterPath, domainNode.join(pathSplit), 'meta.json'), { encoding: 'utf8' });
+    // }
 
     public getDomain(domainNode: string[] = []): Domain {
         console.log(this.domainCache);
@@ -464,6 +465,17 @@ export class DomainDatabase {
     }
 
     public checkFilesExist = (domainNode: string[], nId: string) => existsSync(path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_files`));
+
+    public createCategory(domainNode: string[], category: string) {
+        const notes = this.getDomainNotes(domainNode)
+        notes[category] = []
+        this.persistenceDomainMeta(domainNode, notes)
+    }
+
+    public persistenceDomainMeta(domainNode: string[], notes: any) {
+        writeJSONSync(path.join(this.masterPath, domainNode.join(pathSplit), 'notes.yaml'), notes, { encoding: 'utf8' });
+    }
+
 }
 
 // public checkDocExist(nId: string): boolean {

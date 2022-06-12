@@ -115,6 +115,7 @@ export namespace ExtCmds {
             cname = await window.showInputBox({ value: 'default' });
             if (!cname) return;
         }
+        ext.domainDB.createCategory(Tools.splitDomaiNode(ext.globalState.domainNode), cname)
         await cmdHdlNoteCreate(cname);
     }
     export async function cmdHdlCategoryRemove(category: string) {
