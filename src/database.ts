@@ -293,7 +293,7 @@ export class DomainDatabase {
     //     if (p) this.persistence();
     // }
 
-    public updateLabels(domainNode: string[], labels: string[]) {
+    public updateLabels(domainNode: string[], labels: string[]) {·
         const _labels = Array.from(new Set(labels));
         objectPath.set(this.domainCache, domainNode.concat('.labels'), _labels);
         this.persistence();
@@ -473,7 +473,11 @@ export class DomainDatabase {
     }
 
     public persistenceDomainMeta(domainNode: string[], notes: any) {
-        writeJSONSync(path.join(this.masterPath, domainNode.join(pathSplit), 'notes.yaml'), notes, { encoding: 'utf8' });
+        writeJSONSync(this.getDomainNotesFile(domainNode), notes, { encoding: 'utf8' });
+    }
+
+    public checkNotesExist(domainNode: string[]) {
+        return existsSync(this.getDomainNotesFile(domainNode));
     }
 
 }

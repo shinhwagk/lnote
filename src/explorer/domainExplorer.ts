@@ -29,7 +29,7 @@ function getTreeItem(db: DomainDatabase, dn: DomainNode): TreeItem {
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     const domain = db.getDomain(domainNode);
 
-    const isNotes = existsSync(pathff.join('/mnt/f/OneDrive/vscode-note-data/new-notes', domainNode.join(pathSplit)));
+    const isNotes = db.checkNotesExist(domainNode)
     console.log(isNotes, domainNode, domainNode.join(pathSplit));
 
     const childDomainNumber = Object.keys(domain).length;
