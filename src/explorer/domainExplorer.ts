@@ -1,8 +1,6 @@
-import { existsSync, readdirSync } from 'fs-extra';
-import * as pathff from 'path';
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
-import { pathSplit } from '../constants';
 
+import { pathSplit } from '../constants';
 import { DomainDatabase } from '../database';
 
 export type DomainNode = string;
@@ -37,7 +35,7 @@ function getTreeItem(db: DomainDatabase, dn: DomainNode): TreeItem {
 
     const notesTotalNumberUnderDomain = db.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
-        ? 10
+        ? Object.values<any[]>(db.getDomainNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
 
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
