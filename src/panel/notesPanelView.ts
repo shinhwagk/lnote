@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ToWebView as twv } from './notesMessage';
 import { ExtCmds } from '../extensionCommands';
-import { existsSync, readdirSync, readFileSync } from 'fs-extra';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;

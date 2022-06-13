@@ -293,11 +293,6 @@ export class DomainDatabase {
     //     if (p) this.persistence();
     // }
 
-    public updateLabels(domainNode: string[], labels: string[]) {·
-        const _labels = Array.from(new Set(labels));
-        objectPath.set(this.domainCache, domainNode.concat('.labels'), _labels);
-        this.persistence();
-    }
 
     // public appendLabels(domainNode: string[], labels: string[]) {
     //     const sourceLabels: string[] = objectPath.get(this.domain, domainNode.concat('.labels'));
@@ -479,6 +474,9 @@ export class DomainDatabase {
     public checkNotesExist(domainNode: string[]) {
         return existsSync(this.getDomainNotesFile(domainNode));
     }
+
+    public getFilesPath = (domainNode: string[], nId: string) => path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_files`)
+
 
 }
 

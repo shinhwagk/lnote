@@ -39,8 +39,6 @@ export namespace ExtCmds {
         // ext.domainDB.createNotes(Tools.splitDomaiNode(dn));
         // ext.domainProvider.refresh(dn);
         const domainNode = Tools.splitDomaiNode(dn);
-        const lables = domainNode;
-        ext.domainDB.updateLabels(domainNode, lables);
         await cmdHdlCategoryAdd(true);
         // await cmdHdlDomainPin(dn);
         ext.domainProvider.refresh(dn);

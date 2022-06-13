@@ -7,11 +7,11 @@ import { ext } from '../extensionVariables';
 import { Tools } from './domainExplorer';
 
 export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
-    private _onDidChangeTreeData: EventEmitter<TreeItem> = new EventEmitter<TreeItem>();
-    public readonly onDidChangeTreeData: Event<TreeItem> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<TreeItem | undefined> = new EventEmitter<TreeItem>();
+    public readonly onDidChangeTreeData: Event<TreeItem | undefined> = this._onDidChangeTreeData.event;
 
     public refresh(): void {
-        // this._onDidChangeTreeData.fire();
+        this._onDidChangeTreeData.fire(undefined);
     }
 
     async getTreeItem(element: TreeItem): Promise<TreeItem> {
@@ -19,7 +19,9 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const fPath: string = element ? element.resourceUri!.fsPath : ext.domainDB.noteDB.getFilesPath(Tools.splitDomaiNode(ext.globalState.domainNode), ext.globalState.nId);
+        const fPath: string = element
+            ? element.resourceUri!.fsPath
+            : ext.domainDB.getFilesPath(Tools.splitDomaiNode(ext.globalState.domainNode), ext.globalState.nId);
         return readdirSync(fPath).map((f) => {
             const uri = Uri.file(join(fPath, f));
             if (statSync(uri.fsPath).isDirectory()) {
