@@ -12,7 +12,7 @@ import {
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
-import { DomainDatabase } from './database';
+import { NotesDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
 
 // import { initClient, sendGA } from './client';
@@ -26,7 +26,7 @@ export namespace ext {
     export let masterPath: string;
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
-    export let domainDB: DomainDatabase;
+    export let domainDB: NotesDatabase;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -47,7 +47,7 @@ function listenConfiguration(ctx: ExtensionContext) {
                     return;
                 }
                 ext.masterPath = notespath;
-                ext.domainDB = new DomainDatabase(ext.masterPath);
+                ext.domainDB = new NotesDatabase(ext.masterPath);
                 // initializecomponents();
                 ext.domainDB.refresh();
                 ext.domainProvider.refresh();
@@ -65,7 +65,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         return;
     }
     ext.masterPath = notespath;
-    ext.domainDB = new DomainDatabase(ext.masterPath);
+    ext.domainDB = new NotesDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {

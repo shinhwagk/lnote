@@ -1,7 +1,7 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 
 import { pathSplit } from '../constants';
-import { DomainDatabase } from '../database';
+import { NotesDatabase } from '../database';
 
 export type DomainNode = string;
 
@@ -16,26 +16,25 @@ export namespace Tools {
     }
 }
 
-function createDomainNodes(db: DomainDatabase, domainNode: string[]): DomainNode[] {
+function createDomainNodes(db: NotesDatabase, domainNode: string[]): DomainNode[] {
     return Object.keys(db.getDomain(domainNode))
         .sort()
         .map((name) => Tools.joinDomainNode(domainNode.concat(name)));
 }
 
-function getTreeItem(db: DomainDatabase, dn: DomainNode): TreeItem {
+function getTreeItem(db: NotesDatabase, dn: DomainNode): TreeItem {
     const domainNode = Tools.splitDomaiNode(dn);
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     const domain = db.getDomain(domainNode);
 
     const isNotes = db.checkNotesExist(domainNode)
-    console.log(isNotes, domainNode, domainNode.join(pathSplit));
 
     const childDomainNumber = Object.keys(domain).length;
     item.collapsibleState = childDomainNumber >= 1 ? 1 : 0;
 
     const notesTotalNumberUnderDomain = db.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
-        ? Object.values<any[]>(db.getDomainNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
+        ? Object.values<any[]>(db.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
 
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
@@ -55,7 +54,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     private _onDidChangeTreeData: EventEmitter<DomainNode | undefined> = new EventEmitter<DomainNode | undefined>();
     readonly onDidChangeTreeData: Event<DomainNode | undefined> = this._onDidChangeTreeData.event;
 
-    constructor(private readonly db: DomainDatabase | undefined) { }
+    constructor(private readonly db: NotesDatabase | undefined) { }
 
     public refresh(dn?: DomainNode): void {
         this._onDidChangeTreeData.fire(dn);

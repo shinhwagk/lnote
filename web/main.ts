@@ -82,7 +82,7 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'add note',
-            onClick: (data) => vscode.postMessage({ command: 'note-create', data: { category: data.category } }),
+            onClick: (data) => vscode.postMessage({ command: 'note-add', data: { category: data.category } }),
         },
     ],
     [
@@ -170,7 +170,6 @@ class ContextMenuDom {
     }
 
     public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
-        console.log('ContextMenuDom click');
         this.elem.replaceChildren();
         let gidx = 0; // group index
         for (const l of menus) {
@@ -204,10 +203,10 @@ class ContextMenuDom {
     }
 }
 
-class NoteEditContextMenu {}
+class NoteEditContextMenu { }
 
 class VNNote {
-    constructor(private readonly note: DataNote) {}
+    constructor(private readonly note: DataNote) { }
     dom(): HTMLHeadingElement {
         const d_note = document.createElement('div');
         d_note.className = 'grid-note';
@@ -290,7 +289,7 @@ function elemSpaces(num: number = 1) {
 }
 
 class VNCategory {
-    constructor(private readonly name: string, private readonly notes: DataNote[]) {}
+    constructor(private readonly name: string, private readonly notes: DataNote[]) { }
     doms() {
         const d_category = document.createElement('div');
         d_category.className = 'grid-category';
@@ -435,6 +434,7 @@ let domain;
 
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
+    console.log("view notes.")
     switch (message.command) {
         case 'data':
             console.log(message.data);

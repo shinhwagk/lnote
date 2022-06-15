@@ -92,8 +92,8 @@ export class NotesPanelView {
                     case 'edit':
                         vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
                         break;
-                    case 'note-create':
-                        ExtCmds.cmdHdlNoteCreate(msg.data.category);
+                    case 'note-add':
+                        ExtCmds.cmdHdlNoteAdd(msg.data.category);
                         break;
                     case 'edit-notes':
                         ExtCmds.cmdHdlNoteEditContent();
@@ -147,7 +147,6 @@ export class NotesPanelView {
                     case 'domain-edit-labels':
                         ExtCmds.cmdHdlDomainEditLabels(msg.data);
                         break;
-
                     case 'note-edit-labels':
                         ExtCmds.cmdHdlNoteEditLabels(msg.data);
                         break;
@@ -172,7 +171,7 @@ export class NotesPanelView {
 
     private genViewData(): any {
         const categories: twv.WVCategory[] = [];
-        const domainNotes = ext.domainDB.getDomainNotes(this.domainNode)
+        const domainNotes = ext.domainDB.getNotes(this.domainNode)
         for (const category of Object.keys(domainNotes)) {
             for (const note of domainNotes[category]) {
                 const isDoc = ext.domainDB.checkDocExist(this.domainNode, note.id)
