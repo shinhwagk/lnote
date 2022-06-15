@@ -58,11 +58,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
         {
             title: 'category rename',
             onClick: (data) => vscode.postMessage({ command: 'edit-note-category-rename', data: { nId: data.note.nId } }),
-        },
-        {
-            title: 'labels',
-            onClick: (data) => vscode.postMessage({ command: 'note-edit-labels', data: { nId: data.note.nId } }),
-        },
+        }
     ],
     [
         {
