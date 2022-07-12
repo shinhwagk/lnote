@@ -170,18 +170,18 @@ export class NotesPanelView {
     }
 
     private genViewData(): any {
-        const categories: twv.WVCategory[] = [];
-        const domainNotes = ext.notesDatabase.getNotes(this.domainNode)
-        const notes = ext.notesDatabase.getNotesOfDomain(this.domainNode)
-        for (const category of Object.keys(domainNotes)) {
-            for (const nId of domainNotes[category]) {
+        const wvCategories: twv.WVCategory[] = [];
+        const categoriesOfDomain = ext.notesDatabase.getCategoriesOfDomain(this.domainNode)
+        const notesOfDomain = ext.notesDatabase.domainCache['notes']
+        for (const cname of Object.keys(categoriesOfDomain)) {
+            for (const nId of categoriesOfDomain[cname]) {
                 const isDoc = ext.notesDatabase.checkDocExist(this.domainNode, nId)
                 const isFiles = ext.notesDatabase.checkFilesExist(this.domainNode, nId)
-                const contents = notes[nId]['contents']
-                if (categories.filter((c) => c.name === category).length >= 1) {
-                    categories.filter((c) => c.name === category)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
+                const contents = notesOfDomain[nId]['contents']
+                if (wvCategories.filter((c) => c.name === cname).length >= 1) {
+                    wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
                 } else {
-                    categories.push({ name: category, notes: [{ nId: nId, contents: contents, doc: isDoc, files: isFiles }] });
+                    wvCategories.push({ name: cname, notes: [{ nId: nId, contents: contents, doc: isDoc, files: isFiles }] });
                 }
             }
             // categories.push({ name: category, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
@@ -200,7 +200,7 @@ export class NotesPanelView {
         //         categories.push({ name: category, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
         //     }
         // }
-        return { dpath: this.domainNode, categories: categories };
+        return { dpath: this.domainNode, categories: wvCategories };
         // return { dpath: [], categories: [] };
     }
 }

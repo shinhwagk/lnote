@@ -1,35 +1,21 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
 
-import { pathSplit } from '../constants';
-import { NotesDatabase } from '../database';
 import { ext } from '../extensionVariables';
 import { tools } from '../helper';
 
 export type DomainNode = string;
 
-
-
-function createDomainNodes(domainNode: string[]): DomainNode[] {
-    return Object.keys(ext.notesDatabase.getDomainNames(domainNode))
-        .sort()
-        .map((name) => tools.joinDomainNode(domainNode.concat(name)));
-}
-
 function getTreeItem(dn: DomainNode): TreeItem {
     const domainNode = tools.splitDomaiNode(dn);
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-    const domainNames = ext.notesDatabase.getDomainNames(domainNode);
-    console.log("11111111111111")
+    const domainNames = ext.notesDatabase.getChildrenNameOfDomain(domainNode);
     const isNotes = ext.notesDatabase.checkNotesExist(domainNode)
-    console.log("22222222")
     const childNumberOfDomain = domainNames.length;
     item.collapsibleState = childNumberOfDomain >= 1 ? 1 : 0;
-    console.log("11111111111111")
     const notesTotalNumberUnderDomain = 0// ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
         ? Object.values(ext.notesDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
-    console.log("11111111111111")
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
     if (notesNumberUnderDomain >= 1) {
         item.command = {
@@ -58,13 +44,14 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     }
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
-        // const domainNode = element === undefined ? [] : tools.splitDomaiNode(element);
         if (element === undefined) {
             return ext.notesDatabase.getRootDomain()
         } else {
-            return createDomainNodes(tools.splitDomaiNode(element));
+            const dn = tools.splitDomaiNode(element)
+            return ext.notesDatabase.getChildrenNameOfDomain(dn)
+                .sort()
+                .map((name) => tools.joinDomainNode(dn.concat(name)));
         }
-
     }
 
     public getParent(element: DomainNode): ProviderResult<DomainNode> {

@@ -240,7 +240,8 @@ export class VNDatabase {
 export class NotesDatabase {
     private readonly masterPath: string;
     // private readonly shortcutsFile: string;
-    public domainCache = new Map<string, Domain>();
+    public domainTreeCache = new Map<string, Domain>();
+    public domainCache: any = {};
     private readonly domainCacheName = 'domain.cache.json';
     private readonly domainCacheFile;
     // public readonly noteDB: NoteDatabase;
@@ -265,7 +266,7 @@ export class NotesDatabase {
 
     public refresh(domainNode: string[] | undefined = undefined): void {
         if (domainNode !== undefined) {
-            objectPath.set(this.domainCache, domainNode, {});
+            objectPath.set(this.domainTreeCache, domainNode, {});
         } else {
             this.buildDomainCache();
         }
@@ -274,12 +275,16 @@ export class NotesDatabase {
     public buildDomainCache() {
         for (const domainName of readdirSync(this.masterPath).filter(f => f.endsWith('.yaml')).map(f => f.split('.')[0])) {
             const notes = yaml.parse(readFileSync(this.getDomainNotesFile(domainName), { encoding: 'utf8' }))
-            this.domainCache.set(domainName, notes['domain'])
+            this.domainTreeCache.set(domainName, notes['domain'])
         }
     }
 
     public getDomainNotesFile = (domainName: string) => path.join(this.masterPath, `${domainName}.yaml`)
 
+    public cacheDomain(domainNode: string[]) {
+        this.domainCache = yaml.parse(readFileSync(this.getDomainNotesFile(domainNode[0]), { encoding: 'utf8' }))
+        console.log(this.domainCache)
+    }
     // public refreshDomainNodes(domainNode: string[] = [], p: boolean): void {
     //     const domainLabels = this.getDomainLabels(domainNode);
     //     objectPath.set(this.domainCache, domainNode.concat('.notes'), []); // clear .notes field
@@ -297,7 +302,7 @@ export class NotesDatabase {
     // }
 
     public persistence(): void {
-        vfs.writeJsonSync(this.domainCacheFile, this.domainCache);
+        vfs.writeJsonSync(this.domainCacheFile, this.domainTreeCache);
     }
 
     // public getDomainLabels(domainNode: string[]): string[] {
@@ -305,14 +310,14 @@ export class NotesDatabase {
     // }
 
     public deleteDomain(domainNode: string[]): void {
-        objectPath.del(this.domainCache, domainNode);
+        objectPath.del(this.domainTreeCache, domainNode);
         this.persistence();
     }
 
     public createDomain(domainNode: string[]) {
         mkdirpSync(this.getDomainDirectory(domainNode))
         this.createNotes(domainNode, 'default')
-        objectPath.set(this.domainCache, domainNode, {});
+        objectPath.set(this.domainTreeCache, domainNode, {});
     }
 
     // public appendNewDomain(domainNode: string[], category: string = 'default'): string {
@@ -400,7 +405,7 @@ export class NotesDatabase {
     // }
 
     public removeNote(domainNode: string[], category: string, nId: string) {
-        const notes = this.getNotes(domainNode)
+        const notes = this.getCategoriesOfDomain(domainNode)
         const ns = notes[category]
         // console.log(domainNode, category, nId)
 
@@ -408,7 +413,7 @@ export class NotesDatabase {
     }
 
     public addNote(domainNode: string[], category: string) {
-        const notes = this.getNotes(domainNode)
+        const notes = this.getCategoriesOfDomain(domainNode)
         const nId = generateNId()
         notes[category].push({ id: nId, contents: [''] })
         console.log(JSON.stringify(notes))
@@ -422,7 +427,7 @@ export class NotesDatabase {
     }
 
     public addCategory(domainNode: string[], category: string) {
-        const notes = this.getNotes(domainNode)
+        const notes = this.getCategoriesOfDomain(domainNode)
         notes[category] = []
         // this.persistenceNotes(domainNode, notes)
     }
@@ -435,8 +440,8 @@ export class NotesDatabase {
 
     public getNotesFile = (domainNode: string[]) => path.join(this.getDomainDirectory(domainNode), `notes.yaml`)
 
-    public getNotes(domainNode: string[]): any {
-        return this.getDomain(domainNode)['.categories']
+    public getCategoriesOfDomain(domainNode: string[]): any {
+        return objectPath.get(this.domainCache, ['domain', ...domainNode])['.categories']
     }
 
     public getDomainDirectory = (domainNode: string[]) => path.join(this.masterPath, domainNode.join(pathSplit));
@@ -449,18 +454,17 @@ export class NotesDatabase {
     // }
 
     public getDomain(domainNode: string[] = []): Domain {
-        const domain = this.domainCache.get(domainNode[0])
+        const domain = this.domainTreeCache.get(domainNode[0])
         return objectPath.get(domain!, domainNode);
     }
 
-    public getDomainNames(domainNode: string[] = []): string[] {
-        const domain = this.domainCache.get(domainNode[0])
-        return Object.keys(objectPath.get(domain!, domainNode)).filter(f => f !== '.categories');
+    public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
+        return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.categories');
     }
 
     public getRootDomain(): string[] {
         // const domain = this.domainCache.get(domainNode[0])
-        return [...this.domainCache.keys()]
+        return [...this.domainTreeCache.keys()]
     }
 
     // public selectDomainWithoutMeta(domainNode: string[] = []): Domain {
@@ -471,7 +475,7 @@ export class NotesDatabase {
         let cnt = 0
         for (const domainPath of readdirSync(this.masterPath)) {
             if (domainPath.startsWith(domainNode.join(pathSplit))) {
-                for (const notes of Object.values<any[]>(this.getNotes(domainPath.split(pathSplit)))) {
+                for (const notes of Object.values<any[]>(this.getCategoriesOfDomain(domainPath.split(pathSplit)))) {
                     cnt += notes.length
                 }
             }
@@ -481,7 +485,7 @@ export class NotesDatabase {
 
 
     public getNotesOfDomain(domainNode: string[]): any[] {
-        return yaml.parse(readFileSync(this.getDomainNotesFile(domainNode[0]), 'utf8'))['notes']
+        return this.domainCache['notes']
     }
 
     public checkDocExist(domainNode: string[], nId: string): boolean {
@@ -491,7 +495,7 @@ export class NotesDatabase {
     public checkFilesExist = (domainNode: string[], nId: string) => existsSync(path.join(this.masterPath, domainNode[0], `${nId}_files`));
 
     public createCategory(domainNode: string[], category: string = 'default') {
-        const notes = this.getNotes(domainNode)
+        const notes = this.getCategoriesOfDomain(domainNode)
         notes[category] = []
         this.persistenceNotes(domainNode, notes)
     }

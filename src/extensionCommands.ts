@@ -22,7 +22,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteEditShortDocument(nId: string) {
         const domainNode: string[] = tools.splitDomaiNode(ext.globalState.domainNode!);
-        ext.notesDatabase.getNotes(domainNode)
+        ext.notesDatabase.getCategoriesOfDomain(domainNode)
         // const cn = ext.domainDB.addCol(nId);
         // await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
         // ext.editProvider.refresh();
@@ -84,6 +84,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.globalState.domainNode = dn;
+        ext.notesDatabase.cacheDomain(tools.splitDomaiNode(dn))
         // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
         ext.notesPanelView.parseDomain(tools.splitDomaiNode(dn)).showNotesPlanView();
         await ext.setContext(ctxFilesExplorer, false);
