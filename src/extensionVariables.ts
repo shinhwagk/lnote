@@ -26,7 +26,7 @@ export namespace ext {
     export let masterPath: string;
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
-    export let domainDB: NotesDatabase;
+    export let notesDatabase: NotesDatabase;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -47,9 +47,9 @@ function listenConfiguration(ctx: ExtensionContext) {
                     return;
                 }
                 ext.masterPath = notespath;
-                ext.domainDB = new NotesDatabase(ext.masterPath);
+                ext.notesDatabase = new NotesDatabase(ext.masterPath);
                 // initializecomponents();
-                ext.domainDB.refresh();
+                ext.notesDatabase.refresh();
                 ext.domainProvider.refresh();
             }
         })
@@ -65,7 +65,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         return;
     }
     ext.masterPath = notespath;
-    ext.domainDB = new NotesDatabase(ext.masterPath);
+    ext.notesDatabase = new NotesDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {
@@ -73,7 +73,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     }
 
     if (!ext.domainProvider || !ext.domainTreeView) {
-        ext.domainProvider = new DomainExplorerProvider(ext.domainDB);
+        ext.domainProvider = new DomainExplorerProvider();
         ext.domainTreeView = window.createTreeView('domainExplorer', { treeDataProvider: ext.domainProvider });
     }
 

@@ -2,6 +2,7 @@
 import { randomBytes } from 'crypto';
 
 import * as fse from 'fs-extra';
+import { pathSplit } from './constants';
 
 export namespace vfs {
     const encoding = 'utf-8';
@@ -42,4 +43,13 @@ export namespace tools {
     }
 
     export const intersections = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
+
+    const splitter = pathSplit;
+    export function joinDomainNode(domain: string[]): string {
+        return domain.join(splitter);
+    }
+
+    export function splitDomaiNode(domain: string): string[] {
+        return domain.split(splitter);
+    }
 }

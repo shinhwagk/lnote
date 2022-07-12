@@ -62,8 +62,8 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     ],
     [
         {
-            title: 'remove note',
-            onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } }),
+            title: 'remove',
+            onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { category: data.category, nId: data.note.nId } }),
         },
     ],
     [
@@ -104,8 +104,8 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
 const NoteColContextMenuActions: ContextMenuAction[][] = [
     [
         {
-            title: 'add short document',
-            onClick: (data: any) => vscode.postMessage({ command: 'edit-col-add', data: { id: data.id } }),
+            title: 'edit short document',
+            onClick: (data: any) => vscode.postMessage({ command: 'note-edit-short-document', data: { id: data.id } }),
         },
         // {
         //     title: 'delete short document',
@@ -202,7 +202,7 @@ class ContextMenuDom {
 class NoteEditContextMenu { }
 
 class VNNote {
-    constructor(private readonly note: DataNote) { }
+    constructor(private readonly category: string, private readonly note: DataNote) { }
     dom(): HTMLHeadingElement {
         const d_note = document.createElement('div');
         d_note.className = 'grid-note';
@@ -251,21 +251,21 @@ class VNNote {
         //     vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
         // };
 
-        const delColContext: ContextMenuAction[] = [];
-        for (let i = 1; i <= this.note.contents.length; i++) {
-            delColContext.push({
-                title: `remove col ${i}`,
-                onClick: () => vscode.postMessage({ command: 'edit-col-remove', data: { nId: this.note.nId, cIdx: i } }),
-            });
-        }
+        // const delColContext: ContextMenuAction[] = [];
+        // for (let i = 1; i <= this.note.contents.length; i++) {
+        //     delColContext.push({
+        //         title: `remove col ${i}`,
+        //         onClick: () => vscode.postMessage({ command: 'edit-col-remove', data: { nId: this.note.nId, cIdx: i } }),
+        //     });
+        // }
 
-        const newContxt = NoteEditContextMenuActions.slice();
-        if (this.note.contents.length >= 2) {
-            newContxt.splice(2, 0, delColContext);
-        }
+        // const newContxt = NoteEditContextMenuActions.slice();
+        // if (this.note.contents.length >= 2) {
+        //     newContxt.splice(2, 0, delColContext);
+        // }
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, d_note_edit, newContxt, { note: this.note });
+                nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: this.note, category: this.category });
             })
         );
 
@@ -312,7 +312,7 @@ class VNCategory {
         d_category_body.className = 'grid-category-body';
 
         for (const n of this.notes) {
-            const d_n = new VNNote(n).dom();
+            const d_n = new VNNote(this.name, n).dom();
             d_category_body.appendChild(d_n);
         }
 

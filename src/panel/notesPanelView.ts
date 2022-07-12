@@ -98,8 +98,8 @@ export class NotesPanelView {
                     case 'edit-notes':
                         ExtCmds.cmdHdlNoteEditContent();
                         break;
-                    case 'edit-col-add':
-                        ExtCmds.cmdHdlNoteColAdd(msg.data.id);
+                    case 'note-edit-short-document':
+                        ExtCmds.cmdHdlNoteEditShortDocument(msg.data.id);
                         break;
                     case 'edit-col-remove':
                         ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
@@ -120,7 +120,7 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
                         break;
                     case 'note-remove':
-                        ExtCmds.cmdHdlNoteRemove(msg.data.nId);
+                        ExtCmds.cmdHdlNoteRemove(msg.data.category, msg.data.nId);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
@@ -171,15 +171,17 @@ export class NotesPanelView {
 
     private genViewData(): any {
         const categories: twv.WVCategory[] = [];
-        const domainNotes = ext.domainDB.getNotes(this.domainNode)
+        const domainNotes = ext.notesDatabase.getNotes(this.domainNode)
+        const notes = ext.notesDatabase.getNotesOfDomain(this.domainNode)
         for (const category of Object.keys(domainNotes)) {
-            for (const note of domainNotes[category]) {
-                const isDoc = ext.domainDB.checkDocExist(this.domainNode, note.id)
-                const isFiles = ext.domainDB.checkFilesExist(this.domainNode, note.id)
+            for (const nId of domainNotes[category]) {
+                const isDoc = ext.notesDatabase.checkDocExist(this.domainNode, nId)
+                const isFiles = ext.notesDatabase.checkFilesExist(this.domainNode, nId)
+                const contents = notes[nId]['contents']
                 if (categories.filter((c) => c.name === category).length >= 1) {
-                    categories.filter((c) => c.name === category)[0].notes.push({ nId: note.id, contents: note.contents, doc: isDoc, files: isFiles });
+                    categories.filter((c) => c.name === category)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
                 } else {
-                    categories.push({ name: category, notes: [{ nId: note.id, contents: note.contents, doc: isDoc, files: isFiles }] });
+                    categories.push({ name: category, notes: [{ nId: nId, contents: contents, doc: isDoc, files: isFiles }] });
                 }
             }
             // categories.push({ name: category, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
