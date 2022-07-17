@@ -96,14 +96,14 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteAdd(msg.data.category);
                         break;
                     case 'edit-notes':
-                        ExtCmds.cmdHdlNoteEditContent();
+                        ExtCmds.cmdHdlNoteEditContent(msg.data.nId);
                         break;
                     case 'note-edit-short-document':
                         ExtCmds.cmdHdlNoteEditShortDocument(msg.data.id);
                         break;
-                    case 'edit-col-remove':
-                        ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
-                        break;
+                    // case 'edit-col-remove':
+                    //     ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
+                    //     break;
                     case 'doc':
                         ExtCmds.cmdHdlNoteDocShow(msg.data);
                         break;
@@ -172,7 +172,7 @@ export class NotesPanelView {
     private genViewData(): any {
         const wvCategories: twv.WVCategory[] = [];
         const categoriesOfDomain = ext.notesDatabase.getCategoriesOfDomain(this.domainNode)
-        const notesOfDomain = ext.notesDatabase.domainCache['notes']
+        const notesOfDomain = ext.notesDatabase.notebookCache['notes']
         for (const cname of Object.keys(categoriesOfDomain)) {
             for (const nId of categoriesOfDomain[cname]) {
                 const isDoc = ext.notesDatabase.checkDocExist(this.domainNode, nId)

@@ -1,7 +1,10 @@
 // import * as path from 'path';
 import { randomBytes } from 'crypto';
+import { readFileSync } from 'fs';
 
 import * as fse from 'fs-extra';
+import * as yaml from 'yaml'
+
 import { pathSplit } from './constants';
 
 export namespace vfs {
@@ -51,5 +54,13 @@ export namespace tools {
 
     export function splitDomaiNode(domain: string): string[] {
         return domain.split(splitter);
+    }
+
+    export function readYamlSync(path: string) {
+        return yaml.parse(readFileSync(path, { encoding: 'utf8' }))
+    }
+
+    export function writeYamlSync(path: string, data: any) {
+        fse.writeFileSync(path, yaml.stringify(data), { encoding: 'utf8' })
     }
 }

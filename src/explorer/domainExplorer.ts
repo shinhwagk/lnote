@@ -7,16 +7,15 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
     const domainNode = tools.splitDomaiNode(dn);
-    const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-    const domainNames = ext.notesDatabase.getChildrenNameOfDomain(domainNode);
     const isNotes = ext.notesDatabase.checkNotesExist(domainNode)
-    const childNumberOfDomain = domainNames.length;
-    item.collapsibleState = childNumberOfDomain >= 1 ? 1 : 0;
     const notesTotalNumberUnderDomain = 0// ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
         ? Object.values(ext.notesDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
+
+    const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
+    item.collapsibleState = ext.notesDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
     if (notesNumberUnderDomain >= 1) {
         item.command = {
             arguments: [dn],
@@ -32,8 +31,6 @@ function getTreeItem(dn: DomainNode): TreeItem {
 export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     private _onDidChangeTreeData: EventEmitter<DomainNode | undefined> = new EventEmitter<DomainNode | undefined>();
     readonly onDidChangeTreeData: Event<DomainNode | undefined> = this._onDidChangeTreeData.event;
-
-    constructor() { }
 
     public refresh(dn?: DomainNode): void {
         this._onDidChangeTreeData.fire(dn);

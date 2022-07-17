@@ -14,6 +14,7 @@ import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
 import { NotesDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
+import { tools } from './helper';
 
 // import { initClient, sendGA } from './client';
 
@@ -31,6 +32,7 @@ export namespace ext {
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
     export let domainShortcutStatusBarItem: StatusBarItem;
+    export const editNotes = new Map<string, string[]>()
 }
 
 // function getShortcutsFilePath() {
@@ -64,7 +66,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     if (notespath === undefined || notespath === '') {
         return;
     }
-    ext.masterPath = notespath;
+    ext.masterPath = notespath.endsWith('/') ? notespath : notespath + '/';
     ext.notesDatabase = new NotesDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
 
@@ -102,6 +104,34 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     //     ext.domainShortcutStatusBarItem.show();
     //     ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
     // }
+
+    ext.context.subscriptions.push(
+        workspace.onDidSaveTextDocument((f) => {
+            if (f.fileName.startsWith(ext.masterPath)) {
+                const dirNames = f.fileName.substring(ext.masterPath.length).split('/')
+                if (dirNames[0] === '.cache' && dirNames[1].endsWith('.txt')) {
+                    const d1 = dirNames[1].split('.')[0]
+                    const [notebook, nId] = d1.split('_')
+                    const contents = f.getText().split('+=+=+=').map(c => c.trim())
+                    console.log(notebook, nId, contents)
+                    ext.notesDatabase.updateNoteContent(notebook, nId, contents)
+                }
+            }
+        })
+    )
+
+    ext.context.subscriptions.push(
+        workspace.onDidCloseTextDocument((f) => {
+            if (f.fileName.startsWith(ext.masterPath)) {
+                const dirNames = f.fileName.substring(ext.masterPath.length).split('/')
+                if (dirNames[0] === '.cache' && dirNames[1].endsWith('.txt')) {
+                    const d1 = dirNames[1].split('.')[0]
+                    const [notebook, nId] = d1.split('_')
+                    ext.notesDatabase.removeEditNoteEnv(notebook, nId)
+                }
+            }
+        })
+    )
 }
 
 export class GlobalState {

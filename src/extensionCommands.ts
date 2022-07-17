@@ -27,8 +27,11 @@ export namespace ExtCmds {
         // await commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.domainDB.noteDB.getContentFile(nId, cn)));
         // ext.editProvider.refresh();
     }
-    export async function cmdHdlNoteEditContent() {
-        const v = Uri.file(ext.notesDatabase.getNotesFile(tools.splitDomaiNode(ext.globalState.domainNode)));
+    export async function cmdHdlNoteEditContent(nId: string) {
+        const domainNode: string[] = tools.splitDomaiNode(ext.globalState.domainNode!);
+        const noteEditFile = ext.notesDatabase.createEditNoteEnv(domainNode[0], nId)
+        const v = Uri.file(noteEditFile);
+        ext.editNotes.set(nId, domainNode)
         commands.executeCommand('editExplorer.openFileResource', v);
     }
     export async function cmdHdlNotesCreate(dn: DomainNode) {
@@ -84,19 +87,10 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainPin(dn: DomainNode) {
         ext.globalState.domainNode = dn;
-        ext.notesDatabase.cacheDomain(tools.splitDomaiNode(dn))
+        ext.notesDatabase.cacheNoteBook(tools.splitDomaiNode(dn)[0])
         // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
         ext.notesPanelView.parseDomain(tools.splitDomaiNode(dn)).showNotesPlanView();
         await ext.setContext(ctxFilesExplorer, false);
-    }
-    export async function cmdHdlNoteColRemove(nId: string, cIdx: string) {
-        //cn : column number
-        // if (ext.domainDB.noteDB.getContentFiles(nId).length === 1) {
-        //     window.showInformationMessage("don't remove short document if only one.");
-        //     return;
-        // }
-        // ext.domainDB.noteDB.removeCol(nId, Number(cIdx));
-        // cmdHdlDomainPin(ext.globalState.domainNode);
     }
     // export async function cmdHdlNoteEditRemove() {
     //     const sqp = await window.showQuickPick(['Yes', 'No']);
@@ -137,7 +131,8 @@ export namespace ExtCmds {
     }
     export async function cmdHdlNoteAdd(category: string) {
         const domainNode: string[] = tools.splitDomaiNode(ext.globalState.domainNode!);
-        ext.notesDatabase.addNote(domainNode, category);
+        const nId = ext.notesDatabase.addNote(domainNode, category);
+        cmdHdlNoteEditContent(nId)
         ext.notesDatabase.refresh(domainNode);
         ext.domainProvider.refresh(ext.globalState.domainNode);
         ext.notesPanelView.parseDomain(domainNode).showNotesPlanView();

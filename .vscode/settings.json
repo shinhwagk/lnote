@@ -21,5 +21,8 @@
     },
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "yaml.schemas": {
+        "https://schema.stackhead.io/stackhead-cli/tag/v1/-/cli-config.schema.json": "untitled:Untitled-1"
     }
 }

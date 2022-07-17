@@ -93,11 +93,6 @@
                     "group": "2_domain"
                 },
                 {
-                    "command": "vscode-note.domain.labels",
-                    "when": "view == domainExplorer",
-                    "group": "2_domain"
-                },
-                {
                     "command": "vscode-note.domain.remove",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
@@ -147,10 +142,6 @@
             {
                 "command": "vscode-note.domain.rename",
                 "title": "Rename"
-            },
-            {
-                "command": "vscode-note.domain.labels",
-                "title": "Labels"
             },
             {
                 "command": "vscode-note.domain.remove",
