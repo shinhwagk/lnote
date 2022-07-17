@@ -42,12 +42,14 @@ export class NoteBookDatabase {
     // private readonly shortcutsFile: string;
     public domainTreeCache = {};
     public notebookCache: NoteBook = { domain: {}, notes: {} };
+    public notesCacheDirectory: string;
     // private readonly domainCacheName = 'domain.cache.json';
     // private readonly domainCacheFile;
     // public readonly noteDB: NoteDatabase;
 
     constructor(masterPath: string) {
         this.masterPath = masterPath;
+        this.notesCacheDirectory = path.join(this.masterPath, '.cache')
         // this.domainCacheFile = path.join(this.masterPath, this.domainCacheName);
         // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
         this.initDirectories();
@@ -60,7 +62,7 @@ export class NoteBookDatabase {
 
     private initDirectories() {
         existsSync(this.masterPath) || mkdirpSync(this.masterPath);
-        // existsSync(this.notesCacheDirectory) || mkdirpSync(this.notesCacheDirectory);
+        existsSync(this.notesCacheDirectory) || mkdirpSync(this.notesCacheDirectory);
     }
 
     public refresh(domainNode: string[] | undefined = undefined): void {
@@ -215,12 +217,12 @@ export class NoteBookDatabase {
 
     public createEditNoteEnv(notebookName: string, nId: string, mode: 'edit' | 'add' | 'del' = 'edit') {
         const note = this.notebookCache.notes[nId]
-        vfs.writeFileSync(path.join(this.masterPath, notebookName, '.cache', `${notebookName}_${nId}.txt`), note.contents.join("\n+=+=+=+=\n"))
-        return path.join(this.masterPath, notebookName, '.cache', `${notebookName}_${nId}.txt`)
+        vfs.writeFileSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`), note.contents.join("\n+=+=+=+=\n"))
+        return path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`)
     }
 
     public removeEditNoteEnv(notebookName: string, nId: string) {
-        removeSync(path.join(this.masterPath, '.cache', `${notebookName}_${nId}.txt`))
+        removeSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`))
     }
 
     public checkDocExist(domainNode: string[], nId: string): boolean {

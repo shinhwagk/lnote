@@ -15,6 +15,7 @@ import { section } from './constants';
 import { NoteBookDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
 import { tools } from './helper';
+import path from 'path';
 
 // import { initClient, sendGA } from './client';
 
@@ -107,14 +108,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     ext.context.subscriptions.push(
         workspace.onDidSaveTextDocument((f) => {
-            if (f.fileName.startsWith(ext.masterPath)) {
-                const dirNames = f.fileName.substring(ext.masterPath.length).split('/')
-                if (dirNames[0] === '.cache' && dirNames[1].endsWith('.txt')) {
-                    const d1 = dirNames[1].split('.')[0]
-                    const [notebook, nId] = d1.split('_')
+            const notesCacheDirectory = ext.notesDatabase.notesCacheDirectory
+            if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
+                const fileName = path.basename(f.uri.fsPath)
+                if (fileName.endsWith('.txt')) {
+                    const [nbName, nId] = fileName.split('.')[0].split('_')
                     const contents = f.getText().split('+=+=+=').map(c => c.trim())
-                    console.log(notebook, nId, contents)
-                    ext.notesDatabase.updateNoteContent(notebook, nId, contents)
+                    ext.notesDatabase.updateNoteContent(nbName, nId, contents)
                 }
             }
         })
@@ -122,12 +122,12 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     ext.context.subscriptions.push(
         workspace.onDidCloseTextDocument((f) => {
-            if (f.fileName.startsWith(ext.masterPath)) {
-                const dirNames = f.fileName.substring(ext.masterPath.length).split('/')
-                if (dirNames[0] === '.cache' && dirNames[1].endsWith('.txt')) {
-                    const d1 = dirNames[1].split('.')[0]
-                    const [notebook, nId] = d1.split('_')
-                    ext.notesDatabase.removeEditNoteEnv(notebook, nId)
+            const notesCacheDirectory = ext.notesDatabase.notesCacheDirectory
+            if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
+                const fileName = path.basename(f.uri.fsPath)
+                if (fileName.endsWith('.txt')) {
+                    const [nbName, nId] = fileName.split('.')[0].split('_')
+                    ext.notesDatabase.removeEditNoteEnv(nbName, nId)
                 }
             }
         })
