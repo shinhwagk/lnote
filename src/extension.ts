@@ -8,9 +8,6 @@ export async function activate(context: ExtensionContext) {
 
     initializeExtensionVariables(context);
 
-
-
-
     // context.subscriptions.push(
     //     commands.registerCommand('openFolderWelcome', () => {
 
@@ -26,7 +23,7 @@ export async function activate(context: ExtensionContext) {
     // ext.registerCommand('vscode-note.domain.rename', ExtCmds.cmdHdlDomainRename);
     ext.registerCommand('vscode-note.domain.remove', ExtCmds.cmdHdlDomainRemove);
     ext.registerCommand('vscode-note.domain.search', ExtCmds.cmdHdlDomainSearch);
-    ext.registerCommand('vscode-note.notes.create', ExtCmds.cmdHdlNotesCreate);
+    ext.registerCommand('vscode-note.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
     ext.registerCommand('vscode-note.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
     /**
      * notes view

@@ -12,7 +12,7 @@ import {
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
-import { NotesDatabase } from './database';
+import { NoteBookDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
 import { tools } from './helper';
 
@@ -27,7 +27,7 @@ export namespace ext {
     export let masterPath: string;
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
-    export let notesDatabase: NotesDatabase;
+    export let notesDatabase: NoteBookDatabase;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -49,7 +49,7 @@ function listenConfiguration(ctx: ExtensionContext) {
                     return;
                 }
                 ext.masterPath = notespath;
-                ext.notesDatabase = new NotesDatabase(ext.masterPath);
+                ext.notesDatabase = new NoteBookDatabase(ext.masterPath);
                 // initializecomponents();
                 ext.notesDatabase.refresh();
                 ext.domainProvider.refresh();
@@ -67,7 +67,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         return;
     }
     ext.masterPath = notespath.endsWith('/') ? notespath : notespath + '/';
-    ext.notesDatabase = new NotesDatabase(ext.masterPath);
+    ext.notesDatabase = new NoteBookDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {
@@ -137,4 +137,5 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 export class GlobalState {
     nId: string = '';
     domainNode: DomainNode = '';
+    nbName: string = ''
 }

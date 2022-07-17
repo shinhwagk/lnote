@@ -126,7 +126,7 @@ export class NotesPanelView {
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
                         break;
                     case 'category-add':
-                        ExtCmds.cmdHdlCategoryAdd(false);
+                        ExtCmds.cmdHdlDomainCategoryAdd(false);
                         break;
                     case 'category-rename':
                         ExtCmds.cmdHdlCategoryRename(msg.data.category);

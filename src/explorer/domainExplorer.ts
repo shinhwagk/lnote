@@ -16,7 +16,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
     item.collapsibleState = ext.notesDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
-    if (notesNumberUnderDomain >= 1) {
+    if (isNotes) {
         item.command = {
             arguments: [dn],
             command: 'vscode-note.domain.pin',
@@ -42,7 +42,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
         if (element === undefined) {
-            return ext.notesDatabase.getRootDomain()
+            return ext.notesDatabase.getNoteBookNames()
         } else {
             const dn = tools.splitDomaiNode(element)
             return ext.notesDatabase.getChildrenNameOfDomain(dn)

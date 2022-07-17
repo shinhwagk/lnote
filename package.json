@@ -108,7 +108,7 @@
                     "group": "2_domain"
                 },
                 {
-                    "command": "vscode-note.notes.create",
+                    "command": "vscode-note.domain.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
                     "group": "1_domain"
                 }
@@ -176,7 +176,7 @@
                 }
             },
             {
-                "command": "vscode-note.notes.create",
+                "command": "vscode-note.domain.notes.create",
                 "title": "Create Notes"
             },
             {
