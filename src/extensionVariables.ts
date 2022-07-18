@@ -28,7 +28,7 @@ export namespace ext {
     export let masterPath: string;
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
-    export let notesDatabase: NoteBookDatabase;
+    export let notebookDatabase: NoteBookDatabase;
     export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
     export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
         context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -50,9 +50,9 @@ function listenConfiguration(ctx: ExtensionContext) {
                     return;
                 }
                 ext.masterPath = notespath;
-                ext.notesDatabase = new NoteBookDatabase(ext.masterPath);
+                ext.notebookDatabase = new NoteBookDatabase(ext.masterPath);
                 // initializecomponents();
-                ext.notesDatabase.refresh();
+                ext.notebookDatabase.refresh();
                 ext.domainProvider.refresh();
             }
         })
@@ -68,7 +68,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
         return;
     }
     ext.masterPath = notespath.endsWith('/') ? notespath : notespath + '/';
-    ext.notesDatabase = new NoteBookDatabase(ext.masterPath);
+    ext.notebookDatabase = new NoteBookDatabase(ext.masterPath);
     ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {
@@ -108,13 +108,13 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     ext.context.subscriptions.push(
         workspace.onDidSaveTextDocument((f) => {
-            const notesCacheDirectory = ext.notesDatabase.notesCacheDirectory
+            const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
             if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
                 const fileName = path.basename(f.uri.fsPath)
                 if (fileName.endsWith('.txt')) {
                     const [nbName, nId] = fileName.split('.')[0].split('_')
                     const contents = f.getText().split('+=+=+=').map(c => c.trim())
-                    ext.notesDatabase.updateNoteContent(nbName, nId, contents)
+                    ext.notebookDatabase.updateNoteContent(nbName, nId, contents)
                 }
             }
         })
@@ -122,12 +122,12 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
     ext.context.subscriptions.push(
         workspace.onDidCloseTextDocument((f) => {
-            const notesCacheDirectory = ext.notesDatabase.notesCacheDirectory
+            const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
             if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
                 const fileName = path.basename(f.uri.fsPath)
                 if (fileName.endsWith('.txt')) {
                     const [nbName, nId] = fileName.split('.')[0].split('_')
-                    ext.notesDatabase.removeEditNoteEnv(nbName, nId)
+                    ext.notebookDatabase.removeEditNoteEnv(nbName, nId)
                 }
             }
         })

@@ -104,8 +104,8 @@ export class NotesPanelView {
                     // case 'edit-col-remove':
                     //     ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
                     //     break;
-                    case 'doc':
-                        ExtCmds.cmdHdlNoteDocShow(msg.data);
+                    case 'notebook-domain-category-note-doc-show':
+                        ExtCmds.cmdHdlNotebookDomainCategoryNoteDocShow(msg.data.nId);
                         break;
                     case 'note-files-open':
                         ExtCmds.cmdHdlNoteFilesOpen(msg.data);
@@ -113,8 +113,8 @@ export class NotesPanelView {
                     case 'edit-note-doc-files':
                         ExtCmds.cmdHdlNoteFilesCreate(msg.data.nId);
                         break;
-                    case 'edit-note-doc-add':
-                        ExtCmds.cmdHdlNoteDocCreate(msg.data.nId);
+                    case 'notebook-domain-category-note-doc-create':
+                        ExtCmds.cmdHdlNotebookDomainCategoryNoteDocCreate(msg.data.nId);
                         break;
                     case 'edit-note-category-rename':
                         ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
@@ -171,12 +171,12 @@ export class NotesPanelView {
 
     private genViewData(): any {
         const wvCategories: twv.WVCategory[] = [];
-        const categoriesOfDomain = ext.notesDatabase.getCategoriesOfDomain(this.domainNode)
-        const notesOfDomain = ext.notesDatabase.notebookCache['notes']
+        const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfDomain(this.domainNode)
+        const notesOfDomain = ext.notebookDatabase.notebookCache['notes']
         for (const cname of Object.keys(categoriesOfDomain)) {
             for (const nId of categoriesOfDomain[cname]) {
-                const isDoc = ext.notesDatabase.checkDocExist(this.domainNode, nId)
-                const isFiles = ext.notesDatabase.checkFilesExist(this.domainNode, nId)
+                const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], nId)
+                const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode, nId)
                 const contents = notesOfDomain[nId]['contents']
                 if (wvCategories.filter((c) => c.name === cname).length >= 1) {
                     wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });

@@ -225,8 +225,8 @@ export class NoteBookDatabase {
         removeSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`))
     }
 
-    public checkDocExist(domainNode: string[], nId: string): boolean {
-        return existsSync(path.join(this.masterPath, domainNode[0], `${nId}_doc`)); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
+    public checkDocExist(nbName: string, nId: string): boolean {
+        return existsSync(path.join(this.masterPath, nbName, `${nId}_doc`, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
     }
 
     public checkFilesExist = (domainNode: string[], nId: string) => existsSync(path.join(this.masterPath, domainNode[0], `${nId}_files`));
@@ -245,6 +245,17 @@ export class NoteBookDatabase {
     }
 
     public getFilesPath = (domainNode: string[], nId: string) => path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_files`)
+
+    public noteDocCreate(nbName: string, nId: string) {
+        const docDir = path.join(this.masterPath, nbName, `${nId}_doc`)
+        mkdirpSync(docDir)
+        const docMainFile = path.join(docDir, 'README.md')
+        vfs.writeFileSync(docMainFile, '')
+    }
+
+    public getDocMainFile(nbName: string, nId: string) {
+        return path.join(this.masterPath, nbName, `${nId}_doc`, 'README.md')
+    }
 
 }
 

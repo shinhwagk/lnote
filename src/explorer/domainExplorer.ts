@@ -7,15 +7,15 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
     const domainNode = tools.splitDomaiNode(dn);
-    const isNotes = ext.notesDatabase.checkNotesExist(domainNode)
+    const isNotes = ext.notebookDatabase.checkNotesExist(domainNode)
     const notesTotalNumberUnderDomain = 0// ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
     const notesNumberUnderDomain = isNotes
-        ? Object.values(ext.notesDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
+        ? Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
 
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
     item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
-    item.collapsibleState = ext.notesDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
+    item.collapsibleState = ext.notebookDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
     if (isNotes) {
         item.command = {
             arguments: [dn],
@@ -42,10 +42,10 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
     public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
         if (element === undefined) {
-            return ext.notesDatabase.getNoteBookNames()
+            return ext.notebookDatabase.getNoteBookNames()
         } else {
             const dn = tools.splitDomaiNode(element)
-            return ext.notesDatabase.getChildrenNameOfDomain(dn)
+            return ext.notebookDatabase.getChildrenNameOfDomain(dn)
                 .sort()
                 .map((name) => tools.joinDomainNode(dn.concat(name)));
         }

@@ -47,7 +47,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'create document',
-            onClick: (data) => vscode.postMessage({ command: 'edit-note-doc-add', data: { nId: data.note.nId } }),
+            onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-note-doc-create', data: { nId: data.note.nId } }),
         },
         {
             title: 'create files',
@@ -219,7 +219,7 @@ class VNNote {
         const d_space = document.createElement('span');
         d_space.appendChild(elemSpaces(2));
 
-        d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'doc', data: nid })));
+        d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-domain-category-note-doc-show', data: { nId: nid } })));
         d_note_id.appendChild(d_space);
         d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', data: nid })));
 
