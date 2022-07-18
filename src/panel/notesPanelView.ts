@@ -119,8 +119,8 @@ export class NotesPanelView {
                     case 'edit-note-category-rename':
                         ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
                         break;
-                    case 'note-remove':
-                        ExtCmds.cmdHdlNoteRemove(msg.data.category, msg.data.nId);
+                    case 'notebook-domain-category-note-remove':
+                        ExtCmds.cmdHdlNotebookDomainCategoryNoteRemove(msg.data.category, msg.data.nId);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
@@ -171,7 +171,7 @@ export class NotesPanelView {
 
     private genViewData(): any {
         const wvCategories: twv.WVCategory[] = [];
-        const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfDomain(this.domainNode)
+        const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfNotebook(this.domainNode)
         const notesOfDomain = ext.notebookDatabase.notebookCache['notes']
         for (const cname of Object.keys(categoriesOfDomain)) {
             for (const nId of categoriesOfDomain[cname]) {

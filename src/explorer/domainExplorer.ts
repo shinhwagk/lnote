@@ -8,13 +8,13 @@ export type DomainNode = string;
 function getTreeItem(dn: DomainNode): TreeItem {
     const domainNode = tools.splitDomaiNode(dn);
     const isNotes = ext.notebookDatabase.checkNotesExist(domainNode)
-    const notesTotalNumberUnderDomain = 0// ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
-    const notesNumberUnderDomain = isNotes
-        ? Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
+    const notesTotalNumberUnderDomain = ext.notebookDatabase.getNotesNumberUnderDomain(domainNode)// ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
+    const notesNumberOfDomain = isNotes
+        ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode)//  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
         : 0; //domain['.notes'].length;
 
     const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-    item.description = `${notesNumberUnderDomain}/${notesTotalNumberUnderDomain} `;
+    item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain} `;
     item.collapsibleState = ext.notebookDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
     if (isNotes) {
         item.command = {
