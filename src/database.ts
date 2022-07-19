@@ -33,7 +33,7 @@ interface Notebook {
 }
 
 interface NotebookNotes {
-    [nId: string]: { contents: string[] }
+    [nId: string]: { contents: string[], cts: number, mts: number }
 }
 
 export class NoteBookDatabase {
@@ -192,7 +192,8 @@ export class NoteBookDatabase {
         const nbNotes = this.getNBNotes(domainNode[0])
         const nId = generateNId()
         objectPath.push(this.domainTreeCache, [...domainNode, '.categories', cname], nId)
-        nbNotes[nId] = { contents: [''] }
+        const ts = (new Date()).getTime()
+        nbNotes[nId] = { contents: [''], cts: ts, mts: ts }
         this.writeNBDomains(domainNode[0])
         this.writeNBNotes(domainNode[0])
         return nId
@@ -246,6 +247,7 @@ export class NoteBookDatabase {
     public updateNoteContent(nbName: string, nId: string, contents: string[]) {
         const notes = this.getNBNotes(nbName)
         notes[nId].contents = contents
+        notes[nId].mts = (new Date()).getTime()
         this.writeNBNotes(nbName)
     }
 

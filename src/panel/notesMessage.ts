@@ -15,6 +15,8 @@ export namespace ToWebView {
         doc: boolean;
         files: boolean;
         labels?: string[];
+        cDate: string;
+        mDate: string;
     }
 
     export interface DomainData {

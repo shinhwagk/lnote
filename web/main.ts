@@ -31,6 +31,8 @@ interface DataNote {
     contents: string[];
     doc: boolean;
     files: boolean;
+    cDate: string;
+    mDate: string;
 }
 
 interface DataProtocol {
@@ -217,6 +219,7 @@ class VNNote {
         const f_cion = this.note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
         const d_space = document.createElement('span');
+        d_space.title = `id: ${this.note.nId}, create date: ${this.note.cDate}, modify date: ${this.note.mDate}`
         d_space.appendChild(elemSpaces(2));
 
         d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
