@@ -179,7 +179,7 @@ export class NotesPanelView {
             }
             for (const nId of categoriesOfDomain[cname]) {
                 const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], nId)
-                const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode, nId)
+                const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode[0], nId)
                 const contents = notesOfDomain[nId]['contents']
                 if (wvCategories.filter((c) => c.name === cname).length >= 1) {
                     wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
