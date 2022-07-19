@@ -263,6 +263,11 @@ class VNNote {
         // if (this.note.contents.length >= 2) {
         //     newContxt.splice(2, 0, delColContext);
         // }
+
+        // let necma = this.note.doc ? NoteEditContextMenuActions[0].filter(n => n.title !== 'create document') : NoteEditContextMenuActions;
+        const necma = NoteEditContextMenuActions.slice()
+        if (this.note.doc) { necma[0].shift() }
+        if (this.note.files) { necma[0].pop() }
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
                 nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: this.note, category: this.category });
