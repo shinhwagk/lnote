@@ -225,23 +225,40 @@ export class NoteBookDatabase {
         return [...Object.keys(this.domainTreeCache)]
     }
 
-    public getNotesNumberUnderDomain(domainNode: string[], cnt = 0): number {
-        cnt += this.getNotesNumberOfDomain(domainNode)
+    public getNotesNumberUnderDomain(domainNode: string[], cnt: number = 0): number {
+
+        const nnum = this.getNotesNumberOfDomain(domainNode)
+
+        console.log(domainNode, nnum, cnt)
+
         const nbDomain = objectPath.get(this.domainTreeCache, domainNode)
-        for (const dName of Object.keys(nbDomain).filter(d => d !== '.categories')) {
-            return this.getNotesNumberUnderDomain(domainNode.concat(dName), cnt)
+        const domainNames = Object.keys(nbDomain).filter(d => d !== '.categories')
+        if (domainNames.length === 0) {
+            return cnt
         }
-        return cnt
+        for (const d of domainNames) {
+            cnt += this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
+        }
+        return cnt + nnum
+
+        // console.log("xxxx", JSON.stringify(domainNode), cnt)
+
+        // cnt += this.getNotesNumberOfDomain(domainNode)
+
+        // const nbDomain = objectPath.get(this.domainTreeCache, domainNode)
+        // const domainNames = Object.keys(nbDomain).filter(d => d !== '.categories')
+        // if (domainNames.length === 0) {
+        //     return cnt
+        // }
+        // for (const d of domainNames) {
+        //     return this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
+        // }
+        // return cnt
     }
 
     public getNotesNumberOfDomain(domainNode: string[]): number {
-        // const nb = this.readNBDomains(domainNode[0])
-        const domain: NotebookDomain = objectPath.get(this.domainTreeCache, domainNode)
-        if (domain['.categories']) {
-            return Object.values(domain['.categories']).flat().length
-        } else {
-            return 0
-        }
+        const categories = objectPath.get(this.domainTreeCache, [...domainNode, '.categories'], {})
+        return Object.values(categories).flat().length
     }
 
     public updateNoteContent(nbName: string, nId: string, contents: string[]) {
@@ -279,7 +296,7 @@ export class NoteBookDatabase {
     }
 
     public checkNotesExist(domainNode: string[]) {
-        return this.getDomain(domainNode)['.categories'] !== undefined
+        return objectPath.get(this.domainTreeCache, [...domainNode, '.categories']) !== undefined
     }
 
     public getFilesPath = (nbName: string, nId: string) => path.join(this.masterPath, nbName, `${nId}_files`)
