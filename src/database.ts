@@ -229,7 +229,9 @@ export class NoteBookDatabase {
         return existsSync(path.join(this.masterPath, nbName, `${nId}_doc`, 'README.md')); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
     }
 
-    public checkFilesExist = (domainNode: string[], nId: string) => existsSync(path.join(this.masterPath, domainNode[0], `${nId}_files`));
+    public checkFilesExist(nbName: string, nId: string) {
+        return existsSync(path.join(this.masterPath, nbName, `${nId}_files`, 'README.md'));
+    }
 
     public createCategory(domainNode: string[], cname: string) {
         const dn: NotebookDomain = objectPath.get(this.notebookCache, ['domain', ...domainNode])
