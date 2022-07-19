@@ -205,13 +205,6 @@ export class NoteBookDatabase {
 
     public getNoteBookDirectory = (notebook: string) => path.join(this.masterPath, notebook);
 
-    public getNoteFile = (domainNode: string[], fileName: string) =>
-        path.join(this.masterPath, domainNode.join(pathSplit), fileName);
-
-    // public getDomainMeta(domainNode: string[]): any {
-    //     return readJsonSync(path.join(this.masterPath, domainNode.join(pathSplit), 'meta.json'), { encoding: 'utf8' });
-    // }
-
     public getDomain(domainNode: string[] = []): NotebookDomain {
         return objectPath.get(this.domainTreeCache, domainNode);
     }
@@ -226,34 +219,18 @@ export class NoteBookDatabase {
     }
 
     public getNotesNumberUnderDomain(domainNode: string[], cnt: number = 0): number {
-
-        const nnum = this.getNotesNumberOfDomain(domainNode)
-
-        console.log(domainNode, nnum, cnt)
-
+        cnt += this.getNotesNumberOfDomain(domainNode)
         const nbDomain = objectPath.get(this.domainTreeCache, domainNode)
         const domainNames = Object.keys(nbDomain).filter(d => d !== '.categories')
         if (domainNames.length === 0) {
             return cnt
         }
+
+        let _cnt = 0
         for (const d of domainNames) {
-            cnt += this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
+            _cnt += this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
         }
-        return cnt + nnum
-
-        // console.log("xxxx", JSON.stringify(domainNode), cnt)
-
-        // cnt += this.getNotesNumberOfDomain(domainNode)
-
-        // const nbDomain = objectPath.get(this.domainTreeCache, domainNode)
-        // const domainNames = Object.keys(nbDomain).filter(d => d !== '.categories')
-        // if (domainNames.length === 0) {
-        //     return cnt
-        // }
-        // for (const d of domainNames) {
-        //     return this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
-        // }
-        // return cnt
+        return _cnt
     }
 
     public getNotesNumberOfDomain(domainNode: string[]): number {
@@ -319,20 +296,6 @@ export class NoteBookDatabase {
     }
 
 }
-
-// public checkFilesExist = (nId: string) => existsSync(this.getFilesPath(nId));
-
-// export function parseNoteFile(f: string): Note {
-//     const [cIdx, nIdx, nId] = basename(f.split('.')[0]).split('_');
-//     const noteFilePhth = dirname(f);
-//     const isDoc = existsSync(path.join(noteFilePhth, `${nId}_doc`));
-//     const isFiles = existsSync(path.join(noteFilePhth, `${nId}_files`));
-//     const arr = readFileSync(f, { encoding: 'utf8' })
-//         .split(columnSplit)
-//         .filter((e) => e !== '==+')
-//         .map((e) => e.trim());
-//     return { category: arr[0], contents: arr.slice(1), cIdx: Number(cIdx), nIdx: Number(nIdx), nId, isDoc, isFiles };
-// }
 
 function generateNId(): string {
     return tools.hexRandom(3);
