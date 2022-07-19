@@ -174,34 +174,19 @@ export class NotesPanelView {
         const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfNotebook(this.domainNode)
         const notesOfDomain = ext.notebookDatabase.notebookCache['notes']
         for (const cname of Object.keys(categoriesOfDomain)) {
+            if (wvCategories.filter((c) => c.name === cname).length === 0) {
+                wvCategories.push({ name: cname, notes: [] });
+            }
             for (const nId of categoriesOfDomain[cname]) {
                 const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], nId)
                 const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode, nId)
                 const contents = notesOfDomain[nId]['contents']
                 if (wvCategories.filter((c) => c.name === cname).length >= 1) {
                     wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
-                } else {
-                    wvCategories.push({ name: cname, notes: [{ nId: nId, contents: contents, doc: isDoc, files: isFiles }] });
                 }
             }
-            // categories.push({ name: category, notes: [{ nId: note, contents, doc: isDoc, files: isFiles }] });
         }
-        // const sortNotes = ext.domainDB.getDomainNotes(this.dpathCache);
-        // // const sortNotes = ext.domainDB.sortNotes(notes);
-
-        // for (const nId of sortNotes) {
-        //     const category = ext.domainDB.noteDB.getMeta(nId).category;
-        //     const contents: string[] = ext.domainDB.noteDB.getNoteContents(nId);
-        //     const isDoc = ext.domainDB.noteDB.checkDocExist(nId);
-        //     const isFiles = ext.domainDB.noteDB.checkFilesExist(nId);
-        //     if (categories.filter((c) => c.name === category).length >= 1) {
-        //         categories.filter((c) => c.name === category)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
-        //     } else {
-        //         categories.push({ name: category, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
-        //     }
-        // }
         return { dpath: this.domainNode, categories: wvCategories };
-        // return { dpath: [], categories: [] };
     }
 }
 
