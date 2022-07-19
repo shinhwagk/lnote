@@ -95,8 +95,8 @@ export class NotesPanelView {
                     case 'note-add':
                         ExtCmds.cmdHdlNoteAdd(msg.data.category);
                         break;
-                    case 'edit-notes':
-                        ExtCmds.cmdHdlNoteEditContent(msg.data.nId);
+                    case 'notebook-note-contents-edit':
+                        ExtCmds.cmdHdlNoteEditNoteContents(msg.data.nId);
                         break;
                     case 'note-edit-short-document':
                         ExtCmds.cmdHdlNoteEditShortDocument(msg.data.id);
@@ -104,23 +104,23 @@ export class NotesPanelView {
                     // case 'edit-col-remove':
                     //     ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
                     //     break;
-                    case 'notebook-domain-category-note-doc-show':
-                        ExtCmds.cmdHdlNotebookDomainCategoryNoteDocShow(msg.data.nId);
+                    case 'notebook-note-doc-show':
+                        ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);
                         break;
-                    case 'note-files-open':
-                        ExtCmds.cmdHdlNoteFilesOpen(msg.data);
+                    case 'notebook-note-files-open':
+                        ExtCmds.cmdHdlNoteFilesOpen(msg.data.nId);
                         break;
-                    case 'edit-note-doc-files':
+                    case 'notebook-note-files-create':
                         ExtCmds.cmdHdlNoteFilesCreate(msg.data.nId);
                         break;
-                    case 'notebook-domain-category-note-doc-create':
-                        ExtCmds.cmdHdlNotebookDomainCategoryNoteDocCreate(msg.data.nId);
+                    case 'notebook-note-doc-create':
+                        ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
                         break;
-                    case 'edit-note-category-rename':
+                    case 'edit-note-notebook-domain-category-rename':
                         ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
                         break;
                     case 'notebook-domain-category-note-remove':
-                        ExtCmds.cmdHdlNotebookDomainCategoryNoteRemove(msg.data.category, msg.data.nId);
+                        ExtCmds.cmdHdlNBDomainCategoryNoteRemove(msg.data.category, msg.data.nId);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
@@ -128,11 +128,11 @@ export class NotesPanelView {
                     case 'category-add':
                         ExtCmds.cmdHdlDomainCategoryAdd(false);
                         break;
-                    case 'category-rename':
-                        ExtCmds.cmdHdlCategoryRename(msg.data.category);
+                    case 'notebook-domain-category-rename':
+                        ExtCmds.cmdHdlNBDomainCategoryRename(msg.data.category);
                         break;
-                    case 'category-remove':
-                        ExtCmds.cmdHdlCategoryRemove(msg.data.category);
+                    case 'notebook-domain-category-remove':
+                        ExtCmds.cmdHdlNBDomainCategoryRemove(msg.data.category);
                         break;
                     case 'category-to-domain':
                         vscode.window.showInformationMessage('soon');
@@ -171,8 +171,8 @@ export class NotesPanelView {
 
     private genViewData(): any {
         const wvCategories: twv.WVCategory[] = [];
-        const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfNotebook(this.domainNode)
-        const notesOfDomain = ext.notebookDatabase.notebookCache['notes']
+        const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfDomain(this.domainNode)
+        const notes = ext.notebookDatabase.getNBNotes(this.domainNode[0])
         for (const cname of Object.keys(categoriesOfDomain)) {
             if (wvCategories.filter((c) => c.name === cname).length === 0) {
                 wvCategories.push({ name: cname, notes: [] });
@@ -180,7 +180,7 @@ export class NotesPanelView {
             for (const nId of categoriesOfDomain[cname]) {
                 const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], nId)
                 const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode[0], nId)
-                const contents = notesOfDomain[nId]['contents']
+                const contents = notes[nId]['contents']
                 if (wvCategories.filter((c) => c.name === cname).length >= 1) {
                     wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: nId, contents: contents, doc: isDoc, files: isFiles });
                 }

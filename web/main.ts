@@ -47,17 +47,17 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'create document',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-note-doc-create', data: { nId: data.note.nId } }),
+            onClick: (data) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nId: data.note.nId } }),
         },
         {
             title: 'create files',
-            onClick: (data) => vscode.postMessage({ command: 'edit-note-doc-files', data: { nId: data.note.nId } }),
+            onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } }),
         },
     ],
     [
         {
             title: 'category rename',
-            onClick: (data) => vscode.postMessage({ command: 'edit-note-category-rename', data: { nId: data.note.nId } }),
+            onClick: (data) => vscode.postMessage({ command: 'edit-note-notebook-domain-category-rename', data: { nId: data.note.nId } }),
         }
     ],
     [
@@ -84,13 +84,13 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'rename',
-            onClick: (data) => vscode.postMessage({ command: 'category-rename', data: { category: data.category } }),
+            onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-rename', data: { category: data.category } }),
         },
     ],
     [
         {
             title: 'remove',
-            onClick: (data) => vscode.postMessage({ command: 'category-remove', data: { category: data.category } }),
+            onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { category: data.category } }),
         },
     ],
     [
@@ -105,7 +105,7 @@ const NoteColContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'edit short document',
-            onClick: (data: any) => vscode.postMessage({ command: 'note-edit-short-document', data: { id: data.id } }),
+            onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.id } }),
         },
         // {
         //     title: 'delete short document',
@@ -219,9 +219,9 @@ class VNNote {
         const d_space = document.createElement('span');
         d_space.appendChild(elemSpaces(2));
 
-        d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-domain-category-note-doc-show', data: { nId: nid } })));
+        d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
         d_note_id.appendChild(d_space);
-        d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', data: nid })));
+        d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'notebook-note-files-open', data: { nId: nid } })));
 
         const d_note_content = document.createElement('div');
         d_note_content.className = 'grid-note-content';
@@ -230,9 +230,9 @@ class VNNote {
         for (let i = 0; i < this.note.contents.length; i++) {
             const d = document.createElement('div');
             d.className = 'grid-note-content';
-            d.ondblclick = () => {
-                vscode.postMessage({ command: 'edit-notes', data: { nId: this.note.nId } });
-            };
+            // d.ondblclick = () => {
+            //     vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: this.note.nId } });
+            // };
             d.textContent = this.note.contents[i];
             d.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
@@ -265,12 +265,13 @@ class VNNote {
         // }
 
         // let necma = this.note.doc ? NoteEditContextMenuActions[0].filter(n => n.title !== 'create document') : NoteEditContextMenuActions;
-        const necma = NoteEditContextMenuActions.slice()
-        if (this.note.doc) { necma[0].shift() }
-        if (this.note.files) { necma[0].pop() }
+        // const necma = Object.assign({}, NoteEditContextMenuActions);
+        const necma = NoteEditContextMenuActions
+        // if (this.note.doc) { necma[0].shift() }
+        // if (this.note.files) { necma[0].pop() }
         d_note_edit.appendChild(
             elemIcon('fa-pen', (ev: MouseEvent) => {
-                nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: this.note, category: this.category });
+                nccm.show(ev, d_note_edit, necma, { note: this.note, category: this.category });
             })
         );
 

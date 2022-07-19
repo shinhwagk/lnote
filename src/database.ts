@@ -28,15 +28,20 @@ export interface NotebookNote {
 }
 
 interface Notebook {
-    domain: NotebookDomain
+    domains: NotebookDomain
     notes: { [id: string]: { contents: string[] } }
+}
+
+interface NotebookNotes {
+    [nId: string]: { contents: string[] }
 }
 
 export class NoteBookDatabase {
     private readonly masterPath: string;
     // private readonly shortcutsFile: string;
-    public domainTreeCache = {};
-    public notebookCache: Notebook = { domain: {}, notes: {} };
+    public nbNotesCache = new Map<string, [NotebookNotes, number]>();
+    public domainTreeCache: NotebookDomain = {};
+    // public notebookCache: Notebook = { domains: {}, notes: {} };
     public notesCacheDirectory: string;
     // private readonly domainCacheName = 'domain.cache.json';
     // private readonly domainCacheFile;
@@ -45,7 +50,6 @@ export class NoteBookDatabase {
     constructor(masterPath: string) {
         this.masterPath = masterPath;
         this.notesCacheDirectory = path.join(this.masterPath, '.cache')
-        // this.domainCacheFile = path.join(this.masterPath, this.domainCacheName);
         // this.shortcutsFile = path.join(this.vsnoteDbPath, 'shortcuts.json');
         this.initDirectories();
         // this.noteDB = new NoteDatabase(masterPath);
@@ -60,106 +64,142 @@ export class NoteBookDatabase {
         existsSync(this.notesCacheDirectory) || mkdirpSync(this.notesCacheDirectory);
     }
 
-    public refresh(domainNode: string[] | undefined = undefined): void {
-        if (domainNode !== undefined) {
-            objectPath.set(this.domainTreeCache, domainNode, {});
+    public refresh(nbName: string | undefined = undefined): void {
+        if (nbName !== undefined) {
+            this.cacheNBDomains(nbName)
         } else {
-            this.cacheAllNoteBook();
+            this.cacheAllNBDomains();
         }
     }
 
-    public cacheAllNoteBook() {
-        for (const nbName of readdirSync(this.masterPath).filter(f => f.endsWith('.yaml')).map(f => f.split('.')[0])) {
-            this.cacheNoteBook(nbName)
+    public cacheAllNBDomains() {
+        for (const nbName of readdirSync(this.masterPath).filter(f => f !== '.cache')) {
+            try {
+                this.cacheNBDomains(nbName)
+            } catch (e) {
+                console.error(`nb: ${nbName}. err:${e}`)
+            }
         }
     }
 
-    public readNotebook(nbName: string): Notebook {
-        return tools.readYamlSync(this.getNoteBookFile(nbName))
+    public cacheNBDomains(nbName: string) {
+        const domains = this.readNBDomains(nbName)
+        objectPath.set(this.domainTreeCache, [nbName], domains)
     }
 
-    public writeNotebook(nbName: string, notebook: any) {
-        tools.writeYamlSync(this.getNoteBookFile(nbName), notebook)
+    public getNBNotes(nbName: string) {
+        this.cacheNBNotes(nbName)
+        const [notes, _ts] = this.nbNotesCache.get(nbName)!
+        this.nbNotesCache.set(nbName, [notes, (new Date()).getTime()])
+        return notes
     }
 
-    public cacheNoteBook(nbName: string) {
-        const nb = this.readNotebook(nbName)
-        objectPath.set(this.domainTreeCache, [nbName], nb['domain'][nbName])
-        this.notebookCache = nb
+    public cacheNBNotes(nbName: string, force = false) {
+        const currTime = (new Date()).getTime()
+        if (this.nbNotesCache.has(nbName)) {
+            const nbNotesCacheTime = this.nbNotesCache.get(nbName)?.[1] || 0
+            if (!(force || currTime >= nbNotesCacheTime + 1000 * 60 * 5)) {// 5 mintue
+                return
+            }
+        }
+        const nbNotes = this.readNBNotes(nbName)
+        this.nbNotesCache.set(nbName, [nbNotes, (new Date()).getTime()]);
+
+        // delete redundant notes cache 
+        if (this.nbNotesCache.size >= 6) {
+            const _n1: [string, NotebookNotes, number][] = [...this.nbNotesCache.entries()]
+                .map(nb => [nb[0], nb[1][0], nb[1][1]])
+            const _nbName = _n1.sort(t => (t as any[])[2])[0][0]
+            this.nbNotesCache.delete(_nbName)
+        }
+        console.log('nbNotesCache size', this.nbNotesCache.size, JSON.stringify([...this.nbNotesCache.keys()]))
     }
 
-    public getNoteBookFile = (domainName: string) => path.join(this.masterPath, `${domainName}.yaml`)
+    public readNBDomains(nbName: string) {
+        return tools.readYamlSync(this.getNBDomainsFile(nbName))
+    }
 
-    // public refreshDomainNodes(domainNode: string[] = [], p: boolean): void {
-    //     const domainLabels = this.getDomainLabels(domainNode);
-    //     objectPath.set(this.domainCache, domainNode.concat('.notes'), []); // clear .notes field
-    //     if (domainLabels.length >= 1) {
-    //         const nIds = this.noteDB.getNIdsBylabels(domainLabels);
-    //         objectPath.set(this.domainCache, domainNode.concat('.notes'), nIds);
-    //     }
-    //     if (p) 
-    // }
+    public readNBNotes(nbName: string) {
+        return tools.readYamlSync(this.getNBNotesFile(nbName))
+    }
 
+    public writeNBDomains(nbName: string) {
+        tools.writeYamlSync(this.getNBDomainsFile(nbName), this.domainTreeCache[nbName])
+    }
 
-    // public appendLabels(domainNode: string[], labels: string[]) {
-    //     const sourceLabels: string[] = objectPath.get(this.domain, domainNode.concat('.labels'));
-    //     this.updateLabels(domainNode, Array.from(new Set(sourceLabels.concat(labels))));
-    // }
+    public writeNBNotes(nbName: string) {
+        tools.writeYamlSync(this.getNBNotesFile(nbName), this.getNBNotes(nbName))
+    }
 
-    // public getDomainLabels(domainNode: string[]): string[] {
-    //     return this.getDomain(domainNode)['.labels'];
-    // }
+    public getNBDomainsFile = (nbName: string) => path.join(this.masterPath, nbName, `domains.yaml`)
+
+    public getNBNotesFile = (nbName: string) => path.join(this.masterPath, nbName, `notes.yaml`)
 
     public deleteDomain(domainNode: string[], withNotes: boolean): void {
+        if (domainNode.length === 0) {
+            return
+        }
         const nbName = domainNode[0]
         objectPath.del(this.domainTreeCache, domainNode);
-        const nb = this.readNotebook(nbName)
-        objectPath.del(nb, ['domain', ...domainNode])
-        this.writeNotebook(nbName, nb)
+        this.writeNBDomains(nbName)
     }
 
     public createDomain(domainNode: string[]) {
         const nbName = domainNode[0]
-        const nb: Notebook = tools.readYamlSync(this.getNoteBookFile(nbName))
-        objectPath.set(nb, ['domain'].concat(domainNode), {})
-        this.writeNotebook(nbName, nb)
-        objectPath.set(this.domainTreeCache, [nbName], nb['domain'][nbName])
-        this.cacheNoteBook(nbName)
+        objectPath.set(this.domainTreeCache, domainNode, {})
+        this.writeNBDomains(nbName)
     }
 
     public removeNote(domainNode: string[], category: string, nId: string, deep = false) {
-        const notes = this.getCategoriesOfNotebook(domainNode)
-        const nIds: string[] = notes[category]
-        notes[category] = nIds.filter(n => n !== nId)
-        if (deep) {
-            delete this.notebookCache['notes'][nId]
+        const nbName = domainNode[0]
+        const nIds = objectPath.get<string[]>(this.domainTreeCache, [...domainNode, '.categories', category], [])
+        if (nIds.length >= 1) {
+            objectPath.set(this.domainTreeCache, [...domainNode, '.categories', category], nIds.filter(n => n !== nId))
         }
-        this.writeNotebook(domainNode[0], this.notebookCache)
+        if (deep) {
+            const notes = this.readNBNotes(domainNode[0])
+            delete notes[nId]
+            this.writeNBNotes(nbName)
+        }
+        this.writeNBDomains(nbName)
     }
 
-    public addNote(domainNode: string[], category: string) {
-        const categories = this.getCategoriesOfNotebook(domainNode)
-        const notes = this.notebookCache.notes
+    public removeCategory(domainNode: string[], cname: string, withNotes: boolean) {
+        const notesOfCategory = objectPath.get(this.domainTreeCache, [...domainNode, '.categories', cname], [])
+        if (withNotes) {
+            const nbNotes = this.getNBNotes(domainNode[0])
+            for (const nId of notesOfCategory) {
+                delete nbNotes[nId]
+            }
+            this.writeNBNotes(domainNode[0])
+        }
+        objectPath.del(this.domainTreeCache, [...domainNode, '.categories', cname])
+        if (Object.keys(objectPath.get(this.domainTreeCache, [...domainNode, '.categories'])).length === 0) {
+            objectPath.del(this.domainTreeCache, [...domainNode, '.categories'])
+        }
+        this.writeNBDomains(domainNode[0])
+    }
+
+    public renameCategory(domainNode: string[], ocname: string, ncname: string) {
+        const notesOfCategory = objectPath.get(this.domainTreeCache, [...domainNode, '.categories', ocname], [])
+        objectPath.set(this.domainTreeCache, [...domainNode, '.categories', ncname], notesOfCategory)
+        objectPath.del(this.domainTreeCache, [...domainNode, '.categories', ocname])
+        this.writeNBDomains(domainNode[0])
+    }
+
+    public addNote(domainNode: string[], cname: string) {
+        // const dNotes = objectPath.get(this.domainTreeCache, [...domainNode, '.categories', cname], [])
+        const nbNotes = this.getNBNotes(domainNode[0])
         const nId = generateNId()
-        categories[category].push(nId)
-        notes[nId] = { contents: [] }
-        this.writeNotebook(domainNode[0], this.notebookCache)
+        objectPath.push(this.domainTreeCache, [...domainNode, '.categories', cname], nId)
+        nbNotes[nId] = { contents: [''] }
+        this.writeNBDomains(domainNode[0])
+        this.writeNBNotes(domainNode[0])
         return nId
     }
 
-    public addCategory(domainNode: string[], category: string) {
-        const notes = this.getCategoriesOfNotebook(domainNode)
-        notes[category] = []
-        // this.persistenceNotes(domainNode, notes)
-    }
-
-    public createNotes(domainNode: string[], category: string = 'default') {
-        // this.persistenceNotes(domainNode, {})
-        this.addCategory(domainNode, category)
-    }
-
-    public getCategoriesOfNotebook(domainNode: string[]): any {
-        return objectPath.get(this.notebookCache, ['domain', ...domainNode])['.categories']
+    public getCategoriesOfDomain(domainNode: string[]): any {
+        return objectPath.get(this.domainTreeCache, [...domainNode, '.categories'])
     }
 
     public getNoteBookDirectory = (notebook: string) => path.join(this.masterPath, notebook);
@@ -194,8 +234,8 @@ export class NoteBookDatabase {
     }
 
     public getNotesNumberOfDomain(domainNode: string[]): number {
-        const nb = this.readNotebook(domainNode[0])
-        const domain: NotebookDomain = objectPath.get(nb, ['domain', ...domainNode])
+        // const nb = this.readNBDomains(domainNode[0])
+        const domain: NotebookDomain = objectPath.get(this.domainTreeCache, domainNode)
         if (domain['.categories']) {
             return Object.values(domain['.categories']).flat().length
         } else {
@@ -203,12 +243,10 @@ export class NoteBookDatabase {
         }
     }
 
-    public updateNoteContent(notebook: string, nId: string, contents: string[]) {
-        this.cacheNoteBook(notebook)
-        console.log(notebook, nId, contents)
-        this.notebookCache.notes[nId].contents = contents
-        this.writeNotebook(notebook, this.notebookCache)
-        // writeFileSync(this.getNoteBookFile(notebook), yaml.stringify(this.notebookCache), { encoding: 'utf8' })
+    public updateNoteContent(nbName: string, nId: string, contents: string[]) {
+        const notes = this.getNBNotes(nbName)
+        notes[nId].contents = contents
+        this.writeNBNotes(nbName)
     }
 
     // public getNotesOfNoteBook(domainNode: string[]): { [nId: string]: { contents: string[] } } {
@@ -216,7 +254,7 @@ export class NoteBookDatabase {
     // }
 
     public createEditNoteEnv(notebookName: string, nId: string, mode: 'edit' | 'add' | 'del' = 'edit') {
-        const note = this.notebookCache.notes[nId]
+        const note = this.getNBNotes(notebookName)[nId]
         vfs.writeFileSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`), note.contents.join("\n+=+=+=+=\n"))
         return path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`)
     }
@@ -230,29 +268,31 @@ export class NoteBookDatabase {
     }
 
     public checkFilesExist(nbName: string, nId: string) {
-        return existsSync(path.join(this.masterPath, nbName, `${nId}_files`, 'README.md'));
+        return existsSync(path.join(this.masterPath, nbName, `${nId}_files`));
     }
 
     public createCategory(domainNode: string[], cname: string) {
-        const dn: NotebookDomain = objectPath.get(this.notebookCache, ['domain', ...domainNode])
-        if (dn['.categories'] === undefined) {
-            dn['.categories'] = {}
-        }
-        dn['.categories'][cname] = []
-        this.writeNotebook(domainNode[0], this.notebookCache)
+        objectPath.ensureExists(this.domainTreeCache, [...domainNode, '.categories', cname], [])
+        this.writeNBDomains(domainNode[0])
     }
 
     public checkNotesExist(domainNode: string[]) {
         return this.getDomain(domainNode)['.categories'] !== undefined
     }
 
-    public getFilesPath = (domainNode: string[], nId: string) => path.join(this.masterPath, domainNode.join(pathSplit), `${nId}_files`)
+    public getFilesPath = (nbName: string, nId: string) => path.join(this.masterPath, nbName, `${nId}_files`)
 
     public noteDocCreate(nbName: string, nId: string) {
         const docDir = path.join(this.masterPath, nbName, `${nId}_doc`)
         mkdirpSync(docDir)
         const docMainFile = path.join(docDir, 'README.md')
         vfs.writeFileSync(docMainFile, '')
+    }
+
+    public noteFilesCreate(nbName: string, nId: string) {
+        console.log("fff", nbName)
+        const filesDir = path.join(this.masterPath, nbName, `${nId}_files`)
+        mkdirpSync(filesDir)
     }
 
     public getDocMainFile(nbName: string, nId: string) {
