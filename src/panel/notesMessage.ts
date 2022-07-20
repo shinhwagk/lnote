@@ -1,14 +1,4 @@
 export namespace ToWebView {
-    export interface WVDomain {
-        dpath: string[];
-        categories: WVCategory[];
-    }
-
-    export interface WVCategory {
-        name: string;
-        notes: WVNote[];
-    }
-
     export interface WVNote {
         nId: string;
         contents: string[];
@@ -17,6 +7,16 @@ export namespace ToWebView {
         labels?: string[];
         cDate: string;
         mDate: string;
+    }
+
+    export interface WVCategory {
+        name: string;
+        notes: WVNote[];
+    }
+
+    export interface WVDomain {
+        dpath: string[];
+        categories: WVCategory[];
     }
 
     export interface DomainData {
