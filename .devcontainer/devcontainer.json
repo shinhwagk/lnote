@@ -12,8 +12,5 @@
 		"esbenp.prettier-vscode",
 		"shinhwagk.vscode-note"
 	],
-    "mounts": [
-        "source=/Users/zhangxu/OneDrive/vscode-note-data/new-notes,target=/Users/zhangxu/OneDrive/vscode-note-data/new-notes,type=bind"
-    ],
     "remoteUser": "node"
 }
