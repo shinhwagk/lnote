@@ -135,7 +135,7 @@ export class NoteBookDatabase {
 
   public getNBNotesFile = (nbName: string) => path.join(this.masterPath, nbName, 'notes.yaml')
 
-  public deleteDomain (domainNode: string[], withNotes: boolean): void {
+  public deleteDomain (domainNode: string[], _withNotes: boolean): void {
     if (domainNode.length === 0) {
       return
     }
@@ -251,7 +251,7 @@ export class NoteBookDatabase {
     this.writeNBNotes(nbName)
   }
 
-  public createEditNoteEnv (notebookName: string, nId: string, mode: 'edit' | 'add' | 'del' = 'edit') {
+  public createEditNoteEnv (notebookName: string, nId: string, _mode: 'edit' | 'add' | 'del' = 'edit') {
     const note = this.getNBNotes(notebookName)[nId]
     vfs.writeFileSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`), note.contents.join('\n+=+=+=+=\n'))
     return path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`)

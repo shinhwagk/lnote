@@ -98,12 +98,6 @@ export class NotesPanelView {
           case 'notebook-note-contents-edit':
             ExtCmds.cmdHdlNoteEditNoteContents(msg.data.nId)
             break
-          case 'note-edit-short-document':
-            ExtCmds.cmdHdlNoteEditShortDocument(msg.data.id)
-            break
-            // case 'edit-col-remove':
-            //     ExtCmds.cmdHdlNoteColRemove(msg.data.nId, msg.data.cIdx);
-            //     break;
           case 'notebook-note-doc-show':
             ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId)
             break
@@ -143,12 +137,6 @@ export class NotesPanelView {
             break
           case 'col-to-terminal-args':
             ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx)
-            break
-          case 'domain-edit-labels':
-            ExtCmds.cmdHdlDomainEditLabels(msg.data)
-            break
-          case 'note-edit-labels':
-            ExtCmds.cmdHdlNoteEditLabels(msg.data)
             break
         }
       },
