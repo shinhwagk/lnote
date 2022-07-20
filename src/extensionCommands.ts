@@ -38,6 +38,7 @@ export namespace ExtCmds {
     }
     export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
         ext.globalState.domainNode = dn;
+        ext.globalState.nbName = tools.splitDomaiNode(dn)[0]
         // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
         // ext.domainDB.createNotes(tools.splitDomaiNode(dn));
         // ext.domainProvider.refresh(dn);
@@ -87,7 +88,7 @@ export namespace ExtCmds {
         const name: string | undefined = await window.showInputBox();
         if (!name) return;
         if (name.includes('/')) {
-            window.showErrorMessage(`domain name cannot contain slashes.`);
+            window.showErrorMessage(`domain name cannot contain "/".`);
         }
         if (dn === undefined) {
             ext.notebookDatabase.createNotebook(name);

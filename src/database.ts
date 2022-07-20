@@ -294,7 +294,6 @@ export class NoteBookDatabase {
     }
 
     public noteFilesCreate(nbName: string, nId: string) {
-        console.log("fff", nbName)
         const filesDir = path.join(this.masterPath, nbName, `${nId}_files`)
         mkdirpSync(filesDir)
     }

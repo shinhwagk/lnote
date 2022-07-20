@@ -4,10 +4,6 @@
 
 This extension provides a simple note-taking.
 
-### Features
-
-- Use labels to control how notes are grouped.
-
 ### Modify notes data directory location -> vscode global settings.json
 ```json
 {
