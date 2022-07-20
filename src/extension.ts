@@ -1,10 +1,14 @@
 import { ExtensionContext, ViewColumn, commands, workspace, window } from 'vscode';
 
-import { ext, initializeExtensionVariables } from './extensionVariables';
+import { ext, initializeExtensionVariables, listenConfiguration, listenNoteClose, listenNoteSave } from './extensionVariables';
 import { ExtCmds } from './extensionCommands';
 
 export async function activate(context: ExtensionContext) {
     console.log('vscode extension "vscode-note" is now active!');
+
+    listenConfiguration(context);
+    listenNoteSave(context);
+    listenNoteClose(context);
 
     initializeExtensionVariables(context);
 

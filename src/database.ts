@@ -9,8 +9,7 @@ import {
 } from 'fs-extra';
 
 import { tools, vfs, } from './helper';
-import { pathSplit } from './constants';
-// import { Tools } from './explorer/domainExplorer';
+import { writeFileSync } from 'fs';
 
 export interface NotebookDomain {
     [domain: string]: NotebookDomain;
@@ -54,14 +53,22 @@ export class NoteBookDatabase {
         this.initDirectories();
         // this.noteDB = new NoteDatabase(masterPath);
         // this.domainCache = vfs.readJsonSync(this.domainCacheFile);
-        const s = new Date().getTime();
+        const s = (new Date()).getTime();
         this.refresh();
         console.log('refresh domain success. time: ' + `${new Date().getTime() - s}`);
     }
 
     private initDirectories() {
-        existsSync(this.masterPath) || mkdirpSync(this.masterPath);
-        existsSync(this.notesCacheDirectory) || mkdirpSync(this.notesCacheDirectory);
+        if (!existsSync(this.masterPath)) {
+            mkdirpSync(this.masterPath)
+            existsSync(this.notesCacheDirectory) || mkdirpSync(this.notesCacheDirectory);
+            mkdirpSync(this.getNoteBookDirectory('vscode-note'))
+            this.createDomain(['vscode-note'])
+            this.createCategory(['vscode-note'], 'default')
+            tools.writeYamlSync(this.getNBNotesFile('vscode-note'), {})
+            const nId = this.addNote(['vscode-note'], 'default')
+            this.updateNoteContent('vscode-note', nId, ['hello.'])
+        }
     }
 
     public refresh(nbName: string | undefined = undefined): void {
@@ -112,7 +119,6 @@ export class NoteBookDatabase {
             const _nbName = _n1.sort(t => (t as any[])[2])[0][0]
             this.nbNotesCache.delete(_nbName)
         }
-        console.log('nbNotesCache size', this.nbNotesCache.size, JSON.stringify([...this.nbNotesCache.keys()]))
     }
 
     public readNBDomains(nbName: string) {
@@ -148,6 +154,12 @@ export class NoteBookDatabase {
         const nbName = domainNode[0]
         objectPath.set(this.domainTreeCache, domainNode, {})
         this.writeNBDomains(nbName)
+    }
+
+    public createNotebook(nbName: string) {
+        mkdirpSync(this.getNoteBookDirectory(nbName))
+        tools.writeYamlSync(this.getNBDomainsFile(nbName), {})
+        tools.writeYamlSync(this.getNBNotesFile(nbName), {})
     }
 
     public removeNote(domainNode: string[], category: string, nId: string, deep = false) {
@@ -203,7 +215,7 @@ export class NoteBookDatabase {
         return objectPath.get(this.domainTreeCache, [...domainNode, '.categories'])
     }
 
-    public getNoteBookDirectory = (notebook: string) => path.join(this.masterPath, notebook);
+    public getNoteBookDirectory = (nbName: string) => path.join(this.masterPath, nbName);
 
     public getDomain(domainNode: string[] = []): NotebookDomain {
         return objectPath.get(this.domainTreeCache, domainNode);
@@ -244,10 +256,6 @@ export class NoteBookDatabase {
         notes[nId].mts = (new Date()).getTime()
         this.writeNBNotes(nbName)
     }
-
-    // public getNotesOfNoteBook(domainNode: string[]): { [nId: string]: { contents: string[] } } {
-    //     return this.notebookCache['notes']
-    // }
 
     public createEditNoteEnv(notebookName: string, nId: string, mode: 'edit' | 'add' | 'del' = 'edit') {
         const note = this.getNBNotes(notebookName)[nId]

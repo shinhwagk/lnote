@@ -1,9 +1,6 @@
-import { basename } from 'path';
-
 import { commands, Uri, window, workspace } from 'vscode';
 
 import { ext } from './extensionVariables';
-import { noteDocHtmlPanel } from './panel/noteDocHtmlPanel';
 import { DomainNode } from './explorer/domainExplorer';
 import { ctxFilesExplorer, section } from './constants';
 import { NoteBookDatabase } from './database';
@@ -15,10 +12,15 @@ export namespace ExtCmds {
         // { title: 'choose vscode-note data location.' }
         const dl = await window.showInputBox();
         if (dl === undefined || dl === '') return;
-        if (!existsSync(dl) || !statSync(dl).isDirectory()) {
-            window.showInformationMessage('Make sure the directory already exists.');
+        if (!existsSync(dl)) {
+            workspace.getConfiguration(section).update('notespath', dl, 1);
+        } else {
+            if (!statSync(dl).isDirectory()) {
+                window.showInformationMessage('Make sure the directory already exists.');
+            } else {
+                workspace.getConfiguration(section).update('notespath', dl, 1);
+            }
         }
-        workspace.getConfiguration(section).update('notespath', dl, 1);
     }
     export async function cmdHdlNoteEditShortDocument(nId: string) {
         const domainNode: string[] = tools.splitDomaiNode(ext.globalState.domainNode!);
@@ -86,6 +88,9 @@ export namespace ExtCmds {
         if (!name) return;
         if (name.includes('/')) {
             window.showErrorMessage(`domain name cannot contain slashes.`);
+        }
+        if (dn === undefined) {
+            ext.notebookDatabase.createNotebook(name);
         }
         ext.notebookDatabase.createDomain(_dn.concat(name));
         ext.domainProvider.refresh(dn);
@@ -276,7 +281,7 @@ export namespace ExtCmds {
         // fileTerminal.show(true);
     }
     export async function cmdHdlDomainRefresh() {
-        ext.notebookDatabase = new NoteBookDatabase(ext.masterPath);
+        ext.notebookDatabase = new NoteBookDatabase(ext.notebookPath);
         ext.notebookDatabase.refresh();
         window.showInformationMessage('refreshDomain complete.');
         ext.domainProvider.refresh();

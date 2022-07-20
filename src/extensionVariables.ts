@@ -14,8 +14,8 @@ import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
 import { NoteBookDatabase } from './database';
 import { NotesPanelView } from './panel/notesPanelView';
-import { tools } from './helper';
 import path from 'path';
+import { existsSync } from 'fs-extra';
 
 // import { initClient, sendGA } from './client';
 
@@ -25,7 +25,7 @@ export namespace ext {
     export let domainTreeView: TreeView<DomainNode>;
     export let filesProvider: FilesExplorerProvider;
     export let notesPanelView: NotesPanelView;
-    export let masterPath: string;
+    export let notebookPath: string;
     export let shortcutsFilePath: string;
     export let globalState: GlobalState;
     export let notebookDatabase: NoteBookDatabase;
@@ -40,35 +40,66 @@ export namespace ext {
 //     return path.join(ext.masterPath, 'shortcuts.json');
 // }
 
-function listenConfiguration(ctx: ExtensionContext) {
+export function listenConfiguration(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
             if (e.affectsConfiguration(section)) {
-                const notespath = workspace.getConfiguration(section).get<string>('notespath');
-                if (notespath === undefined || notespath === '') {
+                const notebookPath = workspace.getConfiguration(section).get<string>('notespath');
+                if (notebookPath === undefined || notebookPath === '') {
                     window.showInformationMessage('configuretion "notespath" wrong.');
                     return;
                 }
-                ext.masterPath = notespath;
-                ext.notebookDatabase = new NoteBookDatabase(ext.masterPath);
-                // initializecomponents();
-                ext.notebookDatabase.refresh();
+                ext.notebookPath = notebookPath;
+                ext.notebookDatabase = new NoteBookDatabase(ext.notebookPath);
+                initializeExtensionVariables(ctx);
                 ext.domainProvider.refresh();
             }
         })
     );
 }
 
+export function listenNoteClose(ctx: ExtensionContext) {
+    ctx.subscriptions.push(
+        workspace.onDidCloseTextDocument((f) => {
+            if (ext.notebookDatabase === undefined) return;
+            const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
+            if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
+                const fileName = path.basename(f.uri.fsPath)
+                if (fileName.endsWith('.txt')) {
+                    const [nbName, nId] = fileName.split('.')[0].split('_')
+                    ext.notebookDatabase.removeEditNoteEnv(nbName, nId)
+                }
+            }
+        })
+    )
+}
+
+export function listenNoteSave(ctx: ExtensionContext) {
+    ctx.subscriptions.push(
+        workspace.onDidSaveTextDocument((f) => {
+            if (ext.notebookDatabase === undefined) return;
+            if (f.uri.fsPath.startsWith(ext.notebookDatabase.notesCacheDirectory)) {
+                const fileName = path.basename(f.uri.fsPath)
+                if (fileName.endsWith('.txt')) {
+                    const [nbName, nId] = fileName.split('.')[0].split('_')
+                    const contents = f.getText().split('+=+=+=').map(c => c.trim())
+                    ext.notebookDatabase.updateNoteContent(nbName, nId, contents)
+                }
+            }
+        })
+    )
+}
+
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
     ext.context = ctx;
-    listenConfiguration(ctx);
+
     const notespath = workspace.getConfiguration(section).get<string>('notespath');
 
     if (notespath === undefined || notespath === '') {
         return;
     }
-    ext.masterPath = notespath.endsWith('/') ? notespath : notespath + '/';
-    ext.notebookDatabase = new NoteBookDatabase(ext.masterPath);
+    ext.notebookPath = notespath.endsWith('/') ? notespath : notespath + '/';
+    ext.notebookDatabase = new NoteBookDatabase(ext.notebookPath);
     ext.globalState = new GlobalState();
 
     if (!ext.notesPanelView) {
@@ -105,33 +136,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     //     ext.domainShortcutStatusBarItem.show();
     //     ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
     // }
-
-    ext.context.subscriptions.push(
-        workspace.onDidSaveTextDocument((f) => {
-            const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
-            if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
-                const fileName = path.basename(f.uri.fsPath)
-                if (fileName.endsWith('.txt')) {
-                    const [nbName, nId] = fileName.split('.')[0].split('_')
-                    const contents = f.getText().split('+=+=+=').map(c => c.trim())
-                    ext.notebookDatabase.updateNoteContent(nbName, nId, contents)
-                }
-            }
-        })
-    )
-
-    ext.context.subscriptions.push(
-        workspace.onDidCloseTextDocument((f) => {
-            const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
-            if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
-                const fileName = path.basename(f.uri.fsPath)
-                if (fileName.endsWith('.txt')) {
-                    const [nbName, nId] = fileName.split('.')[0].split('_')
-                    ext.notebookDatabase.removeEditNoteEnv(nbName, nId)
-                }
-            }
-        })
-    )
 }
 
 export class GlobalState {
