@@ -253,7 +253,7 @@ export class NoteBookDatabase {
 
   public createEditNoteEnv (notebookName: string, nId: string, _mode: 'edit' | 'add' | 'del' = 'edit') {
     const note = this.getNBNotes(notebookName)[nId]
-    vfs.writeFileSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`), note.contents.join('\n+=+=+=+=\n'))
+    vfs.writeFileSync(path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`), note.contents.join('\n+=+=+=+=+=\n'))
     return path.join(this.notesCacheDirectory, `${notebookName}_${nId}.txt`)
   }
 
