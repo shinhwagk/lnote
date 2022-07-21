@@ -59,7 +59,7 @@ export function listenConfiguration (ctx: ExtensionContext) {
 export function listenNoteClose (ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((f) => {
-      if (ext.notebookDatabase === undefined) return
+      if (ext.notebookDatabase === undefined) { return }
       const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory
       if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
         const fileName = path.basename(f.uri.fsPath)
@@ -75,7 +75,7 @@ export function listenNoteClose (ctx: ExtensionContext) {
 export function listenNoteSave (ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument((f) => {
-      if (ext.notebookDatabase === undefined) return
+      if (ext.notebookDatabase === undefined) { return }
       if (f.uri.fsPath.startsWith(ext.notebookDatabase.notesCacheDirectory)) {
         const fileName = path.basename(f.uri.fsPath)
         if (fileName.endsWith('.txt')) {
