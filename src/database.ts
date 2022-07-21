@@ -234,7 +234,7 @@ export class NoteBookDatabase {
 
     let _cnt = 0
     for (const d of domainNames) {
-      _cnt += this.getNotesNumberUnderDomain(domainNode.concat(d), cnt)
+      _cnt += this.getNotesNumberUnderDomain(domainNode.concat(d))
     }
     return _cnt
   }
