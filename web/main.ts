@@ -91,14 +91,14 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   ],
   [
     {
-      title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { category: data.category } })
+      title: 'move to other domain',
+      onClick: (data) => vscode.postMessage({ command: 'category-to-domain', data: { category: data.category } })
     }
   ],
   [
     {
-      title: 'move to other domain',
-      onClick: (data) => vscode.postMessage({ command: 'category-to-domain', data: { category: data.category } })
+      title: 'remove',
+      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { category: data.category } })
     }
   ]
 ]
