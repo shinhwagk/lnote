@@ -80,7 +80,11 @@ export function listenNoteSave (ctx: ExtensionContext) {
         const fileName = path.basename(f.uri.fsPath)
         if (fileName.endsWith('.txt')) {
           const [nbName, nId] = fileName.split('.')[0].split('_')
-          const contents = f.getText().split(/\n(\+=){3,}\n/).map(c => c.trim()).filter(e => e !== '+=')
+          const contents = f.getText()
+            .replace('\r\n', '\n')
+            .split(/\n(\+=){3,}\n/)
+            .map(c => c.trim())
+            .filter(e => e !== '+=')
           ext.notebookDatabase.updateNoteContent(nbName, nId, contents)
         }
       }
