@@ -288,10 +288,7 @@ export namespace ExtCmds {
       const dn = tools.splitDomaiNode(ext.globalState.domainNode)
       const selection = await window.showInformationMessage(`delete note ${nId}?`, 'Yes', 'No')
       if (selection !== 'Yes') return
-      // ext.domainDB.removeFromCache(nId);
       ext.notebookDatabase.removeNote(dn, category, nId, true)
-      // ext.domainDB.refreshDomainNodes(dn, true);
-      // window.showInformationMessage(`note ${nId} deleted.`);
       ext.domainProvider.refresh(dn[0])
       ext.notesPanelView.parseDomain().showNotesPlanView()
     }
