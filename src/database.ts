@@ -91,6 +91,8 @@ export class NoteBookDatabase {
   public getNBNotes (nbName: string) {
     this.cacheNBNotes(nbName)
     const [notes] = this.nbNotesCache.get(nbName)!
+    // update nbnotes pin time.
+    this.nbNotesCache.set(nbName, [notes, (new Date()).getTime()])
     return notes
   }
 
