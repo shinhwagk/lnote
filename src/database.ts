@@ -166,8 +166,18 @@ export class NoteBookDatabase {
       const notes = this.readNBNotes(domainNode[0])
       delete notes[nId]
       this.writeNBNotes(nbName)
+      this.removeNoteDoc(domainNode[0], nId)
+      this.removeNoteFiles(domainNode[0], nId)
     }
     this.writeNBDomains(nbName)
+  }
+
+  public removeNoteDoc (nbName:string, nId:string) {
+    removeSync(path.join(this.getNoteBookDirectory(nbName), `${nId}_doc`))
+  }
+
+  public removeNoteFiles (nbName:string, nId:string) {
+    removeSync(path.join(this.getNoteBookDirectory(nbName), `${nId}_files`))
   }
 
   public removeCategory (domainNode: string[], cname: string, withNotes: boolean) {
