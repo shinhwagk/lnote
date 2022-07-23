@@ -163,7 +163,7 @@ export class NoteBookDatabase {
       objectPath.set(this.domainTreeCache, [...domainNode, '.categories', category], nIds.filter(n => n !== nId))
     }
     if (deep) {
-      const notes = this.readNBNotes(domainNode[0])
+      const notes = this.getNBNotes(domainNode[0])
       delete notes[nId]
       this.writeNBNotes(nbName)
       this.removeNoteDoc(domainNode[0], nId)
