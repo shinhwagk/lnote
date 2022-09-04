@@ -3,14 +3,14 @@
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
-            "VARIANT": "14"
+            "VARIANT": "16"
         }
     },
     "extensions": [
-		"dbaeumer.vscode-eslint",
-		"howardzuo.vscode-npm-dependency",
-		"esbenp.prettier-vscode",
-		"shinhwagk.vscode-note"
-	],
+        "dbaeumer.vscode-eslint",
+        "howardzuo.vscode-npm-dependency",
+        "shinhwagk.vscode-note",
+        "amodio.tsl-problem-matcher"
+    ],
     "remoteUser": "node"
 }

@@ -2,24 +2,29 @@ body {
     font-size: 0.8rem;
     font-family: var(--vscode-font-family);
 }
+
 .grid-notes {
     max-width: 99%;
     display: grid;
     margin: 0 auto;
     grid-row-gap: 5px;
 }
+
 .grid-category {
     padding: 5px;
     border-radius: 0.25rem;
     border-width: 1px;
     border-style: solid;
 }
+
 .vscode-light .grid-category {
     border-color: rgba(0, 0, 0, 0.18);
 }
+
 .vscode-dark .grid-category {
     border-color: rgba(255, 255, 255, 0.18);
 }
+
 .grid-category-name {
     font-size: 18px;
     padding-bottom: 5px;
@@ -27,16 +32,20 @@ body {
     border-bottom-width: 0.5px;
     border-bottom-style: solid;
 }
+
 .vscode-light .grid-category-name {
     border-bottom-color: rgba(0, 0, 0, 0.69);
 }
+
 .vscode-dark .grid-category-name {
     border-bottom-color: rgba(255, 255, 255, 0.69);
 }
+
 .grid-category-body {
     display: grid;
     grid-row-gap: 0px;
 }
+
 .grid-note {
     grid-template-columns: 65px 1fr 55px;
     display: grid;
@@ -44,29 +53,50 @@ body {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
 .vscode-light .grid-note {
     border-color: rgba(0, 0, 0, 0.18);
 }
+
 .vscode-dark .grid-note {
     border-color: rgba(255, 255, 255, 0.18);
 }
+
 .grid-note:hover {
     background-color: var(--vscode-list-hoverBackground);
 }
+
 .grid-note-id {
     text-align: center;
 }
+
 .grid-note-edit {
     text-align: center;
 }
-.grid-note-content {
+
+.grid-note-contents {
     display: grid;
+}
+
+.grid-note-content {
     white-space: pre-wrap;
     word-wrap: break-word;
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.18);
+    border-left-style: dashed;
+    padding-left: 4px;
 }
+
+.grid-note-content:hover {
+    /* --background-color: color-mix(in srgb, red 50%, blue);
+    --fallback-color: color-mix(in srgb, red 50%, blue); */
+    /* background-color: color-mix(in srgb, #34c9eb 20%, white); */
+}
+
 .vscode-light .icon {
     color: rgba(0, 0, 0, 0.6);
 }
+
 .vscode-dark .icon {
     color: rgba(255, 255, 255, 0.6);
 }
@@ -84,6 +114,7 @@ body {
     -webkit-user-select: none;
     user-select: none;
 }
+
 body.vscode-high-contrast .contextMenu {
     outline: 1px solid var(--vscode-menu-border, transparent);
     outline-offset: -1px;
@@ -103,6 +134,7 @@ body.vscode-high-contrast .contextMenu {
     background-color: var(--vscode-menu-selectionBackground, var(--vscode-menu-background));
     color: var(--vscode-menu-selectionForeground, var(--vscode-menu-foreground));
 }
+
 body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     outline: 1px solid var(--vscode-menu-selectionBorder, transparent);
     outline-offset: -2px;

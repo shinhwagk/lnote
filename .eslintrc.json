@@ -18,7 +18,6 @@
     },
     "ignorePatterns": [
         "out",
-        "dist",
         "**/*.d.ts"
     ]
 }

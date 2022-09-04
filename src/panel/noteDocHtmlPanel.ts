@@ -1,43 +1,43 @@
-import { basename } from 'path'
-import * as vscode from 'vscode'
-import { ext } from '../extensionVariables'
+import { basename } from 'path';
+import * as vscode from 'vscode';
+import { ext } from '../extensionVariables';
 
-const viewType = 'htmlShowPreview'
-const title = viewType
+const viewType = 'htmlShowPreview';
+const title = viewType;
 
-let _panel: vscode.WebviewPanel | undefined
-const _disposables: vscode.Disposable[] = []
+let _panel: vscode.WebviewPanel | undefined;
+const _disposables: vscode.Disposable[] = [];
 
-export function noteDocHtmlPanel (htmlFile: string) {
+export function noteDocHtmlPanel(htmlFile: string) {
   if (_panel) {
-    _update(_panel!, htmlFile)
-    return
+    _update(_panel!, htmlFile);
+    return;
   }
-  _panel = createPanel()
-  noteDocHtmlPanel(htmlFile)
+  _panel = createPanel();
+  noteDocHtmlPanel(htmlFile);
 }
 
-function createPanel () {
+function createPanel() {
   const panel = vscode.window.createWebviewPanel(viewType, title, vscode.ViewColumn.Two, {
     localResourceRoots: [vscode.Uri.file(ext.notebookPath)]
-  })
-  panel.onDidDispose(() => _dispose(), null, _disposables)
-  return panel
+  });
+  panel.onDidDispose(() => _dispose(), null, _disposables);
+  return panel;
 }
 
-function _dispose () {
-  _panel = undefined
-  _disposables.forEach(d => d.dispose())
+function _dispose() {
+  _panel = undefined;
+  _disposables.forEach(d => d.dispose());
 }
 
-function _update (panel: vscode.WebviewPanel, htmlFile: string) {
-  panel.title = 'vscode-note' + ' -> ' + basename(htmlFile)
-  panel.webview.html = _getHtmlForWebview(htmlFile)
+function _update(panel: vscode.WebviewPanel, htmlFile: string) {
+  panel.title = 'vscode-note' + ' -> ' + basename(htmlFile);
+  panel.webview.html = _getHtmlForWebview(htmlFile);
 }
 
-function _getHtmlForWebview (htmlFile: string) {
-  const onDiskPath = vscode.Uri.file(htmlFile)
-  const src = onDiskPath.with({ scheme: 'vscode-resource' })
+function _getHtmlForWebview(htmlFile: string) {
+  const onDiskPath = vscode.Uri.file(htmlFile);
+  const src = onDiskPath.with({ scheme: 'vscode-resource' });
   return `<!DOCTYPE html>
         <html lang="en">
         <head>
@@ -58,5 +58,5 @@ function _getHtmlForWebview (htmlFile: string) {
         <body>
             <iframe src="${src}" width="100%" height="100%" seamless frameborder=0></iframe>
         </body>
-        </html>`
+        </html>`;
 }
