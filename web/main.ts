@@ -112,7 +112,8 @@ const NoteColContextMenuActions: ContextMenuAction[][] = [
     {
       title: 'add short document',
       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-add', data: { nId: data.nId, cn: data.i } })
-    },
+    }
+  ], [
     {
       title: 'delete short document',
       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId, cn: data.i } })
