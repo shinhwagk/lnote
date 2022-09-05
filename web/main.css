@@ -47,9 +47,10 @@ body {
 }
 
 .grid-note {
-    grid-template-columns: 65px 1fr 55px;
+    grid-template-columns: 55px 1fr 55px;
     display: grid;
-    border-top: 1px solid;
+    border-top-width: 1px;
+    border-top-style: solid;
     padding-top: 5px;
     padding-bottom: 5px;
 }
