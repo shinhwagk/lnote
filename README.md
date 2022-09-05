@@ -2,7 +2,15 @@
 
 # vscode-note
 
-This extension provides a simple note-taking.
+This extension provides a simple note-taking. Make notes closer to the vscode extensions.
+
+## Concepts
+
+- each **_notebook_** (or tree) node can be a **_notes_**.
+- each **_notes_** consists of one or more **_category_**.
+- each **_category_** consists of one or more **_note_**.
+- each **_note_** consists of one or more **_short doc_**, **_doc_**(markdown), **_files_**(attachment)
+
 
 ### Modify notes data directory location -> vscode global settings.json
 ```json
