@@ -19,3 +19,6 @@ This extension provides a simple note-taking. Make notes closer to the vscode ex
 }
 ```
 - strongly recommend use onedrive(similar products) to store/sync your notes data.
+
+## Usage
+![1](https://raw.githubusercontent.com/shinhwagk/vscode-note/master/images/usage.gif)
