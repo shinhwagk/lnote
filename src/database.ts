@@ -144,6 +144,15 @@ export class NoteBookDatabase {
     this.writeNBDomains(nbName);
   }
 
+  public renameDomain(domainNode: string[], domainName: string) {
+    const _d = [...domainNode];
+    _d[domainNode.length - 1] = domainName;
+    const domain = this.getDomain(domainNode);
+    this.deleteDomain(domainNode, false)
+    objectPath.set(this.domainTreeCache, _d, domain);
+    this.writeNBDomains(domainNode[0]);
+  }
+
   public createDomain(domainNode: string[]) {
     const nbName = domainNode[0];
     objectPath.set(this.domainTreeCache, domainNode, {});
@@ -263,7 +272,7 @@ export class NoteBookDatabase {
 
   public createEditNoteEnv(notebookName: string, nId: string, sdIdx: number, _mode: 'edit' | 'add' | 'del' = 'edit') {
     const note = this.getNBNotes(notebookName)[nId];
-    const contentFile = path.join(this.notesCacheDirectory, `${notebookName}_${nId}_${sdIdx}.txt`)
+    const contentFile = path.join(this.notesCacheDirectory, `${notebookName}_${nId}_${sdIdx}.txt`);
     vfs.writeFileSync(contentFile, note.contents[sdIdx]);
     return contentFile;
   }

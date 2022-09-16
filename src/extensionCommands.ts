@@ -184,17 +184,14 @@ export namespace ExtCmds {
   //     // }
   //     // ext.globalState.dpath = newDpath;
   // }
-  // export async function cmdHdlDomainRename(dn: DomainNode) {
-  //     const _dn = tools.splitDomaiNode(dn);
-  //     window.showWarningMessage('sonn.')
-  //     // const orgName = _dn[_dn.length - 1];
-  //     // const newName: string | undefined = await window.showInputBox({ value: orgName });
-  //     // if (!newName || orgName == newName) return;
-  //     // const newDpath = _dn.slice();
-  //     // newDpath[newDpath.length - 1] = newName;
-  //     // // resetDomain(orgDpath, newDpath);
-  //     // ext.domainProvider.refresh(_dn.slice(0, _dn.length - 1).join('/'));
-  // }
+  export async function cmdHdlDomainRename(dn: DomainNode) {
+    const _dn = tools.splitDomaiNode(dn);
+    const orgName = _dn[_dn.length - 1];
+    const newName: string | undefined = await window.showInputBox({ value: orgName });
+    if (!newName || orgName === newName) return;
+    ext.notebookDatabase.renameDomain(_dn, newName);
+    ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
+  }
   export async function cmdHdlDomainRemove(dn: DomainNode) {
     const _dn = tools.splitDomaiNode(dn);
     const domainName = _dn[_dn.length - 1];
