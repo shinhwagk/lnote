@@ -117,7 +117,8 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
             break;
           case 'edit-note-notebook-domain-category-rename':
-            ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
+            vscode.window.showInformationMessage('soon');
+            // ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
             break;
           case 'notebook-domain-category-note-remove':
             ExtCmds.cmdHdlNBDomainCategoryNoteRemove(msg.data.category, msg.data.nId);
