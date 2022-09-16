@@ -67,13 +67,14 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
       title: 'remove',
       onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-note-remove', data: { category: data.category, nId: data.note.nId } })
     }
-  ],
-  [
-    {
-      title: 'open note folder',
-      onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
-    }
   ]
+  // ,
+  // [
+  //   {
+  //     title: 'open note folder',
+  //     onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
+  //   }
+  // ]
 ];
 
 const CategoryEditContextMenuActions: ContextMenuAction[][] = [
