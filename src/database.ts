@@ -144,11 +144,17 @@ export class NoteBookDatabase {
     this.writeNBDomains(nbName);
   }
 
+  public moveDomain(orgDomainNode: string[], newDomainNode: string[]) {
+    const domain = this.getDomain(orgDomainNode);
+    this.deleteDomain(orgDomainNode, false);
+    objectPath.set(this.domainTreeCache, newDomainNode, domain);
+  }
+
   public renameDomain(domainNode: string[], domainName: string) {
     const _d = [...domainNode];
     _d[domainNode.length - 1] = domainName;
     const domain = this.getDomain(domainNode);
-    this.deleteDomain(domainNode, false)
+    this.deleteDomain(domainNode, false);
     objectPath.set(this.domainTreeCache, _d, domain);
     this.writeNBDomains(domainNode[0]);
   }
