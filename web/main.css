@@ -172,3 +172,7 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     fill: var(--vscode-menu-selectionForeground);
     opacity: 0.8;
 }
+
+.checkedLabel {
+    padding: 1px 4px 2px;
+}

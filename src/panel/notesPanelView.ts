@@ -37,10 +37,6 @@ export class NotesPanelView {
                     </div>
                     <script>
                         const vscode = acquireVsCodeApi();
-                        window.onload = function() {
-                            vscode.postMessage({ command: 'get-data' });
-                            console.log('Ready to accept data.');
-                        };
                     </script>
                     <script nonce="${nonce}" src="${this.assetsFile('main.js')}"></script>
                 </body>
@@ -52,7 +48,13 @@ export class NotesPanelView {
       this.initPanel();
     }
 
-    this.panel!.webview.postMessage({ command: 'data', data: this.viewData });
+    this.panel!.webview.postMessage({
+      command: 'post-domain',
+      data: {
+        domainNode: this.domainNode,
+        domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+      }
+    });
     if (!this.panel!.visible) {
       this.panel!.reveal(vscode.ViewColumn.One);
     }
@@ -76,8 +78,8 @@ export class NotesPanelView {
       (e) => {
         const panel = e.webviewPanel;
         if (panel.visible) {
-          this.parseDomain();
-          this.showNotesPlanView();
+          // this.parseDomain();
+          // this.showNotesPlanView();
         }
       },
       null,
@@ -89,21 +91,56 @@ export class NotesPanelView {
           case 'get-data':
             this.showNotesPlanView();
             break;
-          case 'edit':
-            vscode.commands.executeCommand('vscode-note.note.edit', msg.data.id, msg.data.category);
+          case 'get-notes':
+            this.panel!.webview.postMessage({
+              command: 'post-notes',
+              data: {
+                notes: ext.notebookDatabase.getNotesOfDomain(this.domainNode)
+              }
+            });
+            break;
+          case 'get-domain':
+            this.panel!.webview.postMessage({
+              command: 'post-domain',
+              data: {
+                domainNode: this.domainNode,
+                domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+              }
+            });
+            console.log(ext.notebookDatabase.getLabelsOfDomain(this.domainNode))
+            break;
+          case 'get-labels':
+            const labelsOfNotebook = [...ext.notebookDatabase.getNBLabels(this.domainNode[0]).keys()];
+            const labelsOfDomainNode = ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+            this.panel!.webview.postMessage({
+              command: 'post-labels',
+              data: {
+                checkedLabels: labelsOfDomainNode,
+                unCheckedLabels: labelsOfNotebook.filter(l => !labelsOfDomainNode.includes(l))
+              }
+            });
+            break;
+          case 'get-notes-by-labels':
+            const notes = ext.notebookDatabase.getNotesByLabels(this.domainNode[0], msg.data.checkedLabels);
+            this.panel!.webview.postMessage({
+              command: 'post-notes',
+              data: {
+                notes: notes
+              }
+            });
             break;
           case 'note-add':
-            ExtCmds.cmdHdlNoteAdd(msg.data.category);
+            ExtCmds.cmdHdlNoteAdd(msg.data.labels);
             break;
-          case 'notebook-note-contents-edit':
-            ExtCmds.cmdHdlNotebookNoteContentsEdit(msg.data.nId, msg.data.cn);
+          case 'notebook-note-edit':
+            ExtCmds.cmdHdlNotebookNoteEdit(msg.data.nId);
             break;
-          case 'notebook-note-contents-add':
-            ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
+          case 'notes-edit-labels':
+            ExtCmds.cmdHdlNotesEditlabels(msg.data.nIds, msg.data.labels);
             break;
-          case 'notebook-note-contents-remove':
-            ExtCmds.cmdHdlNotebookNoteContentsRemove(msg.data.nId, msg.data.cn);
-            break;
+          // case 'notebook-note-contents-add':
+          //   ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
+          //   break;
           case 'notebook-note-doc-show':
             ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);
             break;
@@ -116,34 +153,23 @@ export class NotesPanelView {
           case 'notebook-note-doc-create':
             ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
             break;
-          case 'edit-note-notebook-domain-category-rename':
-            vscode.window.showInformationMessage('soon');
-            // ExtCmds.cmdHdlNoteCategoryRename(msg.data.nId);
-            break;
-          case 'notebook-domain-category-note-remove':
-            ExtCmds.cmdHdlNBDomainCategoryNoteRemove(msg.data.category, msg.data.nId);
+          case 'note-remove':
+            ExtCmds.cmdHdlNBNoteRemove(msg.data.nId);
             break;
           case 'edit-note-openfolder':
             ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
             break;
           case 'category-add':
-            ExtCmds.cmdHdlDomainCategoryAdd(false);
-            break;
-          case 'notebook-domain-category-rename':
-            ExtCmds.cmdHdlNBDomainCategoryRename(msg.data.category);
-            break;
-          case 'notebook-domain-category-remove':
-            ExtCmds.cmdHdlNBDomainCategoryRemove(msg.data.category);
-            break;
-          case 'category-to-domain':
-            vscode.window.showInformationMessage('soon');
-            // ExtCmds.cmdHdlCategoryMoveToOtherDomain(msg.data.category);
+            ExtCmds.cmdHdlDomainCategoryAdd();
             break;
           case 'col-to-terminal':
             ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
             break;
           case 'col-to-terminal-args':
             ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
+            break;
+          case 'domain-relabels':
+            ExtCmds.cmdHdlDomainRelabels(msg.data.labels);
             break;
         }
       },
@@ -153,38 +179,43 @@ export class NotesPanelView {
     this.panel.webview.html = this.getWebviewContent();
   }
 
-  public parseDomain(domainNode?: string[]) {
+  public parseDomain(domainNode?: string[], labels?: string[]) {
     this.domainNode = domainNode || this.domainNode;
-    this.viewData = this.genViewData();
+    // this.viewData = this.genViewData(labels);
     return this;
   }
 
-  public addCategory(name: string) {
-    this.viewData!.categories.unshift({ name, notes: [] });
-    return this;
-  }
 
-  private genViewData(): any {
-    const wvCategories: twv.WVCategory[] = [];
-    const categoriesOfDomain = ext.notebookDatabase.getCategoriesOfDomain(this.domainNode);
-    const notes = ext.notebookDatabase.getNBNotes(this.domainNode[0]);
-    for (const cname of Object.keys(categoriesOfDomain)) {
-      if (wvCategories.filter((c) => c.name === cname).length === 0) {
-        wvCategories.push({ name: cname, notes: [] });
-      }
-      for (const nId of categoriesOfDomain[cname]) {
-        const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], nId);
-        const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode[0], nId);
-        const contents = notes[nId].contents;
-        const cDate = (new Date(notes[nId].cts)).toISOString();
-        const mDate = (new Date(notes[nId].mts)).toISOString();
-        if (wvCategories.filter((c) => c.name === cname).length >= 1) {
-          wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles, cDate, mDate });
-        }
-      }
-    }
-    return { dpath: this.domainNode, categories: wvCategories };
-  }
+
+  // private genViewData(checkedLabels?: string[]): any {
+  //   const wvCategories: twv.WVCategory[] = [];
+  //   const labels = checkedLabels === undefined ? ext.notebookDatabase.getLabelsOfDomain(this.domainNode) : checkedLabels;
+  //   const labelsOfNotebook = [...ext.notebookDatabase.getNBLabels(this.domainNode[0]).keys()];
+  //   const notes = ext.notebookDatabase.getNotesByLabels(this.domainNode[0], labels);
+  //   // const notesOfLabels = ext.notebookDatabase.getNBLabels(this.domainNode[0]);
+  //   for (const note of notes) {
+  //     const cname = note.category;
+  //     if (wvCategories.filter((c) => c.name === cname).length === 0) {
+  //       wvCategories.push({ name: cname, notes: [], labels: labels[cname] });
+  //     }
+  //     const isDoc = ext.notebookDatabase.checkDocExist(this.domainNode[0], note.nId);
+  //     const isFiles = ext.notebookDatabase.checkFilesExist(this.domainNode[0], note.nId);
+  //     const contents = note.contents;
+  //     const cDate = (new Date(note.cts)).toISOString();
+  //     const mDate = (new Date(note.mts)).toISOString();
+  //     if (wvCategories.filter((c) => c.name === cname).length >= 1) {
+  //       wvCategories.filter((c) => c.name === cname)[0].notes.push({ nId: note.nId, contents, doc: isDoc, files: isFiles, cDate, mDate });
+  //     }
+  //   }
+  //   return {
+  //     dpath: this.domainNode,
+  //     categories: wvCategories,
+  //     checkedLabels: labels,
+  //     unCheckedLabels: labelsOfNotebook.filter(l => !labels.includes(l))
+  //   };
+
+  // }
+
 }
 
 function getNonce() {

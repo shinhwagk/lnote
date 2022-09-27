@@ -11,6 +11,7 @@ export namespace ToWebView {
 
     export interface WVCategory {
         name: string;
+        labels: string[];
         notes: WVNote[];
     }
 

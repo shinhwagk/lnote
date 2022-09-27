@@ -19,10 +19,11 @@ export async function activate(context: ExtensionContext) {
    // );
    ext.registerCommand('vscode-note.choose-location', ExtCmds.cmdHdlChooseLocation);
    /**
-      * domain
-      */
+   * domain
+   **/
    ext.registerCommand('vscode-note.domain.create', ExtCmds.cmdHdlDomainCreate);
    ext.registerCommand('vscode-note.domain.pin', ExtCmds.cmdHdlDomainPin);
+   // ext.registerCommand('vscode-note.domain.pin.level.0', ExtCmds.cmdHdlDomainPinLevel0);
    ext.registerCommand('vscode-note.domain.move', ExtCmds.cmdHdlDomainMove);
    ext.registerCommand('vscode-note.domain.rename', ExtCmds.cmdHdlDomainRename);
    ext.registerCommand('vscode-note.domain.remove', ExtCmds.cmdHdlDomainRemove);

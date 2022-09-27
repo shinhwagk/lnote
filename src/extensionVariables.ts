@@ -61,12 +61,13 @@ export function listenNoteClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((f) => {
       if (ext.notebookDatabase === undefined) { return; }
-      const notesCacheDirectory = ext.notebookDatabase.notesCacheDirectory;
-      if (f.uri.fsPath.startsWith(notesCacheDirectory)) {
+      const cacheDir = ext.notebookDatabase.getNoteBookCacheDirectory(ext.globalState.nbName);
+      if (f.uri.fsPath.startsWith(cacheDir)) {
         const fileName = path.basename(f.uri.fsPath);
-        if (fileName.endsWith('.txt')) {
-          const [nbName, nId, sdIdx] = fileName.split('.')[0].split('_');
-          ext.notebookDatabase.removeEditNoteEnv(nbName, nId, Number(sdIdx));
+        if (fileName.endsWith('.yaml')) {
+          const [nId,] = fileName.split('.')
+          ext.notebookDatabase.removeEditNoteEnv(ext.globalState.nbName, nId);
+          ext.notesPanelView.parseDomain(ext.globalState.domainNodeFormat).showNotesPlanView()
         }
       }
     })
@@ -77,16 +78,16 @@ export function listenNoteSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument((f) => {
       if (ext.notebookDatabase === undefined) { return; }
-      if (f.uri.fsPath.startsWith(ext.notebookDatabase.notesCacheDirectory)) {
+      const cacheDir = ext.notebookDatabase.getNoteBookCacheDirectory(ext.globalState.nbName);
+      console.log(cacheDir, path.basename(f.uri.fsPath))
+      if (f.uri.fsPath.startsWith(cacheDir)) {
         const fileName = path.basename(f.uri.fsPath);
-        if (fileName.endsWith('.txt')) {
-          const [nbName, nId, sdIdx] = fileName.split('.')[0].split('_');
-          const content = f.getText()
-            .replace('\r\n', '\n')
-            .trim();
-          const contents = ext.notebookDatabase.getNBNotes(ext.globalState.nbName)[nId].contents;
-          contents[Number(sdIdx)] = content;
-          ext.notebookDatabase.updateNoteContents(nbName, nId, contents);
+        if (fileName.endsWith('.yaml')) {
+          const [nId,] = fileName.split('.');
+          const enote = tools.readYamlSync(f.uri.fsPath)
+          console.log(enote)
+          ext.notebookDatabase.updateNote(ext.globalState.nbName, nId, enote.contents, enote.labels);
+          ext.notesPanelView.parseDomain(ext.globalState.domainNodeFormat).showNotesPlanView()
         }
       }
     })

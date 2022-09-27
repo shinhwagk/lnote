@@ -17,12 +17,18 @@ namespace Tools {
 }
 
 interface DataDomain {
-  dpath: string[];
+  domainNode: string[];
+  checkedLabels: string[];
+  unCheckedLabels: string[];
   categories: DataCategory[];
+  notes: PostNote[];
+  labels: string[];
+  domainLabels: string[]
 }
 
 interface DataCategory {
   name: string;
+  labels: string[]
   notes: DataNote[];
 }
 
@@ -36,8 +42,19 @@ interface DataNote {
 }
 
 interface DataProtocol {
-  command: 'data';
+  command: string;
   data: DataDomain;
+}
+
+interface PostNote {
+  contents: string[];
+  cts: number;
+  mts: number;
+  labels: string[];
+  category: string;
+  nId: string;
+  doc: boolean;
+  files: boolean;
 }
 
 interface ContextMenuAction {
@@ -46,6 +63,12 @@ interface ContextMenuAction {
 }
 
 const NoteEditContextMenuActions: ContextMenuAction[][] = [
+  [
+    {
+      title: 'edit',
+      onClick: (data) => vscode.postMessage({ command: 'notebook-note-edit', data: { nId: data.note.nId } })
+    }
+  ],
   [
     {
       title: 'create document',
@@ -58,14 +81,8 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
   ],
   [
     {
-      title: 'category rename',
-      onClick: (data) => vscode.postMessage({ command: 'edit-note-notebook-domain-category-rename', data: { nId: data.note.nId } })
-    }
-  ],
-  [
-    {
       title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-note-remove', data: { category: data.category, nId: data.note.nId } })
+      onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
     }
   ]
   // ,
@@ -81,19 +98,13 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'add note',
-      onClick: (data) => vscode.postMessage({ command: 'note-add', data: { category: data.category } })
+      onClick: (data) => vscode.postMessage({ command: 'note-add', data: { labels: data.labels } })
     }
   ],
   [
     {
-      title: 'rename',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-rename', data: { category: data.category } })
-    }
-  ],
-  [
-    {
-      title: 'move to other domain',
-      onClick: (data) => vscode.postMessage({ command: 'category-to-domain', data: { category: data.category } })
+      title: 'edit labels',
+      onClick: (data) => vscode.postMessage({ command: 'notes-edit-labels', data: { labels: data.labels, nIds: data.nIds } })
     }
   ],
   [
@@ -108,16 +119,12 @@ const NoteColContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'edit short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId, cn: data.i } })
-    },
-    {
-      title: 'add short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-add', data: { nId: data.nId, cn: data.i } })
+      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId } })
     }
   ], [
     {
       title: 'delete short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId, cn: data.i } })
+      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId } })
     }
   ]
   // [
@@ -137,7 +144,7 @@ const NoteColContextMenuActions: ContextMenuAction[][] = [
 const DomainContextMenuActions: ContextMenuAction[][] = [
   [
     {
-      title: 'edit labels',
+      title: 'relabels',
       onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-labels', data })
     }
   ]
@@ -201,8 +208,6 @@ class ContextMenuDom {
       (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
         ? e.pageX
         : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
-    // console.log(document.documentElement.clientHeight);
-    // console.log(aaa.getBoundingClientRect().bottom, aaa.getBoundingClientRect().top, e.pageY);
   }
 }
 
@@ -213,6 +218,7 @@ class VNNote {
   dom(): HTMLHeadingElement {
     const d_note = document.createElement('div');
     d_note.className = 'grid-note';
+    // d_note.id = this.note.nId
 
     const d_note_id = document.createElement('div');
     d_note_id.className = 'grid-note-id';
@@ -235,23 +241,30 @@ class VNNote {
     d_note_content.className = 'grid-note-contents';
     d_note_content.style.gridTemplateColumns = `repeat(${this.note.contents.length}, 1fr)`;
 
-    for (let i = 0; i < this.note.contents.length; i++) {
+    this.note.contents.forEach(c => {
       const d = document.createElement('div');
       d.className = 'grid-note-content';
-      // d.ondblclick = () => {
-      //     vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: this.note.nId } });
-      // };
-      d.textContent = this.note.contents[i];
-      d.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        nccm.hide();
-        // nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
-        const nccma = i === 0 ? [[NoteColContextMenuActions[0][0], NoteColContextMenuActions[0][1]]] : NoteColContextMenuActions;
-        nccm.show(e, d, nccma, { nId: this.note.nId, i: i });
-      });
-      // d.oncontextmenu =
+      d.textContent = c
       d_note_content.appendChild(d);
-    }
+    })
+
+    // for (let i = 0; i < this.note.contents.length; i++) {
+    //   const d = document.createElement('div');
+    //   d.className = 'grid-note-content';
+    //   // d.ondblclick = () => {
+    //   //     vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: this.note.nId } });
+    //   // };
+    //   d.textContent = this.note.contents[i];
+    //   d.addEventListener('contextmenu', (e) => {
+    //     e.preventDefault();
+    //     nccm.hide();
+    //     // nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
+    //     const nccma = i === 0 ? [[NoteColContextMenuActions[0][0], NoteColContextMenuActions[0][1]]] : NoteColContextMenuActions;
+    //     nccm.show(e, d, nccma, { nId: this.note.nId, i: i });
+    //   });
+    //   // d.oncontextmenu =
+    //   d_note_content.appendChild(d);
+    // }
 
     const d_note_edit = document.createElement('div');
     d_note_edit.className = 'grid-note-edit';
@@ -300,13 +313,13 @@ function elemSpaces(num: number = 1) {
 }
 
 class VNCategory {
-  constructor(private readonly name: string, private readonly notes: DataNote[]) { }
+  constructor(private readonly labels: string, private readonly notes: DataNote[]) { }
   doms() {
     const d_category = document.createElement('div');
     d_category.className = 'grid-category';
 
     const d_category_name = document.createElement('div');
-    d_category_name.textContent = this.name;
+    d_category_name.textContent = this.labels;
     d_category_name.className = 'grid-category-name';
     // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
     // d_category_name.oncontextmenu = (e) => {
@@ -319,15 +332,20 @@ class VNCategory {
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(
       elemIcon('fa-pen', (ev: MouseEvent) => {
-        nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { category: this.name });
+        nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { labels: this.labels.split(',').map(l => l.trim()), nIds: this.notes.map(n => n.nId) });
       })
     );
+    d_category_name.appendChild(elemSpaces());
+    // const d_category_labels = document.createElement('span');
+    // d_category_labels.style.fontSize = '10px';
+    // d_category_labels.textContent = this.labels.join(',');
+    // d_category_name.append(d_category_labels);
 
     const d_category_body = document.createElement('div');
     d_category_body.className = 'grid-category-body';
 
     for (const n of this.notes) {
-      const d_n = new VNNote(this.name, n).dom();
+      const d_n = new VNNote(this.labels, n).dom();
       d_category_body.appendChild(d_n);
     }
 
@@ -356,19 +374,84 @@ function filterSearch(categories: DataCategory[], key: string) {
       }
     }
     if (newNotes.length >= 1) {
-      newCategory.push({ name: category.name, notes: newNotes });
+      newCategory.push({ name: category.name, notes: newNotes, labels: category.labels });
     }
   }
   return newCategory;
 }
 
+// class VNNoteLabels {
+//   constructor(private readonly checkedLabels: string[], private readonly unCheckLabels: string[]) { }
+//   readerLabels(checkedLabels: string[], unCheckedLabels: string[]) {
+//     this.checkedLabels = checkedLabels;
+//     this.unCheckedLabels = unCheckedLabels;
+//     this.labelsDom.replaceChildren();
+//     console.log("readerLabels", checkedLabels.join(','), unCheckedLabels.join(','));
+//     for (const label of this.domain.checkedLabels) {
+//       const d = document.createElement('label');
+//       d.className = "checkedLabel";
+//       d.textContent = label;
+//       d.onclick = () => {
+//         this.checkedLabels = this.checkedLabels.filter(l => l !== label)
+//         d.className = "unCheckedLabel";
+//         vscode.postMessage({
+//           command: 'get-notes-by-labels',
+//           data: {
+//             checkedLabels: this.checkedLabels.filter(l => l !== label)
+//           }
+//         });
+//       };
+//       this.labelsDom.append(d);
+//     }
+//     for (const label of this.unCheckedLabels) {
+//       const d = document.createElement('label');
+//       d.textContent = label;
+//       d.className = "unCheckedLabel";
+//       d.style.color = "white";
+//       d.onclick = () => {
+//         this.checkedLabels.push(label)
+//         d.className = "checkedLabel";
+//         vscode.postMessage({
+//           command: 'get-notes-by-labels',
+//           data: {
+//             checkedLabels: this.domain.checkedLabels.concat(label)
+//           }
+//         });
+//       };
+//       this.labelsDom.append(d);
+//     }
+//   }
+// }
+
 class VNNoteBook {
+  domainNode: string[] = [];
   search: boolean = false;
+  labelsDom = document.createElement('div');
   categoriesDom = document.createElement('div');
   searchDom = this.createSerachDom();
-  constructor(private readonly domain: DataDomain) {
-    this.readerCategories();
+  lockDom = elemIcon('fa-lock');
+  lockOpenDom = elemIcon('fa-lock-open');
+  checkedLabels: string[] = [];
+  unCheckedLabels: string[] = [];
+  lock = true;
+  nIds: string[] = [];
+  notes: PostNote[] = [];
+  domainLabels: string[] = [];
+  constructor() {
+    // this.readerLabels();
+    // this.readerCategories();
   }
+
+  setDomainNode(domainNode: string[]) {
+    this.domainNode = domainNode;
+  }
+
+  setLabels(checkedLabels: string[], unCheckedLabels: string[]) {
+    this.checkedLabels = checkedLabels;
+    this.unCheckedLabels = unCheckedLabels;
+  }
+
+  // setNotes()
 
   createSerachDom() {
     const i = document.createElement('input');
@@ -376,16 +459,85 @@ class VNNoteBook {
     i.style.display = 'none';
     i.focus();
     i.onkeydown = () => {
-      this.readerCategories(i.value);
+      // this.readerCategories(i.value);
     };
     return i;
   }
 
-  readerCategories(filter: string | undefined = undefined) {
-    const _categories = this.search && filter ? filterSearch(this.domain.categories, filter) : this.domain.categories;
-    this.categoriesDom.innerHTML = ''; // remove all child
-    for (const c of _categories) {
-      this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
+  readerTitle() {
+
+  }
+
+  readerLabels() {
+    // this.domain.checkedLabels = checkedLabels;
+    // this.domain.unCheckedLabels = unCheckedLabels;
+    const _labels = this.checkedLabels.map(l => { return { label: l, checked: true }; });
+    // if (!this.lock) {
+    this.unCheckedLabels.filter(l => !this.domainLabels.includes(l)).map(l => { return { label: l, checked: false }; }).forEach(l => _labels.push(l));
+    // }
+    const labelDoms = []
+    this.labelsDom.replaceChildren();
+    for (const label of this.domainLabels) {
+      const d = document.createElement('label');
+      d.className = 'checkedLabel';
+      d.textContent = label;
+      labelDoms.push(d)
+      this.labelsDom.append(d, elemSpaces());
+    }
+
+    for (const { label, checked } of _labels) {
+      const d = document.createElement('label');
+      d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
+      d.textContent = label;
+      d.onclick = () => {
+        d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
+        if (d.className === 'unCheckedLabel') {
+          this.checkedLabels = this.checkedLabels.filter(l => l !== label);
+        } else {
+          this.checkedLabels.push(label);
+        }
+        this.readerNotes(this.notes, this.checkedLabels.concat(this.domainLabels));
+
+      };
+      labelDoms.push(d)
+      this.labelsDom.append(d, elemSpaces());
+    }
+    // labelDoms.forEach(l => this.labelsDom.append(l, elemSpaces()))
+  }
+
+  // readerCategories(filter: string | undefined = undefined) {
+  //   const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
+  //   this.categoriesDom.innerHTML = ''; // remove all child
+  //   for (const c of _categories) {
+  //     this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
+  //     this.categoriesDom.appendChild(document.createElement('p'));
+  //   }
+  // }
+
+  // interface INote {
+  //   contents: string[], cts: number, mts: number, labels: string[], category: string, nId: string
+  // }
+  intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
+  // subset = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
+
+  readerNotes(notes: PostNote[], checkedLabels: string[]) {
+    this.categoriesDom.replaceChildren();
+    this.notes = notes;
+    this.nIds = notes.map(n => n.nId);
+    const categories: { [cname: string]: DataNote[] } = {};
+    for (const note of notes.filter(n => this.intersection(n.labels, checkedLabels).length === checkedLabels.length)) {
+      const cname = note.labels.filter(f => !this.domainNode.includes(f)).sort().join(', ');
+      const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
+      if (cname in categories) {
+        categories[cname].push(n);
+      } else {
+        categories[cname] = [n];
+      }
+    }
+    // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
+    this.categoriesDom.replaceChildren();
+    for (const [cname, notes] of Object.entries(categories)) {
+      this.categoriesDom.appendChild(new VNCategory(cname, notes).doms());
       this.categoriesDom.appendChild(document.createElement('p'));
     }
   }
@@ -394,18 +546,34 @@ class VNNoteBook {
     const e_domain = document.createElement('div');
     const e_title = document.createElement('h2');
     const e_domain_name = document.createElement('span');
-    e_domain_name.textContent = this.domain.dpath.join(' / ');
+    e_domain_name.textContent = this.domainNode.join(' / ');
     // const e_search = elemNotesSearch();
     e_title.appendChild(e_domain_name);
     e_title.appendChild(elemSpaces());
     e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(
-      elemIcon('fa-pen', (e) => {
-        nccm.show(e, e_title, DomainContextMenuActions, Tools.joinDomainNode(this.domain.dpath));
-      })
-    );
+    e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels', data: { labels: this.checkedLabels } })));
+    // e_title.appendChild(elemSpaces());
+    // const lc = document.createElement('span');
+    // lc.id = "sssss";
+    // lc.onclick = () => {
+    //   if (this.lock) {
+    //     lc.replaceChildren(this.lockOpenDom);
+    //   } else {
+    //     lc.replaceChildren(this.lockDom);
+    //   }
+    //   this.lock = !this.lock;
+    //   this.readerLabels();
+    // };
+    // lc.append(this.lockDom);
+    // e_title.appendChild(lc);
     e_title.appendChild(elemSpaces());
+    // e_title.appendChild(
+    //   elemIcon('fa-pen', (e) => {
+    //     nccm.show(e, e_title, DomainContextMenuActions, Tools.joinDomainNode(this.domain.dpath));
+    //   })
+    // );
+    // e_title.appendChild(elemSpaces());
     e_title.appendChild(
       elemIcon('fa-search', () => {
         if (!this.search) {
@@ -414,13 +582,15 @@ class VNNoteBook {
         } else {
           this.search = false;
           this.searchDom.style.display = 'none';
-          this.readerCategories();
+          // this.readerCategories();
         }
       })
     );
     e_title.appendChild(this.searchDom);
 
-    e_domain.append(e_title, this.categoriesDom);
+    e_domain.append(e_title, this.labelsDom, document.createElement('br'), this.categoriesDom);
+    // this.readerLabels();
+    // this.readerCategories();
     return e_domain;
   }
 }
@@ -441,16 +611,45 @@ document.addEventListener(
   true
 );
 
-let domain;
+let domain = new VNNoteBook();
+
+class GlobalState {
+  checkLabels: string[] = [];
+  unCheckLabels: string[] = [];
+}
+
+const gs = new GlobalState();
+
+function readerNoteLabels() {
+
+
+}
 
 window.addEventListener('message', (event) => {
   const message: DataProtocol = event.data;
-  console.log('view notes.');
+  console.log('view notes.', message);
   switch (message.command) {
-    case 'data':
-      console.log(message.data);
-      domain = new VNNoteBook(message.data);
+    case 'post-domain':
+      domain = new VNNoteBook();
+      domain.setDomainNode(message.data.domainNode);
       document.getElementById('content')?.replaceChildren(domain.doms());
+      domain.domainLabels = message.data.domainLabels;
+      domain.checkedLabels = [];
+      domain.unCheckedLabels = [];
+      domain.notes = [];
+      domain.readerLabels();
+      vscode.postMessage({ command: 'get-notes' });
+      break;
+    // case 'post-labels':
+    //   domain.setLabels(message.data.checkedLabels, message.data.unCheckedLabels);
+    //   domain.readerLabels();
+    //   vscode.postMessage({ command: 'get-notes-by-labels', data: { checkedLabels: message.data.checkedLabels } });
+    //   break;
+    case 'post-notes':
+      console.log(message.data.notes);
+      domain.unCheckedLabels = Array.from(new Set(message.data.notes.map(n => n.labels).flatMap(n => n)));
+      domain.readerLabels();
+      domain.readerNotes(message.data.notes, domain.domainLabels);
       break;
     default:
       document.body.innerHTML = '<h1>loading...{message}</h1>';
