@@ -49,15 +49,30 @@ export class NotesPanelView {
     }
 
     this.panel!.webview.postMessage({
-      command: 'post-domain',
+      command: 'post-data',
       data: {
+        domainNotes: ext.notebookDatabase.getNotesOfDomain(this.domainNode),
         domainNode: this.domainNode,
-        domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+        domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode).sort()
       }
     });
     if (!this.panel!.visible) {
       this.panel!.reveal(vscode.ViewColumn.One);
     }
+  }
+
+  public postNote(note: any) {
+    this.panel!.webview.postMessage({
+      command: 'post-note',
+      data: { note: note }
+    });
+  }
+
+  public removeNote(nId: string) {
+    this.panel!.webview.postMessage({
+      command: 'delete-note',
+      data: { nId: nId }
+    });
   }
 
   private initPanel() {
@@ -89,7 +104,14 @@ export class NotesPanelView {
       (msg) => {
         switch (msg.command) {
           case 'get-data':
-            this.showNotesPlanView();
+            this.panel!.webview.postMessage({
+              command: 'post-data',
+              data: {
+                domainNotes: ext.notebookDatabase.getNotesOfDomain(this.domainNode),
+                domainNode: this.domainNode,
+                domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode).sort()
+              }
+            });
             break;
           case 'get-notes':
             this.panel!.webview.postMessage({
@@ -104,14 +126,14 @@ export class NotesPanelView {
               command: 'post-domain',
               data: {
                 domainNode: this.domainNode,
-                domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+                domainLabels: ext.notebookDatabase.getLabelsOfDomain(this.domainNode).sort()
               }
             });
-            console.log(ext.notebookDatabase.getLabelsOfDomain(this.domainNode))
+            console.log(ext.notebookDatabase.getLabelsOfDomain(this.domainNode));
             break;
           case 'get-labels':
             const labelsOfNotebook = [...ext.notebookDatabase.getNBLabels(this.domainNode[0]).keys()];
-            const labelsOfDomainNode = ext.notebookDatabase.getLabelsOfDomain(this.domainNode)
+            const labelsOfDomainNode = ext.notebookDatabase.getLabelsOfDomain(this.domainNode);
             this.panel!.webview.postMessage({
               command: 'post-labels',
               data: {

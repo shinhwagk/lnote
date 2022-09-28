@@ -43,10 +43,13 @@ export namespace ExtCmds {
 
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.globalState.update(dn);
+    const labels = await window.showInputBox({ placeHolder: 'label1,label2' });
+    if (!labels) { return; };
+    const _l = labels.split(',').map(l => l.trim());
     // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
-    ext.notebookDatabase.labelDomain(ext.globalState.domainNodeFormat, ext.globalState.domainNodeFormat.slice(1));
+    ext.notebookDatabase.labelDomain(ext.globalState.domainNodeFormat, ext.globalState.domainNodeFormat.slice(1).concat(_l));
     // ext.domainProvider.refresh(dn);
-    await cmdHdlDomainCategoryAdd();
+    // await cmdHdlDomainCategoryAdd();
     // await cmdHdlDomainPin(dn);
     ext.domainProvider.refresh(dn);
     cmdHdlDomainPin(dn);
@@ -130,7 +133,6 @@ export namespace ExtCmds {
     const _l = labels.split(',').map(l => l.trim());
     // ext.notebookDatabase.createCategory(tools.splitDomaiNode(ext.globalState.domainNode), cname, _labels);
     await cmdHdlNoteAdd(_l);
-    ext.notesPanelView.parseDomain(ext.globalState.domainNodeFormat).showNotesPlanView();
   }
   export async function cmdHdlNoteAdd(labels: string[]) {
     const domainNode: string[] = tools.splitDomaiNode(ext.globalState.domainNode!);
@@ -138,7 +140,6 @@ export namespace ExtCmds {
     cmdHdlNotebookNoteEdit(nId);
     ext.notebookDatabase.refresh(domainNode[0]);
     ext.domainProvider.refresh(ext.globalState.domainNode);
-    ext.notesPanelView.parseDomain(domainNode).showNotesPlanView();
   }
   export async function cmdHdlNoteFilesCreate(nId: string) {
     ext.notebookDatabase.noteFilesCreate(ext.globalState.nbName, nId);
@@ -270,7 +271,7 @@ export namespace ExtCmds {
     if (selection !== 'Yes') { return; };
     ext.notebookDatabase.removeNote(ext.globalState.nbName, nId);
     ext.domainProvider.refresh(dn[0]);
-    ext.notesPanelView.parseDomain().showNotesPlanView();
+    ext.notesPanelView.removeNote(nId);
   }
   export async function cmdHdlNoteColToActiveTermianl(_nId: string, _cIdx: string) {
     // if (window.activeTerminal) {
@@ -303,7 +304,7 @@ export namespace ExtCmds {
     const ib = await window.showInputBox({ value: oldLabels.join(',') });
     if (ib === undefined || ib === oldLabels.join(',')) { return; }
     const newLabels = ib.split(',').map(l => l.trim());
-    const domainLabels = ext.notebookDatabase.getDomain(ext.globalState.domainNodeFormat)['.labels']
+    const domainLabels = ext.notebookDatabase.getDomain(ext.globalState.domainNodeFormat)['.labels'];
     nIds.forEach(nId => {
       const n = ext.notebookDatabase.getNoteByid(ext.globalState.nbName, nId);
       n.labels = Array.from(new Set(n.labels.filter(l => !oldLabels.includes(l)).concat(newLabels).concat(domainLabels)));

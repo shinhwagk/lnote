@@ -285,7 +285,7 @@ export class NoteBookDatabase {
 
   public updateNote(nbName: string, nId: string, contents: string[], labels: string[]) {
     const notes = this.getNBNotes(nbName);
-    notes[nId].contents = contents.map(c => c.replace('\r\n', '\n').trim())
+    notes[nId].contents = contents.map(c => c.replace('\r\n', '\n').trim());
     notes[nId].mts = (new Date()).getTime();
     notes[nId].labels = labels;
     this.permanentNBNotes(nbName);
@@ -317,8 +317,8 @@ export class NoteBookDatabase {
   //   this.writeNBDomains(domainNode[0]);
   // }
 
-  public checkNotesExist(domainNode: string[]) {
-    return objectPath.get(this.domainTreeCache, [...domainNode, '.labels']) !== undefined;
+  public checkLabelsExist(domainNode: string[]) {
+    return objectPath.get(this.domainTreeCache, [...domainNode, '.labels'], []).length !== 0;
   }
 
   public getFilesPath = (nbName: string, nId: string) => path.join(this.masterPath, nbName, "files", `${nId}`);
@@ -340,7 +340,7 @@ export class NoteBookDatabase {
   }
 
   public getNoteByid(nbName: string, nId: string) {
-    return this.getNBNotes(nbName)[nId]
+    return this.getNBNotes(nbName)[nId];
   }
 
   public getNotesByLabels(nbName: string, labels: string[]): any[] {

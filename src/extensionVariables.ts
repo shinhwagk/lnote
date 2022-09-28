@@ -65,9 +65,9 @@ export function listenNoteClose(ctx: ExtensionContext) {
       if (f.uri.fsPath.startsWith(cacheDir)) {
         const fileName = path.basename(f.uri.fsPath);
         if (fileName.endsWith('.yaml')) {
-          const [nId,] = fileName.split('.')
+          const [nId,] = fileName.split('.');
           ext.notebookDatabase.removeEditNoteEnv(ext.globalState.nbName, nId);
-          ext.notesPanelView.parseDomain(ext.globalState.domainNodeFormat).showNotesPlanView()
+          ext.notesPanelView.postNote(ext.notebookDatabase.getNoteByid(ext.globalState.nbName, nId))
         }
       }
     })
@@ -79,15 +79,14 @@ export function listenNoteSave(ctx: ExtensionContext) {
     workspace.onDidSaveTextDocument((f) => {
       if (ext.notebookDatabase === undefined) { return; }
       const cacheDir = ext.notebookDatabase.getNoteBookCacheDirectory(ext.globalState.nbName);
-      console.log(cacheDir, path.basename(f.uri.fsPath))
+      console.log(cacheDir, path.basename(f.uri.fsPath));
       if (f.uri.fsPath.startsWith(cacheDir)) {
         const fileName = path.basename(f.uri.fsPath);
         if (fileName.endsWith('.yaml')) {
           const [nId,] = fileName.split('.');
-          const enote = tools.readYamlSync(f.uri.fsPath)
-          console.log(enote)
+          const enote = tools.readYamlSync(f.uri.fsPath);
           ext.notebookDatabase.updateNote(ext.globalState.nbName, nId, enote.contents, enote.labels);
-          ext.notesPanelView.parseDomain(ext.globalState.domainNodeFormat).showNotesPlanView()
+          ext.notesPanelView.postNote(ext.notebookDatabase.getNoteByid(ext.globalState.nbName, nId))
         }
       }
     })
