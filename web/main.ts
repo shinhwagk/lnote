@@ -5,17 +5,6 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
-namespace Tools {
-  const splitter = '@!$';
-  export function joinDomainNode(domain: string[]): string {
-    return domain.join(splitter);
-  }
-
-  export function splitDomaiNode(domain: string): string[] {
-    return domain.split(splitter);
-  }
-}
-
 interface DataDomain {
   domainNode: string[];
   checkedLabels: string[];
@@ -153,29 +142,6 @@ const DomainContextMenuActions: ContextMenuAction[][] = [
   ]
 ];
 
-// class abc {
-//     constructor(private readonly _context: string, e: MouseEvent) {
-//         const f = document.createElement('form');
-//         f.className = 'contextMenu';
-//         const args1 = document.createElement('input');
-//         args1.type = 'text' + this._context;
-//         args1.name = 'args1';
-
-//         const but = document.createElement('input');
-//         but.type = 'button';
-//         but.name = 'button';
-//         f.appendChild(args1);
-//         f.appendChild(but);
-//         f!.style.display = 'block';
-//         f!.style.position = 'absolute';
-//         f!.style.top = e.pageY + 'px';
-//         f!.style.left = e.pageX + 'px';
-//         document.getElementById('root')?.appendChild(f);
-//     }
-
-//     show() { }
-// }
-
 class ContextMenuDom {
   private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
   public hide() {
@@ -277,171 +243,6 @@ function readerNote(container: HTMLElement, note: PostNote): void {
   // return d_note;
 }
 
-
-// class VNCategory {
-//   constructor(private readonly labels: string, private readonly notes: DataNote[]) { }
-//   doms() {
-//     const d_category = document.createElement('div');
-//     d_category.className = 'grid-category';
-
-//     const d_category_name = document.createElement('div');
-//     d_category_name.textContent = this.labels;
-//     d_category_name.className = 'grid-category-name';
-//     // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
-//     // d_category_name.oncontextmenu = (e) => {
-//     //     e.preventDefault();
-//     //     // todo for rename
-//     // };
-
-//     d_category_name.appendChild(elemSpaces());
-//     // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
-//     d_category_name.appendChild(elemSpaces());
-//     d_category_name.appendChild(
-//       elemIcon('fa-pen', (ev: MouseEvent) => {
-//         nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { labels: this.labels.split(',').map(l => l.trim()), nIds: this.notes.map(n => n.nId) });
-//       })
-//     );
-//     d_category_name.appendChild(elemSpaces());
-//     // const d_category_labels = document.createElement('span');
-//     // d_category_labels.style.fontSize = '10px';
-//     // d_category_labels.textContent = this.labels.join(',');
-//     // d_category_name.append(d_category_labels);
-
-//     const d_category_body = document.createElement('div');
-//     d_category_body.className = 'grid-category-body';
-
-//     for (const n of this.notes) {
-//       const d_n = new VNNote(n).dom();
-//       d_category_body.appendChild(d_n);
-//     }
-
-//     d_category.append(d_category_name, d_category_body);
-//     return d_category;
-//   }
-// }
-
-// class VNLabel {
-//   dom() {
-//     const _labels = gs.checkedLabels.map(l => { return { label: l, checked: true }; });
-//     if (!this.lock) {
-//       gs.unCheckedLabels.filter(l => !gs.domainLabels.includes(l)).map(l => { return { label: l, checked: false }; }).forEach(l => _labels.push(l));
-//     }
-//     const labelDoms = [];
-//     this.labelsDom.replaceChildren();
-//     for (const label of gs.domainLabels) {
-//       const d = document.createElement('label');
-//       d.className = 'checkedLabel';
-//       d.textContent = label;
-//       labelDoms.push(d);
-//       this.labelsDom.append(d, elemSpaces());
-//     }
-
-//     for (const { label, checked } of _labels) {
-//       const d = document.createElement('label');
-//       d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
-//       d.textContent = label;
-//       d.onclick = () => {
-//         d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-//         if (d.className === 'unCheckedLabel') {
-//           gs.checkedLabels = gs.checkedLabels.filter(l => l !== label);
-//         } else {
-//           gs.checkedLabels.push(label);
-//         }
-//         this.readerNotes(gs.domainNotes, gs.checkedLabels.concat(gs.domainLabels));
-
-//       };
-//       labelDoms.push(d);
-//       this.labelsDom.append(d, elemSpaces());
-//     }
-//   }
-
-// }
-
-// class VNDomain {
-//   domainLabels: string[] = [];
-//   checkedLabels: string[] = [];
-//   unCheckedLabels: string[] = [];
-//   domainNotes: PostNote[] = [];
-//   domainNode: string[] = [];
-//   search: boolean = false;
-//   searchDom = this.createSerachDom();
-
-//   labelsDom = document.createElement('div');
-//   categoriesDom = document.createElement('div');
-
-//   updateDomainLabels(domainLabels: string[]) {
-//     this.domainLabels = domainLabels;
-//   }
-
-//   updateCheckedLabels(checkedLabels: string[]) {
-//     this.checkedLabels = checkedLabels;
-//   }
-
-//   updateUnCheckedLabels(unCheckedLabels: string[]) {
-//     this.unCheckedLabels = unCheckedLabels;
-//   }
-
-//   updateDomainNotes(domainNotes: PostNote[]) {
-//     this.domainNotes = domainNotes;
-//   }
-
-//   updateDomainNode(domainNode: string[]) {
-//     this.domainNode = domainNode;
-//   }
-
-//   createSerachDom() {
-//     const i = document.createElement('input');
-//     i.type = 'text';
-//     i.style.display = 'none';
-//     i.focus();
-//     i.onkeydown = () => {
-//       // this.readerCategories(i.value);
-//     };
-//     return i;
-//   }
-
-//   dom(): HTMLElement {
-//     return document.createElement('a');
-//   }
-
-//   domainNameDom(domainNode: string[]) {
-//     const e_domain = document.createElement('div');
-//     const e_title = document.createElement('h2');
-//     const e_domain_name = document.createElement('span');
-//     e_domain_name.textContent = domainNode.join(' / ');
-//     // const e_search = elemNotesSearch();
-//     e_title.appendChild(e_domain_name);
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels', data: { labels: gs.checkedLabels } })));
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(
-//       elemIcon('fa-search', () => {
-//         if (!this.search) {
-//           this.search = true;
-//           this.searchDom.style.display = 'block';
-//         } else {
-//           this.search = false;
-//           this.searchDom.style.display = 'none';
-//         }
-//       })
-//     );
-//     e_title.appendChild(this.searchDom);
-
-//     // const labelsDom = document.createElement('div');
-//     // labelsDom.id = 'domain-labels';
-//     // const cc = new VNLabel()
-
-//     // const categoriesDom = document.createElement('div');
-//     // categoriesDom.id = 'domain-categories';
-
-
-//     e_domain.append(e_title, this.labelsDom, document.createElement('br'), this.categoriesDom);
-//     document.getElementById('content')?.replaceChildren(e_domain);
-//   }
-// }
-
 function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
   const i = document.createElement('i');
   i.className = `fas ${name} fa-sm`;
@@ -467,139 +268,6 @@ function filterSearch(categories: DataCategory[], key: string) {
   }
   return newCategory;
 }
-
-// class VNNoteBook {
-//   domainNode: string[] = [];
-//   search: boolean = false;
-
-//   categoriesDom = document.createElement('div');
-
-//   lockDom = elemIcon('fa-lock');
-//   lockOpenDom = elemIcon('fa-lock-open');
-//   // checkedLabels: string[] = [];
-//   // unCheckedLabels: string[] = [];
-//   lock = true;
-//   nIds: string[] = [];
-//   // notes: PostNote[] = [];
-//   constructor() {
-//     // this.readerLabels();
-//     // this.readerCategories();
-//   }
-
-//   // setDomainNode(domainNode: string[]) {
-//   //   this.domainNode = domainNode;
-//   // }
-
-//   // setLabels(checkedLabels: string[], unCheckedLabels: string[]) {
-//   //   gs.checkedLabels = checkedLabels;
-//   //   gs.unCheckedLabels = unCheckedLabels;
-//   // }
-
-//   // setNotes()
-
-
-
-//   readerTitle() {
-
-//   }
-
-//   readerLabels(checkedLabels: string[], unCheckedLabels: string[]) {
-//     // this.domain.checkedLabels = checkedLabels;
-//     // this.domain.unCheckedLabels = unCheckedLabels;
-//     const _labels = checkedLabels.map(l => { return { label: l, checked: true }; });
-//     // if (!this.lock) {
-//     gs.unCheckedLabels.filter(l => !gs.domainLabels.includes(l)).map(l => { return { label: l, checked: false }; }).forEach(l => _labels.push(l));
-//     // }
-//     const labelDoms = [];
-//     this.labelsDom.replaceChildren();
-//     for (const label of gs.domainLabels) {
-//       const d = document.createElement('label');
-//       d.className = 'checkedLabel';
-//       d.textContent = label;
-//       labelDoms.push(d);
-//       this.labelsDom.append(d, elemSpaces());
-//     }
-
-//     for (const { label, checked } of _labels) {
-//       const d = document.createElement('label');
-//       d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
-//       d.textContent = label;
-//       d.onclick = () => {
-//         d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-//         if (d.className === 'unCheckedLabel') {
-//           gs.checkedLabels = gs.checkedLabels.filter(l => l !== label);
-//         } else {
-//           gs.checkedLabels.push(label);
-//         }
-//         this.readerNotes(gs.domainNotes, gs.checkedLabels.concat(gs.domainLabels));
-
-//       };
-//       labelDoms.push(d);
-//       this.labelsDom.append(d, elemSpaces());
-//     }
-//     // labelDoms.forEach(l => this.labelsDom.append(l, elemSpaces()))
-//   }
-
-//   // readerCategories(filter: string | undefined = undefined) {
-//   //   const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
-//   //   this.categoriesDom.innerHTML = ''; // remove all child
-//   //   for (const c of _categories) {
-//   //     this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
-//   //     this.categoriesDom.appendChild(document.createElement('p'));
-//   //   }
-//   // }
-
-//   // interface INote {
-//   //   contents: string[], cts: number, mts: number, labels: string[], category: string, nId: string
-//   // }
-
-//   // subset = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
-
-
-
-//   readerNote(note: PostNote) {
-//     // const d_n = new VNNote(this.labels, n).dom();
-//   }
-
-
-
-
-
-
-
-//   // doms() {
-//   //   const e_domain = document.createElement('div');
-//   //   const e_title = document.createElement('h2');
-//   //   const e_domain_name = document.createElement('span');
-//   //   e_domain_name.textContent = this.domainNode.join(' / ');
-//   //   // const e_search = elemNotesSearch();
-//   //   e_title.appendChild(e_domain_name);
-//   //   e_title.appendChild(elemSpaces());
-//   //   e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
-//   //   e_title.appendChild(elemSpaces());
-//   //   e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels', data: { labels: gs.checkedLabels } })));
-//   //   e_title.appendChild(elemSpaces());
-//   //   e_title.appendChild(
-//   //     elemIcon('fa-search', () => {
-//   //       if (!this.search) {
-//   //         this.search = true;
-//   //         this.searchDom.style.display = 'block';
-//   //       } else {
-//   //         this.search = false;
-//   //         this.searchDom.style.display = 'none';
-//   //       }
-//   //     })
-//   //   );
-//   //   e_title.appendChild(this.searchDom);
-
-//   //   e_domain.append(e_title, this.labelsDom, document.createElement('br'), this.categoriesDom);
-//   //   return e_domain;
-//   // }
-// }
-
-// function readerNote(container: HTMLElement, note: PostNote) {
-
-// }
 
 function readerCategory(fDom: Element, categoryName: string, domainNotes: PostNote[]) {
   // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
@@ -817,17 +485,6 @@ window.addEventListener('message', (event) => {
       // domain.readerNotes()
       // vscode.postMessage({ command: 'get-notes' });
       break;
-    // case 'post-labels':
-    //   domain.setLabels(message.data.checkedLabels, message.data.unCheckedLabels);
-    //   domain.readerLabels();
-    //   vscode.postMessage({ command: 'get-notes-by-labels', data: { checkedLabels: message.data.checkedLabels } });
-    //   break;
-    // case 'post-notes':
-    //   console.log(message.data.notes);
-    //   domain.unCheckedLabels = Array.from(new Set(message.data.notes.map(n => n.labels).flatMap(n => n))).sort();
-    //   domain.readerLabels();
-    //   domain.readerNotes(message.data.notes, gs.domainLabels);
-    //   break;
     case 'delete-note':
       document.getElementById(`note-${message.data.nId}`)?.remove();
       break;
@@ -847,3 +504,7 @@ window.addEventListener('message', (event) => {
       document.body.innerHTML = '<h1>loading...{message}</h1>';
   }
 });
+
+// 
+vscode.postMessage({ command: 'get-data' });
+console.log('Ready to accept data.');

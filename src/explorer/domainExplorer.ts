@@ -7,7 +7,8 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
-  const isNotes = ext.notebookDatabase.checkLabelsExist(domainNode);
+  const vnDomain = ext.vnNotebook.getNB(domainNode[0]).domain;
+  const isNotes = vnDomain.checkLabelsExist(domainNode);
   const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
   const notesNumberOfDomain = 1;//isNotes
   // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
@@ -15,7 +16,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
 
   const item: TreeItem = { label: domainNode[domainNode.length - 1] };
   item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain} `;
-  item.collapsibleState = ext.notebookDatabase.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
+  item.collapsibleState = vnDomain.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
   // if (domainNode.length === 1) {
   //   item.command = {
   //     arguments: [dn],
@@ -49,13 +50,13 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
   public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
     if (element === undefined) {
-      return ext.notebookDatabase.getNoteBookNames();
+      return ext.vnNotebook.getNoteBookNames();
     } else {
-      const dn = tools.splitDomaiNode(element);
-      return ext.notebookDatabase
-        .getChildrenNameOfDomain(dn)
+      const domainNode = tools.splitDomaiNode(element);
+      return ext.vnNotebook.getNB(domainNode[0]).domain
+        .getChildrenNameOfDomain(domainNode)
         .sort()
-        .map((name) => tools.joinDomainNode(dn.concat(name)));
+        .map((name) => tools.joinDomainNode(domainNode.concat(name)));
     }
   }
 

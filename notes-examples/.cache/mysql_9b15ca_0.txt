@@ -1,0 +1,2 @@
+binary 255
+varbinary 65535
