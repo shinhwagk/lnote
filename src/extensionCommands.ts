@@ -309,7 +309,7 @@ export namespace ExtCmds {
     const ib = await window.showInputBox({ value: labelsOfDomain.join(', ') });
     if (ib === undefined || ib === labelsOfDomain.join(', ')) { return; }
     // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
-    ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ib.split(',').map(l => l.trim()));
+    ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat.splice(1), ib.split(',').map(l => l.trim()));
     // ext.domainProvider.refresh(dn);
     // await cmdHdlDomainCategoryAdd();
     // await cmdHdlDomainPin(dn);
