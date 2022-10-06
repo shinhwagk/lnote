@@ -21,7 +21,7 @@ export interface NBNoteStruct {
     labels: string[];
 }
 
-export class NBNote {
+export class NBNotes {
     private notesCache = new Map<string, NBNoteStruct>();;
     private notesLabelsCache = new Map<string, Set<string>>();
     private editCacheDirectory: string;
@@ -130,7 +130,7 @@ export class NBNote {
     }
 
     public getNIdsByLabels(labels: string[]) {
-        return labels.map(l => [...this.notesLabelsCache.get(l)!]).flatMap(i => i);
+        return labels.map(l => [...this.notesLabelsCache.get(l) || []]).flatMap(i => i);
     }
 
     public getNotesByLabels(labels: string[]) {

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
+import { tools } from '../helper';
 
 export class NotesPanelView {
   private panel: vscode.WebviewPanel | undefined = undefined;
@@ -55,12 +56,14 @@ export class NotesPanelView {
   private getNotesForWebStruct(domainNode: string[]) {
     const labels = ext.gs.nbDomain.getLabelsOfDomain(domainNode);
     const nbNotes = ext.gs.nbNotes;
-    return nbNotes.getNIdsByLabels(labels).map(nId => {
-      const n = nbNotes.getNoteByid(nId);
-      const isDoc = nbNotes.checkDocExist(nId);
-      const isFiles = nbNotes.checkFilesExist(nId);
-      return { nId: nId, doc: isDoc, files: isFiles, ...n };
-    });
+    return [...new Set(nbNotes.getNIdsByLabels(labels))]
+      .map(nId => { return { nId: nId, note: nbNotes.getNoteByid(nId) }; })
+      .filter(n => tools.intersections(labels, n.note.labels).length === labels.length)
+      .map(n => {
+        const isDoc = nbNotes.checkDocExist(n.nId);
+        const isFiles = nbNotes.checkFilesExist(n.nId);
+        return { nId: n.nId, doc: isDoc, files: isFiles, ...n.note };
+      });
   }
 
   private async postData() {
@@ -198,7 +201,7 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
             break;
           case 'domain-relabels':
-            ExtCmds.cmdHdlDomainRelabels(msg.data.labels);
+            ExtCmds.cmdHdlDomainRelabels();
             break;
         }
       },

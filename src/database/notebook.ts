@@ -7,7 +7,7 @@ import {
     statSync
 } from 'fs-extra';
 
-import { NBNote } from './note';
+import { NBNotes } from './note';
 import { NBDomain } from './domain';
 
 export interface NBDomainStruct {
@@ -27,7 +27,7 @@ interface NBNoteStruct {
 export class VNNotebook {
     private readonly nbMasterPath: string;
     private readonly nbDomainCache = new Map<string, NBDomain>();
-    private readonly nbNotesCache = new Map<string, NBNote>();
+    private readonly nbNotesCache = new Map<string, NBNotes>();
 
     constructor(masterPath: string) {
         this.nbMasterPath = masterPath;
@@ -63,7 +63,7 @@ export class VNNotebook {
 
     public setNBCache(nbName: string) {
         console.log(`cache nb ${nbName}.`);
-        this.nbNotesCache.set(nbName, new NBNote(this.nbMasterPath, nbName));
+        this.nbNotesCache.set(nbName, new NBNotes(this.nbMasterPath, nbName));
         this.nbDomainCache.set(nbName, new NBDomain(this.nbMasterPath, nbName));
     }
 

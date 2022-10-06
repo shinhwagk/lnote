@@ -28,7 +28,7 @@ export class NBDomain {
     public domainCache: NBDomainStruct = {};
 
     constructor(private readonly nbMasterPath: string, private readonly nbName: string) {
-        this.cacheDomain();
+        this.setCache();
     }
 
     public getLabelsOfDomain(domainNode: string[]): string[] {
@@ -87,7 +87,7 @@ export class NBDomain {
         return objectPath.get(this.domainCache, domainNode);
     }
 
-    public cacheDomain() {
+    public setCache() {
         objectPath.set(this.domainCache, [this.nbName], this.readDomain());
     }
 

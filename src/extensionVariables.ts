@@ -15,17 +15,15 @@ import { NotesPanelView } from './panel/notesPanelView';
 import path from 'path';
 import { tools } from './helper';
 import { VNNotebook } from './database/notebook';
-import { NBNote } from './database/note';
+import { NBNotes } from './database/note';
 import { NBDomain } from './database/domain';
-
-// import { initClient, sendGA } from './client';
 
 export class GlobalState {
   nId: string = '';
   domainNode: DomainNode;
   domainNodeFormat: string[];
   nbName: string; //notebook name
-  nbNotes: NBNote;
+  nbNotes: NBNotes;
   nbDomain: NBDomain;
   // vnNoteBook: VNNotebook;
 
@@ -43,7 +41,6 @@ export class GlobalState {
     ext.gs = new GlobalState(domainNode);
   }
 }
-
 
 export namespace ext {
   export let context: ExtensionContext;
@@ -94,7 +91,7 @@ export function listenNoteClose(ctx: ExtensionContext) {
         if (fileName.endsWith('.yaml')) {
           const [nId,] = fileName.split('.');
           ext.gs.nbNotes.removeEditNoteEnv(nId);
-          ext.notesPanelView.postNote(ext.gs.nbNotes.getNoteByid(nId));
+          // ext.notesPanelView.postNote(ext.gs.nbNotes.getNoteByid(nId));
         }
       }
     })

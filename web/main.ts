@@ -392,7 +392,7 @@ function readerDomainName() {
   e_title.appendChild(elemSpaces());
   e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
   e_title.appendChild(elemSpaces());
-  e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels', data: { labels: gs.checkedLabels } })));
+  e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels' })));
   e_title.appendChild(elemSpaces());
   e_title.appendChild(
     elemIcon('fa-search', () => {

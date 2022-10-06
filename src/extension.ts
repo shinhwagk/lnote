@@ -12,18 +12,12 @@ export async function activate(context: ExtensionContext) {
 
    initializeExtensionVariables(context);
 
-   // context.subscriptions.push(
-   //     commands.registerCommand('openFolderWelcome', () => {
-
-   //     })
-   // );
    ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
    /**
    * domain
    **/
    ext.registerCommand('lnote.domain.create', ExtCmds.cmdHdlDomainCreate);
    ext.registerCommand('lnote.domain.pin', ExtCmds.cmdHdlDomainPin);
-   // ext.registerCommand('lnote.domain.pin.level.0', ExtCmds.cmdHdlDomainPinLevel0);
    ext.registerCommand('lnote.domain.move', ExtCmds.cmdHdlDomainMove);
    ext.registerCommand('lnote.domain.rename', ExtCmds.cmdHdlDomainRename);
    ext.registerCommand('lnote.domain.remove', ExtCmds.cmdHdlDomainRemove);
@@ -33,7 +27,6 @@ export async function activate(context: ExtensionContext) {
    /**
       * notes view
       */
-   // ext.registerCommand('lnote.category.add', ExtCmds.cmdHdlCategoryAdd);
    ext.registerCommand('lnote.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
    ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNotebookNoteDocShow);
    // ext.registerCommand('lnote.note.add', ExtCmds.cmdHdlNoteCreate);
