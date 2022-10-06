@@ -1,5 +1,5 @@
 {
-    "name": "vscode-note",
+    "name": "lnote",
     "build": {
         "dockerfile": "Dockerfile",
         "args": {
@@ -9,7 +9,7 @@
     "extensions": [
         "dbaeumer.vscode-eslint",
         "howardzuo.vscode-npm-dependency",
-        "shinhwagk.vscode-note",
+        "shinhwagk.lnote",
         "amodio.tsl-problem-matcher"
     ],
     "remoteUser": "node"

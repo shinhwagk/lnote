@@ -160,7 +160,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
   // if (!ext.domainShortcutStatusBarItem) {
   //     ext.domainShortcutStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
   //     ext.domainShortcutStatusBarItem.text = '$(list-unordered) Domains(Last)';
-  //     ext.domainShortcutStatusBarItem.command = 'vscode-note.shortcuts.last';
+  //     ext.domainShortcutStatusBarItem.command = 'lnote.shortcuts.last';
   //     ext.domainShortcutStatusBarItem.show();
   //     ext.context.subscriptions.push(ext.domainShortcutStatusBarItem);
   // }

@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
-import { NBNoteStruct } from '../database/note';
 
 export class NotesPanelView {
   private panel: vscode.WebviewPanel | undefined = undefined;
@@ -28,7 +27,7 @@ export class NotesPanelView {
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <link href="${stylesMainUri}" rel="stylesheet">
                     <script nonce="${nonce}" src="https://kit.fontawesome.com/61b8139299.js" crossorigin="anonymous" ></script>
-                    <title>vscode-note</title>
+                    <title>lnote</title>
                 </head>
                 <body>
                     <div id="root">
@@ -90,7 +89,7 @@ export class NotesPanelView {
   }
 
   private initPanel() {
-    this.panel = vscode.window.createWebviewPanel('vscode-note', 'vscode-note', vscode.ViewColumn.One, {
+    this.panel = vscode.window.createWebviewPanel('lnote', 'lnote', vscode.ViewColumn.One, {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')]
     });
@@ -209,7 +208,7 @@ export class NotesPanelView {
     this.panel.webview.html = this.getWebviewContent();
   }
 
-  public parseDomain(domainNode?: string[], labels?: string[]) {
+  public parseDomain(domainNode?: string[]) {
     this.domainNode = domainNode || this.domainNode;
     // this.viewData = this.genViewData(labels);
     return this;

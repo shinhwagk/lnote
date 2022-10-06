@@ -1,6 +1,6 @@
 {
-    "name": "vscode-note",
-    "displayName": "vscode-note",
+    "name": "lnote",
+    "displayName": "lnote",
     "description": "A simple note-taking extension.",
     "version": "0.20.12",
     "icon": "icon.png",
@@ -30,7 +30,7 @@
             "activitybar": [
                 {
                     "id": "vsnote-explorer",
-                    "title": "vscode-note",
+                    "title": "lnote",
                     "icon": "images/note.svg"
                 }
             ]
@@ -44,71 +44,71 @@
                 {
                     "id": "filesExplorer",
                     "name": "files",
-                    "when": "vscode-note.files-explorer"
+                    "when": "lnote.files-explorer"
                 }
             ]
         },
         "menus": {
             "view/title": [
                 {
-                    "command": "vscode-note.domain.create",
+                    "command": "lnote.domain.create",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.domain.refresh",
+                    "command": "lnote.domain.refresh",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.files.openTerminal",
+                    "command": "lnote.files.openTerminal",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
                 {
-                    "command": "vscode-note.files.edit.open",
+                    "command": "lnote.files.edit.open",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
                 {
-                    "command": "vscode-note.files.close",
+                    "command": "lnote.files.close",
                     "group": "navigation@1",
                     "when": "view == filesExplorer"
                 },
                 {
-                    "command": "vscode-note.files.refresh",
+                    "command": "lnote.files.refresh",
                     "group": "navigation@2",
                     "when": "view == filesExplorer"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-note.domain.create",
+                    "command": "lnote.domain.create",
                     "when": "view == domainExplorer",
                     "group": "0_domain"
                 },
                 {
-                    "command": "vscode-note.domain.rename",
+                    "command": "lnote.domain.rename",
                     "when": "view == domainExplorer",
                     "group": "2_domain"
                 },
                 {
-                    "command": "vscode-note.domain.remove",
+                    "command": "lnote.domain.remove",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
                 },
                 {
-                    "command": "vscode-note.domain.search",
+                    "command": "lnote.domain.search",
                     "when": "view == domainExplorer",
                     "group": "4_domain"
                 },
                 {
-                    "command": "vscode-note.domain.move",
+                    "command": "lnote.domain.move",
                     "when": "view == domainExplorer",
                     "group": "2_domain"
                 },
                 {
-                    "command": "vscode-note.domain.notes.create",
+                    "command": "lnote.domain.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
                     "group": "1_domain"
                 }
@@ -117,18 +117,18 @@
         "configuration": [
             {
                 "type": "object",
-                "title": "vscode-note",
+                "title": "lnote",
                 "properties": {
-                    "vscode-note.notespath": {
+                    "lnote.notespath": {
                         "type": "string",
-                        "description": "vscode-note data location"
+                        "description": "lnote data location"
                     }
                 }
             }
         ],
         "commands": [
             {
-                "command": "vscode-note.domain.create",
+                "command": "lnote.domain.create",
                 "title": "New",
                 "icon": {
                     "light": "images/light/add.svg",
@@ -136,23 +136,23 @@
                 }
             },
             {
-                "command": "vscode-note.domain.move",
+                "command": "lnote.domain.move",
                 "title": "Move"
             },
             {
-                "command": "vscode-note.domain.rename",
+                "command": "lnote.domain.rename",
                 "title": "Rename"
             },
             {
-                "command": "vscode-note.domain.remove",
+                "command": "lnote.domain.remove",
                 "title": "Remove"
             },
             {
-                "command": "vscode-note.domain.search",
+                "command": "lnote.domain.search",
                 "title": "Search"
             },
             {
-                "command": "vscode-note.domain.refresh",
+                "command": "lnote.domain.refresh",
                 "title": "Refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -160,7 +160,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.close",
+                "command": "lnote.files.close",
                 "title": "Close",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -168,7 +168,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.openTerminal",
+                "command": "lnote.files.openTerminal",
                 "title": "open terminal",
                 "icon": {
                     "light": "images/light/terminal.svg",
@@ -176,11 +176,11 @@
                 }
             },
             {
-                "command": "vscode-note.domain.notes.create",
+                "command": "lnote.domain.notes.create",
                 "title": "Create Notes"
             },
             {
-                "command": "vscode-note.files.edit.open",
+                "command": "lnote.files.edit.open",
                 "title": "open edit window",
                 "icon": {
                     "light": "images/light/edit.svg",
@@ -188,7 +188,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.refresh",
+                "command": "lnote.files.refresh",
                 "title": "refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -199,7 +199,7 @@
         "viewsWelcome": [
             {
                 "view": "domainExplorer",
-                "contents": "Please select a location to save the notes.\n[Notes Location](command:vscode-note.choose-location)"
+                "contents": "Please select a location to save the notes.\n[Notes Location](command:lnote.choose-location)"
             }
         ]
     },

@@ -16,32 +16,11 @@ export interface NBDomainStruct {
     '.labels'?: any; // { [cname:string]: string[] }
 }
 
-// export interface NotebookNote {
-//   nId: string;
-//   cIdx: number;
-//   nIdx: number;
-//   category: string;
-//   contents: string[];
-//   isFiles: boolean;
-//   isDoc: boolean;
-// }
-
-interface NotebookNotes {
-    [nId: string]: NBNoteStruct
-}
 
 interface NBNoteStruct {
     contents: string[], cts: number, mts: number, labels: string[]
 }
 
-interface PostNote {
-    contents: string[];
-    cts: number;
-    mts: number;
-    labels: string[];
-    doc: boolean;
-    files: boolean
-}
 
 // export type NoteBook = string;
 

@@ -9,7 +9,7 @@ import { VNNotebook } from './database/notebook';
 
 export namespace ExtCmds {
   export async function cmdHdlChooseLocation() {
-    // { title: 'choose vscode-note data location.' }
+    // { title: 'choose lnote data location.' }
     const dl = await window.showInputBox();
     if (dl === undefined || dl === '') { return; };
     if (!existsSync(dl)) {
@@ -318,9 +318,6 @@ export namespace ExtCmds {
     // await cmdHdlDomainCategoryAdd();
     // await cmdHdlDomainPin(dn);
     cmdHdlDomainPin(ext.gs.domainNode);
-  }
-  export async function showNotesByLabels(labels: string[]) {
-    ext.notesPanelView.parseDomain(ext.gs.domainNodeFormat, labels).showNotesPlanView();
   }
 
   export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {

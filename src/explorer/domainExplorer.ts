@@ -20,14 +20,14 @@ function getTreeItem(dn: DomainNode): TreeItem {
   // if (domainNode.length === 1) {
   //   item.command = {
   //     arguments: [dn],
-  //     command: 'vscode-note.domain.pin.level.0',
+  //     command: 'lnote.domain.pin.level.0',
   //     title: 'Show Vscode Note'
   //   };
   // } else 
   if (isNotes) {
     item.command = {
       arguments: [dn],
-      command: 'vscode-note.domain.pin',
+      command: 'lnote.domain.pin',
       title: 'Show Vscode Note'
     };
   } else {
