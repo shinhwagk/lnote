@@ -10,20 +10,6 @@ export interface NBDomainStruct {
     '.labels'?: any; // { [cname:string]: string[] }
 }
 
-// export interface NotebookNote {
-//   nId: string;
-//   cIdx: number;
-//   nIdx: number;
-//   category: string;
-//   contents: string[];
-//   isFiles: boolean;
-//   isDoc: boolean;
-// }
-
-
-
-
-
 export class NBDomain {
     public domainCache: NBDomainStruct = {};
 
