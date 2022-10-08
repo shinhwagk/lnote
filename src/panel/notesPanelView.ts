@@ -165,11 +165,11 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNoteAdd(msg.data.labels);
             break;
           case 'notebook-note-edit':
-            ExtCmds.cmdHdlNotebookNoteEdit(msg.data.nId);
+            ExtCmds.cmdHdlNoteEdit(msg.data.nId);
             break;
-          case 'notes-edit-labels':
-            ExtCmds.cmdHdlNotesEditlabels(msg.data.nIds, msg.data.labels);
-            break;
+          // case 'notes-edit-labels':
+          //   ExtCmds.cmdHdlNotesEditlabels(msg.data.nIds, msg.data.labels);
+          //   break;
           // case 'notebook-note-contents-add':
           //   ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
           //   break;

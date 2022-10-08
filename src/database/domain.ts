@@ -34,13 +34,14 @@ export class NBDomain {
             return;
         }
         objectPath.del(this.domainCache, domainNode);
-        this.permanentDomains();
+        this.permanent();
     }
 
     public moveDomain(orgDomainNode: string[], newDomainNode: string[]) {
         const domain = this.getDomain(orgDomainNode);
         this.deleteDomain(orgDomainNode);
         objectPath.set(this.domainCache, newDomainNode, domain);
+        this.permanent();
     }
 
     public renameDomain(domainNode: string[], domainName: string) {
@@ -49,7 +50,7 @@ export class NBDomain {
         const domain = this.getDomain(domainNode);
         this.deleteDomain(domainNode);
         objectPath.set(this.domainCache, _d, domain);
-        this.permanentDomains();
+        this.permanent();
     }
 
     public addDomain(domainNode: string[], labels: string[] = []) {
@@ -58,11 +59,11 @@ export class NBDomain {
 
     public resetLabels(domainNode: string[], labels: string[]) {
         objectPath.set(this.domainCache, [...domainNode, '.labels'], labels);
-        this.permanentDomains();
+        this.permanent();
     }
 
-    public permanentDomains() {
-        vfs.writeJsonSync(this.getDomainFile(), this.domainCache);
+    public permanent() {
+        vfs.writeJsonSync(this.getDomainFile(), this.domainCache[this.nbName]);
     }
 
     // static getNBList(): string[] {
