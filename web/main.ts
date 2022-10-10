@@ -270,6 +270,7 @@ function filterSearch(categories: DataCategory[], key: string) {
 }
 
 function readerCategory(fDom: Element, categoryName: string, domainNotes: PostNote[]) {
+  categoryName = categoryName === '' ? '---' : categoryName;
   // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
 
   const d_category = document.createElement('div');

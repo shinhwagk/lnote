@@ -62,7 +62,9 @@ export class NotesPanelView {
       .map(n => {
         const isDoc = nbNotes.checkDocExist(n.nId);
         const isFiles = nbNotes.checkFilesExist(n.nId);
-        return { nId: n.nId, doc: isDoc, files: isFiles, ...n.note };
+        const _n = JSON.parse(JSON.stringify(n)); // clone obj
+        _n.note.labels = n.note.labels //.concat(ext.gs.nbName);
+        return { nId: _n.nId, doc: isDoc, files: isFiles, ..._n.note };
       });
   }
 

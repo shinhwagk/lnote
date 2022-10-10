@@ -70,8 +70,9 @@ export class VNNotebook {
     public createNB(nbName: string) {
         // [...(new Set(domainNode.slice(1).concat(labels))).values()]
         mkdirpSync(this.getNBDirectory(nbName));
-        this.nbNotesCache.get(nbName)?.addNote([]);
-        this.nbDomainCache.get(nbName)?.addDomain([]);
+        this.setNBCache(nbName);
+        // this.nbNotesCache.get(nbName)?.addNote([]);
+        // this.nbDomainCache.get(nbName)?.addDomain([]);
     }
 
     public getNBDirectory(nbName: string) {

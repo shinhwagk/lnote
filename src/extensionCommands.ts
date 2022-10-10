@@ -43,17 +43,15 @@ export namespace ExtCmds {
 
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
-    const labels = await window.showInputBox({ placeHolder: 'label1,label2' });
+    const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat)
+    const labels = await window.showInputBox({ placeHolder: labelsOfDomain.join(', ') + ', ' });
     if (!labels) { return; };
     const _l = labels.split(',').map(l => l.trim());
-    // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
+    ext.gs.nbNotes.addNote(ext.gs.domainNodeFormatWithoutNBName.concat(_l));
     ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
-    // ext.domainProvider.refresh(dn);
-    // await cmdHdlDomainCategoryAdd();
-    // await cmdHdlDomainPin(dn);
+    ext.vnNotebook.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
-    cmdHdlDomainPin(dn);
-    // ext.notesPanelView.parseDomain().showNotesPlanView();
+    await cmdHdlDomainPin(dn);
   }
   // export async function cmdHdlNoteEdit(nId: string, category: string) {
   //     const picks = [];
@@ -100,13 +98,14 @@ export namespace ExtCmds {
     if (dn === undefined) {
       ext.vnNotebook.createNB(name);
     }
+    ext.updateGS(dn || name);
     ext.gs.nbDomain.addDomain(_dn.concat(name));
     ext.domainProvider.refresh(dn);
     !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {
     ext.updateGS(dn);
-    console.log("pin", dn, ext.gs.domainNodeFormat)
+    console.log("pin", dn, ext.gs.domainNodeFormat);
     // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
     await ext.notesPanelView.parseDomain(ext.gs.domainNodeFormat).showNotesPlanView();
     await ext.setContext(ctxFilesExplorer, false);

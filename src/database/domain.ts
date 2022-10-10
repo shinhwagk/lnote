@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as objectPath from 'object-path';
 
 import { vfs } from '../helper';
+import { existsSync } from 'fs-extra';
 
 export interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -14,7 +15,12 @@ export class NBDomain {
     public domainCache: NBDomainStruct = {};
 
     constructor(private readonly nbMasterPath: string, private readonly nbName: string) {
-        this.setCache();
+        if (!existsSync(this.getDomainFile())) {
+            objectPath.set(this.domainCache, [this.nbName], { '.labels': [] });
+            this.permanent();
+        } else {
+            this.setCache();
+        }
     }
 
     public getLabelsOfDomain(domainNode: string[]): string[] {

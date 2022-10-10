@@ -30,7 +30,11 @@ export class NBNotes {
         this.editCacheDirectory = this.getEditCacheDirectory();
         existsSync(this.editCacheDirectory) || mkdirpSync(this.editCacheDirectory);
 
-        this.setCache();
+        if (!existsSync(this.getNotesFile())) {
+            this.permanent();
+        } else {
+            this.setCache();
+        }
     }
 
     // public getLabelsOfNotebook(): string[] {
