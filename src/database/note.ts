@@ -68,9 +68,14 @@ export class NBNotes {
     }
 
     public setCache() {
+        this.notesLabelsCache.set(this.nbName, new Set<string>());
         for (const [nId, note] of Object.entries(this.loadNotes())) {
             // cache notes file
             this.notesCache.set(nId, note);
+
+            // all note have an nbname label
+            this.notesLabelsCache.get(this.nbName)?.add(nId);
+            console.log(2222, this.nbName, this.notesLabelsCache.get(this.nbName));
 
             // cache nid by labels
             for (const label of note.labels) {
@@ -85,7 +90,7 @@ export class NBNotes {
         const n = this.getNoteByid(nId);
         n.contents = contents.map(c => c.replace('\r\n', '\n').trim());
         n.mts = (new Date()).getTime();
-        n.labels = labels;
+        n.labels = tools.duplicateRemoval(labels);
         this.permanent();
     }
 
@@ -158,7 +163,7 @@ export class NBNotes {
         const nId = generateNId();
         // objectPath.push(this.domainTreeCache, [...domainNode, '.categories', cname], nId);
         const ts = (new Date()).getTime();
-        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: labels });
+        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: tools.duplicateRemoval(labels) });
         // this.writeNBDomains(domainNode[0]);
         this.permanent();
         return nId;
@@ -166,12 +171,13 @@ export class NBNotes {
 
     public resetLabels(nId: string, labels: string[]) {
         this.clearLabels(nId);
-        this.addLabels(nId, labels);
+        this.addLabels(nId, tools.duplicateRemoval(labels));
     }
 
     public removeLabel(nId: string, labels: string[]) {
         const n = this.getNoteByid(nId);
         n.labels = n.labels.filter(l => !labels.includes(l));
+        n.labels = tools.duplicateRemoval(n.labels);
         this.permanent();
     }
 
@@ -183,7 +189,7 @@ export class NBNotes {
 
     public addLabels(nId: string, labels: string[]) {
         const n = this.getNoteByid(nId);
-        n.labels = labels;
+        n.labels = tools.duplicateRemoval(labels);
         this.permanent();
     }
 }

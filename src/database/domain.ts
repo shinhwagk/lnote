@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import * as objectPath from 'object-path';
 
-import { vfs } from '../helper';
+import { tools, vfs } from '../helper';
 import { existsSync } from 'fs-extra';
 
 export interface NBDomainStruct {
@@ -64,7 +64,7 @@ export class NBDomain {
     }
 
     public resetLabels(domainNode: string[], labels: string[]) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], labels);
+        objectPath.set(this.domainCache, [...domainNode, '.labels'], tools.duplicateRemoval(labels));
         this.permanent();
     }
 

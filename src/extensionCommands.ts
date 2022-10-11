@@ -43,10 +43,10 @@ export namespace ExtCmds {
 
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
-    const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat)
-    const labels = await window.showInputBox({ placeHolder: labelsOfDomain.join(', ') + ', ' });
-    if (!labels) { return; };
-    const _l = labels.split(',').map(l => l.trim());
+    // const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    const labelsOfDomain = await window.showInputBox({ placeHolder: [ext.gs.nbName].join(', ') });
+    if (labelsOfDomain === undefined) { return; };
+    const _l = labelsOfDomain.split(',').map(l => l.trim());
     ext.gs.nbNotes.addNote(ext.gs.domainNodeFormatWithoutNBName.concat(_l));
     ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
     ext.vnNotebook.refresh(ext.gs.nbName);

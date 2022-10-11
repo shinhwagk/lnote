@@ -55,15 +55,21 @@ export class NotesPanelView {
 
   private getNotesForWebStruct(domainNode: string[]) {
     const labels = ext.gs.nbDomain.getLabelsOfDomain(domainNode);
+    console.log("111", labels)
     const nbNotes = ext.gs.nbNotes;
+    console.log("1111", nbNotes.getNIdsByLabels(labels))
     return [...new Set(nbNotes.getNIdsByLabels(labels))]
-      .map(nId => { return { nId: nId, note: nbNotes.getNoteByid(nId) }; })
+      .map(nId => {
+        const _note = JSON.parse(JSON.stringify(nbNotes.getNoteByid(nId)));
+        _note.labels.push(ext.gs.nbName)
+        return { nId: nId, note: _note };
+      })
       .filter(n => tools.intersections(labels, n.note.labels).length === labels.length)
       .map(n => {
         const isDoc = nbNotes.checkDocExist(n.nId);
         const isFiles = nbNotes.checkFilesExist(n.nId);
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
-        _n.note.labels = n.note.labels //.concat(ext.gs.nbName);
+        _n.note.labels = n.note.labels; //.concat(ext.gs.nbName);
         return { nId: _n.nId, doc: isDoc, files: isFiles, ..._n.note };
       });
   }
