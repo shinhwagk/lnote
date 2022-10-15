@@ -55,13 +55,14 @@ export class NotesPanelView {
 
   private getNotesForWebStruct(domainNode: string[]) {
     const labels = ext.gs.nbDomain.getLabelsOfDomain(domainNode);
-    console.log("111", labels)
+    console.log("111", labels);
     const nbNotes = ext.gs.nbNotes;
-    console.log("1111", nbNotes.getNIdsByLabels(labels))
+    console.log("1111", nbNotes.getNIdsByLabels(labels));
     return [...new Set(nbNotes.getNIdsByLabels(labels))]
       .map(nId => {
+        console.log("111111", nId);
         const _note = JSON.parse(JSON.stringify(nbNotes.getNoteByid(nId)));
-        _note.labels.push(ext.gs.nbName)
+        _note.labels.push(ext.gs.nbName);
         return { nId: nId, note: _note };
       })
       .filter(n => tools.intersections(labels, n.note.labels).length === labels.length)
@@ -74,7 +75,7 @@ export class NotesPanelView {
       });
   }
 
-  private async postData() {
+  public async postData() {
     await this.panel!.webview.postMessage({
       command: 'post-data',
       data: {
@@ -85,19 +86,19 @@ export class NotesPanelView {
     });
   }
 
-  public async postNote(note: any) {
-    this.panel!.webview.postMessage({
-      command: 'post-note',
-      data: { note: note }
-    });
-  }
+  // public async postNote(note: any) {
+  //   this.panel!.webview.postMessage({
+  //     command: 'post-note',
+  //     data: { note: note }
+  //   });
+  // }
 
-  public async removeNote(nId: string) {
-    this.panel!.webview.postMessage({
-      command: 'delete-note',
-      data: { nId: nId }
-    });
-  }
+  // public async removeNote(nId: string) {
+  //   this.panel!.webview.postMessage({
+  //     command: 'delete-note',
+  //     data: { nId: nId }
+  //   });
+  // }
 
   private initPanel() {
     this.panel = vscode.window.createWebviewPanel('lnote', 'lnote', vscode.ViewColumn.One, {
@@ -219,8 +220,8 @@ export class NotesPanelView {
     this.panel.webview.html = this.getWebviewContent();
   }
 
-  public parseDomain(domainNode?: string[]) {
-    this.domainNode = domainNode || this.domainNode;
+  public parseDomain() {
+    this.domainNode = ext.gs.domainNodeFormat;
     // this.viewData = this.genViewData(labels);
     return this;
   }

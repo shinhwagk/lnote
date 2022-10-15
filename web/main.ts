@@ -452,11 +452,11 @@ class GlobalState {
 
 const gs = new GlobalState();
 
-const Constants = {
-  domainNodeDom: document.createElement('div'),
-  domainLabelsDom: document.createElement('div'),
-  domainCategories: document.createElement('div'),
-};
+// const Constants = {
+//   domainNodeDom: document.createElement('div'),
+//   domainLabelsDom: document.createElement('div'),
+//   domainCategories: document.createElement('div'),
+// };
 
 // function readerNoteLabels() {
 // }
@@ -469,9 +469,15 @@ window.addEventListener('message', (event) => {
       gs.domainLabels = message.data.domainLabels;
       gs.domainNotes = message.data.domainNotes;
       gs.domainNode = message.data.domainNode;
-      gs.checkedLabels = [];
-      gs.unCheckedLabels = Array.from(new Set(gs.domainNotes.map(n => n.labels).flatMap(l => l).filter(l => !gs.domainLabels.includes(l))));
 
+      const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
+
+      // When remove a note, the note label is selected and the note is the only one in the category.
+      gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
+
+      // if (gs.checkedLabels.length === 0) {
+      gs.unCheckedLabels = Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l))));
+      // }
       readerDomainName();
       readerLabels();
       readerCategories();
@@ -486,21 +492,21 @@ window.addEventListener('message', (event) => {
       // domain.readerNotes()
       // vscode.postMessage({ command: 'get-notes' });
       break;
-    case 'delete-note':
-      document.getElementById(`note-${message.data.nId}`)?.remove();
-      break;
-    case 'post-note':
-      const el = document.getElementById(`note-${message.data.note.nId}`);
-      if (el !== null) {
-        readerNote(el, message.data.note);
-      } else {
-        const cname = message.data.note.labels.filter(l => !gs.domainLabels.includes(l)).sort().join(', ').replace(/\s/g, '');
-        const noteDom = document.createElement('div');
-        noteDom.id = `note-${message.data.note.nId}`;
-        document.getElementById(`category-body-${cname}`)?.append(noteDom);
-        readerNote(noteDom, message.data.note);
-      }
-      break;
+    // case 'delete-note':
+    //   document.getElementById(`note-${message.data.nId}`)?.remove();
+    //   break;
+    // case 'post-note':
+    //   const el = document.getElementById(`note-${message.data.note.nId}`);
+    //   if (el !== null) {
+    //     readerNote(el, message.data.note);
+    //   } else {
+    //     const cname = message.data.note.labels.filter(l => !gs.domainLabels.includes(l)).sort().join(', ').replace(/\s/g, '');
+    //     const noteDom = document.createElement('div');
+    //     noteDom.id = `note-${message.data.note.nId}`;
+    //     document.getElementById(`category-body-${cname}`)?.append(noteDom);
+    //     readerNote(noteDom, message.data.note);
+    //   }
+    //   break;
     default:
       document.body.innerHTML = '<h1>loading...{message}</h1>';
   }

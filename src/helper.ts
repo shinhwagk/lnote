@@ -67,4 +67,8 @@ export namespace tools {
   export function duplicateRemoval(arr: string[]): string[] {
     return [...new Set(arr)];
   }
+
+  export function elementRemoval(arr: string[], elm: string): string[] {
+    return arr.filter(e => e !== elm);
+  }
 }

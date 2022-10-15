@@ -32,9 +32,8 @@ export class NBNotes {
 
         if (!existsSync(this.getNotesFile())) {
             this.permanent();
-        } else {
-            this.setCache();
         }
+        this.setCache();
     }
 
     // public getLabelsOfNotebook(): string[] {
@@ -46,6 +45,10 @@ export class NBNotes {
     }
 
     public removeNote(nId: string) {
+        for (const l of this.getNoteByid(nId).labels) {
+            this.notesLabelsCache.get(l)?.delete(nId);
+        }
+        this.notesLabelsCache.get(this.nbName)?.delete(nId);
         this.notesCache.delete(nId);
         this.permanent();
     }
@@ -75,7 +78,6 @@ export class NBNotes {
 
             // all note have an nbname label
             this.notesLabelsCache.get(this.nbName)?.add(nId);
-            console.log(2222, this.nbName, this.notesLabelsCache.get(this.nbName));
 
             // cache nid by labels
             for (const label of note.labels) {
@@ -90,7 +92,7 @@ export class NBNotes {
         const n = this.getNoteByid(nId);
         n.contents = contents.map(c => c.replace('\r\n', '\n').trim());
         n.mts = (new Date()).getTime();
-        n.labels = tools.duplicateRemoval(labels);
+        n.labels = tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName);
         this.permanent();
     }
 
@@ -138,7 +140,7 @@ export class NBNotes {
         return this.notesCache.get(nId)!;
     }
 
-    public getNIdsByLabels(labels: string[]) {
+    public getNIdsByLabels(labels: string[]): string[] {
         return labels.map(l => [...this.notesLabelsCache.get(l) || []]).flatMap(i => i);
     }
 
@@ -163,35 +165,37 @@ export class NBNotes {
         const nId = generateNId();
         // objectPath.push(this.domainTreeCache, [...domainNode, '.categories', cname], nId);
         const ts = (new Date()).getTime();
-        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: tools.duplicateRemoval(labels) });
+        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName) });
         // this.writeNBDomains(domainNode[0]);
         this.permanent();
         return nId;
     }
 
     public resetLabels(nId: string, labels: string[]) {
-        this.clearLabels(nId);
-        this.addLabels(nId, tools.duplicateRemoval(labels));
-    }
-
-    public removeLabel(nId: string, labels: string[]) {
+        // this.clearLabels(nId);
         const n = this.getNoteByid(nId);
-        n.labels = n.labels.filter(l => !labels.includes(l));
-        n.labels = tools.duplicateRemoval(n.labels);
+        n.labels = tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName);
         this.permanent();
     }
 
-    public clearLabels(nId: string) {
-        const n = this.getNoteByid(nId);
-        n.labels = [];
-        this.permanent();
-    }
+    // public removeLabel(nId: string, labels: string[]) {
+    //     const n = this.getNoteByid(nId);
+    //     n.labels = n.labels.filter(l => !labels.includes(l));
+    //     n.labels = tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName);
+    //     this.permanent();
+    // }
 
-    public addLabels(nId: string, labels: string[]) {
-        const n = this.getNoteByid(nId);
-        n.labels = tools.duplicateRemoval(labels);
-        this.permanent();
-    }
+    // public clearLabels(nId: string) {
+    //     const n = this.getNoteByid(nId);
+    //     n.labels = [];
+    //     this.permanent();
+    // }
+
+    // public addLabels(nId: string, labels: string[]) {
+    //     const n = this.getNoteByid(nId);
+    //     n.labels = tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName);
+    //     this.permanent();
+    // }
 }
 
 function generateNId(): string {
