@@ -173,6 +173,11 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     opacity: 0.8;
 }
 
+.checkedFixLabel {
+    padding: 1px 4px 2px;
+    background-color: rgb(0, 0, 0);
+}
+
 .checkedLabel {
     padding: 1px 4px 2px;
     background-color: rgb(70, 70, 70);

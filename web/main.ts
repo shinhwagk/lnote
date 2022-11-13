@@ -323,7 +323,7 @@ function readerCategories() {
   // this.nIds = domainNotes.map(n => n.nId);
   const categories: { [cname: string]: PostNote[] } = {};
   for (const note of gs.domainNotes.filter(n => intersection(n.labels, gs.checkedLabels).length === gs.checkedLabels.length)) {
-    const cname = note.labels.filter(f => !gs.domainLabels.includes(f)).sort().join(', ');
+    const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(', ');
     // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
     if (cname in categories) {
       categories[cname].push(note);
@@ -351,7 +351,7 @@ function readerLabels() {
 
   for (const label of gs.domainLabels) {
     const d = document.createElement('label');
-    d.className = 'checkedLabel';
+    d.className = 'checkedFixLabel';
     d.textContent = label;
     // labelDoms.push(d);
     localDom.append(d, elemSpaces());
