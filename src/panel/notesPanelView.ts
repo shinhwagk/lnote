@@ -55,12 +55,9 @@ export class NotesPanelView {
 
   private getNotesForWebStruct(domainNode: string[]) {
     const labels = ext.gs.nbDomain.getLabelsOfDomain(domainNode);
-    console.log("111", labels);
     const nbNotes = ext.gs.nbNotes;
-    console.log("1111", nbNotes.getNIdsByLabels(labels));
     return [...new Set(nbNotes.getNIdsByLabels(labels))]
       .map(nId => {
-        console.log("111111", nId);
         const _note = JSON.parse(JSON.stringify(nbNotes.getNoteByid(nId)));
         _note.labels.push(ext.gs.nbName);
         return { nId: nId, note: _note };

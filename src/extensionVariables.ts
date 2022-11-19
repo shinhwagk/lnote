@@ -22,7 +22,7 @@ export class GlobalState {
   nId: string = '';
   domainNode: DomainNode;
   domainNodeFormat: string[];
-  domainNodeFormatWithoutNBName: string[];
+  // domainNodeFormatWithoutNBName: string[];
   nbName: string; //notebook name
   nbNotes: NBNotes;
   nbDomain: NBDomain;
@@ -31,7 +31,7 @@ export class GlobalState {
   constructor(domainNode: string) {
     this.domainNode = domainNode;
     this.domainNodeFormat = tools.splitDomaiNode(domainNode);
-    this.domainNodeFormatWithoutNBName = this.domainNodeFormat.slice(1);
+    // this.domainNodeFormatWithoutNBName = this.domainNodeFormat.slice(1);
     this.nbName = this.domainNodeFormat[0];
     const { domain, notes } = ext.vnNotebook.getNB(this.nbName)!;
     this.nbDomain = domain;

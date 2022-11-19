@@ -43,50 +43,14 @@ export namespace ExtCmds {
 
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
-    // const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
-    const labelsOfDomain = await window.showInputBox({ placeHolder: [ext.gs.nbName].join(', ') });
+    const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     if (labelsOfDomain === undefined) { return; };
     const _l = labelsOfDomain.split(',').map(l => l.trim());
-    ext.gs.nbNotes.addNote(ext.gs.domainNodeFormatWithoutNBName.concat(_l));
+    ext.gs.nbNotes.addNote(_l);
     ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
     ext.vnNotebook.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
     await cmdHdlDomainPin(dn);
-  }
-  // export async function cmdHdlNoteEdit(nId: string, category: string) {
-  //     const picks = [];
-  //     ext.activeNote.id = nId;
-  //     ext.activeNote.category = category;
-  //     picks.push(ext.dbFS.selectDocExist(nId) ? 'edit doc' : 'create doc');
-  //     ext.dbFS.selectFilesExist(nId) || picks.push('create files');
-  //     picks.push('category rename');
-  //     picks.push('trash');
-  //     picks.push('open note folder');
-  //     const pick = await window.showQuickPick(picks);
-  //     if (!pick) return;
-  //     switch (pick) {
-  //         case 'create doc':
-  //             await cmdHdlNoteEditDocCreate(nId);
-  //             break;
-  //         case 'edit doc':
-  //             await cmdHdlNoteEditDocFull(nId);
-  //             break;
-  //         case 'create files':
-  //             await cmdHdlNoteEditFilesCreate(nId);
-  //             break;
-  //         case 'category rename':
-  //             await cmdHdlNoteEditCategoryRename(nId);
-  //             break;
-  //         case 'trash':
-  //             await cmdHdlNoteEditTrash(nId);
-  //             break;
-  //         case 'open note folder':
-  //             await cmdHdlNoteOpenFolder(nId);
-  //             break;
-  //     }
-  // }
-  export async function cmdHdlCategoryMoveToOtherDomain() {
-
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
     const _dn: string[] = dn ? tools.splitDomaiNode(dn) : [];
@@ -149,25 +113,25 @@ export namespace ExtCmds {
       Uri.file(ext.gs.nbNotes.getDocMainFile(nId))
     );
   }
-  export async function cmdHdlDomainMove(dn: DomainNode) {
-    const orgDNode = tools.splitDomaiNode(dn);
-    const newDNodePath: string | undefined = await window.showInputBox({ value: dn });
-    if (newDNodePath === undefined || dn === newDNodePath) { return; }
-    const newDNode = tools.splitDomaiNode(newDNodePath);
-    const qp = await window.showQuickPick([`Confirm Path: [${newDNodePath}]`, 'Cancel']);
-    if (qp === 'Cancel' || qp === undefined) { return; }
-    ext.gs.nbDomain.moveDomain(orgDNode, newDNode);
-    ext.domainProvider.refresh();
-    // for (let i = 0; i <= orgDNode.length; i++) {
-    //   if (orgDNode[i] !== newDNode[i]) {
-    //     const dpath = newDNode.slice(0, i);
-    //     await ext.domainProvider.refresh(dpath.join('/'));
-    //     await ext.domainTreeView.reveal(newDNode.join('/'));
-    //     break;
-    //   }
-    // }
-    // ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
-  }
+  // export async function cmdHdlDomainMove(dn: DomainNode) {
+  //   const orgDNode = tools.splitDomaiNode(dn);
+  //   const newDNodePath: string | undefined = await window.showInputBox({ value: dn });
+  //   if (newDNodePath === undefined || dn === newDNodePath) { return; }
+  //   const newDNode = tools.splitDomaiNode(newDNodePath);
+  //   const qp = await window.showQuickPick([`Confirm Path: [${newDNodePath}]`, 'Cancel']);
+  //   if (qp === 'Cancel' || qp === undefined) { return; }
+  //   ext.gs.nbDomain.moveDomain(orgDNode, newDNode);
+  //   ext.domainProvider.refresh();
+  //   // for (let i = 0; i <= orgDNode.length; i++) {
+  //   //   if (orgDNode[i] !== newDNode[i]) {
+  //   //     const dpath = newDNode.slice(0, i);
+  //   //     await ext.domainProvider.refresh(dpath.join('/'));
+  //   //     await ext.domainTreeView.reveal(newDNode.join('/'));
+  //   //     break;
+  //   //   }
+  //   // }
+  //   // ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
+  // }
   export async function cmdHdlDomainRename(dn: DomainNode) {
     const _dn = tools.splitDomaiNode(dn);
     const orgName = _dn[_dn.length - 1];

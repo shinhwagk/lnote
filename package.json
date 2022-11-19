@@ -103,11 +103,6 @@
                     "group": "4_domain"
                 },
                 {
-                    "command": "lnote.domain.move",
-                    "when": "view == domainExplorer",
-                    "group": "2_domain"
-                },
-                {
                     "command": "lnote.domain.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
                     "group": "1_domain"
@@ -134,10 +129,6 @@
                     "light": "images/light/add.svg",
                     "dark": "images/dark/add.svg"
                 }
-            },
-            {
-                "command": "lnote.domain.move",
-                "title": "Move"
             },
             {
                 "command": "lnote.domain.rename",

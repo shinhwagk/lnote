@@ -62,7 +62,6 @@ export class VNNotebook {
     }
 
     public setNBCache(nbName: string) {
-        console.log(`cache nb ${nbName}.`);
         this.nbNotesCache.set(nbName, new NBNotes(this.nbMasterPath, nbName));
         this.nbDomainCache.set(nbName, new NBDomain(this.nbMasterPath, nbName));
     }

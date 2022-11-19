@@ -345,11 +345,17 @@ function readerLabels() {
   const localDom = document.getElementById('domain-labels')!;
   localDom.replaceChildren();
 
-  const _labels = gs.checkedLabels.filter(l => !gs.domainLabels.includes(l)).map(l => { return { label: l, checked: true }; });
+  const _labels = gs.checkedLabels
+    .filter(l => !gs.domainLabels.includes(l))
+    .map(l => { return { label: l, checked: true }; })
   gs.unCheckedLabels.filter(l => !gs.checkedLabels.includes(l)).map(l => { return { label: l, checked: false }; }).forEach(l => _labels.push(l));
   // const labelDoms = [];
 
-  for (const label of gs.domainLabels) {
+  // patch
+  for (
+    const label of gs.domainLabels
+      .filter(l => l !== gs.domainNode[0])
+  ) {
     const d = document.createElement('label');
     d.className = 'checkedFixLabel';
     d.textContent = label;
@@ -476,7 +482,7 @@ window.addEventListener('message', (event) => {
       gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
 
       // if (gs.checkedLabels.length === 0) {
-      gs.unCheckedLabels = Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l))));
+      gs.unCheckedLabels = Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
       // }
       readerDomainName();
       readerLabels();

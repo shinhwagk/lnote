@@ -39,16 +39,17 @@ export class NBDomain {
         if (domainNode.length === 0) {
             return;
         }
+        this.setCache();
         objectPath.del(this.domainCache, domainNode);
         this.permanent();
     }
 
-    public moveDomain(orgDomainNode: string[], newDomainNode: string[]) {
-        const domain = this.getDomain(orgDomainNode);
-        this.deleteDomain(orgDomainNode);
-        objectPath.set(this.domainCache, newDomainNode, domain);
-        this.permanent();
-    }
+    // public moveDomain(orgDomainNode: string[], newDomainNode: string[]) {
+    //     const domain = this.getDomain(orgDomainNode);
+    //     this.deleteDomain(orgDomainNode);
+    //     objectPath.set(this.domainCache, newDomainNode, domain);
+    //     this.permanent();
+    // }
 
     public renameDomain(domainNode: string[], domainName: string) {
         const _d = [...domainNode];
