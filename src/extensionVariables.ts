@@ -84,7 +84,7 @@ export function listenConfiguration(ctx: ExtensionContext) {
   );
 }
 
-export function listenNoteClose(ctx: ExtensionContext) {
+export function listenNoteFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((f) => {
       if (ext.vnNotebook === undefined) { return; }
@@ -100,7 +100,7 @@ export function listenNoteClose(ctx: ExtensionContext) {
   );
 }
 
-export function listenNoteSave(ctx: ExtensionContext) {
+export function listenNoteFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async (f) => {
       if (ext.vnNotebook === undefined) { return; }
