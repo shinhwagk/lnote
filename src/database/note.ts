@@ -128,7 +128,7 @@ export class NBNotes {
     }
 
     public addFiles(nId: string) {
-        const filesDir = path.join(this.nbMasterPath, this.nbName, `${nId}_files`);
+        const filesDir = this.getFilesPath(nId)
         mkdirpSync(filesDir);
     }
 
