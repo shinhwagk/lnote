@@ -115,7 +115,7 @@ export class NBNotes {
     }
 
     public checkFilesExist(nId: string) {
-        return existsSync(path.join(this.nbMasterPath, this.nbName, 'files', `${nId}`));
+        return existsSync(this.getFilesPath(nId));
     }
 
     public getFilesPath = (nId: string) => path.join(this.nbMasterPath, this.nbName, "files", `${nId}`);
