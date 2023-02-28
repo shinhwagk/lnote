@@ -15,7 +15,7 @@ import { NotesPanelView } from './panel/notesPanelView';
 import path from 'path';
 import { tools } from './helper';
 import { VNNotebook } from './database/notebook';
-import { NBNotes } from './database/note';
+import { NBNotes } from './database/notes';
 import { NBDomain } from './database/domain';
 
 export class GlobalState {

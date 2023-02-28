@@ -7,19 +7,19 @@ import {
     statSync
 } from 'fs-extra';
 
-import { NBNotes } from './note';
+import { NBNotes } from './notes';
 import { NBDomain } from './domain';
 
-export interface NBDomainStruct {
-    [domain: string]: NBDomainStruct;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    '.labels'?: any; // { [cname:string]: string[] }
-}
+// export interface NBDomainStruct {
+//     [domain: string]: NBDomainStruct;
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     '.labels'?: any; // { [cname:string]: string[] }
+// }
 
 
-interface NBNoteStruct {
-    contents: string[], cts: number, mts: number, labels: string[]
-}
+// interface NBNoteStruct {
+//     contents: string[], cts: number, mts: number, labels: string[]
+// }
 
 
 // export type NoteBook = string;
@@ -45,23 +45,23 @@ export class VNNotebook {
         if (nbName === undefined) {
             this.nbDomainCache.clear();
             this.nbNotesCache.clear();
-            this.setAllNBCache();
+            this.cacheAllNB();
         } else {
-            this.setNBCache(nbName);
+            this.cacheNB(nbName);
         }
     }
 
-    public setAllNBCache() {
+    public cacheAllNB() {
         for (const nbName of readdirSync(this.nbMasterPath).filter(f => statSync(this.getNBDirectory(f)).isDirectory())) {
             try {
-                this.setNBCache(nbName);
+                this.cacheNB(nbName);
             } catch (e) {
                 console.error(`nb: ${nbName}. err:${e}`);
             }
         }
     }
 
-    public setNBCache(nbName: string) {
+    public cacheNB(nbName: string) {
         this.nbNotesCache.set(nbName, new NBNotes(this.nbMasterPath, nbName));
         this.nbDomainCache.set(nbName, new NBDomain(this.nbMasterPath, nbName));
     }
@@ -69,7 +69,7 @@ export class VNNotebook {
     public createNB(nbName: string) {
         // [...(new Set(domainNode.slice(1).concat(labels))).values()]
         mkdirpSync(this.getNBDirectory(nbName));
-        this.setNBCache(nbName);
+        this.cacheNB(nbName);
         // this.nbNotesCache.get(nbName)?.addNote([]);
         // this.nbDomainCache.get(nbName)?.addDomain([]);
     }
@@ -90,7 +90,7 @@ export class VNNotebook {
     //     return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
     // }
 
-    public getNoteBookNames(): string[] {
+    public getNBNames(): string[] {
         // const domain = this.domainCache.get(domainNode[0])
         return [...this.nbDomainCache.keys()];
     }
@@ -138,12 +138,12 @@ export class VNNotebook {
     //     });
     // }
 
-    public getNotesOfDomain(domainNode: string[]): NBNoteStruct[] {
-        const nbName = domainNode[0];
-        const { domain, notes } = this.getNB(nbName)!;
-        const labelsOfDomain = domain.getLabelsOfDomain(domainNode);
-        return notes.getNotesByLabels(labelsOfDomain);
-    }
+    // public getNotesOfDomain(domainNode: string[]): NBNoteStruct[] {
+    //     const nbName = domainNode[0];
+    //     const { domain, notes } = this.getNB(nbName)!;
+    //     const labelsOfDomain = domain.getLabelsOfDomain(domainNode);
+    //     return notes.getNotesByLabels(labelsOfDomain);
+    // }
 
 
 }

@@ -50,7 +50,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
   public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
     if (element === undefined) {
-      return ext.vnNotebook.getNoteBookNames();
+      return ext.vnNotebook.getNBNames();
     } else {
       const domainNode = tools.splitDomaiNode(element);
       return ext.vnNotebook.getNB(domainNode[0]).domain
