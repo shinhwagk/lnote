@@ -164,7 +164,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNotebookNoteDocShow(nId: string) {
     const docMainfFile = ext.gs.nbNotes.getDocMainFile(nId);
-    // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'README.md')
+    // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'main.md')
     // if (basename(readmeFile).split('.')[1] === 'md') {
     const uri = Uri.file(docMainfFile);
     await commands.executeCommand('markdown.showPreviewToSide', uri);
