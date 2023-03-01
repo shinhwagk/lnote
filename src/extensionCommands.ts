@@ -268,7 +268,7 @@ export namespace ExtCmds {
     const ib = await window.showInputBox({ value: oldLabels.join(',') });
     if (ib === undefined || ib === oldLabels.join(',')) { return; }
     const newLabels = ib.split(',').map(l => l.trim());
-    const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);
     nIds.forEach(nId => {
       ext.gs.nbNotes.resetLabels(nId, newLabels.concat(labelsOfDomain));
     });
@@ -278,7 +278,7 @@ export namespace ExtCmds {
     ext.notesPanelView.parseDomain().showNotesPlanView();
   }
   export async function cmdHdlDomainRelabels() {
-    const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);
     const ib = await window.showInputBox({ value: labelsOfDomain.join(', ') });
     if (ib === undefined || ib === labelsOfDomain.join(', ')) { return; }
     // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
