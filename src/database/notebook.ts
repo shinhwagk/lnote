@@ -39,8 +39,8 @@ export class VNNotebook {
     private readonly domain: NBDomain;
     private readonly notes: NBNotes;
 
-    public createEditNoteEnv;
-    public getEditNoteFile;
+    public createNoteEditEnv;
+    public getNoteEditFile;
 
     constructor(
         private readonly nbName: string,
@@ -51,8 +51,8 @@ export class VNNotebook {
         this.domain = new NBDomain(this.nbName, this.nbDir);
         this.notes = new NBNotes(this.nbName, this.nbDir);
 
-        this.createEditNoteEnv = this.notes.createEditNoteEnv;
-        this.getEditNoteFile = this.notes.getEditNoteFile;
+        this.createNoteEditEnv = this.notes.createEditNoteEnv;
+        this.getNoteEditFile = this.notes.getEditNoteFile;
     }
 
     /**

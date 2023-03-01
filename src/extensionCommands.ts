@@ -24,9 +24,9 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteEdit(nId: string) {
     // ext.gs.nbNotes.createEditNoteEnv(nId);
-    ext.gs.nb.createEditNoteEnv(nId);
+    ext.gs.nb.createNoteEditEnv(nId);
     // ext.editNotes.set(nId, ext.gs.domainNodeFormat);
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditNoteFile(nId)));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getNoteEditFile(nId)));
   }
   // export async function cmdHdlNotebookNoteContentsAdd(nId: string, sdIdx: number) {
   //   const contents = ext.notebookDatabase.getNBNotes(ext.globalState.nbName)[nId].contents;
