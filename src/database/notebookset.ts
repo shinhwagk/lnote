@@ -53,7 +53,7 @@ export class VNNotebookSet {
         return path.join(this.nbMasterPath, nbName);
     }
 
-    public getNB(nbName: string) {
+    public getNB(nbName: string): VNNotebook {
         return this.nbCache.get(nbName)!;
     }
 

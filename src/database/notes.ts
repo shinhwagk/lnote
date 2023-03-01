@@ -23,27 +23,27 @@ export interface INBNote {
 }
 
 function labels2GroupLabel(labels: string[]) {
-    const gl: { [g: string]: string[] } = {}
+    const gl: { [g: string]: string[] } = {};
     for (const label of labels) {
         const [g, l] = label.split('->');
         if (g in gl) {
-            gl[g].push(l)
+            gl[g].push(l);
         } else {
-            gl[g] = [l]
+            gl[g] = [l];
         }
     }
-    return gl
+    return gl;
 }
 
 function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
-    const labels = []
+    const labels = [];
     for (const gl of Object.keys(groupLabels)) {
         for (const l of groupLabels[gl]) {
-            const n_label = `${gl}->${l}`
-            labels.push(n_label)
+            const n_label = `${gl}->${l}`;
+            labels.push(n_label);
         }
     }
-    return labels
+    return labels;
 }
 
 export class NBNote implements INBNote {
@@ -136,7 +136,7 @@ export class NBNotes {
         this.notesFile = path.join(this.nbDir, 'notes.json');
         existsSync(this.notesFile) || vfs.writeFileSync(this.notesFile, '');
 
-        this.notesEditCacheDir = path.join(this.nbDir, this.nbName, 'cache');
+        this.notesEditCacheDir = path.join(this.nbDir, 'cache');
         existsSync(this.notesEditCacheDir) || mkdirpSync(this.notesEditCacheDir);
 
         this.notesDB = vfs.readJsonSync(this.notesFile);
@@ -164,13 +164,12 @@ export class NBNotes {
         }
     }
 
-    public addNote(labels: string[]) {
-        const nId = tools.generateSixString();
+    public addNote(nId: string, labels: string[]) {
         const ts = (new Date()).getTime();
-        const note = { contents: [''], cts: ts, mts: ts, labels: labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName)) }
+        const note = { contents: [''], cts: ts, mts: ts, labels: labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName)) };
         this.notesCache.set(nId, note);
-        this.permanent()
-        return nId;
+        this.permanent();
+        // return nId;
     }
 
     public updateNote(nId: string, contents: string[], labels: string[]) {
@@ -179,13 +178,13 @@ export class NBNotes {
         n.mts = (new Date()).getTime();
         n.labels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName));
         // this.notesDB.update(nId, n)
-        this.permanent()
+        this.permanent();
     }
 
     public removeNote(nId: string) {
-        [...this.notesGroupedByLabelCache.values()].forEach(ids => ids.delete(nId))
+        [...this.notesGroupedByLabelCache.values()].forEach(ids => ids.delete(nId));
         this.notesCache.delete(nId);
-        this.permanent()
+        this.permanent();
         // this.notesDB.delete(nId);
     }
 
@@ -224,7 +223,7 @@ export class NBNotes {
         const n = this.getNoteByid(nId);
         n.labels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName));
         // this.notesDB.update(nId, n)
-        this.permanent()
+        this.permanent();
     }
 
     public permanent() {

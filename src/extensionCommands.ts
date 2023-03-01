@@ -23,9 +23,10 @@ export namespace ExtCmds {
     }
   }
   export async function cmdHdlNoteEdit(nId: string) {
-    ext.gs.nbNotes.createEditNoteEnv(nId);
+    // ext.gs.nbNotes.createEditNoteEnv(nId);
+    ext.gs.nb.createEditNoteEnv(nId);
     // ext.editNotes.set(nId, ext.gs.domainNodeFormat);
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nbNotes.getEditNoteFile(nId)));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditNoteFile(nId)));
   }
   // export async function cmdHdlNotebookNoteContentsAdd(nId: string, sdIdx: number) {
   //   const contents = ext.notebookDatabase.getNBNotes(ext.globalState.nbName)[nId].contents;
@@ -46,10 +47,10 @@ export namespace ExtCmds {
     const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     if (labelsOfDomain === undefined) { return; };
     const _l = labelsOfDomain.split(',').map(l => l.trim());
-    ext.gs.nb.notes.addNote(_l)
-    ext.gs.nb.addNote(_l)
+    ext.gs.nb.craeteNotes(ext.gs.domainNodeFormat, _l);
+    // ext.gs.nb.addNote(_l)
     // ext.gs.nbNotes.addNote(_l);
-    ext.gs.nb.domain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
+    // ext.gs.nb.domain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
     ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
     await cmdHdlDomainPin(dn);
@@ -65,7 +66,7 @@ export namespace ExtCmds {
       ext.vnNotebookSet.createNB(name);
     }
     ext.updateGS(dn || name);
-    ext.gs.nbDomain.addDomain(_dn.concat(name));
+    ext.gs.nb.addDomain(_dn.concat(name));
     ext.domainProvider.refresh(dn);
     !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
@@ -93,9 +94,11 @@ export namespace ExtCmds {
   }
   // labels is category labels.
   export async function cmdHdlNoteAdd(labels: string[]) {
-    const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
-    const nId = ext.gs.nbNotes.addNote([...new Set(labelsOfDomain.concat(ext.gs.domainNodeFormat).concat(labels))]);
-    cmdHdlNoteEdit(nId);
+    // const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    // const nId = ext.gs.nbNotes.addNote([...new Set(labelsOfDomain.concat(ext.gs.domainNodeFormat).concat(labels))]);
+    ext.gs.nb.addNote([...new Set(labelsOfDomain.concat(ext.gs.domainNodeFormat).concat(labels))]);
+    // cmdHdlNoteEdit(nId);
     ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(ext.gs.domainNode);
     await cmdHdlDomainPin(ext.gs.domainNode);
@@ -139,7 +142,7 @@ export namespace ExtCmds {
     const orgName = _dn[_dn.length - 1];
     const newName: string | undefined = await window.showInputBox({ value: orgName });
     if (!newName || orgName === newName) { return; }
-    ext.gs.nbDomain.renameDomain(_dn, newName);
+    ext.gs.nb.renameDomain(_dn, newName);
     ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
   }
   export async function cmdHdlDomainRemove(dn: DomainNode) {
@@ -155,7 +158,8 @@ export namespace ExtCmds {
     } else if (confirm === domainName) {
       if ((await window.showInformationMessage(`Remove domain '${domainName}'?`, 'Yes', 'No')) !== 'Yes') { return; };
     }
-    ext.gs.nbDomain.deleteDomain(_dn);
+    // ext.gs.nbDomain.deleteDomain(_dn);
+    ext.gs.nb.deleteDomain(_dn)
     ext.domainProvider.refresh();
   }
   export async function cmdHdlDomainSearch(_dn: DomainNode) {
