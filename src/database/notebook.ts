@@ -83,11 +83,20 @@ export class VNNotebook {
     public removeEditNoteEnv(nId: string) {
         removeSync(this.getEditNoteFile(nId));
     }
+
+    public getNoteByid(nId: string) {
+        return this.notes.getNoteByid(nId);
+    }
+
     /**
      * 
      * domain
      * 
      */
+
+    public getDomainByNode(dn: string[]) {
+        return this.domain.getDomainByNode(dn);
+    }
 
     public addDomain(dn: string[]) {
         this.domain.addDomain(dn);
@@ -105,12 +114,3 @@ export class VNNotebook {
         return this.domain.getLabelsOfDomain(dn);
     }
 }
-
-
-
-
-// interface DomainInterface {
-//     createDomain(): void
-//     deleteDomain(): void
-//     renameDomain(): void
-// }

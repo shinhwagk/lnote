@@ -24,9 +24,9 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteEdit(nId: string) {
     // ext.gs.nbNotes.createEditNoteEnv(nId);
-    ext.gs.nb.createNoteEditEnv(nId);
+    ext.gs.nb.createEditNoteEnv(nId);
     // ext.editNotes.set(nId, ext.gs.domainNodeFormat);
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getNoteEditFile(nId)));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditNoteFile(nId)));
   }
   // export async function cmdHdlNotebookNoteContentsAdd(nId: string, sdIdx: number) {
   //   const contents = ext.notebookDatabase.getNBNotes(ext.globalState.nbName)[nId].contents;
@@ -104,7 +104,7 @@ export namespace ExtCmds {
     await cmdHdlDomainPin(ext.gs.domainNode);
   }
   export async function cmdHdlNoteFilesCreate(nId: string) {
-    ext.gs.nbNotes.getNoteByid(s).addFiles(nId);
+    ext.gs.nb.getNoteByid(nId).addFiles();
     ext.notesPanelView.parseDomain().showNotesPlanView();
     await cmdHdlNoteFilesOpen(nId);
   }
@@ -112,10 +112,11 @@ export namespace ExtCmds {
     await ext.setContext(ctxFilesExplorer, true);
   }
   export async function cmdHdlNBNoteDocCreate(nId: string) {
-    ext.gs.nbNotes.addDoc(nId);
+    // ext.gs.nbNotes.addDoc(nId);
+    ext.gs.nb.getNoteByid(nId).addDoc();
     await commands.executeCommand(
       'editExplorer.openFileResource',
-      Uri.file(ext.gs.nbNotes.getDocMainFile(nId))
+      Uri.file(ext.gs.nb.getNoteByid(nId).getDocMainFile())
     );
   }
   // export async function cmdHdlDomainMove(dn: DomainNode) {
@@ -169,7 +170,7 @@ export namespace ExtCmds {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
   }
   export async function cmdHdlNotebookNoteDocShow(nId: string) {
-    const docMainfFile = ext.gs.nbNotes.getDocMainFile(nId);
+    const docMainfFile = ext.gs.nb.getNoteByid(nId).getDocMainFile();
     // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'main.md')
     // if (basename(readmeFile).split('.')[1] === 'md') {
     const uri = Uri.file(docMainfFile);
@@ -187,7 +188,7 @@ export namespace ExtCmds {
     await ext.setContext(ctxFilesExplorer, false);
   }
   export async function cmdHdlFilesEditOpen() {
-    await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.nbNotes.getFilesPath(ext.gs.nId)), true);
+    await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.nb.getNoteByid(ext.gs.nId).getFilesPath()), true);
   }
   export async function cmdHdlFilesRefresh() {
     ext.filesProvider.refresh();
@@ -230,7 +231,7 @@ export namespace ExtCmds {
     const dn = tools.splitDomaiNode(ext.gs.domainNode);
     const selection = await window.showInformationMessage(`delete note ${nId}?`, 'Yes', 'No');
     if (selection !== 'Yes') { return; };
-    ext.gs.nbNotes.removeNote(nId);
+    ext.gs.nb.getNoteByid(nId).remove();
     await cmdHdlDomainPin(ext.gs.domainNode);
     // ext.gs.nbDomain.
     ext.domainProvider.refresh(dn[0]);
@@ -282,7 +283,7 @@ export namespace ExtCmds {
     const ib = await window.showInputBox({ value: labelsOfDomain.join(', ') });
     if (ib === undefined || ib === labelsOfDomain.join(', ')) { return; }
     // ext.domainDB.createDomain(tools.splitDomaiNode(dn))
-    ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ib.split(',').map(l => l.trim()));
+    ext.gs.nb.getDomainByNode(ext.gs.domainNodeFormat).resetLabels(ib.split(',').map(l => l.trim()));
     // ext.domainProvider.refresh(dn);
     // await cmdHdlDomainCategoryAdd();
     // await cmdHdlDomainPin(dn);

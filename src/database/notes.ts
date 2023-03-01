@@ -2,12 +2,11 @@ import * as path from 'path';
 
 import {
     existsSync,
-    mkdirpSync,
-    readJSONSync,
-    removeSync
+    readJSONSync
 } from 'fs-extra';
 
 import { tools, vfs } from '../helper';
+import { GroupLables, NBNote } from './note';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -15,14 +14,9 @@ import { tools, vfs } from '../helper';
 //     '.labels'?: any; // { [cname:string]: string[] }
 // }
 
-export interface INBNote {
-    contents: string[];
-    cts: number;
-    mts: number;
-    labels: { [gl: string]: string[] }; // label group
-}
 
-function labels2GroupLabel(labels: string[]) {
+
+function labels2GroupLabel(labels: string[]): GroupLables {
     const gl: { [g: string]: string[] } = {};
     for (const label of labels) {
         const [g, l] = label.split('->');
@@ -44,60 +38,6 @@ function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
         }
     }
     return labels;
-}
-
-export class NBNote implements INBNote {
-    filesPath: string;
-    docPath: string;
-    docMainFile: string;
-    constructor(
-        private readonly nbDir: string,
-        nId: string,
-        private readonly note: INBNote
-    ) {
-        this.filesPath = path.join(this.nbDir, "files", nId);
-        this.docPath = path.join(this.nbDir, "doc", nId);
-        this.docMainFile = path.join(this.docPath, 'main.md');
-    }
-
-    toJSON() {
-        return this.note
-    }
-
-    // public update()
-
-    public removeDoc() {
-        removeSync(this.docPath);
-    }
-
-    public removeFiles() {
-        removeSync(this.filesPath);
-    }
-
-    public checkDocExist(): boolean {
-        return existsSync(this.docMainFile); // || existsSync(this.getDocIndexFile(nId, 'README.html'));
-    }
-
-    public checkFilesExist() {
-        return existsSync(this.filesPath);
-    }
-
-    public addDoc() {
-        mkdirpSync(this.docPath);
-        vfs.writeFileSync(this.docMainFile, '');
-    }
-
-    public addFiles() {
-        mkdirpSync(this.filesPath);
-    }
-
-    public update(content: string[], labels: string[]) {
-
-    }
-
-    public add(labels: string[]) {
-
-    }
 }
 
 // export class NBNotesDB {
@@ -126,7 +66,7 @@ class NBNoteCache {
 }
 
 export class NBNotes {
-    private notesCache = new Map<string, INBNote>();
+    private notesCache = new Map<string, NBNote>();
     private notesGroupedByLabelCache = new Map<string, Set<string>>(); // Set<string>: note ids
 
     private readonly notesFile: string;
@@ -166,9 +106,9 @@ export class NBNotes {
 
     public updateNote(nId: string, contents: string[], labels: string[]) {
         const n = this.getNoteByid(nId);
-        n.contents = contents.map(c => c.replace('\r\n', '\n').trim());
-        n.mts = (new Date()).getTime();
-        n.labels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName));
+        n.updateContents(contents.map(c => c.replace('\r\n', '\n').trim()))
+        n.updateMts((new Date()).getTime())
+        n.updateLabels(labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName)))
         // this.notesDB.update(nId, n)
         this.notesCache.set(nId, n)
         this.permanent();
@@ -181,9 +121,7 @@ export class NBNotes {
         // this.notesDB.delete(nId);
     }
 
-    public getDocMainFile(nId: string) {
-        return path.join(this.nbDir, 'doc', nId, 'main.md');
-    }
+
 
     public getNoteByid(nId: string) {
         return this.notesCache.get(nId)!;

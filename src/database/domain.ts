@@ -13,6 +13,8 @@ export interface NBDomainStruct {
 
 export class NBDomain {
     public domainCache: NBDomainStruct = {};
+    private currentDomainNode: string[] = []
+
 
     constructor(private readonly nbName: string, private readonly nbDir: string) {
         if (!existsSync(this.getDomainFile())) {
@@ -54,7 +56,7 @@ export class NBDomain {
     public renameDomain(domainNode: string[], domainName: string) {
         const _d = [...domainNode];
         _d[domainNode.length - 1] = domainName;
-        const domain = this.getDomain(domainNode);
+        const domain = this.getDomainByNode(domainNode);
         this.deleteDomain(domainNode);
         objectPath.set(this.domainCache, _d, domain);
         this.permanent();
@@ -64,8 +66,8 @@ export class NBDomain {
         this.resetLabels(domainNode, labels);
     }
 
-    public resetLabels(domainNode: string[], labels: string[]) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], tools.duplicateRemoval(labels));
+    public resetLabels(labels: string[]) {
+        objectPath.set(this.domainCache, [...this.currentDomainNode, '.labels'], tools.duplicateRemoval(labels));
         this.permanent();
     }
 
@@ -77,8 +79,10 @@ export class NBDomain {
     //     return readdirSync(this.nbMasterPath).filter(n => existsSync(this.getNBDomainsFile(n)))
     // }
 
-    public getDomain(domainNode: string[] = []): NBDomainStruct {
-        return objectPath.get(this.domainCache, domainNode);
+    public getDomainByNode(domainNode: string[] = []) {
+        this.currentDomainNode = domainNode;
+        // return objectPath.get(this.domainCache, domainNode);
+        return this;
     }
 
     public setCache() {
@@ -90,6 +94,6 @@ export class NBDomain {
     }
 
     public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
-        return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
+        return Object.keys(this.getDomainByNode(domainNode)).filter(f => f !== '.labels');
     }
 }
