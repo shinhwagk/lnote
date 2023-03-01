@@ -1,6 +1,12 @@
 import { ExtensionContext, ViewColumn, commands } from 'vscode';
 
-import { ext, initializeExtensionVariables, listenConfiguration, listenNoteFileClose, listenNoteFileSave } from './extensionVariables';
+import {
+   ext, initializeExtensionVariables,
+   listenConfiguration,
+   listenNoteFileClose,
+   listenNoteFileSave,
+   listenVscodeWindowChange
+} from './extensionVariables';
 import { ExtCmds } from './extensionCommands';
 
 export async function activate(context: ExtensionContext) {
@@ -11,6 +17,9 @@ export async function activate(context: ExtensionContext) {
    listenNoteFileClose(context);
 
    initializeExtensionVariables(context);
+
+   listenVscodeWindowChange();
+
 
    ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
    /**

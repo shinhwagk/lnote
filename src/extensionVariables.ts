@@ -13,7 +13,7 @@ import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { section } from './constants';
 import { NotesPanelView } from './panel/notesPanelView';
 import path from 'path';
-import { tools } from './helper';
+import { tools, vfs } from './helper';
 import { VNNotebook } from './database/notebook';
 import { NBNotes } from './database/notes';
 import { NBDomain } from './database/domain';
@@ -59,6 +59,8 @@ export namespace ext {
   export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
     context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
   export let domainShortcutStatusBarItem: StatusBarItem;
+  export let windowId = (new Date()).getTime().toString()
+
   // export const editNotes = new Map<string, string[]>();
 }
 
@@ -117,6 +119,22 @@ export function listenNoteFileSave(ctx: ExtensionContext) {
       }
     })
   );
+}
+import { existsSync, watchFile } from 'fs';
+
+
+export function listenVscodeWindowChange() {
+  const vscodeWindowCheckFile = path.join(ext.notebookPath, 'windowid')
+  if (!existsSync(vscodeWindowCheckFile)) {
+    vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId)
+  }
+  watchFile(vscodeWindowCheckFile, () => {
+    if (vfs.readFileSync(vscodeWindowCheckFile) !== ext.windowId) {
+      ext.windowId = (new Date()).getTime().toString()
+      vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId)
+      ext.vnNotebook.refresh()
+    }
+  });
 }
 
 export function initializeExtensionVariables(ctx: ExtensionContext): void {
