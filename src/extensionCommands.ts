@@ -5,7 +5,7 @@ import { DomainNode } from './explorer/domainExplorer';
 import { ctxFilesExplorer, section } from './constants';
 import { tools } from './helper';
 import { existsSync, statSync } from 'fs-extra';
-import { VNNotebook } from './database/notebook';
+import { VNNotebookSet } from './database/notebookset';
 
 export namespace ExtCmds {
   export async function cmdHdlChooseLocation() {
@@ -46,9 +46,11 @@ export namespace ExtCmds {
     const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     if (labelsOfDomain === undefined) { return; };
     const _l = labelsOfDomain.split(',').map(l => l.trim());
-    ext.gs.nbNotes.addNote(_l);
-    ext.gs.nbDomain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
-    ext.vnNotebook.refresh(ext.gs.nbName);
+    ext.gs.nb.notes.addNote(_l)
+    ext.gs.nb.addNote(_l)
+    // ext.gs.nbNotes.addNote(_l);
+    ext.gs.nb.domain.resetLabels(ext.gs.domainNodeFormat, ext.gs.domainNodeFormat.slice(1).concat(_l));
+    ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
     await cmdHdlDomainPin(dn);
   }
@@ -60,7 +62,7 @@ export namespace ExtCmds {
       window.showErrorMessage('domain name cannot contain "/".');
     }
     if (dn === undefined) {
-      ext.vnNotebook.createNB(name);
+      ext.vnNotebookSet.createNB(name);
     }
     ext.updateGS(dn || name);
     ext.gs.nbDomain.addDomain(_dn.concat(name));
@@ -94,12 +96,12 @@ export namespace ExtCmds {
     const labelsOfDomain = ext.gs.nbDomain.getLabelsOfDomain(ext.gs.domainNodeFormat);
     const nId = ext.gs.nbNotes.addNote([...new Set(labelsOfDomain.concat(ext.gs.domainNodeFormat).concat(labels))]);
     cmdHdlNoteEdit(nId);
-    ext.vnNotebook.refresh(ext.gs.nbName);
+    ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(ext.gs.domainNode);
     await cmdHdlDomainPin(ext.gs.domainNode);
   }
   export async function cmdHdlNoteFilesCreate(nId: string) {
-    ext.gs.nbNotes.addFiles(nId);
+    ext.gs.nbNotes.getNoteByid(s).addFiles(nId);
     ext.notesPanelView.parseDomain().showNotesPlanView();
     await cmdHdlNoteFilesOpen(nId);
   }
@@ -194,8 +196,8 @@ export namespace ExtCmds {
     // fileTerminal.show(true);
   }
   export async function cmdHdlDomainRefresh() {
-    ext.vnNotebook = new VNNotebook(ext.notebookPath);
-    ext.vnNotebook.refresh();
+    ext.vnNotebookSet = new VNNotebookSet(ext.notebookPath);
+    ext.vnNotebookSet.refresh();
     window.showInformationMessage('refreshDomain complete.');
     ext.domainProvider.refresh();
   }
@@ -266,7 +268,7 @@ export namespace ExtCmds {
     nIds.forEach(nId => {
       ext.gs.nbNotes.resetLabels(nId, newLabels.concat(labelsOfDomain));
     });
-    ext.vnNotebook.refresh(ext.gs.nbName);
+    ext.vnNotebookSet.refresh(ext.gs.nbName);
     // ext.gs.vnNotes.permanent();
     ext.domainProvider.refresh();
     ext.notesPanelView.parseDomain().showNotesPlanView();

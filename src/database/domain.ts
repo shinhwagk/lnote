@@ -14,7 +14,7 @@ export interface NBDomainStruct {
 export class NBDomain {
     public domainCache: NBDomainStruct = {};
 
-    constructor(private readonly nbMasterPath: string, private readonly nbName: string) {
+    constructor(private readonly nbName: string, private readonly nbDir: string) {
         if (!existsSync(this.getDomainFile())) {
             objectPath.set(this.domainCache, [this.nbName], { '.labels': [] });
             this.permanent();
@@ -28,7 +28,7 @@ export class NBDomain {
     }
 
     public getDomainFile() {
-        return path.join(this.nbMasterPath, this.nbName, 'domains.json');
+        return path.join(this.nbDir, this.nbName, 'domains.json');
     }
 
     public readDomain() {

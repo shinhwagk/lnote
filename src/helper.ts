@@ -71,4 +71,8 @@ export namespace tools {
   export function elementRemoval(arr: string[], elm: string): string[] {
     return arr.filter(e => e !== elm);
   }
+
+  export function generateSixString(): string {
+    return tools.hexRandom(3);
+  }
 }

@@ -14,7 +14,7 @@ import { section } from './constants';
 import { NotesPanelView } from './panel/notesPanelView';
 import path from 'path';
 import { tools, vfs } from './helper';
-import { VNNotebook } from './database/notebook';
+import { VNNotebookSet } from './database/notebookset';
 import { NBNotes } from './database/notes';
 import { NBDomain } from './database/domain';
 
@@ -24,8 +24,9 @@ export class GlobalState {
   domainNodeFormat: string[];
   // domainNodeFormatWithoutNBName: string[];
   nbName: string; //notebook name
-  nbNotes: NBNotes;
-  nbDomain: NBDomain;
+  nb: VNNotebook;
+  // nbNotes: NBNotes;
+  // nbDomain: NBDomain;
   // vnNoteBook: VNNotebook;
 
   constructor(domainNode: string) {
@@ -33,9 +34,9 @@ export class GlobalState {
     this.domainNodeFormat = tools.splitDomaiNode(domainNode);
     // this.domainNodeFormatWithoutNBName = this.domainNodeFormat.slice(1);
     this.nbName = this.domainNodeFormat[0];
-    const { domain, notes } = ext.vnNotebook.getNB(this.nbName)!;
-    this.nbDomain = domain;
-    this.nbNotes = notes;
+    this.nb = ext.vnNotebookSet.getNB(this.nbName)!;
+    // this.nbDomain = domain;
+    // this.nbNotes = notes;
     // this.vnNoteBook = new VNNotebook(ext.notebookPath)
   }
 
@@ -54,7 +55,7 @@ export namespace ext {
   export let shortcutsFilePath: string;
   export let gs: GlobalState;
   export const updateGS = GlobalState.update;
-  export let vnNotebook: VNNotebook;
+  export let vnNotebookSet: VNNotebookSet;
   export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
   export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
     context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
@@ -78,7 +79,7 @@ export function listenConfiguration(ctx: ExtensionContext) {
           return;
         }
         ext.notebookPath = notebookPath;
-        ext.vnNotebook = new VNNotebook(ext.notebookPath);
+        ext.vnNotebookSet = new VNNotebookSet(ext.notebookPath);
         initializeExtensionVariables(ctx);
         ext.domainProvider.refresh();
       }
@@ -89,7 +90,7 @@ export function listenConfiguration(ctx: ExtensionContext) {
 export function listenNoteFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((f) => {
-      if (ext.vnNotebook === undefined) { return; }
+      if (ext.vnNotebookSet === undefined) { return; }
       if (f.uri.fsPath.startsWith(ext.gs.nbNotes.getEditCacheDirectory())) {
         const fileName = path.basename(f.uri.fsPath);
         if (fileName.endsWith('.yaml')) {
@@ -105,7 +106,7 @@ export function listenNoteFileClose(ctx: ExtensionContext) {
 export function listenNoteFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async (f) => {
-      if (ext.vnNotebook === undefined) { return; }
+      if (ext.vnNotebookSet === undefined) { return; }
       if (f.uri.fsPath.startsWith(ext.gs.nbNotes.getEditCacheDirectory())) {
         const fileName = path.basename(f.uri.fsPath);
         if (fileName.endsWith('.yaml')) {
@@ -121,6 +122,7 @@ export function listenNoteFileSave(ctx: ExtensionContext) {
   );
 }
 import { existsSync, watchFile } from 'fs';
+import { VNNotebook } from './database/notebook';
 
 
 export function listenVscodeWindowChange() {
@@ -132,7 +134,7 @@ export function listenVscodeWindowChange() {
     if (vfs.readFileSync(vscodeWindowCheckFile) !== ext.windowId) {
       ext.windowId = (new Date()).getTime().toString()
       vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId)
-      ext.vnNotebook.refresh()
+      ext.vnNotebookSet.refresh()
     }
   });
 }
@@ -146,7 +148,7 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     return;
   }
   ext.notebookPath = notespath.endsWith('/') ? notespath : notespath + '/';
-  ext.vnNotebook = new VNNotebook(ext.notebookPath);
+  ext.vnNotebookSet = new VNNotebookSet(ext.notebookPath);
   // ext.gs = new GlobalState();
 
   if (!ext.notesPanelView) {
