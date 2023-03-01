@@ -60,6 +60,10 @@ export class NBNote implements INBNote {
         this.docMainFile = path.join(this.docPath, 'main.md');
     }
 
+    toJSON() {
+        return this.note
+    }
+
     // public update()
 
     public removeDoc() {
@@ -122,10 +126,9 @@ class NBNoteCache {
 }
 
 export class NBNotes {
-    private readonly notesDB: { [nId: string]: INBNote };
     private notesCache = new Map<string, INBNote>();
     private notesGroupedByLabelCache = new Map<string, Set<string>>(); // Set<string>: note ids
-    private readonly notesEditCacheDir: string;
+
     private readonly notesFile: string;
 
     constructor(
@@ -136,16 +139,15 @@ export class NBNotes {
         this.notesFile = path.join(this.nbDir, 'notes.json');
         existsSync(this.notesFile) || vfs.writeFileSync(this.notesFile, '');
 
-        this.notesEditCacheDir = path.join(this.nbDir, 'cache');
-        existsSync(this.notesEditCacheDir) || mkdirpSync(this.notesEditCacheDir);
+        this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
 
-        this.notesDB = vfs.readJsonSync(this.notesFile);
-        this.cacheNotes();
         this.cacheNotesGroupedByLabelCache();
     }
 
     public cacheNotesGroupedByLabelCache() {
-        for (const [nId, note] of Object.entries(this.notesDB)) {
+        // all note have an nbname label
+        this.notesGroupedByLabelCache.set(this.nbName, new Set<string>(this.notesCache.keys()));
+        for (const [nId, note] of this.notesCache.entries()) {
             for (const label of groupLabel2Labels(note.labels)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {
                     this.notesGroupedByLabelCache.set(label, new Set<string>([nId]));
@@ -154,22 +156,12 @@ export class NBNotes {
         }
     }
 
-    public cacheNotes() {
-        this.notesGroupedByLabelCache.set(this.nbName, new Set<string>());
-        for (const [nId, note] of Object.entries(this.notesDB)) {
-            // cache note
-            this.notesCache.set(nId, note);
-            // all note have an nbname label
-            this.notesGroupedByLabelCache.get(this.nbName)?.add(nId);
-        }
-    }
-
     public addNote(nId: string, labels: string[]) {
         const ts = (new Date()).getTime();
-        const note = { contents: [''], cts: ts, mts: ts, labels: labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName)) };
+        const noteLabels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName))
+        const note = { contents: [''], cts: ts, mts: ts, labels: noteLabels };
         this.notesCache.set(nId, note);
         this.permanent();
-        // return nId;
     }
 
     public updateNote(nId: string, contents: string[], labels: string[]) {
@@ -178,6 +170,7 @@ export class NBNotes {
         n.mts = (new Date()).getTime();
         n.labels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName));
         // this.notesDB.update(nId, n)
+        this.notesCache.set(nId, n)
         this.permanent();
     }
 
@@ -186,20 +179,6 @@ export class NBNotes {
         this.notesCache.delete(nId);
         this.permanent();
         // this.notesDB.delete(nId);
-    }
-
-    public getEditNoteFile(nId: string) {
-        return path.join(this.notesEditCacheDir, `${nId}.yaml`);
-    }
-
-    public createEditNoteEnv(nId: string) {
-        const n = this.getNoteByid(nId);
-        const enote = { contents: n.contents, labels: n.labels };
-        tools.writeYamlSync(this.getEditNoteFile(nId), enote);
-    }
-
-    public removeEditNoteEnv(nId: string) {
-        removeSync(this.getEditNoteFile(nId));
     }
 
     public getDocMainFile(nId: string) {

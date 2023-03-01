@@ -4,7 +4,8 @@ import {
     existsSync,
     readdirSync,
     mkdirpSync,
-    statSync
+    statSync,
+    removeSync
 } from 'fs-extra';
 
 import { NBNotes } from './notes';
@@ -39,8 +40,7 @@ export class VNNotebook {
     private readonly domain: NBDomain;
     private readonly notes: NBNotes;
 
-    public createNoteEditEnv;
-    public getNoteEditFile;
+    private readonly notesEditCacheDir: string;
 
     constructor(
         private readonly nbName: string,
@@ -48,11 +48,11 @@ export class VNNotebook {
     ) {
         existsSync(this.nbDir) || mkdirpSync(this.nbDir);
 
+        this.notesEditCacheDir = path.join(this.nbDir, 'cache');
+        existsSync(this.notesEditCacheDir) || mkdirpSync(this.notesEditCacheDir);
+
         this.domain = new NBDomain(this.nbName, this.nbDir);
         this.notes = new NBNotes(this.nbName, this.nbDir);
-
-        this.createNoteEditEnv = this.notes.createEditNoteEnv;
-        this.getNoteEditFile = this.notes.getEditNoteFile;
     }
 
     /**
@@ -69,6 +69,19 @@ export class VNNotebook {
         const nId = tools.generateSixString();
         this.notes.addNote(nId, labels);
         // this.domain.resetLabels(dn, labels.slice(1).concat(dn));
+    }
+
+    public getEditNoteFile(nId: string) {
+        return path.join(this.notesEditCacheDir, `${nId}.yaml`);
+    }
+
+    public createEditNoteEnv(nId: string) {
+        const n = this.notes.getNoteByid(nId);
+        tools.writeYamlSync(this.getEditNoteFile(nId), { contents: n.contents, labels: n.labels });
+    }
+
+    public removeEditNoteEnv(nId: string) {
+        removeSync(this.getEditNoteFile(nId));
     }
     /**
      * 
