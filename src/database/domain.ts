@@ -13,12 +13,14 @@ export interface NBDomainStruct {
 
 export class NBDomain {
     public domainCache: NBDomainStruct = {};
-    private currentDomainNode: string[] = []
+    private activeDomainNode: string[] = [];
 
-
-    constructor(private readonly nbName: string, private readonly nbDir: string) {
+    constructor(
+        readonly nbName: string,
+        readonly nbDir: string
+    ) {
         if (!existsSync(this.getDomainFile())) {
-            objectPath.set(this.domainCache, [this.nbName], { '.labels': [] });
+            objectPath.set(this.domainCache, [this.nbName], { '.labels': {} });
             this.permanent();
         } else {
             this.setCache();
@@ -67,7 +69,7 @@ export class NBDomain {
     }
 
     public resetLabels(labels: string[]) {
-        objectPath.set(this.domainCache, [...this.currentDomainNode, '.labels'], tools.duplicateRemoval(labels));
+        objectPath.set(this.domainCache, [...this.activeDomainNode, '.labels'], tools.duplicateRemoval(labels));
         this.permanent();
     }
 
@@ -80,7 +82,7 @@ export class NBDomain {
     // }
 
     public getDomainByNode(domainNode: string[] = []) {
-        this.currentDomainNode = domainNode;
+        this.activeDomainNode = domainNode;
         // return objectPath.get(this.domainCache, domainNode);
         return this;
     }

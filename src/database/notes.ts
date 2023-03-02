@@ -72,9 +72,8 @@ export class NBNotes {
     private readonly notesFile: string;
 
     constructor(
-        private readonly nbName: string,
-        private readonly nbDir: string
-
+        readonly nbName: string,
+        readonly nbDir: string
     ) {
         this.notesFile = path.join(this.nbDir, 'notes.json');
         existsSync(this.notesFile) || vfs.writeFileSync(this.notesFile, '');
@@ -101,6 +100,7 @@ export class NBNotes {
         const noteLabels = labels2GroupLabel(tools.elementRemoval(tools.duplicateRemoval(labels), this.nbName))
         const note = { contents: [''], cts: ts, mts: ts, labels: noteLabels };
         this.notesCache.set(nId, note);
+        labels.forEach(l => this.notesGroupedByLabelCache.get(l)?.add(nId))
         this.permanent();
     }
 
@@ -120,8 +120,6 @@ export class NBNotes {
         this.permanent();
         // this.notesDB.delete(nId);
     }
-
-
 
     public getNoteByid(nId: string) {
         return this.notesCache.get(nId)!;

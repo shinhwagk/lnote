@@ -36,6 +36,7 @@ import { tools } from '../helper';
 //     }
 // }
 
+
 export class VNNotebook {
     private readonly domain: NBDomain;
     private readonly notes: NBNotes;

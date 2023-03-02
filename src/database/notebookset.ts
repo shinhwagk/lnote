@@ -30,7 +30,7 @@ export class VNNotebookSet {
         }
     }
 
-    public cacheAllNB() {
+    private cacheAllNB() {
         for (const nbName of readdirSync(this.nbMasterPath).filter(f => statSync(this.getNBDir(f)).isDirectory())) {
             try {
                 this.cacheNB(nbName);
@@ -40,7 +40,7 @@ export class VNNotebookSet {
         }
     }
 
-    public cacheNB(nbName: string) {
+    private cacheNB(nbName: string) {
         this.nbCache.set(nbName, new VNNotebook(nbName, this.getNBDir(nbName)));
     }
 
@@ -49,7 +49,7 @@ export class VNNotebookSet {
         this.cacheNB(nbName);
     }
 
-    public getNBDir(nbName: string) {
+    private getNBDir(nbName: string) {
         return path.join(this.nbMasterPath, nbName);
     }
 
@@ -57,7 +57,7 @@ export class VNNotebookSet {
         return this.nbCache.get(nbName)!;
     }
 
-    public getNBNames(): string[] {
+    private getNBNames(): string[] {
         return [...this.nbCache.keys()];
     }
 
