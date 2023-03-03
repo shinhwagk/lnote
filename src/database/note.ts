@@ -2,21 +2,20 @@ import * as path from 'path';
 
 import {
     existsSync,
-    readJSONSync,
     removeSync,
     mkdirpSync
 } from 'fs-extra';
 
-import { tools, vfs } from '../helper';
+import { vfs } from '../helper';
 
-// export interface INBNote {
-//     contents: string[];
-//     cts: number;
-//     mts: number;
-//     labels: { [gl: string]: string[] }; // label group
-// }
+export interface INBNote {
+    contents: string[];
+    cts: number;
+    mts: number;
+    labels: { [gl: string]: string[] }; // label group
+}
 
-export type GroupLables = { [gl: string]: string[] }
+export type GroupLables = { [gl: string]: string[] };
 
 export class NBNote {
     filesPath: string;
@@ -26,34 +25,27 @@ export class NBNote {
     constructor(
         private readonly nbDir: string,
         private readonly nId: string,
-        public contents: string[],
-        private readonly cts: number,
-        public mts: number,
-        public labels: GroupLables // label group
+        public data: INBNote
     ) {
-        this.filesPath = path.join(this.nbDir, "files", nId);
-        this.docPath = path.join(this.nbDir, "doc", nId);
+        this.filesPath = path.join(this.nbDir, "files", this.nId);
+        this.docPath = path.join(this.nbDir, "doc", this.nId);
         this.docMainFile = path.join(this.docPath, 'main.md');
     }
 
-    static create(
+    static get(
         nbDir: string,
         nId: string,
-        contents: string[],
-        cts: number,
-        mts: number,
-        labels: { [gl: string]: string[] }
+        data: INBNote
     ) {
-        return new NBNote(nbDir, nId, contents, cts, mts, labels);
+        return new NBNote(nbDir, nId, data);
     }
 
     toJSON() {
-        return {
-            contents: this.contents,
-            cts: this.cts,
-            mts: this.mts,
-            labels: this.labels
-        }
+        return this.data;
+    }
+
+    public getData() {
+        return this.data;
     }
 
     // public update()
@@ -84,27 +76,22 @@ export class NBNote {
     }
 
     public updateContents(contents: string[]) {
-        this.contents = contents
-
+        this.data.contents = contents;
     }
 
     public updateMts(mts: number) {
-        this.mts = mts
+        this.data.mts = mts;
     }
 
     public updateLabels(labels: GroupLables) {
-        this.labels = labels
-    }
-
-    public add(labels: string[]) {
-
+        this.data.labels = labels;
     }
 
     public getDocMainFile() {
-        return this.docMainFile
+        return this.docMainFile;
     }
 
     public getFilesPath() {
-        return this.filesPath
+        return this.filesPath;
     }
 }

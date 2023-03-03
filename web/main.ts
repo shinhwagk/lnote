@@ -102,7 +102,7 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { category: data.category } })
+      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { labels: data.labels } })
     }
   ]
 ];
@@ -291,7 +291,10 @@ function readerCategory(fDom: Element, categoryName: string, domainNotes: PostNo
   d_category_name.appendChild(elemSpaces());
   d_category_name.appendChild(
     elemIcon('fa-pen', (ev: MouseEvent) => {
-      nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { labels: categoryName.split(',').map(l => l.trim()), nIds: domainNotes.map(n => n.nId) });
+      nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
+        labels: categoryName.split(',').map(l => l.trim().concat(gs.domainNode)),
+        nIds: domainNotes.map(n => n.nId)
+      });
     })
   );
   d_category_name.appendChild(elemSpaces());

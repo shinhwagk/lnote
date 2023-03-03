@@ -41,19 +41,18 @@ export class VNNotebook {
     private readonly domain: NBDomain;
     private readonly notes: NBNotes;
 
-    private readonly notesEditCacheDir: string;
-
     constructor(
         private readonly nbName: string,
         private readonly nbDir: string
     ) {
         existsSync(this.nbDir) || mkdirpSync(this.nbDir);
 
-        this.notesEditCacheDir = path.join(this.nbDir, 'cache');
-        existsSync(this.notesEditCacheDir) || mkdirpSync(this.notesEditCacheDir);
-
         this.domain = new NBDomain(this.nbName, this.nbDir);
         this.notes = new NBNotes(this.nbName, this.nbDir);
+    }
+
+    public getEditDir() {
+        return this.notes.getEditDir();
     }
 
     /**
@@ -62,8 +61,8 @@ export class VNNotebook {
      */
 
     public craeteNotes(dn: string[], labels: string[]) {
-        this.addNote(labels);
-        this.domain.resetLabels(dn, labels.slice(1).concat(dn));
+        this.addNote(labels.concat(dn));
+        this.domain.resetLabels(dn, labels.concat(dn));
     }
 
     public addNote(labels: string[]) {
@@ -72,21 +71,33 @@ export class VNNotebook {
         // this.domain.resetLabels(dn, labels.slice(1).concat(dn));
     }
 
-    public getEditNoteFile(nId: string) {
-        return path.join(this.notesEditCacheDir, `${nId}.yaml`);
+    public updateNote(nId: string, contents: string[], labels: string[]) {
+    }
+
+    public deleteNote(nId: string) {
+
+    }
+
+    public relabelNote(nId: string, labels: string[]) {
+
     }
 
     public createEditNoteEnv(nId: string) {
-        const n = this.notes.getNoteByid(nId);
-        tools.writeYamlSync(this.getEditNoteFile(nId), { contents: n.contents, labels: n.labels });
+        this.notes.createEditNoteEnv(nId);
+        return this.notes.getNoteEditFile(nId);
     }
 
     public removeEditNoteEnv(nId: string) {
-        removeSync(this.getEditNoteFile(nId));
+        removeSync(this.notes.getNoteEditFile(nId));
+        // removeSync(this.createNoteEditFile(nId));
     }
 
-    public getNoteByid(nId: string) {
-        return this.notes.getNoteByid(nId);
+    public getNoteById(nId: string) {
+        return this.notes.getNoteById(nId);
+    }
+
+    public removeNoteById(nId: string) {
+        this.notes.removeNoteById(nId);
     }
 
     /**
@@ -107,8 +118,8 @@ export class VNNotebook {
         this.domain.deleteDomain(dn);
     }
 
-    public renameDomain(domainNode: string[], domainName: string) {
-        this.domain.renameDomain(domainNode, domainName);
+    public renameDomain(dn: string[], domainName: string) {
+        this.domain.renameDomain(dn, domainName);
     }
 
     public getLabelsOfDomain(dn: string[]) {

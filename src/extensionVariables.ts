@@ -102,12 +102,15 @@ export function listenNoteFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async (f) => {
       if (ext.vnNotebookSet === undefined) { return; }
-      if (f.uri.fsPath.startsWith(ext.gs.nbNotes.getEditCacheDirectory())) {
+      if (f.uri.fsPath.startsWith(ext.gs.nb.getEditDir())) {
         const fileName = path.basename(f.uri.fsPath);
         if (fileName.endsWith('.yaml')) {
           const [nId,] = fileName.split('.');
           const enote = tools.readYamlSync(f.uri.fsPath);
-          ext.gs.nbNotes.updateNote(nId, enote.contents, enote.labels);
+          // ext.gs.nb.updateNote(nId, enote.contents, enote.labels);
+          const n = ext.gs.nb.getNoteById(nId);
+          n.updateContents(enote.contents);
+          n.updateLabels(enote.labels);
           // const note = ext.gs.nbNotes.getNoteByid(nId)
           // ext.notesPanelView.postNote({ nId: nId, ...note });
           await ext.notesPanelView.postData();

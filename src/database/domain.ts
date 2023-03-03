@@ -13,7 +13,6 @@ export interface NBDomainStruct {
 
 export class NBDomain {
     public domainCache: NBDomainStruct = {};
-    private activeDomainNode: string[] = [];
 
     constructor(
         readonly nbName: string,
@@ -68,8 +67,8 @@ export class NBDomain {
         this.resetLabels(domainNode, labels);
     }
 
-    public resetLabels(labels: string[]) {
-        objectPath.set(this.domainCache, [...this.activeDomainNode, '.labels'], tools.duplicateRemoval(labels));
+    public resetLabels(domainNode: string[], labels: string[]) {
+        objectPath.set(this.domainCache, [...domainNode, '.labels'], tools.duplicateRemoval(labels));
         this.permanent();
     }
 
