@@ -200,12 +200,12 @@ export class NotesPanelView {
           case 'category-add':
             ExtCmds.cmdHdlDomainCategoryAdd();
             break;
-          case 'col-to-terminal':
-            ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
-            break;
-          case 'col-to-terminal-args':
-            ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
-            break;
+          // case 'col-to-terminal':
+          //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
+          //   break;
+          // case 'col-to-terminal-args':
+          //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
+          //   break;
           case 'domain-relabels':
             ExtCmds.cmdHdlDomainRelabels();
             break;

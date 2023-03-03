@@ -121,7 +121,7 @@ export class NBNotes {
         this.permanent();
     }
 
-    public removeNoteById(nId: string) {
+    public deleteNote(nId: string) {
         [...this.notesGroupedByLabelCache.values()].forEach(ids => ids.delete(nId));
         this.notesCache.delete(nId);
         this.permanent();
@@ -157,7 +157,7 @@ export class NBNotes {
         return path.join(this.editDir, `${nId}.yaml`);
     }
 
-    public createEditNoteEnv(nId: string) {
+    public createNoteEditEnv(nId: string) {
         const n = this.getNoteById(nId);
         tools.writeYamlSync(this.getNoteEditFile(nId), { contents: n.getData().contents, labels: n.getData().labels });
     }

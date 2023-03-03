@@ -75,7 +75,7 @@ export class VNNotebook {
     }
 
     public deleteNote(nId: string) {
-
+        this.notes.deleteNote(nId);
     }
 
     public relabelNote(nId: string, labels: string[]) {
@@ -83,7 +83,7 @@ export class VNNotebook {
     }
 
     public createEditNoteEnv(nId: string) {
-        this.notes.createEditNoteEnv(nId);
+        this.notes.createNoteEditEnv(nId);
         return this.notes.getNoteEditFile(nId);
     }
 
@@ -96,9 +96,7 @@ export class VNNotebook {
         return this.notes.getNoteById(nId);
     }
 
-    public removeNoteById(nId: string) {
-        this.notes.removeNoteById(nId);
-    }
+
 
     /**
      * 
@@ -124,5 +122,10 @@ export class VNNotebook {
 
     public getLabelsOfDomain(dn: string[]) {
         return this.domain.getLabelsOfDomain(dn);
+    }
+
+    public createEditLabelOfDomainEnv(nId: string) {
+        this.notes.createNoteEditEnv(nId);
+        return this.notes.getNoteEditFile(nId);
     }
 }
