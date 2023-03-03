@@ -3,7 +3,8 @@ import * as path from 'path';
 import * as objectPath from 'object-path';
 
 import { tools, vfs } from '../helper';
-import { existsSync } from 'fs-extra';
+import { existsSync, mkdirpSync } from 'fs-extra';
+import { GroupLables } from './note';
 
 export interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -12,89 +13,80 @@ export interface NBDomainStruct {
 }
 
 export class NBDomain {
-    public domainCache: NBDomainStruct = {};
+    private domainCache: NBDomainStruct = {};
+    private editDir: string;
+
+    private readonly domainFile: string;
 
     constructor(
         readonly nbName: string,
         readonly nbDir: string
     ) {
-        if (!existsSync(this.getDomainFile())) {
-            objectPath.set(this.domainCache, [this.nbName], { '.labels': {} });
-            this.permanent();
-        } else {
-            this.setCache();
-        }
+        this.domainFile = path.join(this.nbDir, 'domain.json');
+        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
+
+        this.editDir = path.join(this.nbDir, 'cache', 'domain');
+        existsSync(this.editDir) || mkdirpSync(this.editDir);
+
+        objectPath.set(this.domainCache, [this.nbName], vfs.readJsonSync(this.domainFile));
     }
 
-    public getLabelsOfDomain(domainNode: string[]): string[] {
+    public getLabels(domainNode: string[]): GroupLables[] {
         return objectPath.get(this.domainCache, [...domainNode, '.labels']);
-    }
-
-    public getDomainFile() {
-        return path.join(this.nbDir, this.nbName, 'domains.json');
-    }
-
-    public readDomain() {
-        return vfs.readJsonSync(this.getDomainFile());
     }
 
     public deleteDomain(domainNode: string[]): void {
         if (domainNode.length === 0) {
             return;
         }
-        this.setCache();
         objectPath.del(this.domainCache, domainNode);
         this.permanent();
     }
 
-    // public moveDomain(orgDomainNode: string[], newDomainNode: string[]) {
-    //     const domain = this.getDomain(orgDomainNode);
-    //     this.deleteDomain(orgDomainNode);
-    //     objectPath.set(this.domainCache, newDomainNode, domain);
-    //     this.permanent();
-    // }
+    public getDomain(domainNode: string[] = []) {
+        return objectPath.get(this.domainCache, domainNode);
+    }
 
-    public renameDomain(domainNode: string[], domainName: string) {
-        const _d = [...domainNode];
-        _d[domainNode.length - 1] = domainName;
-        const domain = this.getDomainByNode(domainNode);
-        this.deleteDomain(domainNode);
-        objectPath.set(this.domainCache, _d, domain);
+    public moveDomain(oldDomainNode: string[], newDomainNode: string[]) {
+        const domain = this.getDomain(oldDomainNode);
+        objectPath.set(this.domainCache, newDomainNode, domain);
+        this.deleteDomain(oldDomainNode);
         this.permanent();
     }
 
-    public addDomain(domainNode: string[], labels: string[] = []) {
-        this.resetLabels(domainNode, labels);
+    public renameDomain(domainNode: string[], domainName: string) {
+        const newDomainNode = domainNode.slice(0, domainNode.length - 1).concat(domainName);
+        this.moveDomain(domainNode, newDomainNode);
     }
 
-    public resetLabels(domainNode: string[], labels: string[]) {
+    public addDomain(domainNode: string[], labels: string[] = []) {
+        this.reLabels(domainNode, labels);
+    }
+
+    public reLabels(domainNode: string[], labels: string[]) {
         objectPath.set(this.domainCache, [...domainNode, '.labels'], tools.duplicateRemoval(labels));
         this.permanent();
     }
 
     public permanent() {
-        vfs.writeJsonSync(this.getDomainFile(), this.domainCache[this.nbName]);
+        vfs.writeJsonSync(this.domainFile, this.domainCache[this.nbName]);
     }
 
-    // static getNBList(): string[] {
-    //     return readdirSync(this.nbMasterPath).filter(n => existsSync(this.getNBDomainsFile(n)))
-    // }
-
-    public getDomainByNode(domainNode: string[] = []) {
-        this.activeDomainNode = domainNode;
-        // return objectPath.get(this.domainCache, domainNode);
-        return this;
-    }
-
-    public setCache() {
-        objectPath.set(this.domainCache, [this.nbName], this.readDomain());
-    }
-
-    public checkLabelsExist(domainNode: string[]) {
-        return objectPath.get(this.domainCache, [...domainNode, '.labels'], []).length !== 0;
+    // check domain node is a notes
+    public isNotes(domainNode: string[]) {
+        return objectPath.has(this.domainCache, [...domainNode, '.labels']);
     }
 
     public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
-        return Object.keys(this.getDomainByNode(domainNode)).filter(f => f !== '.labels');
+        return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
+    }
+
+    public createEditEnv(domainNode: string[]) {
+
+    }
+
+    public getEditFile(domainNode: string[]) {
+        // domainNode.join('/')
+        return path.join(this.editDir, `${domainNode}.yaml`);
     }
 }

@@ -8,7 +8,7 @@ export type DomainNode = string;
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
   const vnDomain = ext.vnNotebookSet.getNB(domainNode[0]).domain;
-  const isNotes = vnDomain.checkLabelsExist(domainNode);
+  const isNotes = vnDomain.isNotes(domainNode);
   const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
   const notesNumberOfDomain = 1;//isNotes
   // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)

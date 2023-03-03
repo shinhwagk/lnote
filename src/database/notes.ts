@@ -80,7 +80,7 @@ export class NBNotes {
         this.notesFile = path.join(this.nbDir, 'notes.json');
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
-        this.editDir = path.join(this.nbDir, 'cache');
+        this.editDir = path.join(this.nbDir, 'cache', 'notes');
         existsSync(this.editDir) || mkdirpSync(this.editDir);
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
@@ -153,13 +153,13 @@ export class NBNotes {
         vfs.writeJsonSync(this.notesFile, Object.fromEntries(this.notesCache.entries()));
     }
 
-    public getNoteEditFile(nId: string) {
+    public getEditFile(nId: string) {
         return path.join(this.editDir, `${nId}.yaml`);
     }
 
-    public createNoteEditEnv(nId: string) {
+    public createEditEnv(nId: string) {
         const n = this.getNoteById(nId);
-        tools.writeYamlSync(this.getNoteEditFile(nId), { contents: n.getData().contents, labels: n.getData().labels });
+        tools.writeYamlSync(this.getEditFile(nId), { contents: n.getData().contents, labels: n.getData().labels });
     }
 
     // public removeLabel(nId: string, labels: string[]) {

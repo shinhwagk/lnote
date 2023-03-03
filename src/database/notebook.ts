@@ -62,7 +62,7 @@ export class VNNotebook {
 
     public craeteNotes(dn: string[], labels: string[]) {
         this.addNote(labels.concat(dn));
-        this.domain.resetLabels(dn, labels.concat(dn));
+        this.domain.reLabels(dn, labels.concat(dn));
     }
 
     public addNote(labels: string[]) {
@@ -83,12 +83,12 @@ export class VNNotebook {
     }
 
     public createEditNoteEnv(nId: string) {
-        this.notes.createNoteEditEnv(nId);
-        return this.notes.getNoteEditFile(nId);
+        this.notes.createEditEnv(nId);
+        return this.notes.getEditFile(nId);
     }
 
     public removeEditNoteEnv(nId: string) {
-        removeSync(this.notes.getNoteEditFile(nId));
+        removeSync(this.notes.getEditFile(nId));
         // removeSync(this.createNoteEditFile(nId));
     }
 
@@ -105,7 +105,7 @@ export class VNNotebook {
      */
 
     public getDomainByNode(dn: string[]) {
-        return this.domain.getDomainByNode(dn);
+        return this.domain.getDomain(dn);
     }
 
     public addDomain(dn: string[]) {
@@ -121,11 +121,11 @@ export class VNNotebook {
     }
 
     public getLabelsOfDomain(dn: string[]) {
-        return this.domain.getLabelsOfDomain(dn);
+        return this.domain.getLabels(dn);
     }
 
-    public createEditLabelOfDomainEnv(nId: string) {
-        this.notes.createNoteEditEnv(nId);
-        return this.notes.getNoteEditFile(nId);
+    public createEditDomainEnv(nId: string) {
+        this.domain.createEditEnv(nId);
+        return this.notes.getEditFile(nId);
     }
 }
