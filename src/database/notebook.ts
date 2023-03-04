@@ -8,9 +8,9 @@ import {
     removeSync
 } from 'fs-extra';
 
-import { NBNotes } from './notes';
+import { labels2GroupLabel, NBNotes } from './notes';
 import { NBDomain } from './domain';
-import { tools } from '../helper';
+import { tools, vfs } from '../helper';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -41,18 +41,19 @@ export class VNNotebook {
     private readonly domain: NBDomain;
     private readonly notes: NBNotes;
 
+    // private readonly editDir: string;
+    public readonly editFile: string;
+
     constructor(
         private readonly nbName: string,
         private readonly nbDir: string
     ) {
         existsSync(this.nbDir) || mkdirpSync(this.nbDir);
 
+        this.editFile = path.join(this.nbDir, 'vscode-note@edit.yml');
+
         this.domain = new NBDomain(this.nbName, this.nbDir);
         this.notes = new NBNotes(this.nbName, this.nbDir);
-    }
-
-    public getEditDir() {
-        return this.notes.getEditDir();
     }
 
     /**
@@ -82,21 +83,35 @@ export class VNNotebook {
 
     }
 
-    public createEditNoteEnv(nId: string) {
-        this.notes.createEditEnv(nId);
-        return this.notes.getEditFile(nId);
+    public checkEditEnvClear() {
+        return existsSync(this.editFile);
     }
 
-    public removeEditNoteEnv(nId: string) {
-        removeSync(this.notes.getEditFile(nId));
-        // removeSync(this.createNoteEditFile(nId));
+    public createEditNoteEnv(nId: string) {
+        const nd = this.notes.getNoteById(nId).getData();
+        const ed = { kind: 'NoteData', nId: nId, contents: nd.contents, labels: nd.labels };
+        tools.writeYamlSync(this.editFile, ed);
+    }
+
+    public createEditDomainEnv(domainNode: string[]) {
+        const gl = this.domain.getGroupLabel(domainNode);
+        const ed = { kind: 'DomainGroupLabel', domainNode: domainNode.join('/'), groupLabel: gl };
+        tools.writeYamlSync(this.editFile, ed);
+    }
+
+    public createEditNotesGroupLabelEnv(labels: string[]) {
+        const gl = labels2GroupLabel(labels);
+        const ed = { kind: 'NoteGroupLabel', groupLabel: gl };
+        tools.writeYamlSync(this.editFile, ed);
+    }
+
+    public deleteEditEnv() {
+        removeSync(this.editFile);
     }
 
     public getNoteById(nId: string) {
         return this.notes.getNoteById(nId);
     }
-
-
 
     /**
      * 
@@ -121,11 +136,7 @@ export class VNNotebook {
     }
 
     public getLabelsOfDomain(dn: string[]) {
-        return this.domain.getLabels(dn);
+        return this.domain.getGroupLabel(dn);
     }
 
-    public createEditDomainEnv(nId: string) {
-        this.domain.createEditEnv(nId);
-        return this.notes.getEditFile(nId);
-    }
 }

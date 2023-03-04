@@ -13,10 +13,9 @@ export interface NBDomainStruct {
 }
 
 export class NBDomain {
-    private domainCache: NBDomainStruct = {};
-    private editDir: string;
 
     private readonly domainFile: string;
+    private readonly domainCache: NBDomainStruct = {};
 
     constructor(
         readonly nbName: string,
@@ -25,13 +24,10 @@ export class NBDomain {
         this.domainFile = path.join(this.nbDir, 'domain.json');
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
 
-        this.editDir = path.join(this.nbDir, 'cache', 'domain');
-        existsSync(this.editDir) || mkdirpSync(this.editDir);
-
         objectPath.set(this.domainCache, [this.nbName], vfs.readJsonSync(this.domainFile));
     }
 
-    public getLabels(domainNode: string[]): GroupLables[] {
+    public getGroupLabel(domainNode: string[]): GroupLables[] {
         return objectPath.get(this.domainCache, [...domainNode, '.labels']);
     }
 
@@ -81,12 +77,4 @@ export class NBDomain {
         return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
     }
 
-    public createEditEnv(domainNode: string[]) {
-
-    }
-
-    public getEditFile(domainNode: string[]) {
-        // domainNode.join('/')
-        return path.join(this.editDir, `${domainNode}.yaml`);
-    }
 }

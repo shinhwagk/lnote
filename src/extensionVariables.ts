@@ -109,7 +109,7 @@ export function listenNoteFileSave(ctx: ExtensionContext) {
           const enote = tools.readYamlSync(f.uri.fsPath);
           // ext.gs.nb.updateNote(nId, enote.contents, enote.labels);
           const n = ext.gs.nb.getNoteById(nId);
-          n.updateContents(enote.contents);
+          n.updateDataContents(enote.contents);
           n.updateLabels(enote.labels);
           // const note = ext.gs.nbNotes.getNoteByid(nId)
           // ext.notesPanelView.postNote({ nId: nId, ...note });

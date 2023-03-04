@@ -23,8 +23,8 @@ export namespace ExtCmds {
     }
   }
   export async function cmdHdlNoteEdit(nId: string) {
-    const noteEditFile = ext.gs.nb.createEditNoteEnv(nId);
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(noteEditFile));
+    ext.gs.nb.createEditNoteEnv(nId);
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.editFile));
   }
   // export async function cmdHdlNotebookNoteContentsAdd(nId: string, sdIdx: number) {
   //   const contents = ext.notebookDatabase.getNBNotes(ext.globalState.nbName)[nId].contents;
@@ -261,11 +261,13 @@ export namespace ExtCmds {
     const oldLabels = labels.map(l => l.trim());
     const ib = await window.showInputBox({ value: oldLabels.join(',') });
     if (ib === undefined || ib === oldLabels.join(',')) { return; }
-    const newLabels = ib.split(',').map(l => l.trim());
-    const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);
-    nIds.forEach(nId => {
-      ext.gs.nb.resetLabels(nId, newLabels.concat(labelsOfDomain));
-    });
+
+    ext.gs.nb.createEditNotesGroupLabelEnv(labels);
+    // const newLabels = ib.split(',').map(l => l.trim());
+    // const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);
+    // nIds.forEach(nId => {
+    //   ext.gs.nb.resetLabels(nId, newLabels.concat(labelsOfDomain));
+    // });
     ext.vnNotebookSet.refresh(ext.gs.nbName);
     // ext.gs.vnNotes.permanent();
     ext.domainProvider.refresh();

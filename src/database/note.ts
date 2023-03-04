@@ -6,7 +6,8 @@ import {
     mkdirpSync
 } from 'fs-extra';
 
-import { vfs } from '../helper';
+import { tools, vfs } from '../helper';
+import { groupLabel2Labels, labels2GroupLabel } from './notes';
 
 export interface INBNote {
     contents: string[];
@@ -25,7 +26,7 @@ export class NBNote {
     constructor(
         private readonly nbDir: string,
         private readonly nId: string,
-        public data: INBNote
+        private data: INBNote
     ) {
         this.filesPath = path.join(this.nbDir, "files", this.nId);
         this.docPath = path.join(this.nbDir, "doc", this.nId);
@@ -46,6 +47,10 @@ export class NBNote {
 
     public getData() {
         return this.data;
+    }
+
+    public getDataArrayLabels() {
+        return groupLabel2Labels(this.data.labels);
     }
 
     // public update()
@@ -75,16 +80,20 @@ export class NBNote {
         mkdirpSync(this.filesPath);
     }
 
-    public updateContents(contents: string[]) {
+    public updateDataContents(contents: string[]) {
         this.data.contents = contents;
     }
 
-    public updateMts(mts: number) {
+    public updateDataMts(mts: number) {
         this.data.mts = mts;
     }
 
-    public updateLabels(labels: GroupLables) {
+    public updateDataGroupLabels(labels: GroupLables) {
         this.data.labels = labels;
+    }
+
+    public updateDataArrayLabels(labels: string[]) {
+        this.data.labels = labels2GroupLabel(tools.duplicateRemoval(labels));
     }
 
     public getDocMainFile() {
