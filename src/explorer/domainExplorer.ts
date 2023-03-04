@@ -7,8 +7,8 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
-  const vnDomain = ext.vnNotebookSet.getNB(domainNode[0]).domain;
-  const isNotes = vnDomain.isNotes(domainNode);
+  const notebook = ext.vnNotebookSet.getNB(domainNode[0]);
+  const domainIsNotes = notebook.checkDomainIsNotes(domainNode);
   const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
   const notesNumberOfDomain = 1;//isNotes
   // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
@@ -16,7 +16,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
 
   const item: TreeItem = { label: domainNode[domainNode.length - 1] };
   item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain} `;
-  item.collapsibleState = vnDomain.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
+  item.collapsibleState = notebook.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
   // if (domainNode.length === 1) {
   //   item.command = {
   //     arguments: [dn],
@@ -24,7 +24,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
   //     title: 'Show Vscode Note'
   //   };
   // } else 
-  if (isNotes) {
+  if (domainIsNotes) {
     item.command = {
       arguments: [dn],
       command: 'lnote.domain.pin',
@@ -53,7 +53,7 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
       return ext.vnNotebookSet.getNBNames();
     } else {
       const domainNode = tools.splitDomaiNode(element);
-      return ext.vnNotebookSet.getNB(domainNode[0]).domain
+      return ext.vnNotebookSet.getNB(domainNode[0])
         .getChildrenNameOfDomain(domainNode)
         .sort()
         .map((name) => tools.joinDomainNode(domainNode.concat(name)));

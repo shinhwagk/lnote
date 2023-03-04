@@ -1,20 +1,21 @@
-import { ExtensionContext, ViewColumn, commands } from 'vscode';
+import { commands, ExtensionContext, ViewColumn } from 'vscode';
 
+import { ExtCmds } from './extensionCommands';
 import {
-   ext, initializeExtensionVariables,
+   ext,
+   initializeExtensionVariables,
    listenConfiguration,
-   listenNoteFileClose,
-   listenNoteFileSave,
+   listenEditFileClose,
+   listenEditFileSave,
    listenVscodeWindowChange
 } from './extensionVariables';
-import { ExtCmds } from './extensionCommands';
 
 export async function activate(context: ExtensionContext) {
    console.log('vscode extension "lnote" is now active!');
 
    listenConfiguration(context);
-   listenNoteFileSave(context);
-   listenNoteFileClose(context);
+   listenEditFileSave(context);
+   listenEditFileClose(context);
 
    initializeExtensionVariables(context);
 
@@ -22,9 +23,10 @@ export async function activate(context: ExtensionContext) {
 
 
    ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
+
    /**
-   * domain
-   **/
+    * domain
+    */
    ext.registerCommand('lnote.domain.create', ExtCmds.cmdHdlDomainCreate);
    ext.registerCommand('lnote.domain.pin', ExtCmds.cmdHdlDomainPin);
    ext.registerCommand('lnote.domain.rename', ExtCmds.cmdHdlDomainRename);
@@ -32,11 +34,13 @@ export async function activate(context: ExtensionContext) {
    ext.registerCommand('lnote.domain.search', ExtCmds.cmdHdlDomainSearch);
    ext.registerCommand('lnote.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
    ext.registerCommand('lnote.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
+
    /**
-      * notes view
-      */
+    * notes view
+    */
    ext.registerCommand('lnote.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
    ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNotebookNoteDocShow);
+   ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
    // ext.registerCommand('lnote.note.add', ExtCmds.cmdHdlNoteCreate);
    /**
       * note
@@ -46,14 +50,15 @@ export async function activate(context: ExtensionContext) {
    // ext.registerCommand('lnote.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
    // ext.registerCommand('lnote.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
    // ext.registerCommand('lnote.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
-   ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
+   // ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
    // ext.registerCommand('lnote.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
    // ext.registerCommand('lnote.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
    // ext.registerCommand('lnote.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);
    // ext.registerCommand('lnote.note.edit.doc.full', ExtCmds.cmdHdlNoteEditDocFull);
+
    /**
-      * note files
-      */
+    * note files
+    */
    ext.registerCommand('lnote.files.close', ExtCmds.cmdHdlFilesClose);
    ext.registerCommand('lnote.files.edit.open', ExtCmds.cmdHdlFilesEditOpen);
    ext.registerCommand('lnote.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);

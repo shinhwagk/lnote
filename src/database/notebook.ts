@@ -8,9 +8,10 @@ import {
     removeSync
 } from 'fs-extra';
 
-import { labels2GroupLabel, NBNotes } from './notes';
+import { groupLabel2Labels, labels2GroupLabel, NBNotes } from './notes';
 import { NBDomain } from './domain';
 import { tools, vfs } from '../helper';
+import { GroupLables } from './note';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -59,7 +60,11 @@ export class VNNotebook {
     /**
      * 
      * notes & note
+     * 
      */
+    public getNotesByArrayLabels(al: string[]) {
+        return this.notes.getNotesByArrayLabels(al);
+    }
 
     public craeteNotes(dn: string[], labels: string[]) {
         this.addNote(labels.concat(dn));
@@ -81,6 +86,56 @@ export class VNNotebook {
 
     public relabelNote(nId: string, labels: string[]) {
 
+    }
+
+    public getNoteById(nId: string) {
+        return this.notes.getNoteById(nId);
+    }
+
+    public getNodeFilePath(nId: string) {
+        return this.notes.getNoteById(nId).getFilesPath()
+    }
+
+    /**
+     * 
+     * domain
+     * 
+     */
+    public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
+        return this.domain.getChildrenNameOfDomain(domainNode)
+    }
+
+    public checkDomainIsNotes(domainNode: string[]) {
+        return this.domain.isNotes(domainNode)
+    }
+
+    public getDomainByNode(dn: string[]) {
+        return this.domain.getDomain(dn);
+    }
+
+    public addDomain(dn: string[]) {
+        this.domain.addDomain(dn);
+    }
+
+    public deleteDomain(dn: string[]) {
+        this.domain.deleteDomain(dn);
+    }
+
+    public renameDomain(dn: string[], domainName: string) {
+        this.domain.renameDomain(dn, domainName);
+    }
+
+    public getArrayLabelsOfDomain(dn: string[]) {
+        return groupLabel2Labels(tools.sortGroupLables(this.domain.getGroupLabel(dn)));
+    }
+
+    /**
+     * 
+     * edit
+     * 
+     */
+    public processEditEnv() {
+        this.deleteEditEnv();
     }
 
     public checkEditEnvClear() {
@@ -108,35 +163,4 @@ export class VNNotebook {
     public deleteEditEnv() {
         removeSync(this.editFile);
     }
-
-    public getNoteById(nId: string) {
-        return this.notes.getNoteById(nId);
-    }
-
-    /**
-     * 
-     * domain
-     * 
-     */
-
-    public getDomainByNode(dn: string[]) {
-        return this.domain.getDomain(dn);
-    }
-
-    public addDomain(dn: string[]) {
-        this.domain.addDomain(dn);
-    }
-
-    public deleteDomain(dn: string[]) {
-        this.domain.deleteDomain(dn);
-    }
-
-    public renameDomain(dn: string[], domainName: string) {
-        this.domain.renameDomain(dn, domainName);
-    }
-
-    public getLabelsOfDomain(dn: string[]) {
-        return this.domain.getGroupLabel(dn);
-    }
-
 }

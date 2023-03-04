@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
+import { INBNote, NBNote } from '../database/note';
 
 export class NotesPanelView {
   private panel: vscode.WebviewPanel | undefined = undefined;
@@ -53,22 +54,17 @@ export class NotesPanelView {
     this.initPanel();
   }
 
-  private getNotesForWebStruct(domainNode: string[]) {
-    const labels = ext.gs.nbDomain.getLabelsOfDomain(domainNode);
-    const nbNotes = ext.gs.nbNotes;
-    return [...new Set(nbNotes.getNIdsByLabels(labels))]
-      .map(nId => {
-        const _note = JSON.parse(JSON.stringify(nbNotes.getNoteByid(nId)));
-        _note.labels.push(ext.gs.nbName);
-        return { nId: nId, note: _note };
-      })
-      .filter(n => tools.intersections(labels, n.note.labels).length === labels.length)
+  private getNotesForWebStruct(domainNode: string[]): NBNote[] {
+    const alOfDomain = ext.gs.nb.getArrayLabelsOfDomain(domainNode);
+    // const nbNotes = ext.gs.nb.getLabelsOfDomain;
+    return ext.gs.nb.getNotesByArrayLabels(alOfDomain)
+      .filter(n => tools.intersections(alOfDomain, n.getDataArrayLabels()).length === alOfDomain.length)
       .map(n => {
-        const isDoc = nbNotes.checkDocExist(n.nId);
-        const isFiles = nbNotes.checkFilesExist(n.nId);
-        const _n = JSON.parse(JSON.stringify(n)); // clone obj
-        _n.note.labels = n.note.labels; //.concat(ext.gs.nbName);
-        return { nId: _n.nId, doc: isDoc, files: isFiles, ..._n.note };
+        const isDoc = n.checkDocExist();
+        const isFiles = n.checkFilesExist();
+        const _n = JSON.parse(JSON.stringify(n.getData())); // clone obj
+        const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
+        return { nId: _n.nId, doc: isDoc, files: isFiles, labels: alOfNote, ..._n.note };
       });
   }
 
@@ -78,7 +74,7 @@ export class NotesPanelView {
       data: {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
         domainNode: this.domainNode,
-        domainLabels: ext.gs.nbDomain.getLabelsOfDomain(this.domainNode).sort()
+        domainLabels: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode)
       }
     });
   }
@@ -174,7 +170,7 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNoteEdit(msg.data.nId);
             break;
           case 'notes-edit-labels':
-            ExtCmds.cmdHdlNotesEditlabels(msg.data.nIds, msg.data.labels);
+            ExtCmds.cmdHdlNotesEditlabels(msg.data.labels);
             break;
           // case 'notebook-note-contents-add':
           //   ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
@@ -207,7 +203,7 @@ export class NotesPanelView {
           //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
           //   break;
           case 'domain-relabels':
-            ExtCmds.cmdHdlDomainRelabels();
+            ExtCmds.cmdHdlDomainEditlabels();
             break;
         }
       },

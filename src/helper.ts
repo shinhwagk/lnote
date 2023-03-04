@@ -6,6 +6,7 @@ import * as fse from 'fs-extra';
 import * as yaml from 'yaml';
 
 import { pathSplit } from './constants';
+import { GroupLables } from './database/note';
 
 export namespace vfs {
   const encoding = 'utf-8';
@@ -74,5 +75,15 @@ export namespace tools {
 
   export function generateSixString(): string {
     return tools.hexRandom(3);
+  }
+
+  export function sortGroupLables(obj1: GroupLables): GroupLables {
+    return Object.keys(obj1).sort().reduce(
+      (obj, key) => {
+        obj[key] = obj1[key].sort();
+        return obj;
+      },
+      {} as GroupLables
+    );
   }
 }

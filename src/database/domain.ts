@@ -1,9 +1,8 @@
+import { existsSync } from 'fs-extra';
+import * as objectPath from 'object-path';
 import * as path from 'path';
 
-import * as objectPath from 'object-path';
-
 import { tools, vfs } from '../helper';
-import { existsSync, mkdirpSync } from 'fs-extra';
 import { GroupLables } from './note';
 
 export interface NBDomainStruct {
@@ -27,9 +26,13 @@ export class NBDomain {
         objectPath.set(this.domainCache, [this.nbName], vfs.readJsonSync(this.domainFile));
     }
 
-    public getGroupLabel(domainNode: string[]): GroupLables[] {
+    public getGroupLabel(domainNode: string[]): GroupLables {
         return objectPath.get(this.domainCache, [...domainNode, '.labels']);
     }
+
+    // public getArrayLabel(domainNode: string[]): GroupLables {
+    //     return objectPath.get(this.domainCache, [...domainNode, '.labels']);
+    // }
 
     public deleteDomain(domainNode: string[]): void {
         if (domainNode.length === 0) {

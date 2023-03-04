@@ -1,20 +1,16 @@
+import { existsSync, watchFile } from 'fs';
+import path from 'path';
 import {
-  ExtensionContext,
-  workspace,
-  window,
-  ConfigurationChangeEvent,
-  TreeView,
-  commands,
-  StatusBarItem
+  commands, ConfigurationChangeEvent, ExtensionContext, StatusBarItem, TreeView, window, workspace
 } from 'vscode';
 
+import { section } from './constants';
+import { VNNotebook } from './database/notebook';
+import { VNNotebookSet } from './database/notebookset';
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
-import { section } from './constants';
-import { NotesPanelView } from './panel/notesPanelView';
-import path from 'path';
 import { tools, vfs } from './helper';
-import { VNNotebookSet } from './database/notebookset';
+import { NotesPanelView } from './panel/notesPanelView';
 
 export class GlobalState {
   nId: string = '';
@@ -82,46 +78,49 @@ export function listenConfiguration(ctx: ExtensionContext) {
   );
 }
 
-export function listenNoteFileClose(ctx: ExtensionContext) {
+export function listenEditFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
-    workspace.onDidCloseTextDocument((f) => {
-      if (ext.vnNotebookSet === undefined) { return; }
-      if (f.uri.fsPath.startsWith(ext.gs.nbNotes.getEditCacheDirectory())) {
-        const fileName = path.basename(f.uri.fsPath);
-        if (fileName.endsWith('.yaml')) {
-          const [nId,] = fileName.split('.');
-          ext.gs.nbNotes.removeEditNoteEnv(nId);
-          // ext.notesPanelView.postNote(ext.gs.nbNotes.getNoteByid(nId));
+    workspace.onDidCloseTextDocument(() => {
+      // if (ext.vnNotebookSet === undefined) { return; }
+      if (ext.vnNotebookSet && existsSync(ext.gs.nb.editFile)) {
+        ext.gs.nb.processEditEnv();
+        if (!ext.gs.nb.checkEditEnvClear()) {
+          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
         }
+        // ext.gs.nb.deleteEditEnv();
+        // const fileName = path.basename(f.uri.fsPath);
+        // if (fileName.endsWith('.yaml')) {
+        //   const [nId,] = fileName.split('.');
+        //   ext.gs.nbNotes.removeEditNoteEnv(nId);
+        //   // ext.notesPanelView.postNote(ext.gs.nbNotes.getNoteByid(nId));
+        // }
       }
     })
   );
 }
 
-export function listenNoteFileSave(ctx: ExtensionContext) {
+export function listenEditFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
-    workspace.onDidSaveTextDocument(async (f) => {
-      if (ext.vnNotebookSet === undefined) { return; }
-      if (f.uri.fsPath.startsWith(ext.gs.nb.getEditDir())) {
-        const fileName = path.basename(f.uri.fsPath);
-        if (fileName.endsWith('.yaml')) {
-          const [nId,] = fileName.split('.');
-          const enote = tools.readYamlSync(f.uri.fsPath);
-          // ext.gs.nb.updateNote(nId, enote.contents, enote.labels);
-          const n = ext.gs.nb.getNoteById(nId);
-          n.updateDataContents(enote.contents);
-          n.updateLabels(enote.labels);
-          // const note = ext.gs.nbNotes.getNoteByid(nId)
-          // ext.notesPanelView.postNote({ nId: nId, ...note });
-          await ext.notesPanelView.postData();
-        }
+    workspace.onDidSaveTextDocument(async () => {
+      // if (ext.vnNotebookSet === undefined) { return; }
+      if (ext.vnNotebookSet && existsSync(ext.gs.nb.editFile)) {
+        ext.gs.nb.processEditEnv();
+        // const fileName = path.basename(f.uri.fsPath);
+        // if (fileName.endsWith('.yaml')) {
+        //   const [nId,] = fileName.split('.');
+        //   const enote = tools.readYamlSync(f.uri.fsPath);
+        //   // ext.gs.nb.updateNote(nId, enote.contents, enote.labels);
+        //   const n = ext.gs.nb.getNoteById(nId);
+        //   n.updateDataContents(enote.contents);
+        //   n.updateLabels(enote.labels);
+        //   // const note = ext.gs.nbNotes.getNoteByid(nId)
+        //   // ext.notesPanelView.postNote({ nId: nId, ...note });
+        //   await ext.notesPanelView.postData();
+        // }
       }
     })
   );
 }
-import { existsSync, watchFile } from 'fs';
-import { VNNotebook } from './database/notebook';
-
 
 export function listenVscodeWindowChange() {
   const vscodeWindowCheckFile = path.join(ext.notebookPath, 'windowid');

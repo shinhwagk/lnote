@@ -7,7 +7,7 @@
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
-        "vscode": "^1.71.0"
+        "vscode": "^1.75.0"
     },
     "repository": {
         "type": "git",
@@ -21,9 +21,7 @@
         "vscode"
     ],
     "license": "MIT",
-    "activationEvents": [
-        "onView:domainExplorer"
-    ],
+    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "viewsContainers": {

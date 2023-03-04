@@ -8,6 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { groupLabel2Labels, labels2GroupLabel } from './notes';
+import { ArrayLabels } from './types';
 
 export interface INBNote {
     contents: string[];
@@ -49,7 +50,7 @@ export class NBNote {
         return this.data;
     }
 
-    public getDataArrayLabels() {
+    public getDataArrayLabels(): ArrayLabels {
         return groupLabel2Labels(this.data.labels);
     }
 

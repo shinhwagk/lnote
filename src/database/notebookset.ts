@@ -57,7 +57,7 @@ export class VNNotebookSet {
         return this.nbCache.get(nbName)!;
     }
 
-    private getNBNames(): string[] {
+    public getNBNames(): string[] {
         return [...this.nbCache.keys()];
     }
 
@@ -112,8 +112,6 @@ export class VNNotebookSet {
     // }
 
 
-    // public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
-    //     return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
-    // }
+
 
 }

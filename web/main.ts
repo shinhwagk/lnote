@@ -472,7 +472,7 @@ const gs = new GlobalState();
 
 window.addEventListener('message', (event) => {
   const message: DataProtocol = event.data;
-  console.log('view notes.', message);
+  console.log('vscode-notes webview open.', message);
   switch (message.command) {
     case 'post-data':
       gs.domainLabels = message.data.domainLabels;

@@ -8,6 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { GroupLables, INBNote, NBNote } from './note';
+import { ArrayLabels } from './types';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -25,8 +26,7 @@ export function labels2GroupLabel(labels: string[]): GroupLables {
             gl[g] = [l];
         }
     }
-    // Object.entries(gl).forEach((g, ls) =>ls)
-    return gl;
+    return tools.sortGroupLables(gl);
 }
 
 export function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
@@ -129,15 +129,15 @@ export class NBNotes {
         return NBNote.get(this.nbDir, nId, this.notesCache.get(nId)!);
     }
 
-    public getNIdsByLabels(labels: string[]): string[] {
+    public getNIdsByLabels(labels: ArrayLabels): string[] {
         return labels.map(l => [...this.notesGroupedByLabelCache.get(l) || []]).flatMap(i => i);
     }
 
-    public getNotesByLabels(labels: string[]) {
-        return this.getNIdsByLabels(labels).map(nId => this.getNoteById(nId));
+    public getNotesByArrayLabels(al: ArrayLabels) {
+        return this.getNIdsByLabels(al).map(nId => this.getNoteById(nId));
     }
 
-    public reLabels(nId: string, labels: string[]) {
+    public reLabels(nId: string, labels: ArrayLabels) {
         this.deleteCache(nId);
         this.getNoteById(nId).updateDataArrayLabels(labels);
         this.addCache(nId);
