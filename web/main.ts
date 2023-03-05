@@ -198,6 +198,7 @@ function elemSpaces(num: number = 1) {
 }
 
 function readerNote(container: HTMLElement, note: PostNote): void {
+  console.log("testing", note)
   container.replaceChildren();
 
   const d_note = container;
@@ -294,16 +295,15 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
   return name;
 }
 
-function readerCategory(fDom: Element, labelsOfCategory: string[]) {
+function readerCategory(fDom: Element, labelsOfNotes: string[]) {
   // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
-  let nameOfCategory = arrayLabels2CategoryName(labelsOfCategory); //labelsOfCategory.join(', ');
-  console.log(nameOfCategory);
+  let nameOfCategory = arrayLabels2CategoryName(labelsOfNotes); //labelsOfCategory.join(', ');
 
   // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
   // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
 
   const d_category = document.createElement('div');
-  d_category.id = nameOfCategory.replace(' ', '');
+  // d_category.id = nameOfCategory.replace(' ', '');
   d_category.className = 'grid-category';
 
   const d_category_name = document.createElement('div');
@@ -321,7 +321,7 @@ function readerCategory(fDom: Element, labelsOfCategory: string[]) {
   d_category_name.appendChild(
     elemIcon('fa-pen', (ev: MouseEvent) => {
       nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
-        labels: labelsOfCategory.map(l => l.trim())//.concat(`common->${gs.domainNode}`)
+        labels: labelsOfNotes.map(l => l.trim())//.concat(`common->${gs.domainNode}`)
       });
     })
   );
@@ -336,11 +336,11 @@ function readerCategory(fDom: Element, labelsOfCategory: string[]) {
   d_category_body.className = 'grid-category-body';
 
   for (const n of gs.domainNotes) {
-    if (issubset(n.labels, labelsOfCategory)) {
-      const noteDom = document.createElement('div');
-      noteDom.id = `note-${n.nId}`;
-      d_category_body.appendChild(noteDom);
-      // readerNote(noteDom, n);
+    if (issubset(n.labels, labelsOfNotes)) {
+      const notesDom = document.createElement('div');
+      notesDom.id = `note-${n.nId}`;
+      d_category_body.appendChild(notesDom);
+      readerNote(notesDom, n);
     }
 
     d_category.append(d_category_name, d_category_body);
@@ -354,11 +354,14 @@ function readerCategories() {
   const localDom = document.getElementById('domain-categories')!;
   localDom.replaceChildren();
   // this.nIds = domainNotes.map(n => n.nId);
-  const categories: { [cname: string]: PostNote[] } = {};
-  const nameOfCategories = new Set<string>();
-  for (const note of gs.domainNotes.filter(n => intersection(n.labels, gs.checkedLabels).length === gs.checkedLabels.length)) {
-    const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
-    nameOfCategories.add(cname);
+  const labelsOfNotes = new Set<string>();
+  for (const note of gs.domainNotes) {
+
+    // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
+    console.log(1111, note.labels)
+    if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
+      labelsOfNotes.add(note.labels.join('|||'));
+    }
     // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
     // if (cname in categories) {
     //   categories[cname].push(note);
@@ -369,16 +372,20 @@ function readerCategories() {
     //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
     // }
   }
+  console.log("111", labelsOfNotes)
   // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
-  for (const cname of nameOfCategories.values()) {
-    readerCategory(localDom, cname.split(','));
+  for (const cname of labelsOfNotes.values()) {
+    readerCategory(localDom, cname.split('|||'));
     // document.getElementById(`domain-category-${cname.replace(' ', '')}`)?.append(document.createElement('p'));
   }
 }
 
 interface NoteLabel {
   checked: boolean;
-  name: string;
+  label: string;
+  group: string;
+  // group label: `${group}->${label}`
+  gl: string;
 
   //   dom(){
 
@@ -401,13 +408,16 @@ function readerLabels() {
 
   // sort grouplabel
   const _gl: { [g: string]: NoteLabel[] } = {};
-  for (const [g, ls] of Object.entries(gs.domainGroupLabel)) {
+
+  const labelsall = labels2GroupLabel([...new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls).concat(groupLabel2Labels(gs.domainGroupLabel))).values()])
+  for (const [g, ls] of Object.entries(labelsall)) {
     for (const l of ls) {
       const checked = gs.checkedLabels.includes(`${g}->${l}`);
+      const nl: NoteLabel = { group: g, label: l, gl: `${g}->${l}`, checked: checked }
       if (g in _gl) {
-        _gl[g].push({ name: l, checked: checked });
+        _gl[g].push(nl);
       } else {
-        _gl[g] = [{ name: l, checked: checked }];
+        _gl[g] = [nl];
       }
     }
     _gl[g].sort(l => l.checked ? 1 : 0);
@@ -422,21 +432,21 @@ function readerLabels() {
     // }
   }
 
-  for (const [g, ls] of Object.entries(_gl)) {
+  for (const [g, noteLabels] of Object.entries(_gl)) {
     const group_dom = document.createElement('div');
     group_dom.textContent = g;
-    for (const l of ls) {
+    for (const nl of noteLabels) {
       const d = document.createElement('label');
-      const lname = l.name;
-      d.className = l.checked ? 'checkedLabel' : 'unCheckedLabel';
-      d.textContent = lname;
+      d.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
+      d.textContent = nl.label;
       d.onclick = () => {
         d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
         if (d.className === 'unCheckedLabel') {
-          gs.checkedLabels = gs.checkedLabels.filter(l => l !== lname);
+          gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl.gl);
         } else {
-          gs.checkedLabels.push(lname);
+          gs.checkedLabels.push(nl.gl);
         }
+        // readerLabels()
         readerCategories();
       };
       // labelDoms.push(d);
@@ -520,8 +530,6 @@ function readerDomainName() {
   document.getElementById('content')?.replaceChildren(e_domain);
 }
 
-
-
 const nccm = new ContextMenuDom();
 document.addEventListener(
   'click',
@@ -562,6 +570,42 @@ const gs = new GlobalState();
 // function readerNoteLabels() {
 // }
 
+function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
+  const labels = [];
+  for (const [g, ls] of Object.entries(groupLabels)) {
+    for (const l of ls) {
+      labels.push(`${g}->${l}`);
+    }
+  }
+  return labels;
+}
+
+type GroupLables = { [gl: string]: string[] };
+
+function sortGroupLables(obj1: GroupLables): GroupLables {
+  return Object.keys(obj1).sort().reduce(
+    (obj, key) => {
+      obj[key] = obj1[key].sort();
+      return obj;
+    },
+    {} as GroupLables
+  );
+}
+
+function labels2GroupLabel(labels: string[]): GroupLables {
+  const gl: { [g: string]: string[] } = {};
+  for (const label of labels) {
+    const [g, l] = label.split('->');
+    if (g in gl) {
+      gl[g].push(l);
+    } else {
+      gl[g] = [l];
+    }
+  }
+  return sortGroupLables(gl);
+}
+
+
 window.addEventListener('message', (event) => {
   const message: DataProtocol = event.data;
   console.log('vscode-notes webview open.', message);
@@ -572,15 +616,17 @@ window.addEventListener('message', (event) => {
       gs.domainNotes = message.data.domainNotes;
       gs.domainNode = message.data.domainNode;
 
-      console.log(gs.domainNotes);
-
-      const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
+      // const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
 
       // When remove a note, the note label is selected and the note is the only one in the category.
-      gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
+      // gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
 
       // if (gs.checkedLabels.length === 0) {
-      gs.unCheckedLabels = Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
+      gs.checkedLabels = []
+      const labelsOfnotes = gs.domainNotes.map(n => n.labels).flatMap(ls => ls)
+
+      console.log()
+      gs.unCheckedLabels = [...new Set<string>(labelsOfnotes.concat(groupLabel2Labels(gs.domainGroupLabel))).values()] //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
       // }
       readerDomainName();
       readerLabels();
