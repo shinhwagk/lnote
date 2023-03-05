@@ -21,6 +21,7 @@ interface DataDomain {
   domainLabels: string[];
   domainNotes: PostNote[];
   nId: string;
+  domainArrayLabel: string[];
   domainGroupLabel: { [g: string]: string[] };
 }
 
@@ -198,7 +199,6 @@ function elemSpaces(num: number = 1) {
 }
 
 function readerNote(container: HTMLElement, note: PostNote): void {
-  console.log("testing", note)
   container.replaceChildren();
 
   const d_note = container;
@@ -358,7 +358,6 @@ function readerCategories() {
   for (const note of gs.domainNotes) {
 
     // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
-    console.log(1111, note.labels)
     if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
       labelsOfNotes.add(note.labels.join('|||'));
     }
@@ -372,7 +371,7 @@ function readerCategories() {
     //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
     // }
   }
-  console.log("111", labelsOfNotes)
+  console.log("111", labelsOfNotes);
   // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
   for (const cname of labelsOfNotes.values()) {
     readerCategory(localDom, cname.split('|||'));
@@ -409,18 +408,17 @@ function readerLabels() {
   // sort grouplabel
   const _gl: { [g: string]: NoteLabel[] } = {};
 
-  const labelsall = labels2GroupLabel([...new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls).concat(groupLabel2Labels(gs.domainGroupLabel))).values()])
-  for (const [g, ls] of Object.entries(labelsall)) {
-    for (const l of ls) {
-      const checked = gs.checkedLabels.includes(`${g}->${l}`);
-      const nl: NoteLabel = { group: g, label: l, gl: `${g}->${l}`, checked: checked }
-      if (g in _gl) {
-        _gl[g].push(nl);
-      } else {
-        _gl[g] = [nl];
-      }
+  const labelsall = [...new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls).concat(gs.domainArrayLabel)).values()];
+  for (const label of labelsall) {
+    const checked = gs.checkedLabels.includes(label);
+    const [g, l] = label.split('->');
+    const nl: NoteLabel = { group: g, label: l, gl: `${g}->${l}`, checked: checked };
+    if (g in _gl) {
+      _gl[g].push(nl);
+    } else {
+      _gl[g] = [nl];
     }
-    _gl[g].sort(l => l.checked ? 1 : 0);
+    // _gl[g].sort(l => l.checked ? 0 : 1);
     // const gl_dom = document.createElement('div');
     // gl_dom.textContent = g;
     // for (const l of ls) {
@@ -433,6 +431,9 @@ function readerLabels() {
   }
 
   for (const [g, noteLabels] of Object.entries(_gl)) {
+    // console.log(11, noteLabels);
+    noteLabels.sort(a => a.checked ? -1 : 1);
+
     const group_dom = document.createElement('div');
     group_dom.textContent = g;
     for (const nl of noteLabels) {
@@ -446,7 +447,7 @@ function readerLabels() {
         } else {
           gs.checkedLabels.push(nl.gl);
         }
-        // readerLabels()
+        readerLabels();
         readerCategories();
       };
       // labelDoms.push(d);
@@ -554,7 +555,7 @@ class GlobalState {
   domainNotes: PostNote[] = [];
   domainNode: string[] = [];
   search: boolean = false;
-  domainGroupLabel: { [g: string]: string[] } = {};
+  domainArrayLabel: string[] = [];
 }
 
 // const vnDomain = new VNDomain();
@@ -612,7 +613,7 @@ window.addEventListener('message', (event) => {
   switch (message.command) {
     case 'post-data':
       // gs.domainLabels = message.data.domainLabels;
-      gs.domainGroupLabel = message.data.domainGroupLabel;
+      gs.domainArrayLabel = message.data.domainArrayLabel;
       gs.domainNotes = message.data.domainNotes;
       gs.domainNode = message.data.domainNode;
 
@@ -622,11 +623,11 @@ window.addEventListener('message', (event) => {
       // gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
 
       // if (gs.checkedLabels.length === 0) {
-      gs.checkedLabels = []
-      const labelsOfnotes = gs.domainNotes.map(n => n.labels).flatMap(ls => ls)
+      gs.checkedLabels = [];
+      const labelsOfnotes = gs.domainNotes.map(n => n.labels).flatMap(ls => ls);
 
-      console.log()
-      gs.unCheckedLabels = [...new Set<string>(labelsOfnotes.concat(groupLabel2Labels(gs.domainGroupLabel))).values()] //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
+      console.log();
+      gs.unCheckedLabels = [...new Set<string>(labelsOfnotes.concat(gs.domainArrayLabel)).values()]; //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
       // }
       readerDomainName();
       readerLabels();

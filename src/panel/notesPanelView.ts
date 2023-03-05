@@ -78,7 +78,8 @@ export class NotesPanelView {
       data: {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
         domainNode: this.domainNode,
-        domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode)
+        // domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode),
+        domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode)
       }
     });
   }
