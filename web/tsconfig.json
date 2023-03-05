@@ -12,7 +12,7 @@
         "noUnusedParameters": true,
         "removeComments": true,
         "strict": true,
-        "target": "es5",
+        "target": "ES2015",
         "outDir": "../out"
     },
     "files": [
