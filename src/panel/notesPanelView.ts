@@ -58,7 +58,9 @@ export class NotesPanelView {
     const alOfDomain = ext.gs.nb.getArrayLabelsOfDomain(domainNode);
     // const nbNotes = ext.gs.nb.getLabelsOfDomain;
     return ext.gs.nb.getNotesByArrayLabels(alOfDomain)
-      .filter(n => tools.intersections(alOfDomain, n.getDataArrayLabels()).length === alOfDomain.length)
+      .filter(n =>
+        tools.intersections(alOfDomain, n.getDataArrayLabels()).length === alOfDomain.length
+      )
       .map(n => {
         const isDoc = n.checkDocExist();
         const isFiles = n.checkFilesExist();
@@ -74,7 +76,7 @@ export class NotesPanelView {
       data: {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
         domainNode: this.domainNode,
-        domainLabels: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode)
+        domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode)
       }
     });
   }

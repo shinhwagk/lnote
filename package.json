@@ -206,33 +206,33 @@
         "lint": "eslint src --ext ts"
     },
     "devDependencies": {
-        "@types/fs-extra": "^9.0.13",
+        "@types/fs-extra": "^11.0.1",
         "@types/object-path": "^0.11.1",
         "@types/webpack-env": "^1.18.0",
         "copy-webpack-plugin": "^11.0.0",
         "eslint-config-standard": "^17.0.0",
-        "eslint-plugin-import": "^2.26.0",
-        "eslint-plugin-n": "^15.3.0",
-        "eslint-plugin-promise": "^6.0.1",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-n": "^15.6.1",
+        "eslint-plugin-promise": "^6.1.1",
         "ts-node": "^10.9.1",
-        "@types/vscode": "^1.71.0",
-        "@types/glob": "^8.0.0",
-        "@types/mocha": "^10.0.0",
+        "@types/vscode": "^1.76.0",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
-        "@typescript-eslint/eslint-plugin": "^5.39.0",
-        "@typescript-eslint/parser": "^5.39.0",
-        "eslint": "^8.24.0",
-        "glob": "^8.0.3",
-        "mocha": "^10.0.0",
-        "typescript": "^4.8.4",
-        "ts-loader": "^9.4.1",
-        "webpack": "^5.74.0",
-        "webpack-cli": "^4.10.0",
-        "@vscode/test-electron": "^2.1.5"
+        "@typescript-eslint/eslint-plugin": "^5.54.0",
+        "@typescript-eslint/parser": "^5.54.0",
+        "eslint": "^8.35.0",
+        "glob": "^9.2.1",
+        "mocha": "^10.2.0",
+        "typescript": "^4.9.5",
+        "ts-loader": "^9.4.2",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.1",
+        "@vscode/test-electron": "^2.3.0"
     },
     "dependencies": {
-        "fs-extra": "^10.1.0",
+        "fs-extra": "^11.1.0",
         "object-path": "^0.11.8",
-        "yaml": "^2.1.2"
+        "yaml": "^2.2.1"
     }
 }

@@ -2,17 +2,18 @@
     "compilerOptions": {
         "lib": [
             "es6",
+            "ES2015",
             "dom"
         ],
-        "module": "none",
-        "moduleResolution": "node",
+        // "module": "commonjs",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": true,
         "strict": true,
-        "target": "ES2015",
+        "target": "ES6",
+        "sourceMap": true,
         "outDir": "../out"
     },
     "files": [

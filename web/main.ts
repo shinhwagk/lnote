@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { issubset, intersection } from './tools';
+const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
+
+const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
 
 interface vscode {
   postMessage(message: any): void;
@@ -273,10 +275,31 @@ function filterSearch(categories: DataCategory[], key: string) {
   return newCategory;
 }
 
+function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
+  const gl: { [g: string]: string[] } = {};
+  let name = "";
+  for (const l of labelsOfCategory) {
+    const [gname, label] = l.split('->');
+    if (gname in gl) {
+      gl[gname].push(label);
+    } else {
+      gl[gname] = [label];
+    }
+  }
+  for (const [g, ls] of Object.entries(gl)) {
+    name += `${g} -> `;
+    name += ls.join(',');
+    name += '; ';
+  }
+  return name;
+}
+
 function readerCategory(fDom: Element, labelsOfCategory: string[]) {
   // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
-  let nameOfCategory = labelsOfCategory.join(', ');
-  nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
+  let nameOfCategory = arrayLabels2CategoryName(labelsOfCategory); //labelsOfCategory.join(', ');
+  console.log(nameOfCategory);
+
+  // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
   // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
 
   const d_category = document.createElement('div');
@@ -298,7 +321,7 @@ function readerCategory(fDom: Element, labelsOfCategory: string[]) {
   d_category_name.appendChild(
     elemIcon('fa-pen', (ev: MouseEvent) => {
       nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
-        labels: labelsOfCategory.map(l => l.trim()).concat(gs.domainNode)
+        labels: labelsOfCategory.map(l => l.trim())//.concat(`common->${gs.domainNode}`)
       });
     })
   );
@@ -317,7 +340,7 @@ function readerCategory(fDom: Element, labelsOfCategory: string[]) {
       const noteDom = document.createElement('div');
       noteDom.id = `note-${n.nId}`;
       d_category_body.appendChild(noteDom);
-      readerNote(noteDom, n);
+      // readerNote(noteDom, n);
     }
 
     d_category.append(d_category_name, d_category_body);
@@ -348,7 +371,7 @@ function readerCategories() {
   }
   // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
   for (const cname of nameOfCategories.values()) {
-    readerCategory(localDom, cname.split('.'));
+    readerCategory(localDom, cname.split(','));
     // document.getElementById(`domain-category-${cname.replace(' ', '')}`)?.append(document.createElement('p'));
   }
 }
@@ -404,7 +427,7 @@ function readerLabels() {
     group_dom.textContent = g;
     for (const l of ls) {
       const d = document.createElement('label');
-      const lname = l.name
+      const lname = l.name;
       d.className = l.checked ? 'checkedLabel' : 'unCheckedLabel';
       d.textContent = lname;
       d.onclick = () => {
@@ -544,10 +567,12 @@ window.addEventListener('message', (event) => {
   console.log('vscode-notes webview open.', message);
   switch (message.command) {
     case 'post-data':
-      gs.domainLabels = message.data.domainLabels;
+      // gs.domainLabels = message.data.domainLabels;
       gs.domainGroupLabel = message.data.domainGroupLabel;
       gs.domainNotes = message.data.domainNotes;
       gs.domainNode = message.data.domainNode;
+
+      console.log(gs.domainNotes);
 
       const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
 

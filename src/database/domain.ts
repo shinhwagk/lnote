@@ -20,7 +20,7 @@ export class NBDomain {
         readonly nbName: string,
         readonly nbDir: string
     ) {
-        this.domainFile = path.join(this.nbDir, 'domain.json');
+        this.domainFile = path.join(this.nbDir, 'domains.json');
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
 
         objectPath.set(this.domainCache, [this.nbName], vfs.readJsonSync(this.domainFile));

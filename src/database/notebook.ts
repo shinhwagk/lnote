@@ -126,7 +126,11 @@ export class VNNotebook {
     }
 
     public getArrayLabelsOfDomain(dn: string[]) {
-        return groupLabel2Labels(tools.sortGroupLables(this.domain.getGroupLabel(dn)));
+        return groupLabel2Labels(this.getGroupLabelOfDomain(dn));
+    }
+
+    public getGroupLabelOfDomain(dn: string[]) {
+        return tools.sortGroupLables(this.domain.getGroupLabel(dn));
     }
 
     /**
@@ -135,7 +139,8 @@ export class VNNotebook {
      * 
      */
     public processEditEnv() {
-        this.deleteEditEnv();
+        console.log("processEditEnv")
+        // this.deleteEditEnv();
     }
 
     public checkEditEnvClear() {
@@ -155,8 +160,9 @@ export class VNNotebook {
     }
 
     public createEditNotesGroupLabelEnv(labels: string[]) {
+        console.log(labels)
         const gl = labels2GroupLabel(labels);
-        const ed = { kind: 'NoteGroupLabel', groupLabel: gl };
+        const ed = { kind: 'NotesGroupLabel', groupLabel: gl };
         tools.writeYamlSync(this.editFile, ed);
     }
 
