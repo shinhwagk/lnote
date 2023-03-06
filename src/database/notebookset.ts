@@ -18,7 +18,7 @@ export class VNNotebookSet {
 
         const s = (new Date()).getTime();
         this.refresh();
-        console.log('cache notebook set success, time: ' + `${new Date().getTime() - s}`);
+        console.log('cache notebook set success, time: ' + `${new Date().getTime() - s}` + 'ms');
     }
 
     public refresh(nbName: string | undefined = undefined): void {

@@ -68,7 +68,9 @@ export namespace ExtCmds {
     ext.updateGS(dn);
     // console.log("pin", dn, ext.gs.domainNodeFormat);
     // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
+    const s = (new Date()).getTime()
     await ext.notesPanelView.parseDomain().showNotesPlanView();
+    console.log("get notes time " + `${new Date().getTime() - s}`)
     await ext.setContext(ctxFilesExplorer, false);
   }
   // export async function cmdHdlNoteEditRemove() {
@@ -261,7 +263,7 @@ export namespace ExtCmds {
     // const ib = await window.showInputBox({ value: oldLabels.join(',') });
     // if (ib === undefined || ib === oldLabels.join(',')) { return; }
 
-    ext.gs.nb.createEditNotesGroupLabelEnv(labels);
+    ext.gs.nb.createEditNotesSetLabelsEnv(ext.gs.domainNodeFormat, labels);
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.editFile));
     // const newLabels = ib.split(',').map(l => l.trim());
     // const labelsOfDomain = ext.gs.nb.getLabelsOfDomain(ext.gs.domainNodeFormat);

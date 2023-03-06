@@ -67,7 +67,7 @@ export class NotesPanelView {
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
         const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
         _n['labels'] = alOfNote;
-        return { nId: _n.nId, doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+        return { nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
 
       });
   }

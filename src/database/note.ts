@@ -42,6 +42,10 @@ export class NBNote {
         return new NBNote(nbDir, nId, data);
     }
 
+    getId() {
+        return this.nId
+    }
+
     toJSON() {
         return this.data;
     }
@@ -83,6 +87,7 @@ export class NBNote {
 
     public updateDataContents(contents: string[]) {
         this.data.contents = contents;
+        this.data.mts = (new Date()).getTime()
     }
 
     public updateDataMts(mts: number) {

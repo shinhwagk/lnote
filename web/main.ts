@@ -432,7 +432,7 @@ function readerLabels() {
 
   for (const [g, noteLabels] of Object.entries(_gl)) {
     // console.log(11, noteLabels);
-    noteLabels.sort(a => a.checked ? -1 : 1);
+    // noteLabels.sort(a => a.checked ? -1 : 1);
 
     const group_dom = document.createElement('div');
     group_dom.textContent = g;

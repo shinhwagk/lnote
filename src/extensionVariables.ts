@@ -83,10 +83,13 @@ export function listenEditFileClose(ctx: ExtensionContext) {
     workspace.onDidCloseTextDocument(() => {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
-        ext.gs.nb.processEditEnv();
+        // ext.gs.nb.processEditEnv();
         if (!ext.gs.nb.checkEditEnvClear()) {
           window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
+          return
         }
+        ext.gs.nb.clearEditEnv();
+
         // ext.gs.nb.deleteEditEnv();
         // const fileName = path.basename(f.uri.fsPath);
         // if (fileName.endsWith('.yaml')) {
@@ -104,7 +107,12 @@ export function listenEditFileSave(ctx: ExtensionContext) {
     workspace.onDidSaveTextDocument(async () => {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
+        if (!ext.gs.nb.checkEditEnvClear()) {
+          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
+          return
+        }
         ext.gs.nb.processEditEnv();
+        ext.notesPanelView.showNotesPlanView()
         // const fileName = path.basename(f.uri.fsPath);
         // if (fileName.endsWith('.yaml')) {
         //   const [nId,] = fileName.split('.');

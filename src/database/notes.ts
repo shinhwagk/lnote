@@ -145,6 +145,8 @@ export class NBNotes {
     }
 
     public permanent() {
+        this.notesCache
+
         vfs.writeJsonSync(this.notesFile, Object.fromEntries(this.notesCache.entries()));
     }
 
