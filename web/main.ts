@@ -65,7 +65,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'edit',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-note-edit', data: { nId: data.note.nId } })
+      onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nd', params: { nId: data.note.nId } } })
     }
   ],
   [

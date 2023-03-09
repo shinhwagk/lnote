@@ -36,7 +36,7 @@ export function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
             labels.push(`${g}->${l}`);
         }
     }
-    return labels;
+    return tools.duplicateRemoval(labels);
 }
 
 // export class NBNotesDB {

@@ -60,8 +60,8 @@ export async function activate(context: ExtensionContext) {
     * note files
     */
    ext.registerCommand('lnote.files.close', ExtCmds.cmdHdlFilesClose);
-   ext.registerCommand('lnote.files.edit.open', ExtCmds.cmdHdlFilesEditOpen);
-   ext.registerCommand('lnote.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);
+   ext.registerCommand('lnote.files.open', ExtCmds.cmdHdlFilesOpen);
+   ext.registerCommand('lnote.files.openerminal', ExtCmds.cmdHdlFilesOpenTerminal);
    ext.registerCommand('lnote.files.refresh', ExtCmds.cmdHdlFilesRefresh);
    /**
       *  extension

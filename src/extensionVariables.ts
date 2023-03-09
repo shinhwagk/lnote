@@ -82,13 +82,13 @@ export function listenEditFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument(() => {
       // if (ext.vnNotebookSet === undefined) { return; }
-      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
+      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
         // ext.gs.nb.processEditEnv();
-        if (!ext.gs.nb.checkEditEnvCleaed()) {
-          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
+        if (!ext.gs.nb.checkEditorCleaned()) {
+          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
           return
         }
-        ext.gs.nb.clearEditEnv();
+        ext.gs.nb.clearEditor();
 
         // ext.gs.nb.deleteEditEnv();
         // const fileName = path.basename(f.uri.fsPath);
@@ -106,9 +106,9 @@ export function listenEditFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async () => {
       // if (ext.vnNotebookSet === undefined) { return; }
-      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
-        if (!ext.gs.nb.checkEditEnvCleaed()) {
-          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
+      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
+        if (!ext.gs.nb.checkEditorCleaned()) {
+          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
           return
         }
         ext.gs.nb.processEditEnv();

@@ -8,7 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { groupLabel2Labels, labels2GroupLabel } from './notes';
-import { ArrayLabels, NoteDataLabel as NoteDataGroupLabel } from '../types';
+import { ArrayLabels, } from '../types';
 
 export interface INBNote {
     contents: string[];

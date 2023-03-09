@@ -59,12 +59,12 @@
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "lnote.files.openTerminal",
+                    "command": "lnote.files.open.terminal",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
                 {
-                    "command": "lnote.files.edit.open",
+                    "command": "lnote.files.open",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
@@ -157,7 +157,7 @@
                 }
             },
             {
-                "command": "lnote.files.openTerminal",
+                "command": "lnote.files.open.terminal",
                 "title": "open terminal",
                 "icon": {
                     "light": "images/light/terminal.svg",
@@ -169,7 +169,7 @@
                 "title": "Create Notes"
             },
             {
-                "command": "lnote.files.edit.open",
+                "command": "lnote.files.open",
                 "title": "open edit window",
                 "icon": {
                     "light": "images/light/edit.svg",

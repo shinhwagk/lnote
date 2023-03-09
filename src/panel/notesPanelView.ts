@@ -171,12 +171,15 @@ export class NotesPanelView {
           case 'note-add':
             ExtCmds.cmdHdlNoteAdd(msg.data.labels);
             break;
-          case 'notebook-note-edit':
-            ExtCmds.cmdHdlNoteEdit(msg.data.nId);
+          case 'notebook-editor':
+            ExtCmds.cmdHdlcreateEditor(msg.data.kind, msg.data.params);
             break;
-          case 'notes-edit-labels':
-            ExtCmds.cmdHdlNotesEditlabels(msg.data.labels);
-            break;
+          // case 'notebook-note-edit':
+          //   ExtCmds.cmdHdlNoteEdit(msg.data.nId);
+          //   break;
+          // case 'notes-edit-labels':
+          //   ExtCmds.cmdHdlNotesEditlabels(msg.data.labels);
+          //   break;
           // case 'notebook-note-contents-add':
           //   ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
           //   break;
@@ -207,9 +210,9 @@ export class NotesPanelView {
           // case 'col-to-terminal-args':
           //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
           //   break;
-          case 'domain-relabels':
-            ExtCmds.cmdHdlDomainEditlabels();
-            break;
+          // case 'domain-relabels':
+          //   ExtCmds.cmdHdlDomainEditlabels();
+          //   break;
         }
       },
       undefined,

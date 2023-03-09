@@ -1,14 +1,15 @@
 import * as path from 'path';
 
 import {
-    existsSync, mkdirpSync, removeSync
+    existsSync, mkdirpSync
 } from 'fs-extra';
 
 import { tools } from '../helper';
+import { pathSplit } from '../constants';
 import { NBDomain as VNBDomain } from './domain';
-import { groupLabel2Labels, labels2GroupLabel, NBNotes as VNBNotes } from './notes';
-import { NoteDataLabel } from '../types';
-import { GroupLables as NoteDataGroupLables } from './note';
+import { GroupLables, GroupLables as NoteDataGroupLables } from './note';
+import { groupLabel2Labels, NBNotes as VNBNotes } from './notes';
+import { statSync } from 'fs';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -36,24 +37,24 @@ import { GroupLables as NoteDataGroupLables } from './note';
 
 
 interface IEdit {
-    kind: 'NotesSetLabels' | 'NoteData' | 'DomainGroupLabels' | 'None';
+    kind: 'NotesSetGroupLabels' | 'NoteData' | 'DomainGroupLabels' | 'None';
 }
 
 
 interface IEditNoteData extends IEdit {
     kind: 'NoteData';
     metadata: {
-        nBName: string,
+        nbName: string,
         nId: string,
     },
     editable: {
-        contents: string[]
+        contents: string[],
         groupLabels: NoteDataGroupLables,
     }
 }
 
-interface IEditNotesSetLabels extends IEdit {
-    kind: 'NotesSetLabels';
+interface IEditNotesSetGroupLabels extends IEdit {
+    kind: 'NotesSetGroupLabels';
     metadata: {
         nBName: string,
         domainNode: string[],
@@ -81,23 +82,50 @@ interface IEditDomainGroupLabels extends IEdit {
 export class VNNotebookEditor {
 
     public readonly editFile: string;
+    public readonly editArchiveDir: string;
 
     constructor(
         private readonly nbName: string,
         private readonly nbDir: string
     ) {
-        this.editFile = path.join(this.nbDir, 'vscode-note@edit.yml');
+        this.editFile = path.join(this.nbDir, 'vscode-note@editor.yml');
+        existsSync(this.editFile) || tools.writeYamlSync(this.editFile, {});
+
+        this.editArchiveDir = path.join(this.nbDir, '.editor_archives');
+        existsSync(this.editArchiveDir) || mkdirpSync(this.editArchiveDir);
     }
+
+    public getEditorFile = () => this.editFile;
 
     public getEditObj = () => tools.readYamlSync(this.editFile) as IEdit;
 
-    public createEditNoteEnv(nId: string, contents: string[], labels: NoteDataLabel) {
-        const ed = { kind: 'NoteData', nbName: this.nbName, nId: nId, contents: contents, labels: labels };
+    public createNoteData(nId: string, contents: string[], gls: GroupLables) {
+        const ed: IEditNoteData = { kind: 'NoteData', metadata: { nbName: this.nbName, nId: nId }, editable: { contents: contents, groupLabels: gls } };
         tools.writeYamlSync(this.editFile, ed);
     }
 
-    public checkEditEnvCleaed() {
-        return existsSync(this.editFile);
+    public createDomainGroupLabels(domainNode: string[], gls: GroupLables) {
+        // const gl = this.domain.getGroupLabel(domainNode);
+        const ed = { kind: 'DomainGroupLabels', domainNode: domainNode.join(pathSplit), groupLabels: gls };
+        tools.writeYamlSync(this.editFile, ed);
+    }
+
+    public createNotesSetGroupLabels(domainNode: string[], dgls: GroupLables, gls: GroupLables) {
+        const ed = { kind: 'NotesSetGroupLabels', domainNode: domainNode.join(pathSplit), domainGroupLabes: dgls, commonGroupLabels: gls };
+        tools.writeYamlSync(this.editFile, ed);
+    }
+
+    public checkEditorCleaned() {
+        return statSync(this.editFile).size === 0;
+    }
+
+    public archiveEditor() {
+        const ts = (new Date()).getTime();
+        const e: IEdit = tools.readYamlSync(this.editFile);
+        const k = e.kind.match(/[A-Z]/g)!.join('').toLocaleLowerCase();
+        const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
+        tools.writeYamlSync(archiveFile, e);
+        tools.writeYamlSync(this.editFile, {});
     }
 }
 
@@ -129,7 +157,7 @@ export class VNNotebook {
 
     public craeteNotes(dn: string[], labels: string[]) {
         this.addNote(labels.concat(dn));
-        this.domain.reLabels(dn, labels.concat(dn));
+        this.domain.updateGroupLabels(dn, { 'common': [] });
     }
 
     public addNote(labels: string[]) {
@@ -199,7 +227,7 @@ export class VNNotebook {
      * edit
      * 
      */
-    public processEditEnv(dn: string[]) {
+    public processEditEnv() {
         const editObj: IEdit = this.editor.getEditObj();
         if (editObj.kind == 'NoteData') {
             const eo = editObj as IEditNoteData;
@@ -207,8 +235,8 @@ export class VNNotebook {
             n.updateDataContents(eo.editable.contents);
             n.updateDataGroupLabels(eo.editable.groupLabels);
             this.notes.permanent();
-        } else if (editObj.kind === 'NotesSetLabels') {
-            const eo = editObj as IEditNotesSetLabels;
+        } else if (editObj.kind === 'NotesSetGroupLabels') {
+            const eo = editObj as IEditNotesSetGroupLabels;
             const mcgl = groupLabel2Labels(eo.metadata.commonGroupLabels);
             const notes = this.notes.getNotesByArrayLabels(mcgl);
             const ecgl = groupLabel2Labels(eo.editable.commonGroupLabels);
@@ -219,8 +247,11 @@ export class VNNotebook {
             this.notes.permanent();
         } else if (editObj.kind === 'DomainGroupLabels') {
             const eo = editObj as IEditDomainGroupLabels;
-            this.domain.getGroupLabel()
+            this.domain.updateGroupLabels(eo.metadata.domainNode, eo.editable.commonGroupLabels);
+        } else {
+            return;
         }
+        this.editor.archiveEditor()
         // if (editObj.kind === 'NoteData') {
 
         // } else if (editObj.kind === 'DomainGroupLabel') { }
@@ -228,31 +259,31 @@ export class VNNotebook {
         // this.deleteEditEnv();
     }
 
-    public checkEditEnvCleaed() {
-        return this.editor.checkEditEnvCleaed();
+    public checkEditorCleaned() {
+        return this.editor.checkEditorCleaned();
     }
 
-    public createEditNoteEnv(nId: string) {
+    public createNoteDataEditor(nId: string) {
         const nd = this.notes.getNoteById(nId).getData();
-        this.editor.createEditNoteEnv(nId, nd.contents, nd.labels);
-        const ed = { kind: 'NoteData', nId: nId, contents: nd.contents, labels: nd.labels };
-        tools.writeYamlSync(this.editFile, ed);
+        this.editor.createNoteData(nId, nd.contents, nd.labels);
     }
 
-    public createEditDomainEnv(domainNode: string[]) {
+    public createDomainGroupLabelsEditor(domainNode: string[]) {
         const gl = this.domain.getGroupLabel(domainNode);
-        const ed = { kind: 'DomainGroupLabel', domainNode: domainNode.join('/'), groupLabel: gl };
-        tools.writeYamlSync(this.editFile, ed);
+        // const ed = { kind: 'DomainGroupLabel', domainNode: domainNode.join('/'), groupLabel: gl };
+        this.editor.createDomainGroupLabels(domainNode, gl);
     }
 
-    public createEditNotesSetLabelsEnv(domainNode: string[], labels: string[]) {
-        const gl = labels2GroupLabel(labels);
-        const glOfDomain = this.getGroupLabelOfDomain(domainNode);
-        const ed = { kind: 'NotesSetLabels', domainLabels: glOfDomain, notesSetlabels: gl };
-        tools.writeYamlSync(this.editFile, ed);
+    public createNotesSetGroupLabelsEditor(domainNode: string[], labels: string[]) {
+        const dgls = this.getGroupLabelOfDomain(domainNode);
+        this.editor.createNotesSetGroupLabels(domainNode, dgls, {});
     }
 
-    public clearEditEnv() {
-        removeSync(this.editFile);
+    public clearEditor() {
+        this.editor.archiveEditor();
+    }
+
+    public getEditorFile() {
+        return this.editor.getEditorFile()
     }
 }

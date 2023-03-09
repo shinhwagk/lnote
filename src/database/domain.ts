@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { tools, vfs } from '../helper';
 import { GroupLables } from './note';
+import { groupLabel2Labels, labels2GroupLabel } from './notes';
 
 export interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -58,12 +59,12 @@ export class NBDomain {
         this.moveDomain(domainNode, newDomainNode);
     }
 
-    public addDomain(domainNode: string[], labels: string[] = []) {
-        this.reLabels(domainNode, labels);
+    public addDomain(domainNode: string[], labels: GroupLables = { 'common': [] }) {
+        this.updateGroupLabels(domainNode, labels);
     }
 
-    public reLabels(domainNode: string[], labels: string[]) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], tools.duplicateRemoval(labels));
+    public updateGroupLabels(domainNode: string[], gls: GroupLables) {
+        objectPath.set(this.domainCache, [...domainNode, '.labels'], labels2GroupLabel(groupLabel2Labels(gls)));
         this.permanent();
     }
 
