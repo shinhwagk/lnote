@@ -8,7 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { GroupLables, INBNote, NBNote } from './note';
-import { ArrayLabels } from './types';
+import { ArrayLabels } from '../types';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;

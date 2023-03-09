@@ -8,7 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { groupLabel2Labels, labels2GroupLabel } from './notes';
-import { ArrayLabels } from './types';
+import { ArrayLabels, NoteDataLabel as NoteDataGroupLabel } from '../types';
 
 export interface INBNote {
     contents: string[];
@@ -23,6 +23,9 @@ export class NBNote {
     filesPath: string;
     docPath: string;
     docMainFile: string;
+
+    // arrayLabels: Set<string> = new Set();
+    // grouplabels: NoteDataGroupLabel
 
     constructor(
         private readonly nbDir: string,
@@ -43,7 +46,7 @@ export class NBNote {
     }
 
     getId() {
-        return this.nId
+        return this.nId;
     }
 
     toJSON() {
@@ -55,7 +58,15 @@ export class NBNote {
     }
 
     public getDataArrayLabels(): ArrayLabels {
-        return groupLabel2Labels(this.data.labels);
+        return groupLabel2Labels(this.getData().labels)
+    }
+
+    public removeDataArrayLabels(...al: string[]) {
+        this.updateDataArrayLabels(this.getDataArrayLabels().filter(l => !al.includes(l)))
+    }
+
+    public addDataArrayLabels(...al: string[]) {
+        this.updateDataArrayLabels(tools.duplicateRemoval(this.getDataArrayLabels().concat(al)))
     }
 
     // public update()
@@ -87,7 +98,7 @@ export class NBNote {
 
     public updateDataContents(contents: string[]) {
         this.data.contents = contents;
-        this.data.mts = (new Date()).getTime()
+        this.data.mts = (new Date()).getTime();
     }
 
     public updateDataMts(mts: number) {

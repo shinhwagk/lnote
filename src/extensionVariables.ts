@@ -84,7 +84,7 @@ export function listenEditFileClose(ctx: ExtensionContext) {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
         // ext.gs.nb.processEditEnv();
-        if (!ext.gs.nb.checkEditEnvClear()) {
+        if (!ext.gs.nb.checkEditEnvCleaed()) {
           window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
           return
         }
@@ -107,7 +107,7 @@ export function listenEditFileSave(ctx: ExtensionContext) {
     workspace.onDidSaveTextDocument(async () => {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.editFile)) {
-        if (!ext.gs.nb.checkEditEnvClear()) {
+        if (!ext.gs.nb.checkEditEnvCleaed()) {
           window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.editFile}`);
           return
         }
