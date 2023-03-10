@@ -7,7 +7,7 @@ import {
 } from 'fs-extra';
 
 import { tools, vfs } from '../helper';
-import { groupLabel2Labels, labels2GroupLabel } from './notes';
+import { groupLabel2ArrayLabels, arrayLabels2GroupLabel } from './notes';
 import { ArrayLabels, GroupLables } from '../types';
 
 export interface INBNote {
@@ -56,7 +56,7 @@ export class NBNote {
     }
 
     public getDataArrayLabels(): ArrayLabels {
-        return groupLabel2Labels(this.getData().labels);
+        return groupLabel2ArrayLabels(this.getData().labels);
     }
 
     public removeDataArrayLabels(...al: ArrayLabels) {
@@ -104,11 +104,11 @@ export class NBNote {
     }
 
     public updateDataGroupLabels(gl: GroupLables) {
-        this.updateDataArrayLabels(groupLabel2Labels(gl));
+        this.updateDataArrayLabels(groupLabel2ArrayLabels(gl));
     }
 
     public updateDataArrayLabels(al: string[]) {
-        this.data.labels = labels2GroupLabel(al);
+        this.data.labels = arrayLabels2GroupLabel(al);
     }
 
     public getDocMainFile() {

@@ -8,7 +8,7 @@ import { tools } from '../helper';
 import { pathSplit } from '../constants';
 import { NBDomain as VNBDomain } from './domain';
 import { GroupLables } from '../types';
-import { groupLabel2Labels, NBNotes as VNBNotes } from './notes';
+import { groupLabel2ArrayLabels, NBNotes as VNBNotes } from './notes';
 import { statSync } from 'fs';
 
 // export interface NBDomainStruct {
@@ -215,7 +215,7 @@ export class VNNotebook {
     }
 
     public getArrayLabelsOfDomain(dn: string[]) {
-        return groupLabel2Labels(this.getGroupLabelOfDomain(dn));
+        return groupLabel2ArrayLabels(this.getGroupLabelOfDomain(dn));
     }
 
     public getGroupLabelOfDomain(dn: string[]) {
@@ -237,9 +237,9 @@ export class VNNotebook {
             this.notes.permanent();
         } else if (editObj.kind === 'NotesSetGroupLabels') {
             const eo = editObj as IEditNotesSetGroupLabels;
-            const mcgl = groupLabel2Labels(eo.metadata.commonGroupLabels);
+            const mcgl = groupLabel2ArrayLabels(eo.metadata.commonGroupLabels);
             const notes = this.notes.getNotesByArrayLabels(mcgl);
-            const ecgl = groupLabel2Labels(eo.editable.commonGroupLabels);
+            const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
             for (const n of notes) {
                 const nlabels = n.getDataArrayLabels().filter(l => !mcgl.includes(l)).concat(ecgl);
                 this.notes.reLabels(n.getId(), nlabels);

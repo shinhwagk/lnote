@@ -15,9 +15,9 @@ import { ArrayLabels, GroupLables } from '../types';
 //     '.labels'?: any; // { [cname:string]: string[] }
 // }
 
-export function labels2GroupLabel(labels: string[]): GroupLables {
+export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
     const tmpgl: { [g: string]: Set<string> } = {};
-    for (const label of labels) {
+    for (const label of al) {
         const [g, l] = label.split('->');
         if (g in tmpgl) {
             tmpgl[g].add(l);
@@ -25,12 +25,15 @@ export function labels2GroupLabel(labels: string[]): GroupLables {
             tmpgl[g] = new Set([l]);
         }
     }
-    return Object.fromEntries(Object.entries(tmpgl).map((v) => [v[0], [...v[1].values()].sort()]))
+    return Object.fromEntries(Object.entries(tmpgl)
+        .map((v) =>
+            [v[0], [...v[1].values()].sort()]
+        ));
 }
 
-export function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
+export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
     const labels = [];
-    for (const [g, ls] of Object.entries(groupLabels)) {
+    for (const [g, ls] of Object.entries(gl)) {
         for (const l of ls) {
             labels.push(`${g}->${l}`);
         }
@@ -86,7 +89,7 @@ export class NBNotes {
         // all note have an nbname label
         this.notesGroupedByLabelCache.set(this.nbName, new Set<string>(this.notesCache.keys()));
         for (const [nId, note] of this.notesCache.entries()) {
-            for (const label of groupLabel2Labels(note.labels)) {
+            for (const label of groupLabel2ArrayLabels(note.labels)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {
                     this.notesGroupedByLabelCache.set(label, new Set<string>([nId]));
                 }

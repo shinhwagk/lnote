@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { vfs } from '../helper';
 import { GroupLables } from '../types';
-import { groupLabel2Labels, labels2GroupLabel } from './notes';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
 export interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -64,7 +64,7 @@ export class NBDomain {
     }
 
     public updateGroupLabels(domainNode: string[], gls: GroupLables) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], labels2GroupLabel(groupLabel2Labels(gls)));
+        objectPath.set(this.domainCache, [...domainNode, '.labels'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gls)));
         this.permanent();
     }
 
