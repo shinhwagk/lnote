@@ -8,7 +8,7 @@ import {
 
 import { tools, vfs } from '../helper';
 import { groupLabel2Labels, labels2GroupLabel } from './notes';
-import { ArrayLabels, } from '../types';
+import { ArrayLabels, GroupLables } from '../types';
 
 export interface INBNote {
     contents: string[];
@@ -16,8 +16,6 @@ export interface INBNote {
     mts: number;
     labels: { [gl: string]: string[] }; // label group
 }
-
-export type GroupLables = { [gl: string]: string[] };
 
 export class NBNote {
     filesPath: string;
@@ -58,15 +56,15 @@ export class NBNote {
     }
 
     public getDataArrayLabels(): ArrayLabels {
-        return groupLabel2Labels(this.getData().labels)
+        return groupLabel2Labels(this.getData().labels);
     }
 
-    public removeDataArrayLabels(...al: string[]) {
-        this.updateDataArrayLabels(this.getDataArrayLabels().filter(l => !al.includes(l)))
+    public removeDataArrayLabels(...al: ArrayLabels) {
+        this.updateDataArrayLabels(this.getDataArrayLabels().filter(l => !al.includes(l)));
     }
 
-    public addDataArrayLabels(...al: string[]) {
-        this.updateDataArrayLabels(tools.duplicateRemoval(this.getDataArrayLabels().concat(al)))
+    public addDataArrayLabels(...al: ArrayLabels) {
+        this.updateDataArrayLabels(this.getDataArrayLabels().concat(al));
     }
 
     // public update()
@@ -105,12 +103,12 @@ export class NBNote {
         this.data.mts = mts;
     }
 
-    public updateDataGroupLabels(labels: GroupLables) {
-        this.data.labels = labels;
+    public updateDataGroupLabels(gl: GroupLables) {
+        this.updateDataArrayLabels(groupLabel2Labels(gl));
     }
 
-    public updateDataArrayLabels(labels: string[]) {
-        this.data.labels = labels2GroupLabel(tools.duplicateRemoval(labels));
+    public updateDataArrayLabels(al: string[]) {
+        this.data.labels = labels2GroupLabel(al);
     }
 
     public getDocMainFile() {

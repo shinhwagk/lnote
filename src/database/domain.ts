@@ -1,15 +1,15 @@
 import { existsSync } from 'fs-extra';
-import * as objectPath from 'object-path';
+import objectPath from 'object-path';
 import * as path from 'path';
 
-import { tools, vfs } from '../helper';
-import { GroupLables } from './note';
+import { vfs } from '../helper';
+import { GroupLables } from '../types';
 import { groupLabel2Labels, labels2GroupLabel } from './notes';
 
 export interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    '.labels'?: any; // { [cname:string]: string[] }
+    '.labels'?: any; // { [cname: string]: string[] }
 }
 
 export class NBDomain {

@@ -1,14 +1,13 @@
 import * as path from 'path';
 
 import {
-    existsSync,
-    mkdirpSync,
-    readJSONSync
+    existsSync
 } from 'fs-extra';
 
 import { tools, vfs } from '../helper';
-import { GroupLables, INBNote, NBNote } from './note';
-import { ArrayLabels } from '../types';
+import { INBNote, NBNote } from './note';
+
+import { ArrayLabels, GroupLables } from '../types';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -17,16 +16,16 @@ import { ArrayLabels } from '../types';
 // }
 
 export function labels2GroupLabel(labels: string[]): GroupLables {
-    const gl: { [g: string]: string[] } = {};
+    const tmpgl: { [g: string]: Set<string> } = {};
     for (const label of labels) {
         const [g, l] = label.split('->');
-        if (g in gl) {
-            gl[g].push(l);
+        if (g in tmpgl) {
+            tmpgl[g].add(l);
         } else {
-            gl[g] = [l];
+            tmpgl[g] = new Set([l]);
         }
     }
-    return tools.sortGroupLables(gl);
+    return Object.fromEntries(Object.entries(tmpgl).map((v) => [v[0], [...v[1].values()].sort()]))
 }
 
 export function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
@@ -145,7 +144,7 @@ export class NBNotes {
     }
 
     public permanent() {
-        this.notesCache
+        this.notesCache;
 
         vfs.writeJsonSync(this.notesFile, Object.fromEntries(this.notesCache.entries()));
     }

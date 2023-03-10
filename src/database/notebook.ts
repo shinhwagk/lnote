@@ -7,7 +7,7 @@ import {
 import { tools } from '../helper';
 import { pathSplit } from '../constants';
 import { NBDomain as VNBDomain } from './domain';
-import { GroupLables, GroupLables as NoteDataGroupLables } from './note';
+import { GroupLables } from '../types';
 import { groupLabel2Labels, NBNotes as VNBNotes } from './notes';
 import { statSync } from 'fs';
 
@@ -49,7 +49,7 @@ interface IEditNoteData extends IEdit {
     },
     editable: {
         contents: string[],
-        groupLabels: NoteDataGroupLables,
+        groupLabels: GroupLables,
     }
 }
 
@@ -58,10 +58,10 @@ interface IEditNotesSetGroupLabels extends IEdit {
     metadata: {
         nBName: string,
         domainNode: string[],
-        commonGroupLabels: NoteDataGroupLables,
+        commonGroupLabels: GroupLables,
     },
     editable: {
-        commonGroupLabels: NoteDataGroupLables
+        commonGroupLabels: GroupLables
     }
 
 }
@@ -71,10 +71,10 @@ interface IEditDomainGroupLabels extends IEdit {
     metadata: {
         nBName: string,
         domainNode: string[]
-        commonGroupLabels: NoteDataGroupLables
+        commonGroupLabels: GroupLables
     },
     editable: {
-        commonGroupLabels: NoteDataGroupLables
+        commonGroupLabels: GroupLables
     }
 
 }
@@ -219,7 +219,7 @@ export class VNNotebook {
     }
 
     public getGroupLabelOfDomain(dn: string[]) {
-        return tools.sortGroupLables(this.domain.getGroupLabel(dn));
+        return this.domain.getGroupLabel(dn);
     }
 
     /**

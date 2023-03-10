@@ -103,7 +103,7 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'edit labels',
-      onClick: (data) => vscode.postMessage({ command: 'notes-edit-labels', data: { labels: data.labels } })
+      onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
     }
   ],
   [
@@ -114,37 +114,37 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   ]
 ];
 
-const NoteColContextMenuActions: ContextMenuAction[][] = [
-  [
-    {
-      title: 'edit short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId } })
-    }
-  ], [
-    {
-      title: 'delete short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId } })
-    }
-  ]
-  // [
-  //   {
-  //     title: 'send to active terminal',
-  //     onClick: (data: any) => vscode.postMessage({ command: 'col-to-terminal', data: { id: data.id, cidx: data.i } })
-  //   },
-  //   {
-  //     title: 'send to active terminal with args',
-  //     onClick: (_data: any) => {
-  //       // new abc(context, e).show();
-  //     } /* vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } } */
-  //   }
-  // ]
-];
+// const NoteColContextMenuActions: ContextMenuAction[][] = [
+//   [
+//     {
+//       title: 'edit short document',
+//       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId } })
+//     }
+//   ], [
+//     {
+//       title: 'delete short document',
+//       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId } })
+//     }
+//   ]
+//   // [
+//   //   {
+//   //     title: 'send to active terminal',
+//   //     onClick: (data: any) => vscode.postMessage({ command: 'col-to-terminal', data: { id: data.id, cidx: data.i } })
+//   //   },
+//   //   {
+//   //     title: 'send to active terminal with args',
+//   //     onClick: (_data: any) => {
+//   //       // new abc(context, e).show();
+//   //     } /* vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } } */
+//   //   }
+//   // ]
+// ];
 
 const DomainContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'relabels',
-      onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-labels', data })
+      onClick: (data: any) => vscode.postMessage({ command: 'notebook-editor', params: { labels: data.labels } })
     }
   ]
 ];
