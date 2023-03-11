@@ -61,7 +61,8 @@ export namespace tools {
   }
 
   export function writeYamlSync(path: string, data: any) {
-    fse.writeFileSync(path, yaml.stringify(data), { encoding: 'utf8' });
+    console.log("000000", JSON.stringify(data))
+    fse.writeFileSync(path, yaml.stringify(data, { aliasDuplicateObjects: false }), { encoding: 'utf8' });
   }
 
   export function duplicateRemoval(arr: string[]): string[] {

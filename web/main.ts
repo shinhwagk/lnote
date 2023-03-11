@@ -321,7 +321,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
   d_category_name.appendChild(
     elemIcon('fa-pen', (ev: MouseEvent) => {
       nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
-        labels: labelsOfNotes.map(l => l.trim())//.concat(`common->${gs.domainNode}`)
+        labels: labelsOfNotes.map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
       });
     })
   );
@@ -504,7 +504,7 @@ function readerDomainName() {
   e_title.appendChild(elemSpaces());
   e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
   e_title.appendChild(elemSpaces());
-  e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-relabels' })));
+  e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'edgl', params: {} } })));
   e_title.appendChild(elemSpaces());
   e_title.appendChild(
     elemIcon('fa-search', () => {

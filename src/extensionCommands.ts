@@ -254,14 +254,12 @@ export namespace ExtCmds {
   //   ext.notebookDatabase.permanentNBNotes(ext.globalState.nbName);
   //   ext.notesPanelView.parseDomain().showNotesPlanView();
   // }
-  export async function cmdHdlcreateEditor(kind: string, params: any) {
+  export async function cmdHdlCreateEditor(kind: string, params: any) {
     if (kind === 'nsgl') {
-
       ext.gs.nb.createNotesSetGroupLabelsEditor(ext.gs.domainNodeFormat, params.labels);
-    } else if (kind === 'dgl') {
-      ext.gs.nb.createDomainGroupLabelsEditor(params.nId);
-    }
-    else if (kind === 'nd') {
+    } else if (kind === 'edgl') {
+      ext.gs.nb.createDomainGroupLabelsEditor(ext.gs.domainNodeFormat);
+    } else if (kind === 'nd') {
       ext.gs.nb.createNoteDataEditor(params.nId);
     }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditorFile()));

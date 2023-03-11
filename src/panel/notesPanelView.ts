@@ -172,7 +172,8 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNoteAdd(msg.data.labels);
             break;
           case 'notebook-editor':
-            ExtCmds.cmdHdlcreateEditor(msg.data.kind, msg.data.params);
+            console.log(999999, msg)
+            ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
             break;
           // case 'notebook-note-edit':
           //   ExtCmds.cmdHdlNoteEdit(msg.data.nId);

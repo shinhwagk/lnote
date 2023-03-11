@@ -1,7 +1,7 @@
 import { existsSync, watchFile } from 'fs';
 import path from 'path';
 import {
-  commands, ConfigurationChangeEvent, ExtensionContext, StatusBarItem, TreeView, window, workspace
+  commands, ConfigurationChangeEvent, ExtensionContext, StatusBarItem, TreeView, Uri, window, workspace
 } from 'vscode';
 
 import { section } from './constants';
@@ -84,11 +84,12 @@ export function listenEditFileClose(ctx: ExtensionContext) {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
         // ext.gs.nb.processEditEnv();
-        if (!ext.gs.nb.checkEditorCleaned()) {
-          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
-          return
-        }
-        ext.gs.nb.clearEditor();
+        // if (!ext.gs.nb.checkEditorCleaned()) {
+        //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
+        //   // commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditorFile()));
+        //   return
+        // }
+        // ext.gs.nb.clearEditor();
 
         // ext.gs.nb.deleteEditEnv();
         // const fileName = path.basename(f.uri.fsPath);
@@ -107,10 +108,10 @@ export function listenEditFileSave(ctx: ExtensionContext) {
     workspace.onDidSaveTextDocument(async () => {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
-        if (!ext.gs.nb.checkEditorCleaned()) {
-          window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
-          return
-        }
+        // if (!ext.gs.nb.checkEditorCleaned()) {
+        //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
+        //   return
+        // }
         ext.gs.nb.processEditEnv();
         ext.notesPanelView.showNotesPlanView()
         // const fileName = path.basename(f.uri.fsPath);

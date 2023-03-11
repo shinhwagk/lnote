@@ -1,15 +1,15 @@
+import { statSync } from 'fs';
 import * as path from 'path';
 
 import {
-    existsSync, mkdirpSync
+    existsSync, mkdirpSync, removeSync
 } from 'fs-extra';
 
-import { tools } from '../helper';
 import { pathSplit } from '../constants';
+import { tools } from '../helper';
+import { ArrayLabels, GroupLables } from '../types';
 import { NBDomain as VNBDomain } from './domain';
-import { GroupLables } from '../types';
-import { groupLabel2ArrayLabels, NBNotes as VNBNotes } from './notes';
-import { statSync } from 'fs';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, NBNotes as VNBNotes } from './notes';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -37,7 +37,7 @@ import { statSync } from 'fs';
 
 
 interface IEdit {
-    kind: 'NotesSetGroupLabels' | 'NoteData' | 'DomainGroupLabels' | 'None';
+    kind: 'NotesSetCommonGroupLabels' | 'NoteData' | 'DomainGroupLabels' | 'None';
 }
 
 
@@ -46,15 +46,17 @@ interface IEditNoteData extends IEdit {
     metadata: {
         nbName: string,
         nId: string,
+        groupLabels: GroupLables,
+        contents: string[]
     },
     editable: {
-        contents: string[],
         groupLabels: GroupLables,
+        contents: string[]
     }
 }
 
-interface IEditNotesSetGroupLabels extends IEdit {
-    kind: 'NotesSetGroupLabels';
+interface IEditNotesSetCommonGroupLabels extends IEdit {
+    kind: 'NotesSetCommonGroupLabels';
     metadata: {
         nBName: string,
         domainNode: string[],
@@ -80,52 +82,56 @@ interface IEditDomainGroupLabels extends IEdit {
 }
 
 export class VNNotebookEditor {
-
-    public readonly editFile: string;
+    public readonly editDir: string;
+    public readonly editorFile: string;
     public readonly editArchiveDir: string;
 
     constructor(
         private readonly nbName: string,
         private readonly nbDir: string
     ) {
-        this.editFile = path.join(this.nbDir, 'vscode-note@editor.yml');
-        existsSync(this.editFile) || tools.writeYamlSync(this.editFile, {});
+        this.editDir = path.join(this.nbDir, 'editor')
+        existsSync(this.editDir) || mkdirpSync(this.editDir);
 
-        this.editArchiveDir = path.join(this.nbDir, '.editor_archives');
+        this.editorFile = path.join(this.editDir, 'vscode-note@editor.yml');
+        existsSync(this.editorFile) || tools.writeYamlSync(this.editorFile, {});
+
+        this.editArchiveDir = path.join(this.editDir, 'editor_archives');
         existsSync(this.editArchiveDir) || mkdirpSync(this.editArchiveDir);
     }
 
-    public getEditorFile = () => this.editFile;
+    public getEditorFile = () => this.editorFile;
 
-    public getEditObj = () => tools.readYamlSync(this.editFile) as IEdit;
+    public getEditObj = () => tools.readYamlSync(this.editorFile) as IEdit;
 
     public createNoteData(nId: string, contents: string[], gls: GroupLables) {
-        const ed: IEditNoteData = { kind: 'NoteData', metadata: { nbName: this.nbName, nId: nId }, editable: { contents: contents, groupLabels: gls } };
-        tools.writeYamlSync(this.editFile, ed);
+        const ed: IEditNoteData = { kind: 'NoteData', metadata: { nbName: this.nbName, nId: nId, groupLabels: gls, contents: contents }, editable: { groupLabels: gls, contents: contents, } };
+        tools.writeYamlSync(this.editorFile, ed);
     }
 
     public createDomainGroupLabels(domainNode: string[], gls: GroupLables) {
         // const gl = this.domain.getGroupLabel(domainNode);
         const ed = { kind: 'DomainGroupLabels', domainNode: domainNode.join(pathSplit), groupLabels: gls };
-        tools.writeYamlSync(this.editFile, ed);
+        tools.writeYamlSync(this.editorFile, ed);
     }
 
     public createNotesSetGroupLabels(domainNode: string[], dgls: GroupLables, gls: GroupLables) {
-        const ed = { kind: 'NotesSetGroupLabels', domainNode: domainNode.join(pathSplit), domainGroupLabes: dgls, commonGroupLabels: gls };
-        tools.writeYamlSync(this.editFile, ed);
+        const ed = { kind: 'NotesSetCommonGroupLabels', domainNode: domainNode.join(pathSplit), domainGroupLabes: dgls, commonGroupLabels: gls };
+        tools.writeYamlSync(this.editorFile, ed);
     }
 
     public checkEditorCleaned() {
-        return statSync(this.editFile).size === 0;
+        return statSync(this.editorFile).size === 0;
     }
 
     public archiveEditor() {
         const ts = (new Date()).getTime();
-        const e: IEdit = tools.readYamlSync(this.editFile);
+        const e: IEdit = tools.readYamlSync(this.editorFile);
         const k = e.kind.match(/[A-Z]/g)!.join('').toLocaleLowerCase();
         const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
         tools.writeYamlSync(archiveFile, e);
-        tools.writeYamlSync(this.editFile, {});
+        // removeSync(this.editorFile)
+        // tools.writeYamlSync(this.editFile, {});
     }
 }
 
@@ -235,8 +241,8 @@ export class VNNotebook {
             n.updateDataContents(eo.editable.contents);
             n.updateDataGroupLabels(eo.editable.groupLabels);
             this.notes.permanent();
-        } else if (editObj.kind === 'NotesSetGroupLabels') {
-            const eo = editObj as IEditNotesSetGroupLabels;
+        } else if (editObj.kind === 'NotesSetCommonGroupLabels') {
+            const eo = editObj as IEditNotesSetCommonGroupLabels;
             const mcgl = groupLabel2ArrayLabels(eo.metadata.commonGroupLabels);
             const notes = this.notes.getNotesByArrayLabels(mcgl);
             const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
@@ -274,9 +280,10 @@ export class VNNotebook {
         this.editor.createDomainGroupLabels(domainNode, gl);
     }
 
-    public createNotesSetGroupLabelsEditor(domainNode: string[], labels: string[]) {
+    public createNotesSetGroupLabelsEditor(domainNode: string[], al: ArrayLabels) {
         const dgls = this.getGroupLabelOfDomain(domainNode);
-        this.editor.createNotesSetGroupLabels(domainNode, dgls, {});
+        const gl = arrayLabels2GroupLabel(al)
+        this.editor.createNotesSetGroupLabels(domainNode, dgls, gl);
     }
 
     public clearEditor() {
