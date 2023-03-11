@@ -371,7 +371,6 @@ function readerCategories() {
     //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
     // }
   }
-  console.log("111", labelsOfNotes);
   // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
   for (const cname of labelsOfNotes.values()) {
     readerCategory(localDom, cname.split('|||'));

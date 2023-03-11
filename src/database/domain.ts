@@ -63,8 +63,8 @@ export class NBDomain {
         this.updateGroupLabels(domainNode, labels);
     }
 
-    public updateGroupLabels(domainNode: string[], gls: GroupLables) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gls)));
+    public updateGroupLabels(domainNode: string[], gl: GroupLables) {
+        objectPath.set(this.domainCache, [...domainNode, '.labels'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gl)));
         this.permanent();
     }
 

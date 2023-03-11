@@ -1,14 +1,12 @@
 import * as path from 'path';
 
 import {
-    existsSync,
-    removeSync,
-    mkdirpSync
+    existsSync, mkdirpSync, removeSync
 } from 'fs-extra';
 
-import { tools, vfs } from '../helper';
-import { groupLabel2ArrayLabels, arrayLabels2GroupLabel } from './notes';
+import { vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
 export interface INBNote {
     contents: string[];

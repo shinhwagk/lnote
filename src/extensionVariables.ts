@@ -112,8 +112,12 @@ export function listenEditFileSave(ctx: ExtensionContext) {
         //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
         //   return
         // }
-        ext.gs.nb.processEditEnv();
-        ext.notesPanelView.showNotesPlanView()
+        try {
+          ext.gs.nb.processEditEnv();
+        } catch (e) {
+          window.showErrorMessage(`${e}`);
+        }
+        ext.notesPanelView.showNotesPlanView();
         // const fileName = path.basename(f.uri.fsPath);
         // if (fileName.endsWith('.yaml')) {
         //   const [nId,] = fileName.split('.');

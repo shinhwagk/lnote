@@ -1,0 +1,13 @@
+kind: EditDomain
+immutable:
+  nbName: "@test"
+  domainNode: "@test/114"
+  commonGroupLabels:
+    common:
+      - "114"
+editable:
+  nbName: "@test"
+  domainNode: "@test/114"
+  commonGroupLabels:
+    common:
+      - "114"
