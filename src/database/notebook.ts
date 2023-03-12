@@ -122,7 +122,6 @@ export class VNNotebookEditor {
     }
 
     public createDomainEditor(domainNode: string[], gl: GroupLables) {
-        // const gl = this.domain.getGroupLabel(domainNode);
         const ed: IEditDomain = {
             kind: 'EditDomain',
             immutable: {

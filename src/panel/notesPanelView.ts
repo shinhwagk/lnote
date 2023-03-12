@@ -79,7 +79,8 @@ export class NotesPanelView {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
         domainNode: this.domainNode,
         // domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode),
-        domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode)
+        domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode),
+        // notesCommonArrayLabels: ext.gs.nb.getNotesCommonArrayLabels(this.domainNode),
       }
     });
   }
@@ -172,7 +173,6 @@ export class NotesPanelView {
             ExtCmds.cmdHdlNoteAdd(msg.data.labels);
             break;
           case 'notebook-editor':
-            console.log(999999, msg)
             ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
             break;
           // case 'notebook-note-edit':

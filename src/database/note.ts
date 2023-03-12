@@ -54,7 +54,7 @@ export class NBNote {
     }
 
     public getDataArrayLabels(): ArrayLabels {
-        return groupLabel2ArrayLabels(this.getData().labels);
+        return groupLabel2ArrayLabels(this.getData().labels).sort();
     }
 
     public removeDataArrayLabels(...al: ArrayLabels) {

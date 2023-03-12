@@ -1,27 +1,19 @@
-kind: EditNote
+kind: EditNotesCommonGroupLabels
 immutable:
   nbName: "@test"
-  nId: 00cfb5
-  groupLabels:
+  domainNode: "@test/114/ppp"
+  domainGroupLabes:
     common:
       - "114"
       - ppp
-      - lll
-      - "555"
+  commonGroupLabels:
+    common:
       - default
-  contents:
-    - 1111sss
-    - +=
-    - dfdfdfd
+      - lll
+      - nnn
 editable:
-  groupLabels:
+  commonGroupLabels:
     common:
-      - "114"
-      - ppp
-      - lll
-      - "555"
       - default
-  contents:
-    - 1111sss
-    - +=
-    - dfdfdfd
+      - lll
+      - nnn

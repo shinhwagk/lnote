@@ -61,7 +61,6 @@ export namespace tools {
   }
 
   export function writeYamlSync(path: string, data: any) {
-    console.log("000000", JSON.stringify(data))
     fse.writeFileSync(path, yaml.stringify(data, { aliasDuplicateObjects: false }), { encoding: 'utf8' });
   }
 
