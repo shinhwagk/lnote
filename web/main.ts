@@ -395,9 +395,7 @@ class GroupLabel {
   constructor(private readonly name: string, private readonly lables: string[]) { }
 }
 
-function groupingNotesLabels(notes: PostNote[]) {
-  return [];
-}
+
 
 function readerNotesLabels() {
   const localDom = document.getElementById('domain-labels')!;
@@ -405,30 +403,60 @@ function readerNotesLabels() {
 
   const _gl: { [g: string]: NoteLabel[] } = {};
 
-  const groupLaelOfnotes = new Set<string>();
-  for (const note of gs.domainNotes) {
-    if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
-      groupLaelOfnotes.add(note.labels.sort().join('|||'));
-    }
-  }
-
   // for (const l of groupLaelOfnotes.values()) {
   //   const ll = l.split('|||')
   //   intersection(l, gs.checkedLabels)
   // }
-  const commonlabel = [...groupLaelOfnotes.values()].map(l => l.split('|||')).reduce((p, c) => p.filter(e => c.includes(e)));
+  const commonlabel = [...gs.notesGroupedByLabelCache.values()]
+    .map(l =>
+      l.split('|||')
+        .filter(_l => gs.unCheckedLabels.includes(_l))
+    )
+    .reduce((p, c) => p.filter(e => c.includes(e)));
 
-  for (const label of gs.unCheckedLabels.concat(gs.checkedLabels).sort()) {
-    const checked = gs.checkedLabels.includes(label) || commonlabel.includes(label);
-    // const hasNote = !commonlabel.includes(label);
-    // .size() >= 1 || 0
+  const commonlabel1 = [...gs.notesGroupedByLabelCache.values()]
+    .map(l =>
+      l.split('|||')
+        .filter(_l => _l !== 'common->lll')
+    ).reduce((p, c) => p.filter(e => c.includes(e)));
+
+  console.log(commonlabel, 'commonlabel1', commonlabel1,);
+  // const chosselabel = commonlabel.
+  for (const label of gs.unCheckedLabels) {
+    const [g, l] = label.split('->');
+    let nl: NoteLabel;
+    if (commonlabel1.includes(label)) {
+      nl = {
+        group: g,
+        label: l,
+        gl: `${g}->${l}`,
+        checked: true,
+        available: true //&& groupLaelOfnotes.size >= 2
+      };
+    } else {
+      nl = {
+        group: g,
+        label: l,
+        gl: `${g}->${l}`,
+        checked: false,
+        available: false //&& groupLaelOfnotes.size >= 2
+      };
+    }
+    if (g in _gl) {
+      _gl[g].push(nl);
+    } else {
+      _gl[g] = [nl];
+    }
+  }
+
+  for (const label of gs.checkedLabels) {
     const [g, l] = label.split('->');
     const nl: NoteLabel = {
       group: g,
       label: l,
       gl: `${g}->${l}`,
-      checked: checked,
-      available: hasNote //&& groupLaelOfnotes.size >= 2
+      checked: true,
+      available: true //&& groupLaelOfnotes.size >= 2
     };
     if (g in _gl) {
       _gl[g].push(nl);
@@ -447,7 +475,6 @@ function readerNotesLabels() {
     // }
   }
 
-  console.log("common", commonlabel)
   // console.log("common1", commonlabel1)
   for (const [g, noteLabels] of Object.entries(_gl)) {
     const group_dom = document.createElement('div');
@@ -459,7 +486,7 @@ function readerNotesLabels() {
     for (const nl of noteLabels) {
       const group_label_dom = document.createElement('label');
       group_label_dom.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
-      // group_label_dom.className = commonlabel.includes(nl.gl) ? group_label_dom.className : 'unAvailableLabel';
+      group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
       group_label_dom.textContent = nl.label;
       group_label_dom.onclick = () => {
         if (group_label_dom.className === 'unCheckedLabel') {
@@ -583,7 +610,7 @@ class GlobalState {
   domainNode: string[] = [];
   search: boolean = false;
   domainArrayLabels: string[] = [];
-  notesGroupedByLabelCache = new Map<string, Set<string>>();
+  notesGroupedByLabelCache = new Set<string>;
 }
 
 // const vnDomain = new VNDomain();
@@ -655,12 +682,10 @@ window.addEventListener('message', (event) => {
       gs.notesArrayLabels = [...(new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls))).values()];
 
       for (const n of gs.domainNotes) {
-        for (const l of n.labels) {
-          if (gs.notesGroupedByLabelCache.get(l)?.add(n.nId) === undefined) {
-            gs.notesGroupedByLabelCache.set(l, new Set<string>([n.nId]));
-          }
-        }
+        gs.notesGroupedByLabelCache.add(n.labels.filter(l => !gs.domainArrayLabels.includes(l)).join('|||'));
       }
+
+      console.log("notesgr", gs.notesGroupedByLabelCache);
 
       gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
 
