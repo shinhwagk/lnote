@@ -395,7 +395,9 @@ class GroupLabel {
   constructor(private readonly name: string, private readonly lables: string[]) { }
 }
 
+function arrComEle(...abc: string[][]) {
 
+}
 
 function readerNotesLabels() {
   const localDom = document.getElementById('domain-labels')!;
@@ -407,30 +409,64 @@ function readerNotesLabels() {
   //   const ll = l.split('|||')
   //   intersection(l, gs.checkedLabels)
   // }
-  const commonlabel = [...gs.notesGroupedByLabelCache.values()]
-    .map(l =>
-      l.split('|||')
-        .filter(_l => gs.unCheckedLabels.includes(_l))
-    )
-    .reduce((p, c) => p.filter(e => c.includes(e)));
+  const notesGroupedByLabelCache = [...gs.notesGroupedByLabelCache.values()].map(l => l.split('|||'));
+  console.log('notesGroupedByLabelCache', notesGroupedByLabelCache)
+  console.log("111 unCheckedLabels", gs.unCheckedLabels)
+  console.log("111 checkedLabels", gs.checkedLabels)
+  const commonlabel2 = gs.checkedLabels.length >= 1 ? notesGroupedByLabelCache
+    .filter(ls => issubset(gs.checkedLabels, ls))
+    .map(ls => { console.log(ls); return ls })
+    : notesGroupedByLabelCache
 
-  const commonlabel1 = [...gs.notesGroupedByLabelCache.values()]
-    .map(l =>
-      l.split('|||')
-        .filter(_l => _l !== 'common->lll')
-    ).reduce((p, c) => p.filter(e => c.includes(e)));
+  console.log("commonlabel2", commonlabel2)
+  const commonlabel1 = commonlabel2.reduce((p, c) => p.filter(e => c.includes(e)))
+  console.log("commonlabel1", commonlabel1)
+  commonlabel1.filter(l => !gs.checkedLabels.includes(l)).forEach(l => {
+    gs.checkedLabels.push(l)
+    gs.unCheckedLabels = gs.unCheckedLabels.filter(e => e !== l)
+  })
 
-  console.log(commonlabel, 'commonlabel1', commonlabel1,);
+  let availableLabels = notesGroupedByLabelCache
+    .filter(ls => intersection(ls, gs.checkedLabels).length >= 1)
+    .flatMap(l => l)
+    .filter(l => !gs.checkedLabels.includes(l))
+
+  availableLabels = [...(new Set(availableLabels).values())]
+  // .reduce((p, c) => p.filter(e => c.includes(e)))
+  console.log('availableLabels', availableLabels)
+
+
+  // .reduce((p, c) => p.filter(e => c.includes(e)));
+
+  console.log("unCheckedLabels", gs.unCheckedLabels)
+  console.log("checkedLabels", gs.checkedLabels)
+
+
+  const commonlabel: string[] = commonlabel1;// = [...gs.notesGroupedByLabelCache.values()]
+  //   .map(l =>
+  //     l.split('|||')
+  //       .filter(_l => _l !== 'common->lll')
+  //   ).reduce((p, c) => p.filter(e => c.includes(e)));
+
+  // console.log(commonlabel, 'commonlabel1', commonlabel1,);
   // const chosselabel = commonlabel.
   for (const label of gs.unCheckedLabels) {
     const [g, l] = label.split('->');
     let nl: NoteLabel;
-    if (commonlabel1.includes(label)) {
+    if (commonlabel.includes(label)) {
       nl = {
         group: g,
         label: l,
         gl: `${g}->${l}`,
         checked: true,
+        available: true //&& groupLaelOfnotes.size >= 2
+      };
+    } else if (1 === 1) {
+      nl = {
+        group: g,
+        label: l,
+        gl: `${g}->${l}`,
+        checked: false,
         available: true //&& groupLaelOfnotes.size >= 2
       };
     } else {
@@ -483,22 +519,25 @@ function readerNotesLabels() {
     group_name_dom.textContent = g;
     group_dom.append(group_name_dom, elemSpaces());
 
-    for (const nl of noteLabels) {
+    for (const nl of noteLabels.sort()) {
       const group_label_dom = document.createElement('label');
       group_label_dom.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
-      group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
+      // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
       group_label_dom.textContent = nl.label;
       group_label_dom.onclick = () => {
+        console.log("0000000", group_label_dom.className)
         if (group_label_dom.className === 'unCheckedLabel') {
           gs.checkedLabels.push(nl.gl);
-          gs.unCheckedLabels = gs.unCheckedLabels.filter(l => !gs.checkedLabels.includes(l));
+          gs.unCheckedLabels = gs.unCheckedLabels.filter(l => l !== nl.gl);
         } else if (group_label_dom.className === 'checkedLabel') {
           gs.unCheckedLabels.push(nl.gl);
-          gs.checkedLabels = gs.checkedLabels.filter(l => !gs.unCheckedLabels.includes(l));
+          gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl.gl);
         } else if (group_label_dom.className === 'unCheckedLabel notavailable') {
 
         }
-        group_label_dom.className = group_label_dom.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
+        console.log("0000000", gs.checkedLabels)
+        console.log("0000000", gs.unCheckedLabels)
+        // group_label_dom.className = group_label_dom.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
         // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
         readerNotesLabels();
         readerNotesCategories();
@@ -682,11 +721,12 @@ window.addEventListener('message', (event) => {
       gs.notesArrayLabels = [...(new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls))).values()];
 
       for (const n of gs.domainNotes) {
-        gs.notesGroupedByLabelCache.add(n.labels.filter(l => !gs.domainArrayLabels.includes(l)).join('|||'));
+        // const labels = n.labels
+        const labels = n.labels.filter(l => !gs.domainArrayLabels.includes(l))
+        if (labels.length >= 1) {
+          gs.notesGroupedByLabelCache.add(labels.join('|||'));
+        }
       }
-
-      console.log("notesgr", gs.notesGroupedByLabelCache);
-
       gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
 
       readerDomainName();
