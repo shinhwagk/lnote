@@ -13,6 +13,7 @@ immutable:
       - "114"
       - "555"
       - lll
+      - ppp
 editable:
   commonGroupLabels:
     category:

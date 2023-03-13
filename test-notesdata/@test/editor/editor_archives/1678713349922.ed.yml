@@ -1,0 +1,12 @@
+kind: EditDomain
+immutable:
+  nbName: "@test"
+  domainNode: "@test"
+  commonGroupLabels:
+    common:
+      - default
+editable:
+  domainNode: "@test"
+  commonGroupLabels:
+    common:
+      - ppp

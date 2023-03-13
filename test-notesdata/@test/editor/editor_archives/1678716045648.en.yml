@@ -1,0 +1,27 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: e3b390
+  groupLabels:
+    category:
+      - aaa
+    common:
+      - default
+    xxx:
+      - ddd
+  contents:
+    - "121212"
+    - "12121"
+    - sdsd
+editable:
+  groupLabels:
+    category:
+      - aaa
+    common:
+      - default
+    xxx:
+      - ddd
+  contents:
+    - "121212"
+    - "12112"
+    - sdsd

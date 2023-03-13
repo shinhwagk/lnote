@@ -38,7 +38,7 @@ export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
             labels.push(`${g}->${l}`);
         }
     }
-    return tools.duplicateRemoval(labels);
+    return tools.duplicateRemoval(labels).sort();
 }
 
 // export class NBNotesDB {
@@ -131,12 +131,23 @@ export class NBNotes {
         return NBNote.get(this.nbDir, nId, this.notesCache.get(nId)!);
     }
 
-    public getNIdsByLabels(labels: ArrayLabels): string[] {
+    public getNIdsByArrayLabels(labels: ArrayLabels): string[] {
         return labels.map(l => [...this.notesGroupedByLabelCache.get(l) || []]).flatMap(i => i);
     }
 
-    public getNotesByArrayLabels(al: ArrayLabels) {
-        return this.getNIdsByLabels(al).map(nId => this.getNoteById(nId));
+    public getNIdsByStrictArrayLabels(labels: ArrayLabels): string[] {
+        const ids = [];
+        for (const [nId, n] of this.notesCache.entries()) {
+            if (labels.sort().join() === groupLabel2ArrayLabels(n.labels).join()) {
+                ids.push(nId);
+            }
+        }
+        return ids;
+    }
+
+    public getNotesByArrayLabels(al: ArrayLabels, strict: boolean) {
+        const ids = strict ? this.getNIdsByStrictArrayLabels(al) : this.getNIdsByArrayLabels(al)
+        return ids.map(nId => this.getNoteById(nId));
     }
 
     public reLabels(nId: string, labels: ArrayLabels) {

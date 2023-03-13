@@ -6,16 +6,18 @@ immutable:
     common:
       - default
   commonGroupLabels:
-    category:
-      - ddd
     common:
-      - "111"
       - "114"
       - "555"
       - lll
+      - ppp
+    testlabel:
+      - ff
+      - sdfdsf
 editable:
   commonGroupLabels:
-    category:
-      - ddd
     common:
-      - "111"
+      - "114"
+      - "555"
+      - lll
+      - ppp

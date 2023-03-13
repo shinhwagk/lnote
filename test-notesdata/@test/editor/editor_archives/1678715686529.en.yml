@@ -1,0 +1,20 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: 1f2849
+  groupLabels:
+    common:
+      - default
+  contents:
+    - sdfdf
+    - sdfdsf111222111
+    - ""
+editable:
+  groupLabels:
+    common:
+      - default
+    category:
+      - sss
+  contents:
+    - sdfdf
+    - sdfdsf111222111

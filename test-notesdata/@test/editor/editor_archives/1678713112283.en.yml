@@ -1,0 +1,23 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: 95cdda
+  groupLabels:
+    common:
+      - "114"
+      - default
+      - lll
+      - nnn
+      - ppp
+  contents:
+    - ""
+editable:
+  groupLabels:
+    common:
+      - "114"
+      - default
+      - lll
+      - nnn
+      - ppp
+  contents:
+    - "1111"
