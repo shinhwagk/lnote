@@ -1,84 +1,15 @@
 
 import {
-    existsSync, mkdirpSync, removeSync
+    existsSync, mkdirpSync
 } from 'fs-extra';
 
 import { pathSplit } from '../constants';
 import { tools } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
-import { NBDomain as VNBDomain } from './domain';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, NBNotes as VNBNotes } from './notes';
-import { VNNotebookEditor as VNBEditor } from './editor';
+import { VNBDomain } from './domain';
+import { IEditBase, IEditDeleteNote, IEditDomain, IEditNoteData, IEditNotesCommonGroupLabels, VNNotebookEditor as VNBEditor } from './editor';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, VNBNotes } from './notes';
 
-// export interface NBDomainStruct {
-//     [domain: string]: NBDomainStruct;
-//     // eslint-disable-next-line @typescript-eslint/naming-convention
-//     '.labels'?: any; // { [cname:string]: string[] }
-// }
-
-
-// interface NBNoteStruct {
-//     contents: string[], cts: number, mts: number, labels: string[]
-// }
-
-
-// export type NoteBook = string;
-
-// export function getAllNBNames() {
-//     for (const nbName of readdirSync(this.nbMasterPath).filter(f => statSync(this.getNBDir(f)).isDirectory())) {
-//         try {
-//             this.cacheNB(nbName);
-//         } catch (e) {
-//             console.error(`nb: ${nbName}. err:${e}`);
-//         }
-//     }
-// }
-
-
-export interface IEdit {
-    kind: 'EditCommonGroupLabels' | 'EditNote' | 'EditDomain' | 'None';
-}
-
-export interface IEditNoteData extends IEdit {
-    kind: 'EditNote';
-    immutable: {
-        nbName: string,
-        nId: string,
-        groupLabels: GroupLables,
-        contents: string[]
-    },
-    editable: {
-        groupLabels: GroupLables,
-        contents: string[]
-    }
-}
-
-interface IEditNotesCommonGroupLabels extends IEdit {
-    kind: 'EditCommonGroupLabels';
-    immutable: {
-        nBName: string,
-        domainNode: string[],
-        domainGroupLabes: GroupLables
-        commonGroupLabels: GroupLables
-    },
-    editable: {
-        commonGroupLabels: GroupLables
-    }
-
-}
-
-export interface IEditDomain extends IEdit {
-    kind: 'EditDomain';
-    immutable: {
-        nbName: string,
-        domainNode: string,
-        commonGroupLabels: GroupLables
-    },
-    editable: {
-        domainNode: string,
-        commonGroupLabels: GroupLables
-    }
-}
 
 export class VNNotebook {
     private readonly domain: VNBDomain;
@@ -116,15 +47,8 @@ export class VNNotebook {
         // this.domain.resetLabels(dn, labels.slice(1).concat(dn));
     }
 
-    public updateNote(nId: string, contents: string[], labels: string[]) {
-    }
-
     public deleteNote(nId: string) {
         this.notes.deleteNote(nId);
-    }
-
-    public relabelNote(nId: string, labels: string[]) {
-
     }
 
     public getNoteById(nId: string) {
@@ -178,38 +102,51 @@ export class VNNotebook {
      * 
      */
     public processEditEnv() {
-        const editObj: IEdit = this.editor.getEditorObj();
-        if (editObj.kind === 'EditNote') {
-            const eo = editObj as IEditNoteData;
-            const n = this.notes.getNoteById(eo.immutable.nId);
-            n.updateDataContents(eo.editable.contents);
-            n.updateDataGroupLabels(eo.editable.groupLabels);
-            this.notes.permanent();
-        } else if (editObj.kind === 'EditCommonGroupLabels') {
-            const eo = editObj as IEditNotesCommonGroupLabels;
-
-            const mcgl = groupLabel2ArrayLabels(eo.immutable.commonGroupLabels);
-            const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
-            const dcgl = groupLabel2ArrayLabels(eo.immutable.domainGroupLabes);
-
-            const notes = this.notes.getNotesByArrayLabels(mcgl.concat(dcgl), true);
-            for (const n of notes) {
-                const nlabels = n.getDataArrayLabels().filter(l => !mcgl.includes(l)).concat(ecgl).concat(dcgl);
-                this.notes.reLabels(n.getId(), nlabels);
-            }
-            this.notes.permanent();
-        } else if (editObj.kind === 'EditDomain') {
-            const eo = editObj as IEditDomain;
-            this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
+        const eb: IEditBase = this.editor.getEditorObj();
+        if (eb.kind === 'EditNote') {
+            this.processEditNote(eb)
+        } else if (eb.kind === 'EditCommonGroupLabels') {
+            this.processEditCommonGroupLabels(eb)
+        } else if (eb.kind === 'EditDomain') {
+            this.processEditDomain(eb)
+        } else if (eb.kind === 'EditNoteDelete') {
+            this.processEditNoteDelete(eb)
         } else {
             return;
         }
         this.editor.archiveEditor();
-        // if (editObj.kind === 'EditNote') {
+    }
 
-        // } else if (editObj.kind === 'DomainGroupLabel') { }
-        console.log("processEditEnv");
-        // this.deleteEditEnv();
+    private processEditNote(eb: IEditBase) {
+        const eo = eb as IEditNoteData;
+        const n = this.notes.getNoteById(eo.immutable.nId);
+        n.updateDataContents(eo.editable.contents);
+        n.updateDataGroupLabels(eo.editable.groupLabels);
+        this.notes.permanent();
+    }
+
+    private processEditCommonGroupLabels(eb: IEditBase) {
+        const eo = eb as IEditNotesCommonGroupLabels;
+
+        const mcgl = groupLabel2ArrayLabels(eo.immutable.commonGroupLabels);
+        const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
+        const dcgl = groupLabel2ArrayLabels(eo.immutable.domainGroupLabes);
+
+        const notes = this.notes.getNotesByArrayLabels(mcgl.concat(dcgl), true);
+        for (const n of notes) {
+            const nlabels = n.getDataArrayLabels().filter(l => !mcgl.includes(l)).concat(ecgl).concat(dcgl);
+            this.notes.reLabels(n.getId(), nlabels);
+        }
+    }
+
+    private processEditDomain(eb: IEditBase) {
+        const eo = eb as IEditDomain;
+        this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
+    }
+
+    private processEditNoteDelete(eb: IEditBase) {
+        const eo = eb as IEditDeleteNote;
+        eo.editable.delete && this.notes.deleteNote(eo.immutable.nId)
     }
 
     public checkEditorCleaned() {
@@ -218,18 +155,23 @@ export class VNNotebook {
 
     public createNoteDataEditor(nId: string) {
         const nd = this.notes.getNoteById(nId).getData();
-        this.editor.createNoteData(nId, nd.contents, nd.labels);
+        this.editor.createNoteDataEditorFile(nId, nd.contents, nd.labels);
     }
 
     public createDomainGroupLabelsEditor(domainNode: string[]) {
         const gl = this.domain.getGroupLabel(domainNode);
-        this.editor.createDomainEditor(domainNode, gl);
+        this.editor.createDomainEditorFile(domainNode, gl);
     }
 
     public createNotesSetGroupLabelsEditor(domainNode: string[], al: ArrayLabels) {
         const dgl = this.getArrayLabelsOfDomain(domainNode);
         const gl = al.filter(l => !dgl.includes(l));
-        this.editor.createNotesSetGroupLabels(domainNode, arrayLabels2GroupLabel(dgl), arrayLabels2GroupLabel(gl));
+        this.editor.createNotesSetGroupLabelsEditorFile(domainNode, arrayLabels2GroupLabel(dgl), arrayLabels2GroupLabel(gl));
+    }
+
+    public createNoteDeleteEditor(nId: string) {
+        const nd = this.notes.getNoteById(nId).getData();
+        this.editor.createNoteDeleteEditorFile(nId, nd.contents, nd.labels);
     }
 
     public clearEditor() {

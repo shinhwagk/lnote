@@ -8,6 +8,7 @@ import { tools, vfs } from '../helper';
 import { INBNote, NBNote } from './note';
 
 import { ArrayLabels, GroupLables } from '../types';
+import { jointMark } from '../constants';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -18,7 +19,7 @@ import { ArrayLabels, GroupLables } from '../types';
 export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
     const tmpgl: { [g: string]: Set<string> } = {};
     for (const label of al) {
-        const [g, l] = label.split('->');
+        const [g, l] = label.split(jointMark);
         if (g in tmpgl) {
             tmpgl[g].add(l);
         } else {
@@ -27,18 +28,18 @@ export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
     }
     return Object.fromEntries(Object.entries(tmpgl)
         .map((v) =>
-            [v[0], [...v[1].values()].sort()]
+            [v[0], Array.from(v[1]).sort()]
         ));
 }
 
 export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
-    const labels = [];
+    const labels = new Set<string>();
     for (const [g, ls] of Object.entries(gl)) {
         for (const l of ls) {
-            labels.push(`${g}->${l}`);
+            labels.add(`${g}${jointMark}${l}`);
         }
     }
-    return tools.duplicateRemoval(labels).sort();
+    return Array.from(labels).sort();
 }
 
 // export class NBNotesDB {
@@ -66,7 +67,7 @@ class NBNoteCache {
 
 }
 
-export class NBNotes {
+export class VNBNotes {
     private notesCache = new Map<string, INBNote>();
     // Set<string>: note ids
     // example: key: "<group name> -> label1", [id1,id2]

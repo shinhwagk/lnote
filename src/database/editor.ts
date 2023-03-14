@@ -1,10 +1,67 @@
 import { statSync } from 'fs';
 import * as path from 'path';
-import { existsSync, mkdirpSync } from 'fs-extra';
+import { existsSync, mkdirpSync, moveSync, removeSync } from 'fs-extra';
 import { pathSplit, section } from '../constants';
 import { tools, vfs } from '../helper';
 import { GroupLables } from '../types';
-import { IEdit, IEditNoteData, IEditDomain } from './notebook';
+
+export interface IEditBase {
+    kind: 'EditCommonGroupLabels' | 'EditNote' | 'EditNoteDelete' | 'EditDomain' | 'None';
+}
+
+export interface IEditDeleteNote extends IEditBase {
+    kind: 'EditNoteDelete';
+    immutable: {
+        nbName: string,
+        nId: string,
+        groupLabels: GroupLables,
+        contents: string[]
+    },
+    editable: {
+        delete: boolean
+    }
+}
+
+export interface IEditNoteData extends IEditBase {
+    kind: 'EditNote';
+    immutable: {
+        nbName: string,
+        nId: string,
+        groupLabels: GroupLables,
+        contents: string[]
+    },
+    editable: {
+        groupLabels: GroupLables,
+        contents: string[]
+    }
+}
+
+export interface IEditNotesCommonGroupLabels extends IEditBase {
+    kind: 'EditCommonGroupLabels';
+    immutable: {
+        nBName: string,
+        domainNode: string[],
+        domainGroupLabes: GroupLables
+        commonGroupLabels: GroupLables
+    },
+    editable: {
+        commonGroupLabels: GroupLables
+    }
+
+}
+
+export interface IEditDomain extends IEditBase {
+    kind: 'EditDomain';
+    immutable: {
+        nbName: string,
+        domainNode: string,
+        commonGroupLabels: GroupLables
+    },
+    editable: {
+        domainNode: string,
+        commonGroupLabels: GroupLables
+    }
+}
 
 
 export class VNNotebookEditor {
@@ -28,9 +85,9 @@ export class VNNotebookEditor {
 
     public getEditorFile = () => this.editorFile;
 
-    public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEdit;
+    public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
 
-    public createNoteData(nId: string, contents: string[], gl: GroupLables) {
+    public createNoteDataEditorFile(nId: string, contents: string[], gl: GroupLables) {
         const ed: IEditNoteData = {
             kind: 'EditNote',
             immutable: {
@@ -47,7 +104,23 @@ export class VNNotebookEditor {
         tools.writeYamlSync(this.editorFile, ed);
     }
 
-    public createDomainEditor(domainNode: string[], gl: GroupLables) {
+    public createNoteDeleteEditorFile(nId: string, contents: string[], gl: GroupLables) {
+        const ed: IEditDeleteNote = {
+            kind: 'EditNoteDelete',
+            immutable: {
+                nbName: this.nbName,
+                nId: nId,
+                groupLabels: gl,
+                contents: contents
+            },
+            editable: {
+                delete: false
+            }
+        };
+        tools.writeYamlSync(this.editorFile, ed);
+    }
+
+    public createDomainEditorFile(domainNode: string[], gl: GroupLables) {
         const ed: IEditDomain = {
             kind: 'EditDomain',
             immutable: {
@@ -63,7 +136,7 @@ export class VNNotebookEditor {
         tools.writeYamlSync(this.editorFile, ed);
     }
 
-    public createNotesSetGroupLabels(domainNode: string[], dgl: GroupLables, gl: GroupLables) {
+    public createNotesSetGroupLabelsEditorFile(domainNode: string[], dgl: GroupLables, gl: GroupLables) {
         const ed = {
             kind: 'EditCommonGroupLabels',
             immutable: {
@@ -85,10 +158,11 @@ export class VNNotebookEditor {
 
     public archiveEditor() {
         const ts = (new Date()).getTime();
-        const e: IEdit = tools.readYamlSync(this.editorFile);
+        const e: IEditBase = tools.readYamlSync(this.editorFile);
         const k = e.kind.match(/[A-Z]/g)!.join('').toLocaleLowerCase();
         const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
-        tools.writeYamlSync(archiveFile, e);
+        moveSync(this.editorFile, archiveFile)
+        // tools.writeYamlSync(archiveFile, e);
         // removeSync(this.editorFile)
         // tools.writeYamlSync(this.editFile, {});
     }

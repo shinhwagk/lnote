@@ -6,13 +6,13 @@ import { vfs } from '../helper';
 import { GroupLables } from '../types';
 import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
-export interface NBDomainStruct {
+interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     '.labels'?: any; // { [cname: string]: string[] }
 }
 
-export class NBDomain {
+export class VNBDomain {
 
     private readonly domainFile: string;
     private readonly domainCache: NBDomainStruct = {};

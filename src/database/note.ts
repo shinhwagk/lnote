@@ -12,7 +12,7 @@ export interface INBNote {
     contents: string[];
     cts: number;
     mts: number;
-    labels: { [gl: string]: string[] }; // label group
+    labels: GroupLables; // label group
 }
 
 export class NBNote {
