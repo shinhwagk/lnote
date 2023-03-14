@@ -86,16 +86,6 @@
                     "group": "0_domain"
                 },
                 {
-                    "command": "lnote.domain.rename",
-                    "when": "view == domainExplorer",
-                    "group": "2_domain"
-                },
-                {
-                    "command": "lnote.domain.remove",
-                    "when": "view == domainExplorer",
-                    "group": "3_domain"
-                },
-                {
                     "command": "lnote.domain.search",
                     "when": "view == domainExplorer",
                     "group": "4_domain"
@@ -127,14 +117,6 @@
                     "light": "images/light/add.svg",
                     "dark": "images/dark/add.svg"
                 }
-            },
-            {
-                "command": "lnote.domain.rename",
-                "title": "Rename"
-            },
-            {
-                "command": "lnote.domain.remove",
-                "title": "Remove"
             },
             {
                 "command": "lnote.domain.search",

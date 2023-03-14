@@ -169,9 +169,9 @@ export class NotesPanelView {
           //     }
           //   });
           //   break;
-          case 'note-add':
-            ExtCmds.cmdHdlNoteAdd(msg.data.labels);
-            break;
+          // case 'note-add':
+          //   ExtCmds.cmdHdlNoteAdd(msg.data.labels);
+          //   break;
           case 'notebook-editor':
             ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
             break;
@@ -196,15 +196,15 @@ export class NotesPanelView {
           case 'notebook-note-doc-create':
             ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
             break;
-          case 'note-remove':
-            ExtCmds.cmdHdlNBNoteRemove(msg.data.nId);
-            break;
+          // case 'note-remove':
+          //   ExtCmds.cmdHdlNBNoteRemove(msg.data.nId);
+          //   break;
           case 'edit-note-openfolder':
             ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
             break;
-          case 'category-add':
-            ExtCmds.cmdHdlDomainCategoryAdd();
-            break;
+          // case 'category-add':
+          //   ExtCmds.cmdHdlDomainCategoryAdd();
+          //   break;
           // case 'col-to-terminal':
           //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
           //   break;

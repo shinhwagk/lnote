@@ -43,6 +43,14 @@ export class VNBDomain {
         this.permanent();
     }
 
+    public deleteDomainNotes(domainNode: string[]): void {
+        if (domainNode.length === 0) {
+            return;
+        }
+        objectPath.del(this.domainCache, [...domainNode, '.labels']);
+        this.permanent();
+    }
+
     public getDomain(domainNode: string[] = []) {
         return objectPath.get(this.domainCache, domainNode);
     }

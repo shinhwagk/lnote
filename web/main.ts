@@ -65,7 +65,7 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'edit',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nd', params: { nId: data.note.nId } } })
+      onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: data.note.nId } } })
     }
   ],
   [
@@ -78,12 +78,12 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
       onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } })
     }
   ],
-  [
-    {
-      title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
-    }
-  ]
+  // [
+  //   {
+  //     title: 'remove',
+  //     onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
+  //   }
+  // ]
   // ,
   // [
   //   {
@@ -97,7 +97,7 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
   [
     {
       title: 'add note',
-      onClick: (data) => vscode.postMessage({ command: 'note-add', data: { labels: data.labels } })
+      onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { labels: data.labels } } })
     }
   ],
   [
@@ -594,7 +594,7 @@ function readerDomainName() {
   // const e_search = elemNotesSearch();
   e_title.appendChild(e_domain_name);
   e_title.appendChild(elemSpaces());
-  e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
+  e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { labels: gs.domainLabels } } })));
   e_title.appendChild(elemSpaces());
   e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'edgl', params: {} } })));
   e_title.appendChild(elemSpaces());
