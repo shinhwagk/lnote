@@ -64,7 +64,7 @@ export interface IEditDomain extends IEditBase {
             notes: boolean,
             domainNode: boolean
         }
-        domainNode: string,
+        domainName: string,
         commonGroupLabels: GroupLables
     }
 }
@@ -140,7 +140,7 @@ export class VNBEditor {
                     notes: false,
                     domainNode: false
                 },
-                domainNode: domainNode.join(pathSplit),
+                domainName: domainNode[domainNode.length - 1],
                 commonGroupLabels: gl
             }
         };
