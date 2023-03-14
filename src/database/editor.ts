@@ -111,22 +111,6 @@ export class VNBEditor {
         tools.writeYamlSync(this.editorFile, ed);
     }
 
-    // public createNoteDeleteEditorFile(nId: string, contents: string[], gl: GroupLables) {
-    //     const ed: IEditDeleteNote = {
-    //         kind: 'EditNoteDelete',
-    //         immutable: {
-    //             nbName: this.nbName,
-    //             nId: nId,
-    //             groupLabels: gl,
-    //             contents: contents
-    //         },
-    //         editable: {
-    //             delete: false
-    //         }
-    //     };
-    //     tools.writeYamlSync(this.editorFile, ed);
-    // }
-
     public createDomainEditorFile(domainNode: string[], gl: GroupLables) {
         const ed: IEditDomain = {
             kind: 'EditDomain',
