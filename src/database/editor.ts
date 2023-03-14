@@ -156,9 +156,6 @@ export class VNBEditor {
         const e: IEditBase = tools.readYamlSync(this.editorFile);
         const k = e.kind.match(/[A-Z]/g)!.join('').toLocaleLowerCase();
         const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
-        moveSync(this.editorFile, archiveFile)
-        // tools.writeYamlSync(archiveFile, e);
-        // removeSync(this.editorFile)
-        // tools.writeYamlSync(this.editFile, {});
+        moveSync(this.editorFile, archiveFile);
     }
 }
