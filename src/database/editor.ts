@@ -32,7 +32,7 @@ export interface IEditNoteData extends IEditBase {
         contents: string[]
     },
     editable: {
-        delete: boolean,
+        // delete: boolean,
         groupLabels: GroupLables,
         contents: string[]
     }
@@ -103,7 +103,7 @@ export class VNBEditor {
                 contents: contents
             },
             editable: {
-                delete: false,
+                // delete: false,
                 groupLabels: gl,
                 contents: contents,
             }

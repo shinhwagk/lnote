@@ -23,36 +23,40 @@ export namespace ExtCmds {
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
-    const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
-    if (labelsOfDomain === undefined) { return; };
-    const _l = labelsOfDomain.split(',').map(l => l.trim());
-    ext.gs.nb.craeteNotes(ext.gs.domainNodeFormat, _l);
-    ext.vnNotebookSet.refresh(ext.gs.nbName);
-    ext.domainProvider.refresh(dn);
-    await cmdHdlDomainPin(dn);
+    // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
+    // if (labelsOfDomain === undefined) { return; };
+    // const _l = labelsOfDomain.split(',').map(l => l.trim());
+    ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
+    // ext.vnNotebookSet.refresh(ext.gs.nbName);
+    // ext.domainProvider.refresh(dn);
+    // await cmdHdlDomainPin(dn);
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
+    console.log('msdfsdf')
     const _dn: string[] = dn ? tools.splitDomaiNode(dn) : [];
-    const name: string | undefined = await window.showInputBox();
-    if (!name) { return; };
-    if (name.includes('/')) {
-      window.showErrorMessage('domain name cannot contain "/".');
-    }
-    if (dn === undefined) {
-      ext.vnNotebookSet.createNB(name);
-    }
-    ext.updateGS(dn || name);
-    ext.gs.nb.addDomain(_dn.concat(name));
-    ext.domainProvider.refresh(dn);
-    !dn || ext.domainTreeView.reveal(dn, { expand: true });
+    ext.updateGS(dn!)
+    console.log('dfsdfds', ext.gs.domainNodeFormat)
+    ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat)
+    // const name: string | undefined = await window.showInputBox();
+    // if (!name) { return; };
+    // if (name.includes('/')) {
+    //   window.showErrorMessage('domain name cannot contain "/".');
+    // }
+    // if (dn === undefined) {
+    //   ext.vnNotebookSet.createNB(name);
+    // }
+    // ext.updateGS(dn || name);
+    // ext.gs.nb.addDomain(_dn.concat(name));
+    // ext.domainProvider.refresh(dn);
+    // !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {
     ext.updateGS(dn);
     // console.log("pin", dn, ext.gs.domainNodeFormat);
     // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
-    const s = (new Date()).getTime()
+    const s = (new Date()).getTime();
     await ext.notesPanelView.parseDomain().showNotesPlanView();
-    console.log("get notes time " + `${new Date().getTime() - s}`)
+    console.log("get notes time " + `${new Date().getTime() - s}`);
     await ext.setContext(ctxFilesExplorer, false);
   }
   export async function cmdHdlNoteFilesCreate(nId: string) {
@@ -156,7 +160,7 @@ export namespace ExtCmds {
     } else if (kind === 'edgl') {
       ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
     } else if (kind === 'end') {
-      ext.gs.nb.createNoteEditor(params);
+      ext.gs.nb.createNoteEditor(params.nId, params.labels);
     }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditorFile()));
   }

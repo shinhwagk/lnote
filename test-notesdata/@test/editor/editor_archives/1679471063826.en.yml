@@ -1,0 +1,15 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: 95da47
+  groupLabels:
+    common:
+      - "@test"
+  contents:
+    - ""
+editable:
+  groupLabels:
+    common:
+      - "@test"
+  contents:
+    - "111"

@@ -1,0 +1,28 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: "183260"
+  groupLabels:
+    common:
+      - "114"
+      - "555"
+      - default
+      - lll
+      - ppp
+    testlabel:
+      - sdfdsf
+  contents:
+    - ""
+editable:
+  delete: false
+  groupLabels:
+    common:
+      - "114"
+      - "555"
+      - default
+      - lll
+      - ppp
+    testlabel:
+      - sdfdsf
+  contents:
+    - "1111"

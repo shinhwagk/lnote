@@ -5,7 +5,7 @@ import {
 
 import { pathSplit } from '../constants';
 import { tools } from '../helper';
-import { ArrayLabels } from '../types';
+import { ArrayLabels, GroupLables } from '../types';
 import { VNBDomain } from './domain';
 import { IEditBase, IEditDomain, IEditNoteData, IEditNotesCommonGroupLabels, VNBEditor } from './editor';
 import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, VNBNotes } from './notes';
@@ -36,14 +36,15 @@ export class VNNotebook {
         return this.notes.getNotesByArrayLabels(al, false);
     }
 
-    public craeteNotes(dn: string[], labels: string[]) {
-        this.addNote(labels.concat(dn));
+    public craeteNotes(dn: string[]) {
+        const gl = { "domain": dn };
+        this.addNote(gl);
         this.domain.updateGroupLabels(dn, { 'common': [] });
     }
 
-    public addNote(labels: ArrayLabels) {
+    public addNote(gl: GroupLables) {
         const nId = tools.generateSixString();
-        this.notes.addNote(nId, labels);
+        this.notes.addNote(nId, gl);
     }
 
     public deleteNote(nId: string) {
@@ -103,11 +104,11 @@ export class VNNotebook {
     public processEditEnv() {
         const eb: IEditBase = this.editor.getEditorObj();
         if (eb.kind === 'EditNote') {
-            this.processEditNote(eb)
+            this.processEditNote(eb);
         } else if (eb.kind === 'EditCommonGroupLabels') {
-            this.processEditCommonGroupLabels(eb)
+            this.processEditCommonGroupLabels(eb);
         } else if (eb.kind === 'EditDomain') {
-            this.processEditDomain(eb)
+            this.processEditDomain(eb);
         }
         // else if (eb.kind === 'EditNoteDelete') {
         //     this.processEditNoteDelete(eb)
@@ -120,10 +121,10 @@ export class VNNotebook {
 
     private processEditNote(eb: IEditBase) {
         const eo = eb as IEditNoteData;
-        if (eo.editable.delete) {
-            this.notes.deleteNote(eo.immutable.nId)
-            return;
-        }
+        // if (eo.editable.delete) {
+        //     this.notes.deleteNote(eo.immutable.nId);
+        //     return;
+        // }
         const n = this.notes.getNoteById(eo.immutable.nId);
         n.updateDataContents(eo.editable.contents);
         n.updateDataGroupLabels(eo.editable.groupLabels);
@@ -147,9 +148,9 @@ export class VNNotebook {
     private processEditDomain(eb: IEditBase) {
         const eo = eb as IEditDomain;
         if (eo.editable.delete.notes) {
-            this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit))
+            this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
         } else if (eo.editable.delete.domainNode) {
-            this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit))
+            this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
         }
         this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
     }
@@ -163,23 +164,23 @@ export class VNNotebook {
         return this.editor.checkEditorCleaned();
     }
 
-    public createNoteEditor(params: { nId?: string, labels?: ArrayLabels }) {
-        if (params.nId) {
-            const nd = this.notes.getNoteById(params.nId).getData();
-            this.editor.createNoteEditorFile(params.nId, nd.contents, nd.labels);
+    public createNoteEditor(nId: string, al: ArrayLabels) {
+        if (nId !== '0') {
+            const nd = this.notes.getNoteById(nId).getData();
+            this.editor.createNoteEditorFile(nId, nd.contents, nd.labels);
             return;
-        } else if (!params.nId && params.labels) {
-            params.nId = tools.generateSixString();
-            this.notes.addNote(params.nId, params.labels)
-            const nd = this.notes.getNoteById(params.nId).getData();
-            this.editor.createNoteEditorFile(params.nId, nd.contents, nd.labels);
+        } else {
+            const _nId = tools.generateSixString();
+            this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
+            const nd = this.notes.getNoteById(_nId).getData();
+            this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
             return;
-        } else { }
+        }
     }
 
     public createDomainEditor(domainNode: string[]) {
-        this.domain.isNotes(domainNode) || this.domain.addDomain(domainNode)
-        const gl = this.domain.getGroupLabel(domainNode)
+        // this.domain.isNotes(domainNode) || this.domain.addDomain(domainNode);
+        const gl = this.domain.getGroupLabel(domainNode);
         this.editor.createDomainEditorFile(domainNode, gl);
     }
 

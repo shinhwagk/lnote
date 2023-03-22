@@ -28,7 +28,7 @@ export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
     }
     return Object.fromEntries(Object.entries(tmpgl)
         .map((v) =>
-            [v[0], Array.from(v[1]).sort()]
+            [v[0], Array.from(v[1])]
         ));
 }
 
@@ -39,7 +39,7 @@ export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
             labels.add(`${g}${jointMark}${l}`);
         }
     }
-    return Array.from(labels).sort();
+    return Array.from(labels);
 }
 
 // export class NBNotesDB {
@@ -98,10 +98,10 @@ export class VNBNotes {
         }
     }
 
-    public addNote(nId: string, labels: string[]) {
+    public addNote(nId: string, gl: GroupLables) {
         const ts = (new Date()).getTime();
-        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: {} });
-        this.getNoteById(nId).updateDataArrayLabels(labels);
+        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: gl });
+        // this.getNoteById(nId).updateDataArrayLabels(labels);
         this.addCache(nId);
         this.permanent();
     }

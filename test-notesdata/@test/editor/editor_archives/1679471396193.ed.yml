@@ -1,15 +1,21 @@
 kind: EditDomain
 immutable:
   nbName: "@test"
-  domainNode: "@test/114"
+  domainNode: "@test/114/ppp/lll/555"
   commonGroupLabels:
     common:
       - "114"
+      - "555"
+      - default
+      - lll
+      - ppp
+    testlabel:
+      - sdfdsf
 editable:
   delete:
     notes: false
     domainNode: false
-  domainName: "114"
+  domainName: "555"
   commonGroupLabels:
     common:
       - "114"
