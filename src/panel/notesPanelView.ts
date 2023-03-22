@@ -55,11 +55,15 @@ export class NotesPanelView {
   }
 
   private getNotesForWebStruct(domainNode: string[]): NBNote[] {
-    const alOfDomain = ext.gs.nb.getArrayLabelsOfDomain(domainNode);
+    const al =
+      ext.webState.selectedArraylabels.length === 0
+        ? ext.gs.nb.getArrayLabelsOfDomain(domainNode)
+        : ext.webState.selectedArraylabels;
+
     // const nbNotes = ext.gs.nb.getLabelsOfDomain;
-    return ext.gs.nb.getNotesByArrayLabels(alOfDomain)
+    return ext.gs.nb.getNotesByArrayLabels(al)
       .filter(n =>
-        tools.intersections(alOfDomain, n.getDataArrayLabels()).length === alOfDomain.length
+        tools.intersections(al, n.getDataArrayLabels()).length === al.length
       )
       .map(n => {
         const isDoc = n.checkDocExist();
@@ -77,9 +81,10 @@ export class NotesPanelView {
       command: 'post-data',
       data: {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
-        domainNode: this.domainNode,
+        domainNode: ext.webState.domainNode,
         // domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode),
         domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode),
+        // selectedArrayLabels: ext.webSelectedArrayLabels.length===0? this.
         // notesCommonArrayLabels: ext.gs.nb.getNotesCommonArrayLabels(this.domainNode),
       }
     });
@@ -131,59 +136,13 @@ export class NotesPanelView {
           case 'get-data':
             await this.postData();
             break;
-          // case 'get-notes':
-          //   this.panel!.webview.postMessage({
-          //     command: 'post-notes',
-          //     data: {
-          //       notes: ext.vnNotebook.getNotesOfDomain(this.domainNode)
-          //     }
-          //   });
-          //   break;
-          // case 'get-domain':
-          //   this.panel!.webview.postMessage({
-          //     command: 'post-domain',
-          //     data: {
-          //       domainNode: this.domainNode,
-          //       domainLabels: ext.vnNotebook.getLabelsOfDomain(this.domainNode).sort()
-          //     }
-          //   });
-          //   console.log(ext.vnNotebook.getLabelsOfDomain(this.domainNode));
-          //   break;
-          // case 'get-labels':
-          //   const labelsOfNotebook = [...ext.notebookDatabase.getNBLabels(this.domainNode[0]).keys()];
-          //   const labelsOfDomainNode = ext.notebookDatabase.getLabelsOfDomain(this.domainNode);
-          //   this.panel!.webview.postMessage({
-          //     command: 'post-labels',
-          //     data: {
-          //       checkedLabels: labelsOfDomainNode,
-          //       unCheckedLabels: labelsOfNotebook.filter(l => !labelsOfDomainNode.includes(l))
-          //     }
-          //   });
-          //   break;
-          // case 'get-notes-by-labels':
-          //   const notes = ext.vnNotebook.getNotesByLabels(this.domainNode[0], msg.data.checkedLabels);
-          //   this.panel!.webview.postMessage({
-          //     command: 'post-notes',
-          //     data: {
-          //       notes: notes
-          //     }
-          //   });
-          //   break;
-          // case 'note-add':
-          //   ExtCmds.cmdHdlNoteAdd(msg.data.labels);
-          //   break;
+          case 'web-update-labels':
+            ext.webState.selectedArraylabels
+            await this.postData();
+            break
           case 'notebook-editor':
             ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
             break;
-          // case 'notebook-note-edit':
-          //   ExtCmds.cmdHdlNoteEdit(msg.data.nId);
-          //   break;
-          // case 'notes-edit-labels':
-          //   ExtCmds.cmdHdlNotesEditlabels(msg.data.labels);
-          //   break;
-          // case 'notebook-note-contents-add':
-          //   ExtCmds.cmdHdlNotebookNoteContentsAdd(msg.data.nId, msg.data.cn);
-          //   break;
           case 'notebook-note-doc-show':
             ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);
             break;
@@ -196,24 +155,9 @@ export class NotesPanelView {
           case 'notebook-note-doc-create':
             ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
             break;
-          // case 'note-remove':
-          //   ExtCmds.cmdHdlNBNoteRemove(msg.data.nId);
-          //   break;
           case 'edit-note-openfolder':
             ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
             break;
-          // case 'category-add':
-          //   ExtCmds.cmdHdlDomainCategoryAdd();
-          //   break;
-          // case 'col-to-terminal':
-          //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
-          //   break;
-          // case 'col-to-terminal-args':
-          //   ExtCmds.cmdHdlNoteColToActiveTermianl(msg.data.id, msg.data.cidx);
-          //   break;
-          // case 'domain-relabels':
-          //   ExtCmds.cmdHdlDomainEditlabels();
-          //   break;
         }
       },
       undefined,

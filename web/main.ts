@@ -525,6 +525,7 @@ function readerNotesLabels() {
       // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
       group_label_dom.textContent = nl.label;
       group_label_dom.onclick = () => {
+        vscode.postMessage({ command: 'web-update-labels', data: { nId: nid } }))
         console.log("0000000", group_label_dom.className)
         if (group_label_dom.className === 'unCheckedLabel') {
           gs.checkedLabels.push(nl.gl);

@@ -55,6 +55,11 @@ export namespace ExtCmds {
     // console.log("pin", dn, ext.gs.domainNodeFormat);
     // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
     const s = (new Date()).getTime();
+    ext.webState.selectedArraylabels = ext.webState.selectedArraylabels.length === 0
+      ? ext.gs.nb.getArrayLabelsOfDomain(ext.gs.domainNodeFormat)
+      : ext.webState.selectedArraylabels;
+    ext.webState.notes = ext.gs.nb.getNotesByArrayLabels(ext.webState.selectedArraylabels);
+
     await ext.notesPanelView.parseDomain().showNotesPlanView();
     console.log("get notes time " + `${new Date().getTime() - s}`);
     await ext.setContext(ctxFilesExplorer, false);
