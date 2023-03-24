@@ -400,7 +400,7 @@ function arrComEle(...abc: string[][]) {
 }
 
 function readerNotesLabels() {
-  const localDom = document.getElementById('domain-labels')!;
+  const localDom = document.getElementById('notes-labels')!;
   localDom.replaceChildren();
 
   const _gl: { [g: string]: NoteLabel[] } = {};
@@ -614,7 +614,7 @@ function readerDomainName() {
 
   // labels
   const labelsDom = document.createElement('div');
-  labelsDom.id = 'domain-labels';
+  labelsDom.id = 'notes-labels';
 
   // categories
   const categoriesDom = document.createElement('div');
@@ -728,7 +728,7 @@ window.addEventListener('message', (event) => {
           gs.notesGroupedByLabelCache.add(labels.join('|||'));
         }
       }
-      gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
+      // gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
 
       readerDomainName();
       readerNotesLabels();

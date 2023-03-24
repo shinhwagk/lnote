@@ -57,15 +57,21 @@ export interface IEditDomain extends IEditBase {
     immutable: {
         nbName: string,
         domainNode: string,
-        commonGroupLabels: GroupLables
+        commonGroupLabels: GroupLables,
+        orderBy?: {
+            notesGroupLabels?: GroupLables
+        }
     },
     editable: {
-        delete: {
-            notes: boolean,
-            domainNode: boolean
-        }
+        // delete: {
+        //     notes: boolean,
+        //     domainNode: boolean
+        // }
         domainName: string,
-        commonGroupLabels: GroupLables
+        commonGroupLabels: GroupLables,
+        orderBy?: {
+            notesGroupLabels?: GroupLables
+        }
     }
 }
 
@@ -120,10 +126,10 @@ export class VNBEditor {
                 commonGroupLabels: gl
             },
             editable: {
-                delete: {
-                    notes: false,
-                    domainNode: false
-                },
+                // delete: {
+                //     notes: false,
+                //     domainNode: false
+                // },
                 domainName: domainNode[domainNode.length - 1],
                 commonGroupLabels: gl
             }

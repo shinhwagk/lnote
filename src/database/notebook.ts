@@ -147,11 +147,11 @@ export class VNNotebook {
 
     private processEditDomain(eb: IEditBase) {
         const eo = eb as IEditDomain;
-        if (eo.editable.delete.notes) {
-            this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
-        } else if (eo.editable.delete.domainNode) {
-            this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
-        }
+        // if (eo.editable.delete.notes) {
+        //     this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
+        // } else if (eo.editable.delete.domainNode) {
+        //     this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
+        // }
         this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
     }
 

@@ -12,6 +12,7 @@ import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { tools, vfs } from './helper';
 import { NotesPanelView } from './panel/notesPanelView';
+import { WebStatus } from './panel/web';
 import { ArrayLabels } from './types';
 
 export class GlobalState {
@@ -54,17 +55,7 @@ export namespace ext {
     context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
   export let domainShortcutStatusBarItem: StatusBarItem;
   export let windowId = (new Date()).getTime().toString();
-  export const webState: {
-    selectedArraylabels: ArrayLabels,
-    unSelectedArraylabels: ArrayLabels,
-    notes: NBNote[]
-    domainNode: string[]
-  } = {
-    selectedArraylabels: [],
-    notes: [],
-    domainNode: [],
-    unSelectedArraylabels: []
-  }
+  export const webState = new WebStatus()
 
   // export const editNotes = new Map<string, string[]>();
 }

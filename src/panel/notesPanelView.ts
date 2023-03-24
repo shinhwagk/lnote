@@ -137,7 +137,6 @@ export class NotesPanelView {
             await this.postData();
             break;
           case 'web-update-labels':
-            ext.webState.selectedArraylabels
             await this.postData();
             break
           case 'notebook-editor':
