@@ -8,12 +8,12 @@ import { tools } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
 import { VNBDomain } from './domain';
 import { IEditBase, IEditDomain, IEditNoteData, IEditNotesCommonGroupLabels, VNBEditor } from './editor';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, VNBNotes } from './notes';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, LNotes } from './notes';
 
 
 export class VNNotebook {
     private readonly domain: VNBDomain;
-    private readonly notes: VNBNotes;
+    private readonly notes: LNotes;
     private readonly editor: VNBEditor;
 
     constructor(
@@ -23,7 +23,7 @@ export class VNNotebook {
         existsSync(this.nbDir) || mkdirpSync(this.nbDir);
 
         this.domain = new VNBDomain(this.nbName, this.nbDir);
-        this.notes = new VNBNotes(this.nbName, this.nbDir);
+        this.notes = new LNotes(this.nbName, this.nbDir);
         this.editor = new VNBEditor(nbName, nbDir);
     }
 
@@ -36,10 +36,16 @@ export class VNNotebook {
         return this.notes.getNotesByArrayLabels(al, false);
     }
 
+<<<<<<< Updated upstream
     public craeteNotes(dn: string[]) {
         const gl = { "domain": dn };
         this.addNote(gl);
         this.domain.updateGroupLabels(dn, { 'common': [] });
+=======
+    public craeteNotes(dn: string[],) {
+        this.addNote(["common->default"]);
+        this.domain.updateGroupLabels(dn, { 'common': ['default'] });
+>>>>>>> Stashed changes
     }
 
     public addNote(gl: GroupLables) {
@@ -121,10 +127,17 @@ export class VNNotebook {
 
     private processEditNote(eb: IEditBase) {
         const eo = eb as IEditNoteData;
+<<<<<<< Updated upstream
         // if (eo.editable.delete) {
         //     this.notes.deleteNote(eo.immutable.nId);
         //     return;
         // }
+=======
+        if (eo.editable.delete) {
+            this.notes.deleteNote(eo.immutable.nId);
+            return;
+        }
+>>>>>>> Stashed changes
         const n = this.notes.getNoteById(eo.immutable.nId);
         n.updateDataContents(eo.editable.contents);
         n.updateDataGroupLabels(eo.editable.groupLabels);
@@ -147,12 +160,31 @@ export class VNNotebook {
 
     private processEditDomain(eb: IEditBase) {
         const eo = eb as IEditDomain;
+<<<<<<< Updated upstream
         // if (eo.editable.delete.notes) {
         //     this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
         // } else if (eo.editable.delete.domainNode) {
         //     this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
         // }
         this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
+=======
+        const dn = eo.immutable.domainNode.split(pathSplit);
+        if (eo.editable.delete.notes) {
+            if (this.domain.isNotes(dn)) {
+                this.domain.deleteDomainNotes(dn);
+            } else {
+                throw new Error("domain is notes.");
+            }
+        } else if (eo.editable.delete.domainNode) {
+            if (this.domain.getChildrenNameOfDomain(dn).length === 0) {
+                this.domain.deleteDomain(dn);
+            } else {
+                throw new Error("domain have child domain.");
+            }
+        } else {
+            this.domain.updateGroupLabels(dn, eo.editable.commonGroupLabels)
+        }
+>>>>>>> Stashed changes
     }
 
     // private processEditNoteDelete(eb: IEditBase) {
@@ -169,19 +201,34 @@ export class VNNotebook {
             const nd = this.notes.getNoteById(nId).getData();
             this.editor.createNoteEditorFile(nId, nd.contents, nd.labels);
             return;
+<<<<<<< Updated upstream
         } else {
             const _nId = tools.generateSixString();
             this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
             const nd = this.notes.getNoteById(_nId).getData();
             this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
+=======
+        } else if (!params.nId && params.labels) {
+            params.nId = tools.generateSixString();
+            this.notes.addNote(params.nId, params.labels);
+            const nd = this.notes.getNoteById(params.nId).getData();
+            this.editor.createNoteEditorFile(params.nId, nd.contents, nd.labels);
+>>>>>>> Stashed changes
             return;
         }
     }
 
     public createDomainEditor(domainNode: string[]) {
+<<<<<<< Updated upstream
         // this.domain.isNotes(domainNode) || this.domain.addDomain(domainNode);
         const gl = this.domain.getGroupLabel(domainNode);
         this.editor.createDomainEditorFile(domainNode, gl);
+=======
+        this.domain.isNotes(domainNode) || this.domain.addDomain(domainNode);
+        const gl = this.domain.getGroupLabel(domainNode);
+        const isNotes = this.domain.isNotes(domainNode);
+        this.editor.createDomainEditorFile(domainNode, isNotes, gl);
+>>>>>>> Stashed changes
     }
 
     public createNotesSetGroupLabelsEditor(domainNode: string[], al: ArrayLabels) {

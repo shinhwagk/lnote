@@ -1,0 +1,17 @@
+kind: EditDomain
+immutable:
+  nbName: "@test"
+  domainNode: "@test/114/ppp/666/3"
+  notes: true
+  commonGroupLabels:
+    common:
+      - default
+editable:
+  delete:
+    notes: false
+    domainNode: false
+  domainName: "3"
+  commonGroupLabels:
+    common:
+      - default
+      - "3" 

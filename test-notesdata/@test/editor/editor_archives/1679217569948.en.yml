@@ -1,0 +1,12 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: b4fe87
+  groupLabels: {}
+  contents:
+    - ""
+editable:
+  delete: false
+  groupLabels: {}
+  contents:
+    - "111"

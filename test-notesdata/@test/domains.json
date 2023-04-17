@@ -1,1 +1,112 @@
+<<<<<<< Updated upstream
 {"114":{"ppp":{"lll":{"555":{".labels":{"common":["114"]},"fff":{".labels":{},"xxx":{".labels":{}}}},".labels":{}},".labels":{"common":["114","ppp"]}},".labels":{"common":["114"]}},".labels":{"common":["default"]}}
+=======
+{
+    "@test": {
+        "6": {},
+        "114": {
+            "ppp": {
+                "666": {
+                    "3": {
+                        ".labels": {
+                            "common": [
+                                "3",
+                                "default"
+                            ]
+                        }
+                    },
+                    ".labels": {
+                        "common": [
+                            "default"
+                        ],
+                        "domain": [
+                            "114",
+                            "666",
+                            "@test",
+                            "ppp"
+                        ]
+                    }
+                },
+                "lll": {
+                    "555": {
+                        ".labels": {
+                            "common": [
+                                "114",
+                                "555",
+                                "default",
+                                "lll",
+                                "ppp"
+                            ],
+                            "testlabel": [
+                                "sdfdsf"
+                            ]
+                        },
+                        "aaaa": {
+                            "444": {
+                                "888": {
+                                    "333": {
+                                        ".labels": {
+                                            "domain": [
+                                                "114",
+                                                "333",
+                                                "444",
+                                                "555",
+                                                "888",
+                                                "@test",
+                                                "aaaa",
+                                                "lll",
+                                                "ppp"
+                                            ]
+                                        }
+                                    },
+                                    ".labels": {
+                                        "domain": [
+                                            "114",
+                                            "444",
+                                            "555",
+                                            "888",
+                                            "@test",
+                                            "aaaa",
+                                            "lll",
+                                            "ppp"
+                                        ]
+                                    }
+                                },
+                                ".labels": {
+                                    "domain": [
+                                        "114",
+                                        "444",
+                                        "555",
+                                        "@test",
+                                        "aaaa",
+                                        "lll",
+                                        "ppp"
+                                    ]
+                                }
+                            },
+                            ".labels": {}
+                        }
+                    },
+                    ".labels": {}
+                },
+                ".labels": {
+                    "common": [
+                        "114",
+                        "ppp"
+                    ]
+                }
+            },
+            ".labels": {
+                "common": [
+                    "114"
+                ]
+            }
+        },
+        ".labels": {
+            "common": [
+                "default"
+            ]
+        }
+    }
+}
+>>>>>>> Stashed changes

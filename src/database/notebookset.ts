@@ -61,6 +61,10 @@ export class VNNotebookSet {
         return [...this.nbCache.keys()];
     }
 
+    public search(): string[] {
+        return []
+    }
+
     // public getNotesNumberUnderDomain(domainNode: string[], cnt: number = 0): number {
     //     cnt += this.getNotesNumberOfDomain(domainNode);
     //     const nbDomain = objectPath.get(this.domainCache, domainNode);

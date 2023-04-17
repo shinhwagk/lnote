@@ -57,10 +57,15 @@ export interface IEditDomain extends IEditBase {
     immutable: {
         nbName: string,
         domainNode: string,
+<<<<<<< Updated upstream
         commonGroupLabels: GroupLables,
         orderBy?: {
             notesGroupLabels?: GroupLables
         }
+=======
+        notes: boolean,
+        commonGroupLabels: GroupLables
+>>>>>>> Stashed changes
     },
     editable: {
         // delete: {
@@ -117,12 +122,13 @@ export class VNBEditor {
         tools.writeYamlSync(this.editorFile, ed);
     }
 
-    public createDomainEditorFile(domainNode: string[], gl: GroupLables) {
+    public createDomainEditorFile(domainNode: string[], notes: boolean, gl: GroupLables) {
         const ed: IEditDomain = {
             kind: 'EditDomain',
             immutable: {
                 nbName: this.nbName,
                 domainNode: domainNode.join(pathSplit),
+                notes: notes,
                 commonGroupLabels: gl
             },
             editable: {

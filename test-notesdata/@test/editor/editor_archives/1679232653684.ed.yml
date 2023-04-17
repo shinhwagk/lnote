@@ -1,0 +1,16 @@
+kind: EditDomain
+immutable:
+  nbName: "@test"
+  domainNode: "@test/6"
+  notes: true
+  commonGroupLabels:
+    common:
+      - default
+editable:
+  delete:
+    notes: true
+    domainNode: false
+  domainName: "6"
+  commonGroupLabels:
+    common:
+      - default

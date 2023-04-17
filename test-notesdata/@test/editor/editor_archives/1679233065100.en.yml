@@ -1,0 +1,24 @@
+kind: EditNote
+immutable:
+  nbName: "@test"
+  nId: 555f2b
+  groupLabels:
+    common:
+      - "114"
+      - "555"
+      - lll
+      - nnn
+      - ppp
+  contents:
+    - xxxx111
+editable:
+  delete: false
+  groupLabels:
+    common:
+      - "114"
+      - "555"
+      - lll
+      - nnn
+      - ppp
+  contents:
+    - xxxx111221

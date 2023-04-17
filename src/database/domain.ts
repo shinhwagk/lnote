@@ -15,7 +15,7 @@ interface NBDomainStruct {
 export class VNBDomain {
 
     private readonly domainFile: string;
-    private readonly domainCache: NBDomainStruct = {};
+    private domainCache: NBDomainStruct = {};
 
     constructor(
         readonly nbName: string,
@@ -24,7 +24,7 @@ export class VNBDomain {
         this.domainFile = path.join(this.nbDir, 'domains.json');
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
 
-        objectPath.set(this.domainCache, [this.nbName], vfs.readJsonSync(this.domainFile));
+        this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);
     }
 
     public getGroupLabel(domainNode: string[]): GroupLables {
@@ -67,8 +67,10 @@ export class VNBDomain {
         this.moveDomain(domainNode, newDomainNode);
     }
 
-    public addDomain(domainNode: string[], labels: GroupLables = { 'common': [] }) {
-        this.updateGroupLabels(domainNode, labels);
+    // , labels: GroupLables = { 'common': [] }
+    public addDomain(domainNode: string[]) {
+        objectPath.set(this.domainCache, [...domainNode], {})
+        this.permanent();
     }
 
     public updateGroupLabels(domainNode: string[], gl: GroupLables) {
@@ -77,7 +79,7 @@ export class VNBDomain {
     }
 
     public permanent() {
-        vfs.writeJsonSync(this.domainFile, this.domainCache[this.nbName]);
+        vfs.writeJsonSync(this.domainFile, this.domainCache);
     }
 
     // check domain node is a notes

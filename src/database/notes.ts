@@ -8,7 +8,7 @@ import { tools, vfs } from '../helper';
 import { INBNote, NBNote } from './note';
 
 import { ArrayLabels, GroupLables } from '../types';
-import { jointMark } from '../constants';
+import { jointMark, notesFileName } from '../constants';
 
 // export interface NBDomainStruct {
 //     [domain: string]: NBDomainStruct;
@@ -67,7 +67,8 @@ class NBNoteCache {
 
 }
 
-export class VNBNotes {
+// lnotes
+export class LNotes {
     private notesCache = new Map<string, INBNote>();
     // Set<string>: note ids
     // example: key: "<group name> -> label1", [id1,id2]
@@ -79,7 +80,7 @@ export class VNBNotes {
         readonly nbName: string,
         readonly nbDir: string
     ) {
-        this.notesFile = path.join(this.nbDir, 'notes.json');
+        this.notesFile = path.join(this.nbDir, notesFileName);
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
@@ -147,7 +148,7 @@ export class VNBNotes {
     }
 
     public getNotesByArrayLabels(al: ArrayLabels, strict: boolean) {
-        const ids = strict ? this.getNIdsByStrictArrayLabels(al) : this.getNIdsByArrayLabels(al)
+        const ids = strict ? this.getNIdsByStrictArrayLabels(al) : this.getNIdsByArrayLabels(al);
         return ids.map(nId => this.getNoteById(nId));
     }
 
@@ -160,7 +161,6 @@ export class VNBNotes {
 
     public permanent() {
         this.notesCache;
-
         vfs.writeJsonSync(this.notesFile, Object.fromEntries(this.notesCache.entries()));
     }
 
@@ -174,6 +174,18 @@ export class VNBNotes {
         this.getNoteById(nId)
             .getDataArrayLabels()
             .forEach(l => this.notesGroupedByLabelCache.get(l)?.delete(nId));
+    }
+
+    public search(keywords: string[]): string[] {
+        const ids: string[] = [];
+        for (const [nId, note] of this.notesCache.entries()) {
+            const contentOfNote = note.contents.concat(groupLabel2ArrayLabels(note.labels)).join(' |\| ');
+            const match = keywords.map(kw => new RegExp(kw)).filter(re => re.test(contentOfNote))
+            if (match.length === keywords.length) {
+                ids.push(nId);
+            }
+        }
+        return ids;
     }
     // public removeLabel(nId: string, labels: string[]) {
     //     const n = this.getNoteByid(nId);

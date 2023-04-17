@@ -23,6 +23,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
+<<<<<<< Updated upstream
     // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     // if (labelsOfDomain === undefined) { return; };
     // const _l = labelsOfDomain.split(',').map(l => l.trim());
@@ -30,6 +31,12 @@ export namespace ExtCmds {
     // ext.vnNotebookSet.refresh(ext.gs.nbName);
     // ext.domainProvider.refresh(dn);
     // await cmdHdlDomainPin(dn);
+=======
+    ext.gs.nb.craeteNotes(ext.gs.domainNodeFormat,);
+    ext.vnNotebookSet.refresh(ext.gs.nbName);
+    ext.domainProvider.refresh(dn);
+    await cmdHdlDomainPin(dn);
+>>>>>>> Stashed changes
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
     console.log('msdfsdf')
