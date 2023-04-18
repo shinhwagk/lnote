@@ -57,15 +57,8 @@ export interface IEditDomain extends IEditBase {
     immutable: {
         nbName: string,
         domainNode: string,
-<<<<<<< Updated upstream
-        commonGroupLabels: GroupLables,
-        orderBy?: {
-            notesGroupLabels?: GroupLables
-        }
-=======
         notes: boolean,
         commonGroupLabels: GroupLables
->>>>>>> Stashed changes
     },
     editable: {
         // delete: {

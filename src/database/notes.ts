@@ -176,16 +176,17 @@ export class LNotes {
             .forEach(l => this.notesGroupedByLabelCache.get(l)?.delete(nId));
     }
 
-    public search(keywords: string[]): string[] {
-        const ids: string[] = [];
+    public search(keywords: string[]): NBNote[] {
+        const notes: NBNote[] = [];
+        const res = keywords.map(kw => new RegExp(kw));
         for (const [nId, note] of this.notesCache.entries()) {
             const contentOfNote = note.contents.concat(groupLabel2ArrayLabels(note.labels)).join(' |\| ');
-            const match = keywords.map(kw => new RegExp(kw)).filter(re => re.test(contentOfNote))
-            if (match.length === keywords.length) {
-                ids.push(nId);
+            if (res.filter(re => re.test(contentOfNote)).length === keywords.length) {
+                const n = new NBNote(this.nbDir, nId, note);
+                notes.push(n);
             }
         }
-        return ids;
+        return notes;
     }
     // public removeLabel(nId: string, labels: string[]) {
     //     const n = this.getNoteByid(nId);

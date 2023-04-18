@@ -59,6 +59,11 @@
                     "when": "view == domainExplorer"
                 },
                 {
+                    "command": "lnote.domain.search",
+                    "group": "navigation",
+                    "when": "view == domainExplorer"
+                },
+                {
                     "command": "lnote.files.open.terminal",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
@@ -91,11 +96,6 @@
                     "group": "3_domain"
                 },
                 {
-                    "command": "lnote.domain.search",
-                    "when": "view == domainExplorer",
-                    "group": "4_domain"
-                },
-                {
                     "command": "lnote.domain.notes.create",
                     "when": "view == domainExplorer && viewItem == emptyNotes",
                     "group": "1_domain"
@@ -124,12 +124,16 @@
                 }
             },
             {
-                "command": "lnote.domain.remove",
-                "title": "Remove"
+                "command": "lnote.domain.search",
+                "title": "Search",
+                "icon": {
+                    "light": "images/light/add.svg",
+                    "dark": "images/dark/add.svg"
+                }
             },
             {
-                "command": "lnote.domain.search",
-                "title": "Search"
+                "command": "lnote.domain.remove",
+                "title": "Remove"
             },
             {
                 "command": "lnote.domain.refresh",

@@ -5,15 +5,14 @@ import {
 } from 'vscode';
 
 import { section } from './constants';
-import { NBNote } from './database/note';
 import { VNNotebook } from './database/notebook';
 import { VNNotebookSet } from './database/notebookset';
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { tools, vfs } from './helper';
 import { NotesPanelView } from './panel/notesPanelView';
+import { SearchPanelView } from './panel/searchPanelView';
 import { WebStatus } from './panel/web';
-import { ArrayLabels } from './types';
 
 export class GlobalState {
   nId: string = '';
@@ -45,6 +44,7 @@ export namespace ext {
   export let domainTreeView: TreeView<DomainNode>;
   export let filesProvider: FilesExplorerProvider;
   export let notesPanelView: NotesPanelView;
+  export let searchPanelView: SearchPanelView;
   export let notebookPath: string;
   export let shortcutsFilePath: string;
   export let gs: GlobalState;
@@ -167,6 +167,10 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
 
   if (!ext.notesPanelView) {
     ext.notesPanelView = new NotesPanelView();
+  }
+
+  if (!ext.searchPanelView) {
+    ext.searchPanelView = new SearchPanelView();
   }
 
   if (!ext.domainProvider || !ext.domainTreeView) {

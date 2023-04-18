@@ -81,7 +81,7 @@ export class NotesPanelView {
       command: 'post-data',
       data: {
         domainNotes: this.getNotesForWebStruct(this.domainNode),
-        domainNode: ext.webState.domainNode,
+        // domainNode: ext.webState.domainNode,
         // domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode),
         domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode),
         // selectedArrayLabels: ext.webSelectedArrayLabels.length===0? this.

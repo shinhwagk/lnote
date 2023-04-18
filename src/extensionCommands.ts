@@ -23,7 +23,6 @@ export namespace ExtCmds {
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     ext.updateGS(dn);
-<<<<<<< Updated upstream
     // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     // if (labelsOfDomain === undefined) { return; };
     // const _l = labelsOfDomain.split(',').map(l => l.trim());
@@ -31,12 +30,6 @@ export namespace ExtCmds {
     // ext.vnNotebookSet.refresh(ext.gs.nbName);
     // ext.domainProvider.refresh(dn);
     // await cmdHdlDomainPin(dn);
-=======
-    ext.gs.nb.craeteNotes(ext.gs.domainNodeFormat,);
-    ext.vnNotebookSet.refresh(ext.gs.nbName);
-    ext.domainProvider.refresh(dn);
-    await cmdHdlDomainPin(dn);
->>>>>>> Stashed changes
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
     console.log('msdfsdf')
@@ -65,7 +58,7 @@ export namespace ExtCmds {
     ext.webState.selectedArraylabels = ext.webState.selectedArraylabels.length === 0
       ? ext.gs.nb.getArrayLabelsOfDomain(ext.gs.domainNodeFormat)
       : ext.webState.selectedArraylabels;
-    ext.webState.notes = ext.gs.nb.getNotesByArrayLabels(ext.webState.selectedArraylabels);
+    // ext.webState.notes = ext.gs.nb.getNotesByArrayLabels(ext.webState.selectedArraylabels);
 
     await ext.notesPanelView.parseDomain().showNotesPlanView();
     console.log("get notes time " + `${new Date().getTime() - s}`);
@@ -112,8 +105,8 @@ export namespace ExtCmds {
     ext.gs.nb.deleteDomain(_dn);
     ext.domainProvider.refresh();
   }
-  export async function cmdHdlDomainSearch(_dn: DomainNode) {
-    window.showInformationMessage('soon');
+  export async function cmdHdlGlobalSearch(_dn: DomainNode) {
+    await ext.searchPanelView.show();
   }
   export async function cmdHdlNoteOpenFolder(_nId: string) {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);

@@ -8,6 +8,7 @@ import {
 } from 'fs-extra';
 
 import { VNNotebook } from './notebook';
+import { INBNote, NBNote } from './note';
 
 export class VNNotebookSet {
     private readonly nbCache = new Map<string, VNNotebook>();
@@ -61,8 +62,15 @@ export class VNNotebookSet {
         return [...this.nbCache.keys()];
     }
 
-    public search(): string[] {
-        return []
+    public search(keywords: string[]): NBNote[] {
+        const notes: NBNote[] = [];
+        for (const [nbName, nb] of this.nbCache.entries()) {
+            if (keywords.includes(nbName)) {
+                const _kws = keywords.filter(kw => kw !== nbName);
+                nb.search(_kws).forEach(n => notes.push(n));
+            }
+        }
+        return notes
     }
 
     // public getNotesNumberUnderDomain(domainNode: string[], cnt: number = 0): number {
