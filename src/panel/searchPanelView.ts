@@ -6,6 +6,7 @@ import { tools } from '../helper';
 import { INBNote, NBNote } from '../database/note';
 
 interface IWebNote {
+    nb: string;
     nId: string;
     contents: string[];
     doc: boolean;
@@ -39,14 +40,13 @@ export class SearchPanelView {
                     <link href="${stylesMainUri}" rel="stylesheet">
                     <script nonce="${nonce}" src="https://kit.fontawesome.com/61b8139299.js" crossorigin="anonymous" ></script>
                     <title>lnote</title>
-                    <script>
-                        
-                    </script>
                 </head>
                 <body>
-                    <textarea id="APjFqb" maxlength="2048" name="q" rows="1" ></textarea>
-                    <button onclick="myFunction()">button</button>
-                    <a id="search-time"></a>
+                    <div class="search">
+                        <textarea id="APjFqb" class="searchTextArea" maxlength="2048" name="q" rows="1" >@test default</textarea>
+                        <button class="searchButton" onclick="myFunction()">button</button>
+                        <a id="search-time"></a>
+                    </div>
                     <div id="root">
                         <div id="content"></div>
                         <ul id="contextMenu" class="contextMenu"></ul>
@@ -77,7 +77,7 @@ export class SearchPanelView {
                 const _n = JSON.parse(JSON.stringify(n)); // clone obj
                 const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
                 _n['labels'] = alOfNote;
-                return { nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+                return { nb: n.getNBName(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
             });
     }
 
@@ -135,7 +135,6 @@ export class SearchPanelView {
                         const keywords = msg.data.keywords;
                         console.log("keywords", keywords);
                         const notes = ext.vnNotebookSet.search(keywords);
-                        console.log(notes)
                         await this.postData(this.convertForWebStruct(notes));
 
                         break;

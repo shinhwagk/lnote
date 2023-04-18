@@ -16,11 +16,11 @@ interface DataDomain {
     checkedLabels: string[];
     unCheckedLabels: string[];
     categories: DataCategory[];
-    notes: PostNote[];
-    note: PostNote
+    notes: DataNote[];
+    // note: PostNote
     labels: string[];
     domainLabels: string[];
-    domainNotes: PostNote[];
+    domainNotes: DataNote[];
     nId: string;
     domainArrayLabel: string[];
     domainGroupLabel: { [g: string]: string[] };
@@ -32,13 +32,16 @@ interface DataCategory {
     notes: DataNote[];
 }
 
-interface DataNote {
+interface DataNote1 {
+    nb: string;
     nId: string;
     contents: string[];
     doc: boolean;
     files: boolean;
-    cDate: string;
-    mDate: string;
+    cts: number;
+    mts: number;
+    labels: string[];
+    category: string;
 }
 
 interface DataProtocol {
@@ -46,15 +49,16 @@ interface DataProtocol {
     data: DataDomain;
 }
 
-interface PostNote {
+interface DataNote {
+    nb: string;
+    nId: string;
     contents: string[];
+    doc: boolean;
+    files: boolean;
     cts: number;
     mts: number;
     labels: string[];
     category: string;
-    nId: string;
-    doc: boolean;
-    files: boolean;
 }
 
 interface ContextMenuAction {
@@ -66,17 +70,17 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'edit',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: data.note.nId, labels: {} } } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nb: data.note.nb, nId: data.note.nId, labels: {} } } })
         }
     ],
     [
         {
             title: 'create document',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nb: data.note.nb, nId: data.note.nId } })
         },
         {
             title: 'create files',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nb: data.note.nb, nId: data.note.nId } })
         }
     ],
     // [
@@ -199,7 +203,7 @@ function elemSpaces(num: number = 1) {
     return s;
 }
 
-function readerNote(container: HTMLElement, note: PostNote): void {
+function readerNote(container: HTMLElement, note: DataNote): void {
     container.replaceChildren();
 
     const d_note = container;
@@ -336,7 +340,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
     d_category_body.className = 'grid-category-body';
 
-    for (const n of gs.domainNotes) {
+    for (const n of gs.notes) {
         if (issubset(n.labels, labelsOfNotes)) {
             const notesDom = document.createElement('div');
             notesDom.id = `note-${n.nId}`;
@@ -345,23 +349,32 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
         }
 
         d_category.append(d_category_name, d_category_body);
-        fDom.append(d_category);
+        fDom.append(d_category, document.createElement('p'));
         // d_category.append(d_category_name, d_category_body);
         // return d_category;
     }
 }
 
 function readerNotesCategories() {
-    const localDom = document.getElementById('domain-categories')!;
+    let localDom = document.getElementById('domain-categories')!;
     localDom.replaceChildren();
+
+    // const categoriesDom = document.createElement('div');
+    // categoriesDom.id = 'domain-categories';
+    // document.getElementById('content')?.replaceChildren(categoriesDom);
+
     // this.nIds = domainNotes.map(n => n.nId);
     const labelsOfNotes = new Set<string>();
-    for (const note of gs.domainNotes) {
-
+    for (const note of gs.notes) {
         // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
-        if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
+        if (gs.checkedLabels.length === 0) {
             labelsOfNotes.add(note.labels.sort().join('|||'));
+        } else {
+            if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
+                labelsOfNotes.add(note.labels.sort().join('|||'));
+            }
         }
+
         // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
         // if (cname in categories) {
         //   categories[cname].push(note);
@@ -406,145 +419,175 @@ function readerNotesLabels() {
 
     const _gl: { [g: string]: NoteLabel[] } = {};
 
+    const _ava = new Set<string>();
+    const _com: string[][] = [];
+    // const  = new Set<string>()
+
+    // if (gs.checkedLabels)
+
+    // const groupLabels = new Map<string, Set<string>>();
+
+    for (const n of gs.notes) {
+        if (gs.checkedLabels.length >= 1) {
+            if (intersection(n.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
+                n.labels.forEach(l => _ava.add(l));
+                _com.push(n.labels);
+            }
+        }
+        else {
+            gs.allLabels.forEach(l => _ava.add(l));
+            _com.push(n.labels);
+        }
+    }
+    const _com1 = _com.reduce((p, c) => p.filter(e => c.includes(e)));
+    // console.log("comm", commonlabel1)
+
+
     // for (const l of groupLaelOfnotes.values()) {
     //   const ll = l.split('|||')
     //   intersection(l, gs.checkedLabels)
     // }
-    const notesGroupedByLabelCache = [...gs.notesGroupedByLabelCache.values()].map(l => l.split('|||'));
-    console.log('notesGroupedByLabelCache', notesGroupedByLabelCache)
-    console.log("111 unCheckedLabels", gs.unCheckedLabels)
-    console.log("111 checkedLabels", gs.checkedLabels)
-    const commonlabel2 = gs.checkedLabels.length >= 1 ? notesGroupedByLabelCache
-        .filter(ls => issubset(gs.checkedLabels, ls))
-        .map(ls => { console.log(ls); return ls })
-        : notesGroupedByLabelCache
+    // const notesGroupedByLabelCache = [...gs.notesGroupedByLabelCache.values()].map(l => l.split('|||'));
+    // console.log('notesGroupedByLabelCache', notesGroupedByLabelCache);
+    // console.log("111 unCheckedLabels", gs.unCheckedLabels);
+    // console.log("111 checkedLabels", gs.checkedLabels);
+    // const commonlabel2 = gs.checkedLabels.length >= 1 ? notesGroupedByLabelCache
+    //     .filter(ls => issubset(gs.checkedLabels, ls))
+    //     .map(ls => { console.log(ls); return ls; })
+    //     : notesGroupedByLabelCache;
 
-    console.log("commonlabel2", commonlabel2)
-    const commonlabel1 = commonlabel2.reduce((p, c) => p.filter(e => c.includes(e)))
-    console.log("commonlabel1", commonlabel1)
-    commonlabel1.filter(l => !gs.checkedLabels.includes(l)).forEach(l => {
-        gs.checkedLabels.push(l)
-        gs.unCheckedLabels = gs.unCheckedLabels.filter(e => e !== l)
-    })
+    // console.log("commonlabel2", commonlabel2);
+    // const commonlabel1 = commonlabel2.reduce((p, c) => p.filter(e => c.includes(e)));
+    // console.log("commonlabel1", commonlabel1);
+    // commonlabel1.filter(l => !gs.checkedLabels.includes(l)).forEach(l => {
+    //     gs.checkedLabels.push(l);
+    //     gs.unCheckedLabels = gs.unCheckedLabels.filter(e => e !== l);
+    // });
 
-    let availableLabels = notesGroupedByLabelCache
-        .filter(ls => intersection(ls, gs.checkedLabels).length >= 1)
-        .flatMap(l => l)
-        .filter(l => !gs.checkedLabels.includes(l))
+    // let availableLabels = notesGroupedByLabelCache
+    //     .filter(ls => intersection(ls, gs.checkedLabels).length >= 1)
+    //     .flatMap(l => l)
+    //     .filter(l => !gs.checkedLabels.includes(l));
 
-    availableLabels = [...(new Set(availableLabels).values())]
-    // .reduce((p, c) => p.filter(e => c.includes(e)))
-    console.log('availableLabels', availableLabels)
-
-
-    // .reduce((p, c) => p.filter(e => c.includes(e)));
-
-    console.log("unCheckedLabels", gs.unCheckedLabels)
-    console.log("checkedLabels", gs.checkedLabels)
+    // availableLabels = [...(new Set(availableLabels).values())];
+    // // .reduce((p, c) => p.filter(e => c.includes(e)))
+    // console.log('availableLabels', availableLabels);
 
 
-    const commonlabel: string[] = commonlabel1;// = [...gs.notesGroupedByLabelCache.values()]
-    //   .map(l =>
-    //     l.split('|||')
-    //       .filter(_l => _l !== 'common->lll')
-    //   ).reduce((p, c) => p.filter(e => c.includes(e)));
+    // // .reduce((p, c) => p.filter(e => c.includes(e)));
 
-    // console.log(commonlabel, 'commonlabel1', commonlabel1,);
-    // const chosselabel = commonlabel.
-    for (const label of gs.unCheckedLabels) {
-        const [g, l] = label.split('->');
-        let nl: NoteLabel;
-        if (commonlabel.includes(label)) {
-            nl = {
-                group: g,
-                label: l,
-                gl: `${g}->${l}`,
-                checked: true,
-                available: true //&& groupLaelOfnotes.size >= 2
-            };
-        } else if (1 === 1) {
-            nl = {
-                group: g,
-                label: l,
-                gl: `${g}->${l}`,
-                checked: false,
-                available: true //&& groupLaelOfnotes.size >= 2
-            };
-        } else {
-            nl = {
-                group: g,
-                label: l,
-                gl: `${g}->${l}`,
-                checked: false,
-                available: false //&& groupLaelOfnotes.size >= 2
-            };
-        }
-        if (g in _gl) {
-            _gl[g].push(nl);
-        } else {
-            _gl[g] = [nl];
-        }
-    }
+    // console.log("unCheckedLabels", gs.unCheckedLabels);
+    // console.log("checkedLabels", gs.checkedLabels);
 
-    for (const label of gs.checkedLabels) {
-        const [g, l] = label.split('->');
-        const nl: NoteLabel = {
-            group: g,
-            label: l,
-            gl: `${g}->${l}`,
-            checked: true,
-            available: true //&& groupLaelOfnotes.size >= 2
-        };
-        if (g in _gl) {
-            _gl[g].push(nl);
-        } else {
-            _gl[g] = [nl];
-        }
-        // _gl[g].sort(l => l.checked ? 0 : 1);
-        // const gl_dom = document.createElement('div');
-        // gl_dom.textContent = g;
-        // for (const l of ls) {
-        //   const l_dom = document.createElement('label');
-        //   l_dom.className = gs.checkedLabels.includes(`${g}->${l}`) ? 'checkedLabel' : 'unCheckedLabel';
-        //   l_dom.textContent = l;
-        //   l_dom.id = `${g}->${l}`;
-        //   gl_dom.append(l_dom, elemSpaces());
-        // }
-    }
+
+    // const commonlabel: string[] = commonlabel1;// = [...gs.notesGroupedByLabelCache.values()]
+    // //   .map(l =>
+    // //     l.split('|||')
+    // //       .filter(_l => _l !== 'common->lll')
+    // //   ).reduce((p, c) => p.filter(e => c.includes(e)));
+
+    // // console.log(commonlabel, 'commonlabel1', commonlabel1,);
+    // // const chosselabel = commonlabel.
+    // for (const label of gs.unCheckedLabels) {
+    //     const [g, l] = label.split('->');
+    //     let nl: NoteLabel;
+    //     if (commonlabel.includes(label)) {
+    //         nl = {
+    //             group: g,
+    //             label: l,
+    //             gl: `${g}->${l}`,
+    //             checked: true,
+    //             available: true //&& groupLaelOfnotes.size >= 2
+    //         };
+    //     } else if (1 === 1) {
+    //         nl = {
+    //             group: g,
+    //             label: l,
+    //             gl: `${g}->${l}`,
+    //             checked: false,
+    //             available: true //&& groupLaelOfnotes.size >= 2
+    //         };
+    //     } else {
+    //         nl = {
+    //             group: g,
+    //             label: l,
+    //             gl: `${g}->${l}`,
+    //             checked: false,
+    //             available: false //&& groupLaelOfnotes.size >= 2
+    //         };
+    //     }
+    //     if (g in _gl) {
+    //         _gl[g].push(nl);
+    //     } else {
+    //         _gl[g] = [nl];
+    //     }
+    // }
+
+    // for (const label of gs.checkedLabels) {
+    //     const [g, l] = label.split('->');
+    //     const nl: NoteLabel = {
+    //         group: g,
+    //         label: l,
+    //         gl: `${g}->${l}`,
+    //         checked: true,
+    //         available: true //&& groupLaelOfnotes.size >= 2
+    //     };
+    //     if (g in _gl) {
+    //         _gl[g].push(nl);
+    //     } else {
+    //         _gl[g] = [nl];
+    //     }
+    //     // _gl[g].sort(l => l.checked ? 0 : 1);
+    //     // const gl_dom = document.createElement('div');
+    //     // gl_dom.textContent = g;
+    //     // for (const l of ls) {
+    //     //   const l_dom = document.createElement('label');
+    //     //   l_dom.className = gs.checkedLabels.includes(`${g}->${l}`) ? 'checkedLabel' : 'unCheckedLabel';
+    //     //   l_dom.textContent = l;
+    //     //   l_dom.id = `${g}->${l}`;
+    //     //   gl_dom.append(l_dom, elemSpaces());
+    //     // }
+    // }
 
     // console.log("common1", commonlabel1)
-    for (const [g, noteLabels] of Object.entries(_gl)) {
+    // console.log(gs.allGroupLabels)
+    for (const [g, noteLabels] of gs.allGroupLabels.entries()) {
         const group_dom = document.createElement('div');
         // group_dom.textContent = g;
         const group_name_dom = document.createElement('label');
         group_name_dom.textContent = g;
         group_dom.append(group_name_dom, elemSpaces());
 
-        for (const nl of noteLabels.sort()) {
+        for (const nl of [...noteLabels.values()].sort()) {
             const group_label_dom = document.createElement('label');
-            group_label_dom.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
-            // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
-            group_label_dom.textContent = nl.label;
+            group_label_dom.className =
+                gs.checkedLabels.length >= 1 ?
+                    _com1.includes(nl) ?
+                        'checkedLabel'
+                        : gs.checkedLabels.includes(nl)
+                            ? 'checkedLabel'
+                            : _ava.has(nl)
+                                ? 'unCheckedLabel'
+                                : 'unAvailableLabel'
+                    : _com1.includes(nl)
+                        ? 'checkedLabel'
+                        : 'unCheckedLabel';
+            group_label_dom.textContent = nl.split('->')[1];
             group_label_dom.onclick = () => {
-                vscode.postMessage({ command: 'web-update-labels', data: { nId: 'nid' } })
-                console.log("0000000", group_label_dom.className)
+                // vscode.postMessage({ command: 'web-update-labels', data: { nId: 'nid' } });
+                // console.log("0000000", group_label_dom.className);
                 if (group_label_dom.className === 'unCheckedLabel') {
-                    gs.checkedLabels.push(nl.gl);
-                    gs.unCheckedLabels = gs.unCheckedLabels.filter(l => l !== nl.gl);
+                    gs.checkedLabels.push(nl);
+                    gs.unCheckedLabels = gs.unCheckedLabels.filter(l => l !== nl);
                 } else if (group_label_dom.className === 'checkedLabel') {
-                    gs.unCheckedLabels.push(nl.gl);
-                    gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl.gl);
-                } else if (group_label_dom.className === 'unCheckedLabel notavailable') {
+                    gs.unCheckedLabels.push(nl);
+                    gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl);
+                } else if (group_label_dom.className === 'unCheckedLabel unAvailableLabel') {
 
                 }
-                console.log("0000000", gs.checkedLabels)
-                console.log("0000000", gs.unCheckedLabels)
-                // group_label_dom.className = group_label_dom.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-                // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
                 readerNotesLabels();
                 readerNotesCategories();
             };
-            // labelDoms.push(d);
             group_dom.append(group_label_dom, elemSpaces());
         }
         localDom.append(group_dom);
@@ -643,17 +686,19 @@ document.addEventListener(
 );
 
 class GlobalState {
-    notes: INBNote[] = [];
+    notes: DataNote[] = [];
     s_s = 0;
     domainLabels: string[] = [];
     checkedLabels: string[] = [];
     unCheckedLabels: string[] = [];
     notesArrayLabels: string[] = [];
-    domainNotes: PostNote[] = [];
+    domainNotes: DataNote[] = [];
     domainNode: string[] = [];
     search: boolean = false;
     domainArrayLabels: string[] = [];
-    notesGroupedByLabelCache = new Set<string>;
+    notesGroupedByLabelCache = new Set<string>();
+    allLabels = new Set<string>();
+    allGroupLabels = new Map<string, Set<string>>();
 }
 
 // const vnDomain = new VNDomain();
@@ -711,8 +756,7 @@ window.addEventListener('message', (event) => {
     switch (message.command) {
         case 'post-notes':
             const e_s = (new Date()).getTime();
-            const notes = message.data.notes;
-            console.log(notes)
+            gs.notes = message.data.notes;
             document.getElementById('search-time')!.textContent = `${e_s - gs.s_s} ms`;
             // gs.domainLabels = message.data.domainLabels;
             // gs.domainArrayLabels = message.data.domainArrayLabel;
@@ -728,18 +772,53 @@ window.addEventListener('message', (event) => {
             // gs.checkedLabels = [];
             // gs.notesArrayLabels = [...(new Set<string>(gs.domainNotes.map(n => n.labels).flatMap(ls => ls))).values()];
 
-            // for (const n of gs.domainNotes) {
-            //     // const labels = n.labels
-            //     const labels = n.labels.filter(l => !gs.domainArrayLabels.includes(l))
-            //     if (labels.length >= 1) {
-            //         gs.notesGroupedByLabelCache.add(labels.join('|||'));
-            //     }
+
+            // interface NoteLabel {
+            //     checked: boolean;
+            //     label: string;
+            //     group: string;
+            //     // group label: `${group}->${label}`
+            //     gl: string;
+            //     available: boolean;
+
+            //     //   dom(){
+
+            //     // }
             // }
+            for (const n of gs.notes) {
+                // gs.notesGroupedByLabelCache.add(n.labels.sort().join('|||'));
+                n.labels.forEach(n => gs.allLabels.add(n));
+                for (const label of n.labels) {
+                    const [g, l] = label.split('->');
+                    if (gs.allGroupLabels.has(g)) {
+                        gs.allGroupLabels.get(g)?.add(label);
+                    } else {
+                        const s = new Set<string>();
+                        s.add(label);
+                        gs.allGroupLabels.set(g, s);
+                    }
+                }
+            }
             // // gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
 
-            // readerDomainName();
-            // readerNotesLabels();
-            // readerNotesCategories();
+            // lables
+            const labelsDom = document.createElement('div');
+            labelsDom.id = 'notes-labels';
+
+            // categories
+            const categoriesDom = document.createElement('div');
+            categoriesDom.id = 'domain-categories';
+
+            const e_domain = document.createElement('div');
+            e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
+
+            document.getElementById('content')?.replaceChildren(e_domain);
+
+            // const _notes = gs.checkedLabels.length >= 1
+            //     ? gs.notes.filter(n => intersection(gs.checkedLabels, n.labels).length === gs.checkedLabels.length)
+            //     : gs.notes;
+            readerNotesLabels();
+            readerNotesCategories();
 
             // vnDomain.updateDomainLabels(message.data.domainLabels);
             // vnDomain.updateDomainNotes(message.data.domainNotes);
@@ -771,18 +850,14 @@ window.addEventListener('message', (event) => {
     }
 });
 
-
-
 function myFunction() {
     gs.s_s = (new Date()).getTime();
     const x = (<HTMLTextAreaElement>document.getElementById("APjFqb"))?.value;
     // document.createElement('textarea')
-
     if (x) {
         const keywords = x.trim().split(' ');
         if (keywords.length >= 2) {
-            console.log("111")
-            vscode.postMessage({ command: 'search', data: { keywords: keywords } })
+            vscode.postMessage({ command: 'search', data: { keywords: keywords } });
         }
     }
     // document.getElementById("content").innerHTML = "You selected: " + x;

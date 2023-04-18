@@ -192,3 +192,7 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     padding: 1px 4px 2px;
     background-color: rgb(218, 12, 12);
 }
+
+.searchTextArea {
+    background-color: var(--vscode-menu-background);
+}

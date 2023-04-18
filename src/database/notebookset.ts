@@ -64,6 +64,7 @@ export class VNNotebookSet {
 
     public search(keywords: string[]): NBNote[] {
         const notes: NBNote[] = [];
+        console.log(1, keywords)
         for (const [nbName, nb] of this.nbCache.entries()) {
             if (keywords.includes(nbName)) {
                 const _kws = keywords.filter(kw => kw !== nbName);

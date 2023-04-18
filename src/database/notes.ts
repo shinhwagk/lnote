@@ -130,7 +130,7 @@ export class LNotes {
     }
 
     public getNoteById(nId: string): NBNote {
-        return NBNote.get(this.nbDir, nId, this.notesCache.get(nId)!);
+        return NBNote.get(this.nbName, this.nbDir, nId, this.notesCache.get(nId)!);
     }
 
     public getNIdsByArrayLabels(labels: ArrayLabels): string[] {
@@ -180,9 +180,11 @@ export class LNotes {
         const notes: NBNote[] = [];
         const res = keywords.map(kw => new RegExp(kw));
         for (const [nId, note] of this.notesCache.entries()) {
-            const contentOfNote = note.contents.concat(groupLabel2ArrayLabels(note.labels)).join(' |\| ');
-            if (res.filter(re => re.test(contentOfNote)).length === keywords.length) {
-                const n = new NBNote(this.nbDir, nId, note);
+
+            const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
+            console.log("contentof note ", contentOfNote);
+            if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
+                const n = new NBNote(this.nbName, this.nbDir, nId, note);
                 notes.push(n);
             }
         }

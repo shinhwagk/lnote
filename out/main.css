@@ -180,7 +180,7 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
 
 .checkedLabel {
     padding: 1px 4px 2px;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(80, 80, 80);
 }
 
 .unCheckedLabel {
@@ -189,8 +189,15 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
 }
 
 .unAvailableLabel {
+    color: darkgrey;
     padding: 1px 4px 2px;
-    background-color: rgb(218, 12, 12);
+    /* background-color: rgb(218, 12, 12); */
+}
+
+.search {
+    /* display: inline-block;
+    border: 1px solid red;
+    margin: 2px; */
 }
 
 .searchTextArea {
@@ -199,5 +206,13 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     /* padding: 0 0 3px; */
     color: #e8eaed;
     resize: none;
+    background-color: var(--vscode-menu-background);
+    /* display: block; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+}
+
+.searchButton {
+    color: #e8eaed;
     background-color: var(--vscode-menu-background);
 }
