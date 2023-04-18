@@ -182,7 +182,6 @@ export class LNotes {
         for (const [nId, note] of this.notesCache.entries()) {
 
             const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
-            console.log("contentof note ", contentOfNote);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
                 const n = new NBNote(this.nbName, this.nbDir, nId, note);
                 notes.push(n);

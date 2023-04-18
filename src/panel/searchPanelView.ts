@@ -81,7 +81,7 @@ export class SearchPanelView {
             });
     }
 
-    public async postData(notes: IWebNote[]) {
+    public async postNotes(notes: IWebNote[]) {
         await this.panel!.webview.postMessage({
             command: 'post-notes',
             data: { notes: notes }
@@ -132,11 +132,8 @@ export class SearchPanelView {
             async (msg) => {
                 switch (msg.command) {
                     case 'search':
-                        const keywords = msg.data.keywords;
-                        console.log("keywords", keywords);
-                        const notes = ext.vnNotebookSet.search(keywords);
-                        await this.postData(this.convertForWebStruct(notes));
-
+                        const notes = ext.vnNotebookSet.search(msg.data.keywords);
+                        await this.postNotes(this.convertForWebStruct(notes));
                         break;
                     case 'notebook-editor':
                         ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
