@@ -112,7 +112,7 @@ export namespace ExtCmds {
   export async function cmdHdlNoteOpenFolder(_nId: string) {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
   }
-  export async function cmdHdlNotebookNoteDocShow(params: { nb: string, nId: string }) {
+  export async function cmdHdlNoteDocShow(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
     const docMainfFile = nb.getNoteById(params.nId).getDocMainFile();
     // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'main.md')

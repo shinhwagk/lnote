@@ -56,7 +56,7 @@ export class DomainPanelView {
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
         const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
         _n['labels'] = alOfNote;
-        return { nb: n.getNBName(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+        return { nb: n.getNb(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
       });
   }
 
@@ -101,7 +101,7 @@ export class DomainPanelView {
             ExtCmds.cmdHdlNoteEditor(msg.data.params);
             break;
           case 'notebook-note-doc-show':
-            ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);
+            ExtCmds.cmdHdlNoteDocShow(msg.data.nId);
             break;
           case 'notebook-note-files-open':
             ExtCmds.cmdHdlNoteFilesOpen(msg.data.nId);

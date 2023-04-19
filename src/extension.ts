@@ -5,8 +5,8 @@ import {
    ext,
    initializeExtensionVariables,
    listenConfiguration,
-   listenEditFileClose,
-   listenEditFileSave,
+   listenEditorFileClose,
+   listenEditorFileSave,
    listenVscodeWindowChange
 } from './extensionVariables';
 
@@ -14,15 +14,19 @@ export async function activate(context: ExtensionContext) {
    console.log('vscode extension "lnote" is now active!');
 
    listenConfiguration(context);
-   listenEditFileSave(context);
-   listenEditFileClose(context);
+   listenEditorFileSave(context);
+   listenEditorFileClose(context);
 
    initializeExtensionVariables(context);
 
    listenVscodeWindowChange();
 
-
    ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
+
+   /**
+    * global search
+    */
+   ext.registerCommand('lnote.search', ExtCmds.cmdHdlGlobalSearch);
 
    /**
     * domain
@@ -31,7 +35,6 @@ export async function activate(context: ExtensionContext) {
    ext.registerCommand('lnote.domain.pin', ExtCmds.cmdHdlDomainPin);
    // ext.registerCommand('lnote.domain.rename', ExtCmds.cmdHdlDomainRename);
    ext.registerCommand('lnote.domain.remove', ExtCmds.cmdHdlDomainRemove);
-   ext.registerCommand('lnote.domain.search', ExtCmds.cmdHdlGlobalSearch);
    ext.registerCommand('lnote.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
    ext.registerCommand('lnote.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
 
@@ -39,7 +42,7 @@ export async function activate(context: ExtensionContext) {
     * notes view
     */
    ext.registerCommand('lnote.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
-   ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNotebookNoteDocShow);
+   ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNoteDocShow);
    ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
    // ext.registerCommand('lnote.note.add', ExtCmds.cmdHdlNoteCreate);
    /**

@@ -5,15 +5,10 @@ import {
 } from 'fs-extra';
 
 import { vfs } from '../helper';
-import { ArrayLabels, GroupLables } from '../types';
+import { ArrayLabels, GroupLables, INBNote } from '../types';
 import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
-export interface INBNote {
-    contents: string[];
-    cts: number;
-    mts: number;
-    labels: GroupLables; // label group
-}
+
 
 export class NBNote {
     filesPath: string;
@@ -44,7 +39,7 @@ export class NBNote {
         return new NBNote(nbName, nbDir, nId, data);
     }
 
-    getNBName() {
+    getNb() {
         return this.nb
     }
 

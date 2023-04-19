@@ -5,9 +5,9 @@ import {
 } from 'fs-extra';
 
 import { vfs } from '../helper';
-import { INBNote, NBNote } from './note';
+import { NBNote } from './note';
 
-import { ArrayLabels, GroupLables } from '../types';
+import { ArrayLabels, GroupLables, INBNote } from '../types';
 import { jointMark, notesFileName } from '../constants';
 
 /**

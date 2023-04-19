@@ -17,7 +17,7 @@
         "outDir": "../out"
     },
     "files": [
-        "./main.ts",
+        "./domain.ts",
         "./search.ts"
     ]
 }

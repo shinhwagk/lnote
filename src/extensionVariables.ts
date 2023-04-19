@@ -70,7 +70,7 @@ export function listenConfiguration(ctx: ExtensionContext) {
   );
 }
 
-export function listenEditFileClose(ctx: ExtensionContext) {
+export function listenEditorFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
       // if (ext.vnNotebookSet === undefined) { return; }
@@ -100,7 +100,7 @@ export function listenEditFileClose(ctx: ExtensionContext) {
   );
 }
 
-export function listenEditFileSave(ctx: ExtensionContext) {
+export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async () => {
       if (

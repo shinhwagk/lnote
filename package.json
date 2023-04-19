@@ -59,7 +59,7 @@
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "lnote.domain.search",
+                    "command": "lnote.search",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
@@ -124,7 +124,7 @@
                 }
             },
             {
-                "command": "lnote.domain.search",
+                "command": "lnote.search",
                 "title": "Search",
                 "icon": {
                     "light": "images/light/search.svg",

@@ -663,7 +663,7 @@ function myFunction() {
     const x = (<HTMLTextAreaElement>document.getElementById("APjFqb"))?.value;
     // document.createElement('textarea')
     if (x) {
-        const keywords = x.trim().split(' ');
+        const keywords = x.trim().split(/\s+/);
         if (keywords.length >= 1) {
             vscode.postMessage({ command: 'search', data: { keywords: keywords } });
         }

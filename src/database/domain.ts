@@ -18,10 +18,10 @@ export class VNBDomain {
     private domainCache: NBDomainStruct = {};
 
     constructor(
-        readonly nbName: string,
-        readonly nbDir: string
+        readonly nb: string,
+        readonly dir: string
     ) {
-        this.domainFile = path.join(this.nbDir, 'domains.json');
+        this.domainFile = path.join(this.dir, 'domains.json');
         existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
 
         this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);

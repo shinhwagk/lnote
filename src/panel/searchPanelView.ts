@@ -3,12 +3,13 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
-import { INBNote, NBNote } from '../database/note';
+import { NBNote } from '../database/note';
 import { IWebNote } from './types';
+import { INBNote } from '../types';
 
 export class SearchPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
-    private keywords = new Set<string>()
+    private keywords = new Set<string>();
 
     private getWebviewContent() {
         const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
@@ -62,16 +63,24 @@ export class SearchPanelView {
     private convertForWebStruct(notes: NBNote[]): IWebNote[] {
         return notes
             .map(n => {
+                const _n = n.getData()
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
-                const _n = JSON.parse(JSON.stringify(n)); // clone obj
-                const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
-                _n['labels'] = alOfNote;
-                return { nb: n.getNBName(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+                const al = n.getDataArrayLabels();
+                return {
+                    nb: n.getNb(),
+                    nId: n.getId(),
+                    doc: isDoc,
+                    files: isFiles,
+                    labels: al,
+                    contents: _n.contents,
+                    mts: _n.mts,
+                    cts: _n.cts
+                };
             });
     }
 
-    public async postNotes(notes: IWebNote[]) {
+    private async postNotes(notes: IWebNote[]) {
         await this.panel!.webview.postMessage({
             command: 'post-notes',
             data: { notes: notes }
@@ -105,7 +114,7 @@ export class SearchPanelView {
                 switch (msg.command) {
                     case 'search':
                         this.keywords.clear();
-                        (msg.data.keywords as string[]).forEach(x => this.keywords.add(x))
+                        (msg.data.keywords as string[]).forEach(x => this.keywords.add(x));
                         const notes = ext.lnbs.search(msg.data.keywords);
                         await this.postNotes(this.convertForWebStruct(notes));
                         break;
@@ -113,7 +122,7 @@ export class SearchPanelView {
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
                     case 'note-doc-show':
-                        ExtCmds.cmdHdlNotebookNoteDocShow(msg.params);
+                        ExtCmds.cmdHdlNoteDocShow(msg.params);
                         break;
                     case 'note-files-open':
                         ExtCmds.cmdHdlNoteFilesOpen(msg.params);
