@@ -16,25 +16,13 @@ import { WebStatus } from './panel/web';
 
 export class GlobalState {
   nId: string = '';
-  domainNode: DomainNode;
-  domainNodeFormat: string[];
-  // domainNodeFormatWithoutNBName: string[];
-  nbName: string; //notebook name
-  nb: VNNotebook;
+  nbName: string | undefined; //notebook name
+  nb: VNNotebook | undefined;
 
-  constructor(domainNode: string) {
-    this.domainNode = domainNode;
-    this.domainNodeFormat = tools.splitDomaiNode(domainNode);
-    // this.domainNodeFormatWithoutNBName = this.domainNodeFormat.slice(1);
-    this.nbName = this.domainNodeFormat[0];
-    this.nb = ext.vnNotebookSet.getNB(this.nbName);
-    // this.nbDomain = domain;
-    // this.nbNotes = notes;
-    // this.vnNoteBook = new VNNotebook(ext.notebookPath)
-  }
 
-  static update(domainNode: string) {
-    ext.gs = new GlobalState(domainNode);
+
+  update(nbname: string) {
+    this.nb = ext.vnNotebookSet.getNB(nbname)
   }
 }
 
@@ -47,8 +35,8 @@ export namespace ext {
   export let searchPanelView: SearchPanelView;
   export let notebookPath: string;
   export let shortcutsFilePath: string;
-  export let gs: GlobalState;
-  export const updateGS = GlobalState.update;
+  export const gs: GlobalState = new GlobalState()
+  // export const updateGS = GlobalState.update;
   export let vnNotebookSet: VNNotebookSet;
   export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
   export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>

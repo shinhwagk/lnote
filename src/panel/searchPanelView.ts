@@ -17,7 +17,6 @@ interface IWebNote {
 
 export class SearchPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
-    private domainNode: string[] = [];
 
     // private assetsFile = (name: string) => {
     //   const file = path.join(ext.context.extensionPath, 'out', name);
@@ -61,7 +60,7 @@ export class SearchPanelView {
 
     async show(): Promise<void> {
         if (this.panel) {
-            this.panel!.reveal(vscode.ViewColumn.One);
+            this.panel.reveal(vscode.ViewColumn.One);
             // await this.postData();
             return;
         }
@@ -88,25 +87,18 @@ export class SearchPanelView {
         });
     }
 
-    // public async postNote(note: any) {
-    //   this.panel!.webview.postMessage({
-    //     command: 'post-note',
-    //     data: { note: note }
-    //   });
-    // }
-
-    // public async removeNote(nId: string) {
-    //   this.panel!.webview.postMessage({
-    //     command: 'delete-note',
-    //     data: { nId: nId }
-    //   });
-    // }
-
     private initPanel() {
-        this.panel = vscode.window.createWebviewPanel('lnote', 'lnote', vscode.ViewColumn.One, {
-            enableScripts: true,
-            localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')]
-        });
+        this.panel = vscode.window.createWebviewPanel(
+            'lnote',
+            'lnote',
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                localResourceRoots: [
+                    vscode.Uri.joinPath(ext.context.extensionUri, 'out')
+                ],
+                retainContextWhenHidden: true
+            });
 
         this.panel.iconPath = vscode.Uri.joinPath(ext.context.extensionUri, 'images/wv-icon.svg');
         this.panel.onDidDispose(
@@ -117,17 +109,17 @@ export class SearchPanelView {
             null,
             ext.context.subscriptions
         );
-        this.panel.onDidChangeViewState(
-            (e) => {
-                const panel = e.webviewPanel;
-                if (panel.visible) {
-                    // this.parseDomain();
-                    // this.showNotesPlanView();
-                }
-            },
-            null,
-            ext.context.subscriptions
-        );
+        // this.panel.onDidChangeViewState(
+        //     (e) => {
+        //         const panel = e.webviewPanel;
+        //         if (panel.visible) {
+        //             // this.parseDomain();
+        //             // this.showNotesPlanView();
+        //         }
+        //     },
+        //     null,
+        //     ext.context.subscriptions
+        // );
         this.panel.webview.onDidReceiveMessage(
             async (msg) => {
                 switch (msg.command) {
@@ -135,20 +127,20 @@ export class SearchPanelView {
                         const notes = ext.vnNotebookSet.search(msg.data.keywords);
                         await this.postNotes(this.convertForWebStruct(notes));
                         break;
-                    case 'notebook-editor':
-                        ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
+                    case 'note-editor':
+                        ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
-                    case 'notebook-note-doc-show':
-                        ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);
+                    case 'note-doc-show':
+                        ExtCmds.cmdHdlNotebookNoteDocShow(msg.params);
                         break;
-                    case 'notebook-note-files-open':
-                        ExtCmds.cmdHdlNoteFilesOpen(msg.data.nId);
+                    case 'note-files-open':
+                        ExtCmds.cmdHdlNoteFilesOpen(msg.params);
                         break;
-                    case 'notebook-note-files-create':
-                        ExtCmds.cmdHdlNoteFilesCreate(msg.data.nId);
+                    case 'note-files-create':
+                        ExtCmds.cmdHdlNoteFilesCreate(msg.params);
                         break;
-                    case 'notebook-note-doc-create':
-                        ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
+                    case 'note-doc-create':
+                        ExtCmds.cmdHdlNBNoteDocCreate(msg.params);
                         break;
                     case 'edit-note-openfolder':
                         ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
@@ -161,11 +153,6 @@ export class SearchPanelView {
         this.panel.webview.html = this.getWebviewContent();
     }
 
-    public parseDomain() {
-        this.domainNode = ext.gs.domainNodeFormat;
-        // this.viewData = this.genViewData(labels);
-        return this;
-    }
 }
 
 function getNonce() {

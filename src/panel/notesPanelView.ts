@@ -140,7 +140,7 @@ export class NotesPanelView {
             await this.postData();
             break
           case 'notebook-editor':
-            ExtCmds.cmdHdlCreateEditor(msg.data.kind, msg.data.params);
+            ExtCmds.cmdHdlNoteEditor(msg.data.params);
             break;
           case 'notebook-note-doc-show':
             ExtCmds.cmdHdlNotebookNoteDocShow(msg.data.nId);

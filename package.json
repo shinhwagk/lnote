@@ -127,8 +127,8 @@
                 "command": "lnote.domain.search",
                 "title": "Search",
                 "icon": {
-                    "light": "images/light/add.svg",
-                    "dark": "images/dark/add.svg"
+                    "light": "images/light/search.svg",
+                    "dark": "images/dark/search.svg"
                 }
             },
             {

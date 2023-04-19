@@ -1,15 +1,19 @@
-kind: EditDomain
+kind: EditNote
 immutable:
   nbName: "@test"
-  domainNode: "@test/114"
-  commonGroupLabels:
+  nId: 1f2849
+  groupLabels:
     common:
-      - "114"
+      - default
+      - ccc
+  contents:
+    - sdfdf
+    - sdfdsf111222111
 editable:
-  delete:
-    notes: false
-    domainNode: false
-  domainName: "114"
-  commonGroupLabels:
+  groupLabels:
     common:
-      - "114"
+      - default
+      - ccc
+  contents:
+    - sdfdf
+    - sdfdsf111222111

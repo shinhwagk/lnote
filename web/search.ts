@@ -69,17 +69,17 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'edit',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nb: data.note.nb, nId: data.note.nId, labels: {} } } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-editor', params: { nb: data.note.nb, nId: data.note.nId, labels: {} } })
         }
     ],
     [
         {
             title: 'create document',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nb: data.note.nb, nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-doc-create', params: { nb: data.note.nb, nId: data.note.nId } })
         },
         {
             title: 'create files',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nb: data.note.nb, nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-files-create', params: { nb: data.note.nb, nId: data.note.nId } })
         }
     ],
     // [
@@ -220,9 +220,9 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     d_space.title = `id: ${note.nId}, create date: ${note.cts}, modify date: ${note.mts}`;
     d_space.appendChild(elemSpaces(2));
 
-    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
+    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: nid } })));
     d_note_id.appendChild(d_space);
-    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'notebook-note-files-open', data: { nId: nid } })));
+    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: nid } })));
 
     const d_note_content = document.createElement('div');
     d_note_content.className = 'grid-note-contents';

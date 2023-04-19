@@ -169,18 +169,19 @@ export class VNNotebook {
         return this.editor.checkEditorCleaned();
     }
 
-    public createNoteEditor(nId: string, al: ArrayLabels) {
-        if (nId !== '0') {
-            const nd = this.notes.getNoteById(nId).getData();
-            this.editor.createNoteEditorFile(nId, nd.contents, nd.labels);
-            return;
-        } else {
-            const _nId = tools.generateSixString();
-            this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
-            const nd = this.notes.getNoteById(_nId).getData();
-            this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
-            return;
-        }
+    public createNoteEditor(nId: string,) {
+        const nd = this.notes.getNoteById(nId).getData();
+        this.editor.createNoteEditorFile(nId, nd.contents, nd.labels);
+        // if (nId !== '0') {
+
+        //     return;
+        // } else {
+        //     const _nId = tools.generateSixString();
+        //     this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
+        //     const nd = this.notes.getNoteById(_nId).getData();
+        //     this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
+        //     return;
+        // }
     }
 
     public createDomainEditor(domainNode: string[]) {
