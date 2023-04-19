@@ -22,21 +22,20 @@ export namespace ExtCmds {
     }
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
-    ext.updateGS(dn);
+    ext.gs.update(dn.split(pathSplit)[0]);
     // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     // if (labelsOfDomain === undefined) { return; };
     // const _l = labelsOfDomain.split(',').map(l => l.trim());
-    ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
+    // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
     // ext.vnNotebookSet.refresh(ext.gs.nbName);
     // ext.domainProvider.refresh(dn);
     // await cmdHdlDomainPin(dn);
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
-    console.log('msdfsdf');
     const _dn: string[] = dn ? tools.splitDomaiNode(dn) : [];
-    ext.updateGS(dn!);
-    console.log('dfsdfds', ext.gs.domainNodeFormat);
-    ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
+    // ext.updateGS(dn!);
+    // console.log('dfsdfds', ext.gs.domainNodeFormat);
+    // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
     // const name: string | undefined = await window.showInputBox();
     // if (!name) { return; };
     // if (name.includes('/')) {
@@ -55,17 +54,17 @@ export namespace ExtCmds {
     // console.log("pin", dn, ext.gs.domainNodeFormat);
     // ext.domainDB.refresh(tools.splitDomaiNode(dn), true);
     const s = (new Date()).getTime();
-    ext.webState.selectedArraylabels = ext.webState.selectedArraylabels.length === 0
-      ? ext.gs.nb?.getArrayLabelsOfDomain(ext.gs.domainNodeFormat)
-      : ext.webState.selectedArraylabels;
+    // ext.webState.selectedArraylabels = ext.webState.selectedArraylabels.length === 0
+    //   ? ext.gs.lnb?.getArrayLabelsOfDomain(ext.gs.domainNodeFormat)
+    //   : ext.webState.selectedArraylabels;
     // ext.webState.notes = ext.gs.nb.getNotesByArrayLabels(ext.webState.selectedArraylabels);
 
-    await ext.notesPanelView.parseDomain().showNotesPlanView();
+    await ext.domainPanelView.show();
     console.log("get notes time " + `${new Date().getTime() - s}`);
     await ext.setContext(ctxFilesExplorer, false);
   }
   export async function cmdHdlNoteFilesCreate(params: { nb: string, nId: string }) {
-    const nb = ext.vnNotebookSet.getNB(params.nb);
+    const nb = ext.lnbs.get(params.nb);
     nb.getNoteById(params.nId).addFiles();
     // ext.notesPanelView.parseDomain().showNotesPlanView();
     await cmdHdlNoteFilesOpen(params);
@@ -74,7 +73,7 @@ export namespace ExtCmds {
     await ext.setContext(ctxFilesExplorer, true);
   }
   export async function cmdHdlNBNoteDocCreate(params: { nb: string, nId: string }) {
-    const nb = ext.vnNotebookSet.getNB(params.nb);
+    const nb = ext.lnbs.get(params.nb);
     nb.getNoteById(params.nId).addDoc();
     await commands.executeCommand(
       'editExplorer.openFileResource',
@@ -86,7 +85,7 @@ export namespace ExtCmds {
     const orgName = _dn[_dn.length - 1];
     const newName: string | undefined = await window.showInputBox({ value: orgName });
     if (!newName || orgName === newName) { return; }
-    ext.gs.nb?.renameDomain(_dn, newName);
+    ext.gs.lnb?.renameDomain(_dn, newName);
     ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
   }
   export async function cmdHdlDomainRemove(dn: DomainNode) {
@@ -103,17 +102,18 @@ export namespace ExtCmds {
       if ((await window.showInformationMessage(`Remove domain '${domainName}'?`, 'Yes', 'No')) !== 'Yes') { return; };
     }
     // ext.gs.nbDomain.deleteDomain(_dn);
-    ext.gs.nb?.deleteDomain(_dn);
+    ext.gs.lnb?.deleteDomain(_dn);
     ext.domainProvider.refresh();
   }
   export async function cmdHdlGlobalSearch(_dn: DomainNode) {
     await ext.searchPanelView.show();
+    ext.gs.web = 'search'
   }
   export async function cmdHdlNoteOpenFolder(_nId: string) {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
   }
   export async function cmdHdlNotebookNoteDocShow(params: { nb: string, nId: string }) {
-    const nb = ext.vnNotebookSet.getNB(params.nb);
+    const nb = ext.lnbs.get(params.nb);
     const docMainfFile = nb.getNoteById(params.nId).getDocMainFile();
     // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'main.md')
     // if (basename(readmeFile).split('.')[1] === 'md') {
@@ -133,8 +133,8 @@ export namespace ExtCmds {
     await ext.setContext(ctxFilesExplorer, false);
   }
   export async function cmdHdlFilesOpen() {
-    if (ext.gs.nb) {
-      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.nb.getNoteById(ext.gs.nId).getFilesPath()), true);
+    if (ext.gs.lnb) {
+      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.lnb.getNoteById(ext.gs.nId).getFilesPath()), true);
     }
   }
   export async function cmdHdlFilesRefresh() {
@@ -148,7 +148,7 @@ export namespace ExtCmds {
     // fileTerminal.show(true);
   }
   export async function cmdHdlDomainRefresh() {
-    ext.vnNotebookSet.refresh();
+    ext.lnbs.refresh();
     ext.domainProvider.refresh();
     window.showInformationMessage('refresh domain complete.');
   }
@@ -165,8 +165,8 @@ export namespace ExtCmds {
   //   // }
   // }
   export async function cmdHdlNoteEditor(params: any) {
-    const nb = ext.vnNotebookSet.getNB(params.nb);
-    nb.createNoteEditor(params.nId);
+    // const nb = ext.lnbs.get(params.nb);
+    ext.lnbs.createNoteEditor(params.nb, params.nId);
     // ext.gs.nb.createNoteEditor(params.nId, params.labels);
     // if (kind === 'nsgl') {
     //   ext.gs.nb.createNotesSetGroupLabelsEditor(ext.gs.domainNodeFormat, params.labels);
@@ -175,7 +175,7 @@ export namespace ExtCmds {
     // } else if (kind === 'end') {
     //   ext.gs.nb.createNoteEditor(params.nbName, params.nId, params.labels);
     // }
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(nb.getEditorFile()));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile()));
   }
 
   // export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {

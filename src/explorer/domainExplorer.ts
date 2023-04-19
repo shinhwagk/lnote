@@ -7,7 +7,7 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
-  const notebook = ext.vnNotebookSet.getNB(domainNode[0]);
+  const notebook = ext.lnbs.get(domainNode[0]);
   const domainIsNotes = notebook.checkDomainIsNotes(domainNode);
   const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
   const notesNumberOfDomain = 1;//isNotes
@@ -50,10 +50,10 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
   public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
     if (element === undefined) {
-      return ext.vnNotebookSet.getNBNames();
+      return ext.lnbs.getNames();
     } else {
       const domainNode = tools.splitDomaiNode(element);
-      return ext.vnNotebookSet.getNB(domainNode[0])
+      return ext.lnbs.get(domainNode[0])
         .getChildrenNameOfDomain(domainNode)
         .sort()
         .map((name) => tools.joinDomainNode(domainNode.concat(name)));

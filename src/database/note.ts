@@ -24,13 +24,13 @@ export class NBNote {
     // grouplabels: NoteDataGroupLabel
 
     constructor(
-        private readonly nbName: string,
-        private readonly nbDir: string,
+        private readonly nb: string,
+        private readonly dir: string,
         private readonly nId: string,
         private data: INBNote
     ) {
-        this.filesPath = path.join(this.nbDir, "files", this.nId);
-        this.docPath = path.join(this.nbDir, "doc", this.nId);
+        this.filesPath = path.join(this.dir, "files", this.nId);
+        this.docPath = path.join(this.dir, "doc", this.nId);
         this.docMainFile = path.join(this.docPath, 'main.md');
         // this.nbName = nbName
     }
@@ -45,7 +45,7 @@ export class NBNote {
     }
 
     getNBName() {
-        return this.nbName
+        return this.nb
     }
 
     getId() {

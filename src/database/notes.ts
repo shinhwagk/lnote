@@ -4,18 +4,21 @@ import {
     existsSync
 } from 'fs-extra';
 
-import { tools, vfs } from '../helper';
+import { vfs } from '../helper';
 import { INBNote, NBNote } from './note';
 
 import { ArrayLabels, GroupLables } from '../types';
 import { jointMark, notesFileName } from '../constants';
 
-// export interface NBDomainStruct {
-//     [domain: string]: NBDomainStruct;
-//     // eslint-disable-next-line @typescript-eslint/naming-convention
-//     '.labels'?: any; // { [cname:string]: string[] }
-// }
-
+/**
+ * grouplabels:
+ * {
+ *   common: ["label1", "labels"]
+ * }
+ * 
+ * arraylabels:
+ * ["common->labels", "common->labels"]
+ */
 export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
     const tmpgl: { [g: string]: Set<string> } = {};
     for (const label of al) {
@@ -32,6 +35,12 @@ export function arrayLabels2GroupLabel(al: ArrayLabels): GroupLables {
         ));
 }
 
+/**
+ * grouplabels:
+ * {
+ *   common: ["label1", "labels"]
+ * }
+ */
 export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
     const labels = new Set<string>();
     for (const [g, ls] of Object.entries(gl)) {
@@ -63,10 +72,6 @@ export function groupLabel2ArrayLabels(gl: GroupLables): ArrayLabels {
 //     }
 // }
 
-class NBNoteCache {
-
-}
-
 // lnotes
 export class LNotes {
     private notesCache = new Map<string, INBNote>();
@@ -77,10 +82,10 @@ export class LNotes {
     private readonly notesFile: string;
 
     constructor(
-        readonly nbName: string,
-        readonly nbDir: string
+        readonly nb: string,
+        readonly dir: string
     ) {
-        this.notesFile = path.join(this.nbDir, notesFileName);
+        this.notesFile = path.join(this.dir, notesFileName);
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
@@ -89,7 +94,7 @@ export class LNotes {
 
     public cacheNotesGroupedByLabelCache() {
         // all note have an nbname label
-        this.notesGroupedByLabelCache.set(this.nbName, new Set<string>(this.notesCache.keys()));
+        this.notesGroupedByLabelCache.set(this.nb, new Set<string>(this.notesCache.keys()));
         for (const [nId, note] of this.notesCache.entries()) {
             for (const label of groupLabel2ArrayLabels(note.labels)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {
@@ -130,7 +135,7 @@ export class LNotes {
     }
 
     public getNoteById(nId: string): NBNote {
-        return NBNote.get(this.nbName, this.nbDir, nId, this.notesCache.get(nId)!);
+        return NBNote.get(this.nb, this.dir, nId, this.notesCache.get(nId)!);
     }
 
     public getNIdsByArrayLabels(labels: ArrayLabels): string[] {
@@ -176,18 +181,8 @@ export class LNotes {
             .forEach(l => this.notesGroupedByLabelCache.get(l)?.delete(nId));
     }
 
-    public search(keywords: string[]): NBNote[] {
-        const notes: NBNote[] = [];
-        const res = keywords.map(kw => new RegExp(kw));
-        for (const [nId, note] of this.notesCache.entries()) {
-
-            const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
-            if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
-                const n = new NBNote(this.nbName, this.nbDir, nId, note);
-                notes.push(n);
-            }
-        }
-        return notes;
+    public getCache() {
+        return this.notesCache;
     }
     // public removeLabel(nId: string, labels: string[]) {
     //     const n = this.getNoteByid(nId);

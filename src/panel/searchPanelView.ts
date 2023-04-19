@@ -4,33 +4,19 @@ import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { INBNote, NBNote } from '../database/note';
-
-interface IWebNote {
-    nb: string;
-    nId: string;
-    contents: string[];
-    doc: boolean;
-    files: boolean;
-    cDate: string;
-    mDate: string;
-}
+import { IWebNote } from './types';
 
 export class SearchPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
+    private keywords = new Set<string>()
 
-    // private assetsFile = (name: string) => {
-    //   const file = path.join(ext.context.extensionPath, 'out', name);
-    //   return vscode.Uri.file(file).with({ scheme: 'vscode-resource' }).toString();
-    // };
-
-    // const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
     private getWebviewContent() {
         const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
         const jsPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'search.js');
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const jsMainUrl = this.panel?.webview.asWebviewUri(jsPathMainPath);
         // const cspSource = this.panel?.webview.cspSource
-        const nonce = getNonce();
+        const nonce = tools.getNonce();
         return `<!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -68,6 +54,11 @@ export class SearchPanelView {
         this.initPanel();
     }
 
+    async refresh(): Promise<void> {
+        const notes = ext.lnbs.search(Array.from(this.keywords));
+        await this.postNotes(this.convertForWebStruct(notes));
+    }
+
     private convertForWebStruct(notes: NBNote[]): IWebNote[] {
         return notes
             .map(n => {
@@ -90,7 +81,7 @@ export class SearchPanelView {
     private initPanel() {
         this.panel = vscode.window.createWebviewPanel(
             'lnote',
-            'lnote',
+            'lnote search',
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
@@ -109,22 +100,13 @@ export class SearchPanelView {
             null,
             ext.context.subscriptions
         );
-        // this.panel.onDidChangeViewState(
-        //     (e) => {
-        //         const panel = e.webviewPanel;
-        //         if (panel.visible) {
-        //             // this.parseDomain();
-        //             // this.showNotesPlanView();
-        //         }
-        //     },
-        //     null,
-        //     ext.context.subscriptions
-        // );
         this.panel.webview.onDidReceiveMessage(
             async (msg) => {
                 switch (msg.command) {
                     case 'search':
-                        const notes = ext.vnNotebookSet.search(msg.data.keywords);
+                        this.keywords.clear();
+                        (msg.data.keywords as string[]).forEach(x => this.keywords.add(x))
+                        const notes = ext.lnbs.search(msg.data.keywords);
                         await this.postNotes(this.convertForWebStruct(notes));
                         break;
                     case 'note-editor':
@@ -152,14 +134,4 @@ export class SearchPanelView {
         );
         this.panel.webview.html = this.getWebviewContent();
     }
-
-}
-
-function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 }

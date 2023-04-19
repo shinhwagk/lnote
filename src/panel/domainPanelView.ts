@@ -2,26 +2,20 @@ import * as vscode from 'vscode';
 
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
+import { NBNote } from '../database/note';
+import { IWebNote } from './types';
 import { tools } from '../helper';
-import { INBNote, NBNote } from '../database/note';
 
-export class NotesPanelView {
+export class DomainPanelView {
   private panel: vscode.WebviewPanel | undefined = undefined;
-  private domainNode: string[] = [];
 
-  // private assetsFile = (name: string) => {
-  //   const file = path.join(ext.context.extensionPath, 'out', name);
-  //   return vscode.Uri.file(file).with({ scheme: 'vscode-resource' }).toString();
-  // };
-
-  // const stylesMainUri = webview.asWebviewUri(stylesPathMainPath);
   private getWebviewContent() {
     const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
     const jsPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.js');
     const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
     const jsMainUrl = this.panel?.webview.asWebviewUri(jsPathMainPath);
     // const cspSource = this.panel?.webview.cspSource
-    const nonce = getNonce();
+    const nonce = tools.getNonce();
     return `<!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -44,71 +38,45 @@ export class NotesPanelView {
                 </html>`;
   }
 
-  async showNotesPlanView(): Promise<void> {
+  async show(): Promise<void> {
     if (this.panel) {
       this.panel!.reveal(vscode.ViewColumn.One);
-      await this.postData();
+      // await this.postData();
       return;
     }
 
     this.initPanel();
   }
 
-  private getNotesForWebStruct(domainNode: string[]): NBNote[] {
-    const al =
-      ext.webState.selectedArraylabels.length === 0
-        ? ext.gs.nb.getArrayLabelsOfDomain(domainNode)
-        : ext.webState.selectedArraylabels;
-
-    // const nbNotes = ext.gs.nb.getLabelsOfDomain;
-    return ext.gs.nb.getNotesByArrayLabels(al)
-      .filter(n =>
-        tools.intersections(al, n.getDataArrayLabels()).length === al.length
-      )
+  private convertForWebStruct(notes: NBNote[]): IWebNote[] {
+    return notes
       .map(n => {
         const isDoc = n.checkDocExist();
         const isFiles = n.checkFilesExist();
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
         const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
         _n['labels'] = alOfNote;
-        return { nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
-
+        return { nb: n.getNBName(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
       });
   }
 
-  public async postData() {
+  public async postNotes(notes: IWebNote[]) {
     await this.panel!.webview.postMessage({
-      command: 'post-data',
-      data: {
-        domainNotes: this.getNotesForWebStruct(this.domainNode),
-        // domainNode: ext.webState.domainNode,
-        // domainGroupLabel: ext.gs.nb.getGroupLabelOfDomain(this.domainNode),
-        domainArrayLabel: ext.gs.nb.getArrayLabelsOfDomain(this.domainNode),
-        // selectedArrayLabels: ext.webSelectedArrayLabels.length===0? this.
-        // notesCommonArrayLabels: ext.gs.nb.getNotesCommonArrayLabels(this.domainNode),
-      }
+      command: 'post-notes',
+      data: { notes: notes }
     });
   }
 
-  // public async postNote(note: any) {
-  //   this.panel!.webview.postMessage({
-  //     command: 'post-note',
-  //     data: { note: note }
-  //   });
-  // }
-
-  // public async removeNote(nId: string) {
-  //   this.panel!.webview.postMessage({
-  //     command: 'delete-note',
-  //     data: { nId: nId }
-  //   });
-  // }
-
   private initPanel() {
-    this.panel = vscode.window.createWebviewPanel('lnote', 'lnote', vscode.ViewColumn.One, {
+    this.panel = vscode.window.createWebviewPanel(
+      'lnote',
+      'lnote',
+      vscode.ViewColumn.One, {
       enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')]
-    });
+      localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')],
+      retainContextWhenHidden: true
+    }
+    );
 
     this.panel.iconPath = vscode.Uri.joinPath(ext.context.extensionUri, 'images/wv-icon.svg');
     this.panel.onDidDispose(
@@ -119,26 +87,16 @@ export class NotesPanelView {
       null,
       ext.context.subscriptions
     );
-    this.panel.onDidChangeViewState(
-      (e) => {
-        const panel = e.webviewPanel;
-        if (panel.visible) {
-          // this.parseDomain();
-          // this.showNotesPlanView();
-        }
-      },
-      null,
-      ext.context.subscriptions
-    );
     this.panel.webview.onDidReceiveMessage(
       async (msg) => {
         switch (msg.command) {
           case 'get-data':
-            await this.postData();
+            const notes = ext.lnbs.get(ext.gs.domainNode[0]).getNotes(ext.gs.domainNode);
+            await this.postNotes(this.convertForWebStruct(notes));
             break;
           case 'web-update-labels':
-            await this.postData();
-            break
+            // await this.postData();
+            break;
           case 'notebook-editor':
             ExtCmds.cmdHdlNoteEditor(msg.data.params);
             break;
@@ -164,19 +122,4 @@ export class NotesPanelView {
     );
     this.panel.webview.html = this.getWebviewContent();
   }
-
-  public parseDomain() {
-    this.domainNode = ext.gs.domainNodeFormat;
-    // this.viewData = this.genViewData(labels);
-    return this;
-  }
-}
-
-function getNonce() {
-  let text = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 32; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
 }

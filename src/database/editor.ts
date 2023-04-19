@@ -26,7 +26,7 @@ export interface IEditBase {
 export interface IEditNoteData extends IEditBase {
     kind: 'EditNote';
     immutable: {
-        nbName: string,
+        nb: string,
         nId: string,
         groupLabels: GroupLables,
         contents: string[]
@@ -74,22 +74,21 @@ export interface IEditDomain extends IEditBase {
 }
 
 
-export class VNBEditor {
+export class LEditor {
     public readonly editDir: string;
     public readonly editorFile: string;
     public readonly editArchiveDir: string;
 
     constructor(
-        private readonly nbName: string,
-        private readonly nbDir: string
+        private readonly dir: string
     ) {
-        this.editDir = path.join(this.nbDir, 'editor');
+        this.editDir = path.join(this.dir, '.editor');
         existsSync(this.editDir) || mkdirpSync(this.editDir);
 
         this.editorFile = path.join(this.editDir, `${section}@editor.yml`);
         existsSync(this.editorFile) || vfs.writeFileSync(this.editorFile, '');
 
-        this.editArchiveDir = path.join(this.editDir, 'editor_archives');
+        this.editArchiveDir = path.join(this.editDir, 'archives');
         existsSync(this.editArchiveDir) || mkdirpSync(this.editArchiveDir);
     }
 
@@ -97,11 +96,11 @@ export class VNBEditor {
 
     public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
 
-    public createNoteEditorFile(nId: string, contents: string[], gl: GroupLables) {
+    public createNoteEditorFile(nb: string, nId: string, contents: string[], gl: GroupLables) {
         const ed: IEditNoteData = {
             kind: 'EditNote',
             immutable: {
-                nbName: this.nbName,
+                nb: nb,
                 nId: nId,
                 groupLabels: gl,
                 contents: contents
@@ -119,7 +118,7 @@ export class VNBEditor {
         const ed: IEditDomain = {
             kind: 'EditDomain',
             immutable: {
-                nbName: this.nbName,
+                nbName: domainNode[0],
                 domainNode: domainNode.join(pathSplit),
                 notes: notes,
                 commonGroupLabels: gl
@@ -140,7 +139,7 @@ export class VNBEditor {
         const ed = {
             kind: 'EditCommonGroupLabels',
             immutable: {
-                nbName: this.nbName,
+                nbName: domainNode[0],
                 domainNode: domainNode.join(pathSplit),
                 domainGroupLabes: dgl,
                 commonGroupLabels: gl
@@ -157,10 +156,13 @@ export class VNBEditor {
     }
 
     public archiveEditor() {
-        const ts = (new Date()).getTime();
+        const ts = tools.formatDate(new Date());
         const e: IEditBase = tools.readYamlSync(this.editorFile);
-        const k = e.kind.match(/[A-Z]/g)!.join('').toLocaleLowerCase();
+        const k = e.kind.toLocaleLowerCase();
         const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
         moveSync(this.editorFile, archiveFile);
     }
+
+
+
 }

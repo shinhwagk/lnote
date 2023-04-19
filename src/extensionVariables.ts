@@ -5,24 +5,25 @@ import {
 } from 'vscode';
 
 import { section } from './constants';
-import { VNNotebook } from './database/notebook';
-import { VNNotebookSet } from './database/notebookset';
+import { LNotebook } from './database/notebook';
+import { LNotebooks } from './database/notebooks';
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
-import { tools, vfs } from './helper';
-import { NotesPanelView } from './panel/notesPanelView';
+import { vfs } from './helper';
+import { DomainPanelView } from './panel/domainPanelView';
 import { SearchPanelView } from './panel/searchPanelView';
-import { WebStatus } from './panel/web';
+// import { WebStatus } from './panel/web';
 
 export class GlobalState {
   nId: string = '';
-  nbName: string | undefined; //notebook name
-  nb: VNNotebook | undefined;
+  nb: string | undefined; //notebook name
+  lnb: LNotebook | undefined;
+  domainNode: string[] = [];
+  web: 'domain' | 'search' = 'domain';
 
-
-
-  update(nbname: string) {
-    this.nb = ext.vnNotebookSet.getNB(nbname)
+  update(nb: string) {
+    this.nb = nb;
+    this.lnb = ext.lnbs.get(nb);
   }
 }
 
@@ -31,19 +32,18 @@ export namespace ext {
   export let domainProvider: DomainExplorerProvider;
   export let domainTreeView: TreeView<DomainNode>;
   export let filesProvider: FilesExplorerProvider;
-  export let notesPanelView: NotesPanelView;
+  export let domainPanelView: DomainPanelView;
   export let searchPanelView: SearchPanelView;
   export let notebookPath: string;
   export let shortcutsFilePath: string;
-  export const gs: GlobalState = new GlobalState()
-  // export const updateGS = GlobalState.update;
-  export let vnNotebookSet: VNNotebookSet;
+  export const gs: GlobalState = new GlobalState();
+  export let lnbs: LNotebooks;
   export const setContext = <T>(ctx: string, value: T) => commands.executeCommand('setContext', ctx, value);
   export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any) =>
     context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
   export let domainShortcutStatusBarItem: StatusBarItem;
   export let windowId = (new Date()).getTime().toString();
-  export const webState = new WebStatus()
+  // export const webState = new WebStatus();
 
   // export const editNotes = new Map<string, string[]>();
 }
@@ -62,7 +62,7 @@ export function listenConfiguration(ctx: ExtensionContext) {
           return;
         }
         ext.notebookPath = notebookPath;
-        ext.vnNotebookSet = new VNNotebookSet(ext.notebookPath);
+        ext.lnbs = new LNotebooks(ext.notebookPath);
         initializeExtensionVariables(ctx);
         ext.domainProvider.refresh();
       }
@@ -72,9 +72,14 @@ export function listenConfiguration(ctx: ExtensionContext) {
 
 export function listenEditFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
-    workspace.onDidCloseTextDocument(() => {
+    workspace.onDidCloseTextDocument((e) => {
       // if (ext.vnNotebookSet === undefined) { return; }
-      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
+      if (
+        ext.lnbs
+        && existsSync(ext.lnbs.getEditorFile())
+        && ext.lnbs.getEditorFile() === e.fileName
+      ) {
+        ext.lnbs.editor.archiveEditor();
         // ext.gs.nb.processEditEnv();
         // if (!ext.gs.nb.checkEditorCleaned()) {
         //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
@@ -98,18 +103,22 @@ export function listenEditFileClose(ctx: ExtensionContext) {
 export function listenEditFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async () => {
-      // if (ext.vnNotebookSet === undefined) { return; }
-      if (ext.vnNotebookSet && ext.gs.nb && existsSync(ext.gs.nb.getEditorFile())) {
-        // if (!ext.gs.nb.checkEditorCleaned()) {
-        //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
-        //   return
-        // }
+      if (
+        ext.lnbs && existsSync(ext.lnbs.getEditorFile())
+      ) {
         try {
-          ext.gs.nb.processEditEnv();
+          ext.lnbs.processEditEnv();
         } catch (e) {
           window.showErrorMessage(`${e}`);
+          return;
         }
-        ext.notesPanelView.showNotesPlanView();
+
+        if (ext.gs.web === 'domain') {
+          ext.domainPanelView.show();
+        } else if (ext.gs.web === 'search') {
+          ext.searchPanelView.refresh();
+        }
+        // ext.lnbs.editor.archiveEditor();
         // const fileName = path.basename(f.uri.fsPath);
         // if (fileName.endsWith('.yaml')) {
         //   const [nId,] = fileName.split('.');
@@ -136,7 +145,7 @@ export function listenVscodeWindowChange() {
     if (vfs.readFileSync(vscodeWindowCheckFile) !== ext.windowId) {
       ext.windowId = (new Date()).getTime().toString();
       vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId);
-      ext.vnNotebookSet.refresh();
+      ext.lnbs.refresh();
     }
   });
 }
@@ -150,11 +159,11 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     return;
   }
   ext.notebookPath = notespath.endsWith('/') ? notespath : notespath + '/';
-  ext.vnNotebookSet = new VNNotebookSet(ext.notebookPath);
+  ext.lnbs = new LNotebooks(ext.notebookPath);
   // ext.gs = new GlobalState();
 
-  if (!ext.notesPanelView) {
-    ext.notesPanelView = new NotesPanelView();
+  if (!ext.domainPanelView) {
+    ext.domainPanelView = new DomainPanelView();
   }
 
   if (!ext.searchPanelView) {

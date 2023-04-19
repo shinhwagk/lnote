@@ -109,12 +109,6 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
             title: 'edit labels',
             onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
         }
-    ],
-    [
-        {
-            title: 'remove',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { labels: data.labels } })
-        }
     ]
 ];
 
@@ -616,16 +610,13 @@ window.addEventListener('message', (event) => {
             document.getElementById('search-time')!.textContent = `${e_s - gs.s_s} ms`;
 
             for (const n of gs.notes) {
-
                 n.labels.forEach(n => gs.allLabels.add(n));
                 for (const label of n.labels) {
                     const [g] = label.split('->');
                     if (gs.allGroupLabels.has(g)) {
                         gs.allGroupLabels.get(g)?.add(label);
                     } else {
-                        const s = new Set<string>();
-                        s.add(label);
-                        gs.allGroupLabels.set(g, s);
+                        gs.allGroupLabels.set(g, new Set([label]));
                     }
                 }
             }
@@ -673,7 +664,7 @@ function myFunction() {
     // document.createElement('textarea')
     if (x) {
         const keywords = x.trim().split(' ');
-        if (keywords.length >= 2) {
+        if (keywords.length >= 1) {
             vscode.postMessage({ command: 'search', data: { keywords: keywords } });
         }
     }

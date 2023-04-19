@@ -1,19 +1,21 @@
 kind: EditNote
 immutable:
   nbName: "@test"
-  nId: 1f2849
+  nId: c44299
   groupLabels:
     common:
-      - default
+      - abc
       - ccc
+    command:
+      - ls
   contents:
-    - sdfdf
-    - sdfdsf111222111
+    - "2"
 editable:
   groupLabels:
     common:
-      - default
+      - abc
       - ccc
+    command:
+      - ls
   contents:
-    - sdfdf
-    - sdfdsf111222111
+    - "21"

@@ -3,29 +3,29 @@ import {
     existsSync, mkdirpSync
 } from 'fs-extra';
 
-import { pathSplit } from '../constants';
 import { tools } from '../helper';
-import { ArrayLabels, GroupLables } from '../types';
-import { VNBDomain } from './domain';
-import { IEditBase, IEditDomain, IEditNoteData, IEditNotesCommonGroupLabels, VNBEditor } from './editor';
+import { GroupLables } from '../types';
+import { VNBDomain as LDomain } from './domain';
+
 import { NBNote } from './note';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, LNotes } from './notes';
+import { groupLabel2ArrayLabels, LNotes } from './notes';
 
-
-export class VNNotebook {
-    private readonly domain: VNBDomain;
+export class LNotebook {
+    private readonly domain: LDomain;
     private readonly notes: LNotes;
-    private readonly editor: VNBEditor;
 
     constructor(
-        private readonly nbName: string,
-        private readonly nbDir: string
+        private readonly nb: string,
+        private readonly dir: string
     ) {
-        existsSync(this.nbDir) || mkdirpSync(this.nbDir);
+        existsSync(this.dir) || mkdirpSync(this.dir);
 
-        this.domain = new VNBDomain(this.nbName, this.nbDir);
-        this.notes = new LNotes(this.nbName, this.nbDir);
-        this.editor = new VNBEditor(nbName, nbDir);
+        this.domain = new LDomain(this.nb, this.dir);
+        this.notes = new LNotes(this.nb, this.dir);
+    }
+
+    public getln() {
+        return this.notes;
     }
 
     /**
@@ -101,116 +101,22 @@ export class VNNotebook {
         return this.domain.getGroupLabel(dn);
     }
 
-    /**
-     * 
-     * edit
-     * 
-     */
-    public processEditEnv() {
-        const eb: IEditBase = this.editor.getEditorObj();
-        if (eb.kind === 'EditNote') {
-            this.processEditNote(eb);
-        } else if (eb.kind === 'EditCommonGroupLabels') {
-            this.processEditCommonGroupLabels(eb);
-        } else if (eb.kind === 'EditDomain') {
-            this.processEditDomain(eb);
-        }
-        // else if (eb.kind === 'EditNoteDelete') {
-        //     this.processEditNoteDelete(eb)
-        // }
-        else {
-            return;
-        }
-        this.editor.archiveEditor();
-    }
-
-    private processEditNote(eb: IEditBase) {
-        const eo = eb as IEditNoteData;
-        // if (eo.editable.delete) {
-        //     this.notes.deleteNote(eo.immutable.nId);
-        //     return;
-        // }
-        const n = this.notes.getNoteById(eo.immutable.nId);
-        n.updateDataContents(eo.editable.contents);
-        n.updateDataGroupLabels(eo.editable.groupLabels);
-        this.notes.permanent();
-    }
-
-    private processEditCommonGroupLabels(eb: IEditBase) {
-        const eo = eb as IEditNotesCommonGroupLabels;
-
-        const mcgl = groupLabel2ArrayLabels(eo.immutable.commonGroupLabels);
-        const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
-        const dcgl = groupLabel2ArrayLabels(eo.immutable.domainGroupLabes);
-
-        const notes = this.notes.getNotesByArrayLabels(mcgl.concat(dcgl), true);
-        for (const n of notes) {
-            const nlabels = n.getDataArrayLabels().filter(l => !mcgl.includes(l)).concat(ecgl).concat(dcgl);
-            this.notes.reLabels(n.getId(), nlabels);
-        }
-    }
-
-    private processEditDomain(eb: IEditBase) {
-        const eo = eb as IEditDomain;
-        // if (eo.editable.delete.notes) {
-        //     this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
-        // } else if (eo.editable.delete.domainNode) {
-        //     this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
-        // }
-        this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
-    }
-
-    // private processEditNoteDelete(eb: IEditBase) {
-    //     const eo = eb as IEditDeleteNote;
-    //     eo.editable.delete && this.notes.deleteNote(eo.immutable.nId)
-    // }
-
-    public checkEditorCleaned() {
-        return this.editor.checkEditorCleaned();
-    }
-
-    public createNoteEditor(nId: string,) {
-        const nd = this.notes.getNoteById(nId).getData();
-        this.editor.createNoteEditorFile(nId, nd.contents, nd.labels);
-        // if (nId !== '0') {
-
-        //     return;
-        // } else {
-        //     const _nId = tools.generateSixString();
-        //     this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
-        //     const nd = this.notes.getNoteById(_nId).getData();
-        //     this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
-        //     return;
-        // }
-    }
-
-    public createDomainEditor(domainNode: string[]) {
-        this.domain.isNotes(domainNode) || this.domain.addDomain(domainNode);
-        const gl = this.domain.getGroupLabel(domainNode);
-        const isNotes = this.domain.isNotes(domainNode);
-        this.editor.createDomainEditorFile(domainNode, isNotes, gl);
-    }
-
-    public createNotesSetGroupLabelsEditor(domainNode: string[], al: ArrayLabels) {
-        const dgl = this.getArrayLabelsOfDomain(domainNode);
-        const gl = al.filter(l => !dgl.includes(l));
-        this.editor.createNotesSetGroupLabelsEditorFile(domainNode, arrayLabels2GroupLabel(dgl), arrayLabels2GroupLabel(gl));
-    }
-
-    // public createNoteDeleteEditor(nId: string) {
-    //     const nd = this.notes.getNoteById(nId).getData();
-    //     this.editor.createNoteDeleteEditorFile(nId, nd.contents, nd.labels);
-    // }
-
-    public clearEditor() {
-        this.editor.archiveEditor();
-    }
-
-    public getEditorFile() {
-        return this.editor.getEditorFile();
-    }
 
     public search(keywords: string[]): NBNote[] {
-        return this.notes.search(keywords);
+        const notes: NBNote[] = [];
+        const res = keywords.map(kw => new RegExp(kw));
+        for (const [nId, note] of this.notes.getCache().entries()) {
+            const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
+            if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
+                const n = new NBNote(this.nb, this.dir, nId, note);
+                notes.push(n);
+            }
+        }
+        return notes;
+    }
+
+    public getNotes(domainNode: string[]): NBNote[] {
+        const al = this.getArrayLabelsOfDomain(domainNode);
+        return this.getNotesByArrayLabels(al);
     }
 }
