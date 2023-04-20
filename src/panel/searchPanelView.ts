@@ -69,7 +69,7 @@ export class SearchPanelView {
                 const al = n.getDataArrayLabels();
                 return {
                     nb: n.getnb(),
-                    nId: n.getId(),
+                    nid: n.getId(),
                     doc: isDoc,
                     files: isFiles,
                     labels: al,
@@ -122,7 +122,6 @@ export class SearchPanelView {
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
                     case 'note-add':
-                        console.log("111")
                         ExtCmds.cmdHdlNoteAdd(msg.params);
                         break;
                     case 'note-doc-show':
