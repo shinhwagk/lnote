@@ -4,11 +4,11 @@ import {
 } from 'fs-extra';
 
 import { tools } from '../helper';
-import { GroupLables } from '../types';
+import { ArrayLabels, GroupLables } from '../types';
 import { VNBDomain as LDomain } from './domain';
 
 import { LNote } from './note';
-import { groupLabel2ArrayLabels, LNotes } from './notes';
+import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, LNotes } from './notes';
 
 export class LNotebook {
     private readonly ldomain: LDomain;
@@ -50,6 +50,10 @@ export class LNotebook {
     public addNote(gl: GroupLables) {
         const nId = tools.generateSixString();
         this.lnotes.addNote(nId, gl);
+    }
+    public addNoteByAl(gl: ArrayLabels) {
+        const nId = tools.generateSixString();
+        this.lnotes.addNote(nId, arrayLabels2GroupLabel(gl));
     }
 
     public deleteNote(nId: string) {
@@ -107,9 +111,8 @@ export class LNotebook {
         for (const [nId, note] of this.lnotes.getCache().entries()) {
             const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
-                const n = new LNote(this.nb, this.dir, nId, note);
-                n.getData().labels['@nb'] = [n.getnb()];
-                notes.push(n);
+                // n.getData().labels['@@nb'] = [n.getnb()];
+                notes.push(new LNote(this.nb, this.dir, nId, note));
             }
         }
         return notes;

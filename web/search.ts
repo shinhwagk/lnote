@@ -101,7 +101,7 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'add note',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'note-add', params: { nb: data.note.nb, nId: data.note.nId, labels: data.labels } } })
+            onClick: (data) => vscode.postMessage({ command: 'note-add', params: { nb: data.nb, labels: data.labels } })
         }
     ],
     [
@@ -318,9 +318,11 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(
         elemIcon('fa-pen', (ev: MouseEvent) => {
+            labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1]
             nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
                 // nb:
-                labels: labelsOfNotes.map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
+                nb: labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1],
+                labels: labelsOfNotes.filter(l => !l.startsWith('@@nb->')).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
             });
         })
     );

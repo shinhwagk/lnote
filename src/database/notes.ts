@@ -89,13 +89,13 @@ export class LNotes {
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
-        // [...this.notesCache.values()].forEach(n =>)
+        [...this.notesCache.values()].forEach(n => n.labels['@@nb'] = [this.nb]);
         this.cacheNotesGroupedByLabelCache();
     }
 
     public cacheNotesGroupedByLabelCache() {
         // all note have an nb name label
-        this.notesGroupedByLabelCache.set(`nb->${this.nb}`, new Set<string>(this.notesCache.keys()));
+        this.notesGroupedByLabelCache.set(`@@nb->${this.nb}`, new Set<string>(this.notesCache.keys()));
         for (const [nId, note] of this.notesCache.entries()) {
             for (const label of groupLabel2ArrayLabels(note.labels)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {

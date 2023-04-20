@@ -121,6 +121,10 @@ export class SearchPanelView {
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
+                    case 'note-add':
+                        console.log("111")
+                        ExtCmds.cmdHdlNoteAdd(msg.params);
+                        break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
                         break;

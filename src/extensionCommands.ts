@@ -177,6 +177,24 @@ export namespace ExtCmds {
     // }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile1()));
   }
+  export async function cmdHdlNoteAdd(params: any) {
+    // const nb = ext.lnbs.get(params.nb);
+    ext.lnbs.get(params.nb as string).addNoteByAl(params.labels);
+    const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()]
+    const nid = notes[notes.length - 1][0];
+    console.log(params.nb, nid)
+    cmdHdlNoteEditor({ nb: params.nb, nId: nid })
+    // cmdHdlNoteEditor()
+    // ext.gs.nb.createNoteEditor(params.nId, params.labels);
+    // if (kind === 'nsgl') {
+    //   ext.gs.nb.createNotesSetGroupLabelsEditor(ext.gs.domainNodeFormat, params.labels);
+    // } else if (kind === 'edgl') {
+    //   ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
+    // } else if (kind === 'end') {
+    //   ext.gs.nb.createNoteEditor(params.nbName, params.nId, params.labels);
+    // }
+    // commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile1()));
+  }
 
   // export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {
   //   // if (window.activeTerminal) {
