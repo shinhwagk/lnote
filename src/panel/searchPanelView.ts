@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
-import { NBNote } from '../database/note';
+import { LNote } from '../database/note';
 import { IWebNote } from './types';
 import { INBNote } from '../types';
 
@@ -60,7 +60,7 @@ export class SearchPanelView {
         await this.postNotes(this.convertForWebStruct(notes));
     }
 
-    private convertForWebStruct(notes: NBNote[]): IWebNote[] {
+    private convertForWebStruct(notes: LNote[]): IWebNote[] {
         return notes
             .map(n => {
                 const _n = n.getData()
@@ -68,7 +68,7 @@ export class SearchPanelView {
                 const isFiles = n.checkFilesExist();
                 const al = n.getDataArrayLabels();
                 return {
-                    nb: n.getNb(),
+                    nb: n.getnb(),
                     nId: n.getId(),
                     doc: isDoc,
                     files: isFiles,
@@ -118,7 +118,7 @@ export class SearchPanelView {
                         const notes = ext.lnbs.search(msg.data.keywords);
                         await this.postNotes(this.convertForWebStruct(notes));
                         break;
-                    case 'note-editor':
+                    case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
                     case 'note-doc-show':

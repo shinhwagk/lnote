@@ -29,7 +29,7 @@
 //             const notes = ext.lnbs.search(msg.data.keywords);
 //             await this.postNotes(convertForWebStruct(notes));
 //             break;
-//         case 'note-editor':
+//         case 'note-edit':
 //             ExtCmds.cmdHdlNoteEditor(msg.params);
 //             break;
 //         case 'note-doc-show':

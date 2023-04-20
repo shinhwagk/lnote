@@ -5,7 +5,7 @@ import {
 } from 'fs-extra';
 
 import { vfs } from '../helper';
-import { NBNote } from './note';
+import { LNote } from './note';
 
 import { ArrayLabels, GroupLables, INBNote } from '../types';
 import { jointMark, notesFileName } from '../constants';
@@ -89,12 +89,13 @@ export class LNotes {
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
+        // [...this.notesCache.values()].forEach(n =>)
         this.cacheNotesGroupedByLabelCache();
     }
 
     public cacheNotesGroupedByLabelCache() {
-        // all note have an nbname label
-        this.notesGroupedByLabelCache.set(this.nb, new Set<string>(this.notesCache.keys()));
+        // all note have an nb name label
+        this.notesGroupedByLabelCache.set(`nb->${this.nb}`, new Set<string>(this.notesCache.keys()));
         for (const [nId, note] of this.notesCache.entries()) {
             for (const label of groupLabel2ArrayLabels(note.labels)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {
@@ -134,8 +135,8 @@ export class LNotes {
         this.permanent();
     }
 
-    public getNoteById(nId: string): NBNote {
-        return NBNote.get(this.nb, this.dir, nId, this.notesCache.get(nId)!);
+    public getNoteById(nId: string): LNote {
+        return LNote.get(this.nb, this.dir, nId, this.notesCache.get(nId)!);
     }
 
     public getNIdsByArrayLabels(labels: ArrayLabels): string[] {

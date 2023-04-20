@@ -23,6 +23,13 @@ export interface IEditBase {
 //     }
 // }
 
+export interface IEditNoteData1 {
+    nb: string,
+    nid: string,
+    gls: GroupLables,
+    contents: string[]
+}
+
 export interface IEditNoteData extends IEditBase {
     kind: 'EditNote';
     immutable: {
@@ -96,6 +103,18 @@ export class LEditor {
 
     public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
 
+
+    public getEditorFile1 = () => path.join(this.editDir, `${section}@editnote.yml`);;
+    public createNoteEditorFile1(nb: string, nId: string, contents: string[], gl: GroupLables) {
+        const ed: IEditNoteData1 = {
+            nb: nb,
+            nid: nId,
+            gls: gl,
+            contents: contents,
+        };
+        tools.writeYamlSync(this.getEditorFile1(), ed);
+    }
+
     public createNoteEditorFile(nb: string, nId: string, contents: string[], gl: GroupLables) {
         const ed: IEditNoteData = {
             kind: 'EditNote',
@@ -155,7 +174,7 @@ export class LEditor {
         return statSync(this.editorFile).size === 0;
     }
 
-    public archiveEditor() {
+    public archiveEditor(editorFile: string) {
         const ts = tools.formatDate(new Date());
         const e: IEditBase = tools.readYamlSync(this.editorFile);
         const k = e.kind.toLocaleLowerCase();
@@ -163,6 +182,13 @@ export class LEditor {
         moveSync(this.editorFile, archiveFile);
     }
 
+    public archiveEditor1(editorFile: string) {
+        const ts = tools.formatDate(new Date());
+        const e: IEditBase = tools.readYamlSync(this.editorFile);
+        const k = e.kind.toLocaleLowerCase();
+        const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
+        moveSync(editorFile, archiveFile);
+    }
 
 
 }

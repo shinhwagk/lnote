@@ -76,10 +76,10 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (
         ext.lnbs
-        && existsSync(ext.lnbs.getEditorFile())
+        && existsSync(ext.lnbs.getEditorFile1())
         && ext.lnbs.getEditorFile() === e.fileName
       ) {
-        ext.lnbs.editor.archiveEditor();
+        ext.lnbs.editor.archiveEditor(ext.lnbs.getEditorFile1());
         // ext.gs.nb.processEditEnv();
         // if (!ext.gs.nb.checkEditorCleaned()) {
         //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
@@ -104,10 +104,10 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async () => {
       if (
-        ext.lnbs && existsSync(ext.lnbs.getEditorFile())
+        ext.lnbs && existsSync(ext.lnbs.getEditorFile1())
       ) {
         try {
-          ext.lnbs.processEditEnv();
+          ext.lnbs.processEditorNote();
         } catch (e) {
           window.showErrorMessage(`${e}`);
           return;

@@ -175,7 +175,7 @@ export namespace ExtCmds {
     // } else if (kind === 'end') {
     //   ext.gs.nb.createNoteEditor(params.nbName, params.nId, params.labels);
     // }
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile()));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile1()));
   }
 
   // export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {

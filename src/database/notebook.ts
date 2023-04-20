@@ -7,12 +7,12 @@ import { tools } from '../helper';
 import { GroupLables } from '../types';
 import { VNBDomain as LDomain } from './domain';
 
-import { NBNote } from './note';
+import { LNote } from './note';
 import { groupLabel2ArrayLabels, LNotes } from './notes';
 
 export class LNotebook {
-    private readonly domain: LDomain;
-    private readonly notes: LNotes;
+    private readonly ldomain: LDomain;
+    private readonly lnotes: LNotes;
 
     constructor(
         private readonly nb: string,
@@ -20,12 +20,12 @@ export class LNotebook {
     ) {
         existsSync(this.dir) || mkdirpSync(this.dir);
 
-        this.domain = new LDomain(this.nb, this.dir);
-        this.notes = new LNotes(this.nb, this.dir);
+        this.ldomain = new LDomain(this.nb, this.dir);
+        this.lnotes = new LNotes(this.nb, this.dir);
     }
 
     public getln() {
-        return this.notes;
+        return this.lnotes;
     }
 
     /**
@@ -34,13 +34,13 @@ export class LNotebook {
      * 
      */
     public getNotesByArrayLabels(al: string[]) {
-        return this.notes.getNotesByArrayLabels(al, false);
+        return this.lnotes.getNotesByArrayLabels(al, false);
     }
 
     public craeteNotes(dn: string[]) {
         const gl = { "domain": dn };
         this.addNote(gl);
-        this.domain.updateGroupLabels(dn, { 'common': [] });
+        this.ldomain.updateGroupLabels(dn, { 'common': [] });
         // public craeteNotes(dn: string[],) {
         //     this.addNote(["common->default"]);
         //     this.domain.updateGroupLabels(dn, { 'common': ['default'] });
@@ -49,19 +49,19 @@ export class LNotebook {
 
     public addNote(gl: GroupLables) {
         const nId = tools.generateSixString();
-        this.notes.addNote(nId, gl);
+        this.lnotes.addNote(nId, gl);
     }
 
     public deleteNote(nId: string) {
-        this.notes.deleteNote(nId);
+        this.lnotes.deleteNote(nId);
     }
 
     public getNoteById(nId: string) {
-        return this.notes.getNoteById(nId);
+        return this.lnotes.getNoteById(nId);
     }
 
     public getNodeFilePath(nId: string) {
-        return this.notes.getNoteById(nId).getFilesPath();
+        return this.lnotes.getNoteById(nId).getFilesPath();
     }
 
     /**
@@ -70,27 +70,27 @@ export class LNotebook {
      * 
      */
     public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
-        return this.domain.getChildrenNameOfDomain(domainNode);
+        return this.ldomain.getChildrenNameOfDomain(domainNode);
     }
 
     public checkDomainIsNotes(domainNode: string[]) {
-        return this.domain.isNotes(domainNode);
+        return this.ldomain.isNotes(domainNode);
     }
 
     public getDomainByNode(dn: string[]) {
-        return this.domain.getDomain(dn);
+        return this.ldomain.getDomain(dn);
     }
 
     public addDomain(dn: string[]) {
-        this.domain.addDomain(dn);
+        this.ldomain.addDomain(dn);
     }
 
     public deleteDomain(dn: string[]) {
-        this.domain.deleteDomain(dn);
+        this.ldomain.deleteDomain(dn);
     }
 
     public renameDomain(dn: string[], domainName: string) {
-        this.domain.renameDomain(dn, domainName);
+        this.ldomain.renameDomain(dn, domainName);
     }
 
     public getArrayLabelsOfDomain(dn: string[]) {
@@ -98,24 +98,24 @@ export class LNotebook {
     }
 
     public getGroupLabelOfDomain(dn: string[]) {
-        return this.domain.getGroupLabel(dn);
+        return this.ldomain.getGroupLabel(dn);
     }
 
-
-    public search(keywords: string[]): NBNote[] {
-        const notes: NBNote[] = [];
+    public search(keywords: string[]): LNote[] {
+        const notes: LNote[] = [];
         const res = keywords.map(kw => new RegExp(kw));
-        for (const [nId, note] of this.notes.getCache().entries()) {
+        for (const [nId, note] of this.lnotes.getCache().entries()) {
             const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
-                const n = new NBNote(this.nb, this.dir, nId, note);
+                const n = new LNote(this.nb, this.dir, nId, note);
+                n.getData().labels['@nb'] = [n.getnb()];
                 notes.push(n);
             }
         }
         return notes;
     }
 
-    public getNotes(domainNode: string[]): NBNote[] {
+    public getNotes(domainNode: string[]): LNote[] {
         const al = this.getArrayLabelsOfDomain(domainNode);
         return this.getNotesByArrayLabels(al);
     }

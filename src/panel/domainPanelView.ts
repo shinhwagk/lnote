@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
-import { NBNote } from '../database/note';
+import { LNote } from '../database/note';
 import { IWebNote } from './types';
 import { tools } from '../helper';
 
@@ -48,7 +48,7 @@ export class DomainPanelView {
     this.initPanel();
   }
 
-  private convertForWebStruct(notes: NBNote[]): IWebNote[] {
+  private convertForWebStruct(notes: LNote[]): IWebNote[] {
     return notes
       .map(n => {
         const isDoc = n.checkDocExist();
@@ -56,7 +56,7 @@ export class DomainPanelView {
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
         const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
         _n['labels'] = alOfNote;
-        return { nb: n.getNb(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+        return { nb: n.getnb(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
       });
   }
 

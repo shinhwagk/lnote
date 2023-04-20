@@ -8,9 +8,7 @@ import { vfs } from '../helper';
 import { ArrayLabels, GroupLables, INBNote } from '../types';
 import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
-
-
-export class NBNote {
+export class LNote {
     filesPath: string;
     docPath: string;
     docMainFile: string;
@@ -36,11 +34,11 @@ export class NBNote {
         nId: string,
         data: INBNote
     ) {
-        return new NBNote(nbName, nbDir, nId, data);
+        return new LNote(nbName, nbDir, nId, data);
     }
 
-    getNb() {
-        return this.nb
+    getnb() {
+        return this.nb;
     }
 
     getId() {

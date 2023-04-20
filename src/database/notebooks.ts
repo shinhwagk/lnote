@@ -4,9 +4,11 @@ import {
     existsSync, mkdirpSync, readdirSync, statSync
 } from 'fs-extra';
 
-import { NBNote } from './note';
+import { LNote } from './note';
 import { LNotebook } from './notebook';
-import { IEditBase, IEditNoteData, LEditor } from './editor';
+import { IEditBase, IEditNoteData, IEditNoteData1, LEditor } from './editor';
+import { tools } from '../helper';
+import { GroupLables } from '../types';
 
 export class LNotebooks {
     private readonly nbs = new Map<string, LNotebook>();
@@ -65,7 +67,7 @@ export class LNotebooks {
         return Array.from(this.nbs.keys());
     }
 
-    public search(keywords: string[]): NBNote[] {
+    public search(keywords: string[]): LNote[] {
         return Array.from(this.nbs.entries()).map(([n, nb]) => {
             if (keywords.includes(n)) {
                 const _kws = keywords.filter(kw => kw !== n);
@@ -131,6 +133,16 @@ export class LNotebooks {
      * edit
      * 
      */
+    public processEditorNote() {
+        const en = tools.readYamlSync(this.getEditorFile1()) as IEditNoteData1;
+        const lnb = this.get(en.nb);
+        const n = lnb.getNoteById(en.nid);
+        // n.getNoteById(eo.immutable.nId);
+        n.updateDataContents(en.contents);
+        n.updateDataGroupLabels(en.gls);
+        lnb.getln().permanent();
+    }
+
     public processEditEnv() {
         const eb: IEditBase = this.editor.getEditorObj();
         if (eb.kind === 'EditNote') {
@@ -194,7 +206,7 @@ export class LNotebooks {
 
     public createNoteEditor(nb: string, nId: string,) {
         const nd = this.get(nb).getNoteById(nId).getData();
-        this.editor.createNoteEditorFile(nb, nId, nd.contents, nd.labels);
+        this.editor.createNoteEditorFile1(nb, nId, nd.contents, nd.labels);
         // if (nId !== '0') {
 
         //     return;
@@ -225,11 +237,15 @@ export class LNotebooks {
     //     this.editor.createNoteDeleteEditorFile(nId, nd.contents, nd.labels);
     // }
 
-    public clearEditor() {
-        this.editor.archiveEditor();
-    }
+    // public clearEditor() {
+    //     this.editor.archiveEditor();
+    // }
 
     public getEditorFile() {
         return this.editor.getEditorFile();
+    }
+
+    public getEditorFile1() {
+        return this.editor.getEditorFile1();
     }
 }
