@@ -22,7 +22,7 @@ export namespace ExtCmds {
     }
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
-    ext.gs.update(dn.split(pathSplit)[0]);
+    // ext.gs.update(dn.split(pathSplit)[0]);
     // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     // if (labelsOfDomain === undefined) { return; };
     // const _l = labelsOfDomain.split(',').map(l => l.trim());
@@ -166,6 +166,7 @@ export namespace ExtCmds {
   // }
   export async function cmdHdlNoteEditor(params: any) {
     // const nb = ext.lnbs.get(params.nb);
+    console.log(params)
     ext.lnbs.createNoteEditor(params.nb, params.nId);
     // ext.gs.nb.createNoteEditor(params.nId, params.labels);
     // if (kind === 'nsgl') {

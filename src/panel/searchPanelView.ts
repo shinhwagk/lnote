@@ -5,7 +5,6 @@ import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { LNote } from '../database/note';
 import { IWebNote } from './types';
-import { INBNote } from '../types';
 
 export class SearchPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -63,13 +62,13 @@ export class SearchPanelView {
     private convertForWebStruct(notes: LNote[]): IWebNote[] {
         return notes
             .map(n => {
-                const _n = n.getData()
+                const _n = n.getData();
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
                 const al = n.getDataArrayLabels();
                 return {
                     nb: n.getnb(),
-                    nid: n.getId(),
+                    id: n.getId(),
                     doc: isDoc,
                     files: isFiles,
                     labels: al,

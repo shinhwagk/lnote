@@ -70,7 +70,7 @@ export class DomainPanelView {
   private initPanel() {
     this.panel = vscode.window.createWebviewPanel(
       'lnote',
-      'lnote',
+      'lnote domain',
       vscode.ViewColumn.One, {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(ext.context.extensionUri, 'out')],

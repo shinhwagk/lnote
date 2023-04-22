@@ -2,7 +2,7 @@ import { ArrayLabels } from "../types";
 
 export interface IWebNote {
     nb: string;
-    nid: string;
+    id: string;
     contents: string[];
     doc: boolean;
     files: boolean;

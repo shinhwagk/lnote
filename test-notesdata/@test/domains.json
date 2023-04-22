@@ -1,1 +1,36 @@
-{"114":{"ppp":{"lll":{"555":{".labels":["114","ppp","lll","555","default"]},".labels":["114","ppp","lll","default","dddd3"]},".labels":["114","ppp"]},".labels":["114"]},".labels":["default"]}
+{
+    "@test": {
+        "114": {
+            "ppp": {
+                "lll": {
+                    "555": {
+                        ".labels": [
+                            "114",
+                            "ppp",
+                            "lll",
+                            "555",
+                            "default"
+                        ]
+                    },
+                    ".labels": [
+                        "114",
+                        "ppp",
+                        "lll",
+                        "default",
+                        "dddd3"
+                    ]
+                },
+                ".labels": [
+                    "114",
+                    "ppp"
+                ]
+            },
+            ".labels": [
+                "114"
+            ]
+        },
+        ".labels": [
+            "default"
+        ]
+    }
+}

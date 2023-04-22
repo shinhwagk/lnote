@@ -25,7 +25,7 @@ export interface IEditBase {
 
 export interface IEditNoteData1 {
     nb: string,
-    nid: string,
+    id: string,
     gls: GroupLables,
     contents: string[]
 }
@@ -103,14 +103,14 @@ export class LEditor {
 
     public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
 
+    public getEditorFile1 = () => path.join(this.editDir, `${section}-editnote.yml`);
 
-    public getEditorFile1 = () => path.join(this.editDir, `${section}@editnote.yml`);;
-    public createNoteEditorFile1(nb: string, nId: string, contents: string[], gl: GroupLables) {
+    public createNoteEditorFile1(nb: string, id: string, contents: string[], gls: GroupLables) {
         const ed: IEditNoteData1 = {
             nb: nb,
-            nid: nId,
-            gls: gl,
-            contents: contents,
+            id: id,
+            gls: gls,
+            contents: contents
         };
         tools.writeYamlSync(this.getEditorFile1(), ed);
     }

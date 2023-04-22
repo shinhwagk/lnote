@@ -136,7 +136,7 @@ export class LNotebooks {
     public processEditorNote() {
         const en = tools.readYamlSync(this.getEditorFile1()) as IEditNoteData1;
         const lnb = this.get(en.nb);
-        const n = lnb.getNoteById(en.nid);
+        const n = lnb.getNoteById(en.id);
         // n.getNoteById(eo.immutable.nId);
         n.updateDataContents(en.contents);
         n.updateDataGroupLabels(en.gls);

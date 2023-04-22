@@ -50,7 +50,7 @@ interface DataProtocol {
 
 interface DataNote {
     nb: string;
-    nId: string;
+    id: string;
     contents: string[];
     doc: boolean;
     files: boolean;
@@ -69,17 +69,17 @@ const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
             title: 'edit',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-edit', params: { nb: data.note.nb, nId: data.note.nId, labels: {} } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-edit', params: { nb: data.note.nb, nId: data.note.id } })
         }
     ],
     [
         {
             title: 'create document',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-doc-create', params: { nb: data.note.nb, nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-doc-create', params: { nb: data.note.nb, nId: data.note.id } })
         },
         {
             title: 'create files',
-            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-files-create', params: { nb: data.note.nb, nId: data.note.nId } })
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-files-create', params: { nb: data.note.nb, nId: data.note.id } })
         }
     ],
     // [
@@ -104,12 +104,12 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
             onClick: (data) => vscode.postMessage({ command: 'note-add', params: { nb: data.nb, labels: data.labels } })
         }
     ],
-    [
-        {
-            title: 'edit labels',
-            onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
-        }
-    ]
+    // [
+    //     {
+    //         title: 'edit labels',
+    //         onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
+    //     }
+    // ]
 ];
 
 // const NoteColContextMenuActions: ContextMenuAction[][] = [
@@ -211,7 +211,7 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
     const d_space = document.createElement('span');
-    d_space.title = `id: ${note.nId}, create date: ${note.cts}, modify date: ${note.mts}`;
+    d_space.title = `id: ${note.id}, create date: ${note.cts}, modify date: ${note.mts}`;
     d_space.appendChild(elemSpaces(2));
 
     d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: nid } })));
@@ -232,13 +232,21 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     const d_note_edit = document.createElement('div');
     d_note_edit.className = 'grid-note-edit';
     d_note_edit.oncontextmenu = (e) => { e.preventDefault(); };
-    const nid = note.nId;
+    const nid = note.id;
 
     // if (this.note.doc) { necma[0].shift() }
     // if (this.note.files) { necma[0].pop() }
     d_note_edit.appendChild(
         elemIcon('fa-pen', (ev: MouseEvent) => {
-            nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: note });
+            const necms = NoteEditContextMenuActions;
+            const cmas: ContextMenuAction[][] = [necms[0], []];
+            note.doc || cmas[1].push(necms[1][0]);
+            note.files || cmas[1].push(necms[1][1]);
+            if (cmas[1].length === 0) {
+                vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } });
+                return;
+            }
+            nccm.show(ev, d_note_edit, cmas, { note: note });
         })
     );
 
@@ -318,7 +326,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(
         elemIcon('fa-pen', (ev: MouseEvent) => {
-            labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1]
+            labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1];
             nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
                 // nb:
                 nb: labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1],
@@ -339,7 +347,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     for (const n of gs.notes) {
         if (issubset(n.labels, labelsOfNotes)) {
             const notesDom = document.createElement('div');
-            notesDom.id = `note-${n.nId}`;
+            notesDom.id = `note-${n.id}`;
             d_category_body.appendChild(notesDom);
             readerNote(notesDom, n);
         }

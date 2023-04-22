@@ -7,8 +7,8 @@ export type DomainNode = string;
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
-  const notebook = ext.lnbs.get(domainNode[0]);
-  const domainIsNotes = notebook.checkDomainIsNotes(domainNode);
+  const nb = ext.lnbs.get(domainNode[0]);
+  const domainIsNotes = nb.checkDomainIsNotes(domainNode);
   const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
   const notesNumberOfDomain = 1;//isNotes
   // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
@@ -16,7 +16,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
 
   const item: TreeItem = { label: domainNode[domainNode.length - 1] };
   item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain} `;
-  item.collapsibleState = notebook.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
+  item.collapsibleState = nb.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
   // if (domainNode.length === 1) {
   //   item.command = {
   //     arguments: [dn],
