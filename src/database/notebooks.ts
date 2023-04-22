@@ -51,7 +51,6 @@ export class LNotebooks {
     }
 
     public create(nb: string) {
-        mkdirpSync(this.getDir(nb));
         this.cache(nb);
     }
 

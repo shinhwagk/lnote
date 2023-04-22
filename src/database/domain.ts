@@ -22,7 +22,8 @@ export class VNBDomain {
         readonly dir: string
     ) {
         this.domainFile = path.join(this.dir, 'domains.json');
-        existsSync(this.domainFile) || vfs.writeJsonSync(this.domainFile, { '.labels': {} });
+
+        existsSync(this.domainFile) || this.add([this.nb]);
 
         this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);
     }
@@ -68,8 +69,8 @@ export class VNBDomain {
     }
 
     // , labels: GroupLables = { 'common': [] }
-    public addDomain(domainNode: string[]) {
-        objectPath.set(this.domainCache, [...domainNode], {})
+    public add(domainNode: string[]) {
+        objectPath.set(this.domainCache, [...domainNode], {});
         this.permanent();
     }
 

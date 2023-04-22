@@ -32,7 +32,18 @@ export namespace ExtCmds {
     // await cmdHdlDomainPin(dn);
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
-    const _dn: string[] = dn ? tools.splitDomaiNode(dn) : [];
+    const name: string | undefined = await window.showInputBox();
+    if (name === undefined) { return; };
+    if (name.includes('/')) {
+      window.showErrorMessage('domain name cannot contain "/".');
+    }
+    if (dn === undefined) {
+      ext.lnbs.create(name);
+    } else {
+      console.log("211", dn)
+      const dna = dn.split(pathSplit);
+      ext.lnbs.get(dn.split(pathSplit)[0]).addDomain(dna.concat(name));
+    }
     // ext.updateGS(dn!);
     // console.log('dfsdfds', ext.gs.domainNodeFormat);
     // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
@@ -46,7 +57,7 @@ export namespace ExtCmds {
     // }
     // ext.updateGS(dn || name);
     // ext.gs.nb.addDomain(_dn.concat(name));
-    // ext.domainProvider.refresh(dn);
+    ext.domainProvider.refresh(dn);
     // !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {

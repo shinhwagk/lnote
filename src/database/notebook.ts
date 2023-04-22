@@ -86,7 +86,7 @@ export class LNotebook {
     }
 
     public addDomain(dn: string[]) {
-        this.ldomain.addDomain(dn);
+        this.ldomain.add(dn);
     }
 
     public deleteDomain(dn: string[]) {
