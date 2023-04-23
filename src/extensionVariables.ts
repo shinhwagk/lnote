@@ -10,8 +10,7 @@ import { LNotebooks } from './database/notebooks';
 import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { vfs } from './helper';
-import { DomainPanelView } from './panel/domainPanelView';
-import { SearchPanelView } from './panel/searchPanelView';
+import { LWebPanelView } from './panel/webPanelView';
 // import { WebStatus } from './panel/web';
 
 export class GlobalState {
@@ -19,7 +18,6 @@ export class GlobalState {
   nb: string | undefined; //notebook name
   lnb: LNotebook | undefined;
   domainNode: string[] = [];
-  web: 'domain' | 'search' = 'domain';
 
   update(nb: string) {
     this.nb = nb;
@@ -32,8 +30,7 @@ export namespace ext {
   export let domainProvider: DomainExplorerProvider;
   export let domainTreeView: TreeView<DomainNode>;
   export let filesProvider: FilesExplorerProvider;
-  export let domainPanelView: DomainPanelView;
-  export let searchPanelView: SearchPanelView;
+  export let lwebPanelView: LWebPanelView;
   export let notebookPath: string;
   export let shortcutsFilePath: string;
   export const gs: GlobalState = new GlobalState();
@@ -112,12 +109,12 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
           window.showErrorMessage(`${e}`);
           return;
         }
+        ext.lwebPanelView.refresh();
+        // if (ext.lwebPanelView.getKind() === 'domain') {
+        //   ext.domainPanelView.show();
+        // } else if (ext.lwebPanelView.getKind() === 'search') {
 
-        if (ext.gs.web === 'domain') {
-          ext.domainPanelView.show();
-        } else if (ext.gs.web === 'search') {
-          ext.searchPanelView.refresh();
-        }
+        // }
         // ext.lnbs.editor.archiveEditor();
         // const fileName = path.basename(f.uri.fsPath);
         // if (fileName.endsWith('.yaml')) {
@@ -162,12 +159,8 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
   ext.lnbs = new LNotebooks(ext.notebookPath);
   // ext.gs = new GlobalState();
 
-  if (!ext.domainPanelView) {
-    ext.domainPanelView = new DomainPanelView();
-  }
-
-  if (!ext.searchPanelView) {
-    ext.searchPanelView = new SearchPanelView();
+  if (!ext.lwebPanelView) {
+    ext.lwebPanelView = new LWebPanelView();
   }
 
   if (!ext.domainProvider || !ext.domainTreeView) {

@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
-
-const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
-
 
 interface vscode {
     postMessage(message: any): void;
@@ -11,8 +7,18 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
+
+type GroupLables = { [gl: string]: string[] };
+
+declare const webKind: 'search' | 'domain';
+
+const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
+
+const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
+
 interface DataDomain {
     domainNode: string[];
+    dn: string[];
     checkedLabels: string[];
     // categories: DataCategory[];
     notes: DataNote[];
@@ -24,24 +30,6 @@ interface DataDomain {
     domainArrayLabel: string[];
     domainGroupLabel: { [g: string]: string[] };
 }
-
-// interface DataCategory {
-//     name: string;
-//     labels: string[]
-//     notes: DataNote[];
-// }
-
-// interface DataNote1 {
-//     nb: string;
-//     nId: string;
-//     contents: string[];
-//     doc: boolean;
-//     files: boolean;
-//     cts: number;
-//     mts: number;
-//     labels: string[];
-//     category: string;
-// }
 
 interface DataProtocol {
     command: string;
@@ -64,6 +52,30 @@ interface ContextMenuAction {
     title: string;
     onClick: (data: any) => void;
 }
+
+
+
+
+// interface DataCategory {
+//     name: string;
+//     labels: string[]
+//     notes: DataNote[];
+// }
+
+// interface DataNote1 {
+//     nb: string;
+//     nId: string;
+//     contents: string[];
+//     doc: boolean;
+//     files: boolean;
+//     cts: number;
+//     mts: number;
+//     labels: string[];
+//     category: string;
+// }
+
+
+
 
 const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
@@ -243,10 +255,11 @@ function readerNote(container: HTMLElement, note: DataNote): void {
             note.doc || cmas[1].push(necms[1][0]);
             note.files || cmas[1].push(necms[1][1]);
             if (cmas[1].length === 0) {
+                console.log("note", note);
                 vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } });
                 return;
             }
-            nccm.show(ev, d_note_edit, cmas, { note: note });
+            gs.nccm.show(ev, d_note_edit, cmas, { note: note });
         })
     );
 
@@ -326,11 +339,11 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(
         elemIcon('fa-pen', (ev: MouseEvent) => {
-            labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1];
-            nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
+            // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
+            gs.nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
                 // nb:
-                nb: labelsOfNotes.filter(l => l.startsWith('@@nb'))[0].split('->')[1],
-                labels: labelsOfNotes.filter(l => !l.startsWith('@@nb->')).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
+                nb: labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1],
+                labels: labelsOfNotes.concat(gs.dn.map(n => `domain->${n}`)).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
             });
         })
     );
@@ -396,23 +409,6 @@ function readerNotesCategories() {
     }
 }
 
-interface NoteLabel {
-    checked: boolean;
-    label: string;
-    group: string;
-    // group label: `${group}->${label}`
-    gl: string;
-    available: boolean;
-
-    //   dom(){
-
-    // }
-}
-
-
-
-
-
 function readerNotesLabels() {
     const localDom = document.getElementById('notes-labels')!;
     localDom.replaceChildren();
@@ -427,7 +423,7 @@ function readerNotesLabels() {
                 _com.push(n.labels);
             }
         } else {
-            gs.allLabels.forEach(l => _ava.add(l));
+            gs.allArrayLabels.forEach(l => _ava.add(l));
             _com.push(n.labels);
         }
     }
@@ -501,79 +497,69 @@ function readerNotesLabels() {
     // }
 }
 
-// function readerDomainName() {
-//     const e_domain = document.createElement('div');
-//     const e_title = document.createElement('h2');
-//     const e_domain_name = document.createElement('span');
-//     const e_search = document.createElement('input');
-//     e_search.type = 'text';
-//     e_search.style.display = 'none';
-//     e_search.focus();
-//     e_search.onkeydown = () => {
-//         // this.readerCategories(i.value);
-//     };
+function readerDomainName() {
+    const e_domain = document.getElementById('domain');
+    e_domain?.replaceChildren();
 
-//     e_domain_name.textContent = gs.domainNode.join(' / ');
-//     // const e_search = elemNotesSearch();
-//     e_title.appendChild(e_domain_name);
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'edgl', params: {} } })));
-//     e_title.appendChild(elemSpaces());
-//     e_title.appendChild(
-//         elemIcon('fa-search', () => {
-//             if (!gs.search) {
-//                 gs.search = true;
-//                 e_search.style.display = 'block';
-//             } else {
-//                 gs.search = false;
-//                 e_search.style.display = 'none';
-//             }
-//         })
-//     );
-//     e_title.appendChild(e_search);
+    const e_title = document.createElement('h2');
+    const e_domain_name = document.createElement('span');
+    const e_search = document.createElement('input');
+    e_search.type = 'text';
+    e_search.style.display = 'none';
+    e_search.focus();
+    e_search.onkeydown = () => {
+        // this.readerCategories(i.value);
+    };
 
-//     // labels
-//     const labelsDom = document.createElement('div');
-//     labelsDom.id = 'notes-labels';
+    e_domain_name.textContent = `Domain: ${gs.dn.join(' / ')}`;
+    // const e_search = elemNotesSearch();
+    e_title.appendChild(e_domain_name);
+    e_title.appendChild(elemSpaces());
+    // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
+    e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'domain-note-add', params: { dn: gs.dn } })));
+    e_title.appendChild(elemSpaces());
+    e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-labels-edit', params: {} })));
+    e_title.appendChild(elemSpaces());
+    // e_title.appendChild(
+    //     elemIcon('fa-search', () => {
+    //         if (!gs.search) {
+    //             gs.search = true;
+    //             e_search.style.display = 'block';
+    //         } else {
+    //             gs.search = false;
+    //             e_search.style.display = 'none';
+    //         }
+    //     })
+    // );
+    // e_title.appendChild(e_search);
 
-//     // categories
-//     const categoriesDom = document.createElement('div');
-//     categoriesDom.id = 'domain-categories';
+    // labels
+    // const labelsDom = document.createElement('div');
+    // labelsDom.id = 'notes-labels';
 
-//     e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
-//     document.getElementById('content')?.replaceChildren(e_domain);
-// }
+    // // categories
+    // const categoriesDom = document.createElement('div');
+    // categoriesDom.id = 'domain-categories';
 
-const nccm = new ContextMenuDom();
-document.addEventListener(
-    'click',
-    () => {
-        nccm.hide();
-    },
-    true
-);
-document.addEventListener(
-    'contextmenu',
-    () => {
-        console.log('global contextmenu click');
-        nccm.hide();
-    },
-    true
-);
+    // e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
+    // document.getElementById('content')?.replaceChildren(e_domain);
+    console.log(e_title);
+    e_domain?.append(e_title);
+}
 
 class GlobalState {
     notes: DataNote[] = [];
     s_s = 0;
     checkedLabels = new Set<string>();
     // init once
-    allLabels = new Set<string>();
+    allArrayLabels = new Set<string>();
     // init once
     allGroupLabels = new Map<string, Set<string>>();
-}
 
-const gs = new GlobalState();
+    domainNode: string[] = [];
+    dn: string[] = [];
+    nccm: ContextMenuDom = new ContextMenuDom();
+}
 
 function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
     const labels = [];
@@ -585,8 +571,6 @@ function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
     return labels;
 }
 
-type GroupLables = { [gl: string]: string[] };
-
 function sortGroupLables(obj1: GroupLables): GroupLables {
     return Object.keys(obj1).sort().reduce(
         (obj, key) => {
@@ -597,90 +581,140 @@ function sortGroupLables(obj1: GroupLables): GroupLables {
     );
 }
 
-function labels2GroupLabel(labels: string[]): GroupLables {
-    const gl: { [g: string]: string[] } = {};
-    for (const label of labels) {
-        const [g, l] = label.split('->');
-        if (g in gl) {
-            gl[g].push(l);
-        } else {
-            gl[g] = [l];
-        }
-    }
-    return sortGroupLables(gl);
-}
+// function labels2GroupLabel(labels: string[]): GroupLables {
+//     const gl: { [g: string]: string[] } = {};
+//     for (const label of labels) {
+//         const [g, l] = label.split('->');
+//         if (g in gl) {
+//             gl[g].push(l);
+//         } else {
+//             gl[g] = [l];
+//         }
+//     }
+//     return sortGroupLables(gl);
+// }
 
-
-window.addEventListener('message', (event) => {
-    const message: DataProtocol = event.data;
-    console.log('vscode-notes webview open.', message);
-    switch (message.command) {
-        case 'post-notes':
-            const e_s = (new Date()).getTime();
-            gs.notes = message.data.notes;
-            document.getElementById('search-time')!.textContent = `${e_s - gs.s_s} ms`;
-
-            for (const n of gs.notes) {
-                n.labels.forEach(n => gs.allLabels.add(n));
-                for (const label of n.labels) {
-                    const [g] = label.split('->');
-                    if (gs.allGroupLabels.has(g)) {
-                        gs.allGroupLabels.get(g)?.add(label);
-                    } else {
-                        gs.allGroupLabels.set(g, new Set([label]));
-                    }
-                }
-            }
-
-            // lables
-            const labelsDom = document.createElement('div');
-            labelsDom.id = 'notes-labels';
-
-            // categories
-            const categoriesDom = document.createElement('div');
-            categoriesDom.id = 'domain-categories';
-
-            const e_domain = document.createElement('div');
-            e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
-
-            document.getElementById('content')?.replaceChildren(e_domain);
-
-            readerNotesLabels();
-            readerNotesCategories();
-
-            break;
-        // case 'delete-note':
-        //   document.getElementById(`note - ${ message.data.nId }`)?.remove();
-        //   break;
-        // case 'post-note':
-        //   const el = document.getElementById(`note - ${ message.data.note.nId }`);
-        //   if (el !== null) {
-        //     readerNote(el, message.data.note);
-        //   } else {
-        //     const cname = message.data.note.labels.filter(l => !gs.domainLabels.includes(l)).sort().join(', ').replace(/\s/g, '');
-        //     const noteDom = document.createElement('div');
-        //     noteDom.id = `note - ${ message.data.note.nId }`;
-        //     document.getElementById(`category - body - ${ cname }`)?.append(noteDom);
-        //     readerNote(noteDom, message.data.note);
-        //   }
-        //   break;
-        default:
-            document.body.innerHTML = '<h1>loading...{message}</h1>';
-    }
-});
-
-function myFunction() {
+function searchAction() {
     gs.s_s = (new Date()).getTime();
     const x = (<HTMLTextAreaElement>document.getElementById("APjFqb"))?.value;
     // document.createElement('textarea')
     if (x) {
         const keywords = x.trim().split(/\s+/);
         if (keywords.length >= 1) {
-            vscode.postMessage({ command: 'search', data: { keywords: keywords } });
+            vscode.postMessage({ command: 'search', params: { keywords: keywords } });
         }
     }
     // document.getElementById("content").innerHTML = "You selected: " + x;
 }
-//
-// vscode.postMessage({ command: 'get-data' });
-// console.log('Ready to accept data.');
+
+// <div id="root">
+// <div id="content"></div>
+// <ul id="contextMenu" class="contextMenu"></ul>
+// </div>
+
+function initFrameDoms() {
+    // search 
+    const searchDom = document.createElement('div');
+    searchDom.className = "search";
+    const searchTextAreaDom = document.createElement('textarea');
+    searchTextAreaDom.id = "APjFqb";
+    searchTextAreaDom.className = "searchTextArea";
+    searchTextAreaDom.maxLength = 2048;
+    searchTextAreaDom.rows = 1;
+    // searchTextAreaDom.value = "@test default";
+    const searchButtonDom = document.createElement('button');
+    searchButtonDom.className = "searchButton";
+    searchButtonDom.onclick = searchAction;
+    searchButtonDom.textContent = "search";
+    const searchTimeDom = document.createElement('span');
+    searchTimeDom.id = "search-time";
+
+    searchDom.append(searchTextAreaDom, searchButtonDom, searchTimeDom);
+
+    // const contentDom = document.createElement('div');
+    // contentDom.id = "content";
+    const menuDom = document.createElement('ul');
+    menuDom.id = "contextMenu";
+    menuDom.className = "contextMenu";
+
+    // domain 
+    const domainDom = document.createElement('div');
+    domainDom.id = "domain";
+
+    // lables
+    const labelsDom = document.createElement('div');
+    labelsDom.id = 'notes-labels';
+
+    // categories
+    const categoriesDom = document.createElement('div');
+    categoriesDom.id = 'domain-categories';
+
+    // const e_domain = document.createElement('div');
+    // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
+
+    // document.getElementById('content')?.replaceChildren(e_domain);
+    const doms = webKind === 'domain' ? [domainDom, labelsDom, categoriesDom, menuDom] : [searchDom, labelsDom, categoriesDom, menuDom];
+    document.getElementById('root')?.append(...doms);
+
+    // gs.nccm = new ContextMenuDom();
+}
+
+function processNotes() {
+    gs.allArrayLabels.clear();
+    gs.allGroupLabels.clear();
+
+    for (const n of gs.notes) {
+        n.labels.forEach(n => gs.allArrayLabels.add(n));
+        for (const label of n.labels) {
+            const [g] = label.split('->');
+            if (gs.allGroupLabels.has(g)) {
+                gs.allGroupLabels.get(g)?.add(label);
+            } else {
+                gs.allGroupLabels.set(g, new Set([label]));
+            }
+        }
+    }
+}
+
+document.addEventListener('click', () => gs.nccm.hide(), true);
+
+document.addEventListener('contextmenu', () => gs.nccm.hide(), true);
+
+window.addEventListener('message', (event) => {
+    const message: DataProtocol = event.data;
+    console.log('vscode-notes webview open.', webKind, message);
+    switch (message.command) {
+        case 'post-search':
+            const e_s = (new Date()).getTime();
+            gs.notes = message.data.notes;
+            document.getElementById('search-time')!.textContent = `${e_s - gs.s_s} ms`;
+
+            processNotes();
+
+            readerNotesLabels();
+            readerNotesCategories();
+            break;
+        case 'post-domain':
+            gs.dn = message.data.dn;
+            gs.notes = message.data.notes;
+
+            processNotes();
+
+            // gs.allGroupLabels.delete('##nb');
+            readerDomainName();
+            readerNotesLabels();
+            readerNotesCategories();
+            break;
+        default:
+            document.body.innerHTML = '<h1>loading...{message}</h1>';
+    }
+});
+
+
+initFrameDoms();
+// new GlobalState after initFrameDoms
+const gs = new GlobalState();
+
+if (webKind === 'domain') {
+    vscode.postMessage({ command: 'domain' });
+}

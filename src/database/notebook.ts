@@ -38,9 +38,9 @@ export class LNotebook {
     }
 
     public craeteNotes(dn: string[]) {
-        const gl = { "domain": dn };
-        this.addNote(gl);
-        this.ldomain.updateGroupLabels(dn, { 'common': [] });
+        const gls = { "domain": dn };
+        this.addNote(gls);
+        this.ldomain.updateGroupLabels(dn, gls);
         // public craeteNotes(dn: string[],) {
         //     this.addNote(["common->default"]);
         //     this.domain.updateGroupLabels(dn, { 'common': ['default'] });
@@ -111,7 +111,7 @@ export class LNotebook {
         for (const [nId, note] of this.lnotes.getCache().entries()) {
             const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
-                // n.getData().labels['@@nb'] = [n.getnb()];
+                // n.getData().labels['##nb'] = [n.getnb()];
                 notes.push(new LNote(this.nb, this.dir, nId, note));
             }
         }

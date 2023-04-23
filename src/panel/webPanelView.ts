@@ -6,13 +6,34 @@ import { tools } from '../helper';
 import { LNote } from '../database/note';
 import { IWebNote } from './types';
 
-export class SearchPanelView {
+export class LWebPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
     private keywords = new Set<string>();
+    private webKind: 'domain' | 'search' = 'domain';
+    // only for domain web
+    private domainNode: string[] = [];
+
+    public setKind(kind: 'domain' | 'search') {
+        if (kind !== this.webKind) {
+            this.panel?.dispose();
+        }
+        this.webKind = kind;
+        return this;
+    }
+
+    public setDomainNode(dn: string[]) {
+        this.setKind('domain');
+        this.domainNode = dn;
+        return this;
+    }
+
+    public getKind() {
+        return this.webKind;
+    }
 
     private getWebviewContent() {
         const stylesPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'main.css');
-        const jsPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', 'search.js');
+        const jsPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', `main.js`);
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const jsMainUrl = this.panel?.webview.asWebviewUri(jsPathMainPath);
         // const cspSource = this.panel?.webview.cspSource
@@ -24,18 +45,11 @@ export class SearchPanelView {
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <link href="${stylesMainUri}" rel="stylesheet">
                     <script nonce="${nonce}" src="https://kit.fontawesome.com/61b8139299.js" crossorigin="anonymous" ></script>
+                    <script type="text/javascript" >const webKind = "${this.webKind}"; </script>
                     <title>lnote</title>
                 </head>
                 <body>
-                    <div class="search">
-                        <textarea id="APjFqb" class="searchTextArea" maxlength="2048" name="q" rows="1" >@test default</textarea>
-                        <button class="searchButton" onclick="myFunction()">button</button>
-                        <a id="search-time"></a>
-                    </div>
-                    <div id="root">
-                        <div id="content"></div>
-                        <ul id="contextMenu" class="contextMenu"></ul>
-                    </div>
+                    <div id="root"></div>
                     <script>
                         const vscode = acquireVsCodeApi();
                     </script>
@@ -46,17 +60,21 @@ export class SearchPanelView {
 
     async show(): Promise<void> {
         if (this.panel) {
+            if (this.webKind === 'domain') {
+                this.postDomain();
+            }
             this.panel.reveal(vscode.ViewColumn.One);
-            // await this.postData();
             return;
         }
-
         this.initPanel();
     }
 
     async refresh(): Promise<void> {
-        const notes = ext.lnbs.search(Array.from(this.keywords));
-        await this.postNotes(this.convertForWebStruct(notes));
+        if (this.webKind === 'domain') {
+            await this.postDomain()
+        } else if (this.webKind === 'search') {
+            await this.postSerach();
+        }
     }
 
     private convertForWebStruct(notes: LNote[]): IWebNote[] {
@@ -79,17 +97,26 @@ export class SearchPanelView {
             });
     }
 
-    private async postNotes(notes: IWebNote[]) {
+    private async postSerach() {
+        const notes = ext.lnbs.search(Array.from(this.keywords));
         await this.panel!.webview.postMessage({
-            command: 'post-notes',
-            data: { notes: notes }
+            command: 'post-search',
+            data: { notes: this.convertForWebStruct(notes) }
+        });
+    }
+
+    private async postDomain() {
+        const notes = ext.lnbs.get(this.domainNode[0]).getNotes(this.domainNode);
+        await this.panel!.webview.postMessage({
+            command: 'post-domain',
+            data: { dn: this.domainNode, notes: this.convertForWebStruct(notes) }
         });
     }
 
     private initPanel() {
         this.panel = vscode.window.createWebviewPanel(
             'lnote',
-            'lnote search',
+            `lnote ${this.webKind}`,
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
@@ -113,15 +140,20 @@ export class SearchPanelView {
                 switch (msg.command) {
                     case 'search':
                         this.keywords.clear();
-                        (msg.data.keywords as string[]).forEach(x => this.keywords.add(x));
-                        const notes = ext.lnbs.search(msg.data.keywords);
-                        await this.postNotes(this.convertForWebStruct(notes));
+                        (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
+                        this.postSerach();
+                        break;
+                    case 'domain':
+                        this.postDomain();
                         break;
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
                     case 'note-add':
                         ExtCmds.cmdHdlNoteAdd(msg.params);
+                        break;
+                    case 'domain-note-add':
+                        ExtCmds.cmdHdlDomainNoteAdd(msg.params)
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);

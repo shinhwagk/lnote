@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
-import { ext } from '../extensionVariables';
-import { ExtCmds } from '../extensionCommands';
-import { LNote } from '../database/note';
-import { IWebNote } from './types';
-import { tools } from '../helper';
+import { ext } from '../src/extensionVariables';
+import { ExtCmds } from '../src/extensionCommands';
+import { LNote } from '../src/database/note';
+import { IWebNote } from '../src/panel/types';
+import { tools } from '../src/helper';
 
 export class DomainPanelView {
   private panel: vscode.WebviewPanel | undefined = undefined;
@@ -41,7 +41,6 @@ export class DomainPanelView {
   async show(): Promise<void> {
     if (this.panel) {
       this.panel!.reveal(vscode.ViewColumn.One);
-      // await this.postData();
       return;
     }
 

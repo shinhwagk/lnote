@@ -10,7 +10,32 @@
                             "lll",
                             "555",
                             "default"
-                        ]
+                        ],
+                        "abc": {
+                            ".labels": {
+                                "common": [
+                                    "@test",
+                                    "114",
+                                    "ppp",
+                                    "lll",
+                                    "555",
+                                    "abc"
+                                ]
+                            },
+                            "ccc": {
+                                ".labels": {
+                                    "domain": [
+                                        "@test",
+                                        "114",
+                                        "ppp",
+                                        "lll",
+                                        "555",
+                                        "abc",
+                                        "ccc"
+                                    ]
+                                }
+                            }
+                        }
                     },
                     ".labels": [
                         "114",
@@ -31,6 +56,8 @@
         },
         ".labels": [
             "default"
-        ]
+        ],
+        "abc": {},
+        "abc1": {}
     }
 }

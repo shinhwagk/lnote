@@ -8,7 +8,6 @@ import { LNote } from './note';
 import { LNotebook } from './notebook';
 import { IEditBase, IEditNoteData, IEditNoteData1, LEditor } from './editor';
 import { tools } from '../helper';
-import { GroupLables } from '../types';
 
 export class LNotebooks {
     private readonly nbs = new Map<string, LNotebook>();

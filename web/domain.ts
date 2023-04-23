@@ -1,118 +1,57 @@
-// /* eslint-disable @typescript-eslint/naming-convention */
-// const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
-// const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
 
-// interface vscode {
-//   postMessage(message: any): void;
-// }
+// // const NoteEditContextMenuActions: ContextMenuAction[][] = [
+// //     [
+// //         {
+// //             title: 'edit',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: data.note.nId, labels: {} } } })
+// //         }
+// //     ],
+// //     [
+// //         {
+// //             title: 'create document',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nId: data.note.nId } })
+// //         },
+// //         {
+// //             title: 'create files',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } })
+// //         }
+// //     ],
+// //     // [
+// //     //   {
+// //     //     title: 'remove',
+// //     //     onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
+// //     //   }
+// //     // ]
+// //     // ,
+// //     // [
+// //     //   {
+// //     //     title: 'open note folder',
+// //     //     onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
+// //     //   }
+// //     // ]
+// // ];
 
-// declare function acquireVsCodeApi(): vscode;
-// declare const vscode: vscode;
-
-// interface DataDomain {
-//   domainNode: string[];
-//   checkedLabels: string[];
-//   unCheckedLabels: string[];
-//   categories: DataCategory[];
-//   notes: PostNote[];
-//   note: PostNote
-//   labels: string[];
-//   domainLabels: string[];
-//   domainNotes: PostNote[];
-//   nId: string;
-//   domainArrayLabel: string[];
-//   domainGroupLabel: { [g: string]: string[] };
-// }
-
-// interface DataCategory {
-//   name: string;
-//   labels: string[]
-//   notes: DataNote[];
-// }
-
-// interface DataNote {
-//   nId: string;
-//   contents: string[];
-//   doc: boolean;
-//   files: boolean;
-//   cDate: string;
-//   mDate: string;
-// }
-
-// interface DataProtocol {
-//   command: string;
-//   data: DataDomain;
-// }
-
-// interface PostNote {
-//   contents: string[];
-//   cts: number;
-//   mts: number;
-//   labels: string[];
-//   category: string;
-//   nId: string;
-//   doc: boolean;
-//   files: boolean;
-// }
-
-// interface ContextMenuAction {
-//   title: string;
-//   onClick: (data: any) => void;
-// }
-
-// const NoteEditContextMenuActions: ContextMenuAction[][] = [
-//   [
-//     {
-//       title: 'edit',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: data.note.nId, labels: {} } } })
-//     }
-//   ],
-//   [
-//     {
-//       title: 'create document',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nId: data.note.nId } })
-//     },
-//     {
-//       title: 'create files',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } })
-//     }
-//   ],
-//   // [
-//   //   {
-//   //     title: 'remove',
-//   //     onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
-//   //   }
-//   // ]
-//   // ,
-//   // [
-//   //   {
-//   //     title: 'open note folder',
-//   //     onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
-//   //   }
-//   // ]
-// ];
-
-// const CategoryEditContextMenuActions: ContextMenuAction[][] = [
-//   [
-//     {
-//       title: 'add note',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: data.labels } } })
-//     }
-//   ],
-//   [
-//     {
-//       title: 'edit labels',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
-//     }
-//   ],
-//   [
-//     {
-//       title: 'remove',
-//       onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { labels: data.labels } })
-//     }
-//   ]
-// ];
+// // const CategoryEditContextMenuActions: ContextMenuAction[][] = [
+// //     [
+// //         {
+// //             title: 'add note',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: data.labels } } })
+// //         }
+// //     ],
+// //     [
+// //         {
+// //             title: 'edit labels',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
+// //         }
+// //     ],
+// //     [
+// //         {
+// //             title: 'remove',
+// //             onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { labels: data.labels } })
+// //         }
+// //     ]
+// // ];
 
 // // const NoteColContextMenuActions: ContextMenuAction[][] = [
 // //   [
@@ -149,250 +88,250 @@
 // //   ]
 // // ];
 
-// class ContextMenuDom {
-//   private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
-//   public hide() {
-//     this.elem.style.display = 'none';
-//   }
+// // class ContextMenuDom {
+// //     private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
+// //     public hide() {
+// //         this.elem.style.display = 'none';
+// //     }
 
-//   public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
-//     this.elem.replaceChildren();
-//     let gidx = 0; // group index
-//     for (const l of menus) {
-//       if (gidx >= 1 && gidx < menus.length) {
-//         const d_li = document.createElement('li');
-//         d_li.className = 'contextMenuDivider';
-//         this.elem.appendChild(d_li);
-//       }
-//       for (const i of l) {
-//         const d_li = document.createElement('li');
-//         d_li.className = 'contextMenuItem';
-//         d_li.textContent = i.title;
-//         d_li.onclick = () => i.onClick(data);
-//         this.elem.appendChild(d_li);
-//       }
-//       gidx += 1;
-//     };
-//     this.elem!.style.display = 'block';
-//     this.elem!.style.position = 'absolute';
+// //     public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
+// //         this.elem.replaceChildren();
+// //         let gidx = 0; // group index
+// //         for (const l of menus) {
+// //             if (gidx >= 1 && gidx < menus.length) {
+// //                 const d_li = document.createElement('li');
+// //                 d_li.className = 'contextMenuDivider';
+// //                 this.elem.appendChild(d_li);
+// //             }
+// //             for (const i of l) {
+// //                 const d_li = document.createElement('li');
+// //                 d_li.className = 'contextMenuItem';
+// //                 d_li.textContent = i.title;
+// //                 d_li.onclick = () => i.onClick(data);
+// //                 this.elem.appendChild(d_li);
+// //             }
+// //             gidx += 1;
+// //         };
+// //         this.elem!.style.display = 'block';
+// //         this.elem!.style.position = 'absolute';
 
-//     this.elem!.style.top =
-//       (frameElem.getBoundingClientRect().bottom + this.elem.clientHeight <= document.documentElement.clientHeight
-//         ? e.pageY
-//         : e.pageY - this.elem.clientHeight) + 'px';
-//     this.elem!.style.left =
-//       (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
-//         ? e.pageX
-//         : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
-//   }
-// }
+// //         this.elem!.style.top =
+// //             (frameElem.getBoundingClientRect().bottom + this.elem.clientHeight <= document.documentElement.clientHeight
+// //                 ? e.pageY
+// //                 : e.pageY - this.elem.clientHeight) + 'px';
+// //         this.elem!.style.left =
+// //             (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
+// //                 ? e.pageX
+// //                 : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
+// //     }
+// // }
 
-// class NoteEditContextMenu { }
+// // class NoteEditContextMenu { }
 
 
 // function elemSpaces(num: number = 1) {
-//   const s = document.createElement('span');
-//   for (let i = 0; i < num; i++) {
-//     s.innerHTML += '&nbsp;';
-//   }
-//   return s;
+//     const s = document.createElement('span');
+//     for (let i = 0; i < num; i++) {
+//         s.innerHTML += '&nbsp;';
+//     }
+//     return s;
 // }
 
 // function readerNote(container: HTMLElement, note: PostNote): void {
-//   container.replaceChildren();
+//     container.replaceChildren();
 
-//   const d_note = container;
-//   d_note.className = 'grid-note';
-//   // d_note.id = `note_${note.nId}`;
+//     const d_note = container;
+//     d_note.className = 'grid-note';
+//     // d_note.id = `note_${note.nId}`;
 
-//   const d_note_id = document.createElement('div');
-//   d_note_id.className = 'grid-note-id';
-//   d_note_id.oncontextmenu = (e) => { e.preventDefault(); };
+//     const d_note_id = document.createElement('div');
+//     d_note_id.className = 'grid-note-id';
+//     d_note_id.oncontextmenu = (e) => { e.preventDefault(); };
 
-//   const d_cion = note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
-//   const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
+//     const d_cion = note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
+//     const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
-//   const d_space = document.createElement('span');
-//   d_space.title = `id: ${note.nId}, create date: ${note.cts}, modify date: ${note.mts}`;
-//   d_space.appendChild(elemSpaces(2));
+//     const d_space = document.createElement('span');
+//     d_space.title = `id: ${note.nId}, create date: ${note.cts}, modify date: ${note.mts}`;
+//     d_space.appendChild(elemSpaces(2));
 
-//   d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
-//   d_note_id.appendChild(d_space);
-//   d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'notebook-note-files-open', data: { nId: nid } })));
+//     d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
+//     d_note_id.appendChild(d_space);
+//     d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'notebook-note-files-open', data: { nId: nid } })));
 
-//   const d_note_content = document.createElement('div');
-//   d_note_content.className = 'grid-note-contents';
-//   d_note_content.style.gridTemplateColumns = `repeat(${note.contents.length}, 1fr)`;
+//     const d_note_content = document.createElement('div');
+//     d_note_content.className = 'grid-note-contents';
+//     d_note_content.style.gridTemplateColumns = `repeat(${note.contents.length}, 1fr)`;
 
-//   note.contents.forEach(c => {
-//     const d = document.createElement('div');
-//     d.className = 'grid-note-content';
-//     d.textContent = c;
-//     d_note_content.appendChild(d);
-//   });
+//     note.contents.forEach(c => {
+//         const d = document.createElement('div');
+//         d.className = 'grid-note-content';
+//         d.textContent = c;
+//         d_note_content.appendChild(d);
+//     });
 
-//   const d_note_edit = document.createElement('div');
-//   d_note_edit.className = 'grid-note-edit';
-//   d_note_edit.oncontextmenu = (e) => { e.preventDefault(); };
-//   const nid = note.nId;
+//     const d_note_edit = document.createElement('div');
+//     d_note_edit.className = 'grid-note-edit';
+//     d_note_edit.oncontextmenu = (e) => { e.preventDefault(); };
+//     const nid = note.nId;
 
-//   // if (this.note.doc) { necma[0].shift() }
-//   // if (this.note.files) { necma[0].pop() }
-//   d_note_edit.appendChild(
-//     elemIcon('fa-pen', (ev: MouseEvent) => {
-//       nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: note });
-//     })
-//   );
+//     // if (this.note.doc) { necma[0].shift() }
+//     // if (this.note.files) { necma[0].pop() }
+//     d_note_edit.appendChild(
+//         elemIcon('fa-pen', (ev: MouseEvent) => {
+//             nccm.show(ev, d_note_edit, NoteEditContextMenuActions, { note: note });
+//         })
+//     );
 
-//   d_note.appendChild(d_note_id);
-//   d_note.appendChild(d_note_content);
-//   d_note.appendChild(d_note_edit);
-//   // return d_note;
+//     d_note.appendChild(d_note_id);
+//     d_note.appendChild(d_note_content);
+//     d_note.appendChild(d_note_edit);
+//     // return d_note;
 // }
 
 // function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
-//   const i = document.createElement('i');
-//   i.className = `fas ${name} fa-sm`;
-//   i.onclick = onclick;
-//   return i;
+//     const i = document.createElement('i');
+//     i.className = `fas ${name} fa-sm`;
+//     i.onclick = onclick;
+//     return i;
 // }
 
 // function filterSearch(categories: DataCategory[], key: string) {
-//   const newCategory: DataCategory[] = [];
-//   for (const category of categories) {
-//     const newNotes: DataNote[] = [];
-//     for (const note of category.notes) {
-//       for (const content of note.contents) {
-//         if (new RegExp(key).test(content)) {
-//           newNotes.push(note);
-//           break;
+//     const newCategory: DataCategory[] = [];
+//     for (const category of categories) {
+//         const newNotes: DataNote[] = [];
+//         for (const note of category.notes) {
+//             for (const content of note.contents) {
+//                 if (new RegExp(key).test(content)) {
+//                     newNotes.push(note);
+//                     break;
+//                 }
+//             }
 //         }
-//       }
+//         if (newNotes.length >= 1) {
+//             newCategory.push({ name: category.name, notes: newNotes, labels: category.labels });
+//         }
 //     }
-//     if (newNotes.length >= 1) {
-//       newCategory.push({ name: category.name, notes: newNotes, labels: category.labels });
-//     }
-//   }
-//   return newCategory;
+//     return newCategory;
 // }
 
 // function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
-//   const gl: { [g: string]: string[] } = {};
-//   let name = "";
-//   for (const l of labelsOfCategory.filter(l => !gs.domainArrayLabels.includes(l))) {
-//     const [gname, label] = l.split('->');
-//     if (gname in gl) {
-//       gl[gname].push(label);
-//     } else {
-//       gl[gname] = [label];
+//     const gl: { [g: string]: string[] } = {};
+//     let name = "";
+//     for (const l of labelsOfCategory.filter(l => !gs.domainArrayLabels.includes(l))) {
+//         const [gname, label] = l.split('->');
+//         if (gname in gl) {
+//             gl[gname].push(label);
+//         } else {
+//             gl[gname] = [label];
+//         }
 //     }
-//   }
-//   for (const [g, ls] of Object.entries(gl)) {
-//     name += `${g} -> `;
-//     name += ls.join(',');
-//     name += '; ';
-//   }
-//   return name;
+//     for (const [g, ls] of Object.entries(gl)) {
+//         name += `${g} -> `;
+//         name += ls.join(',');
+//         name += '; ';
+//     }
+//     return name;
 // }
 
 // function readerCategory(fDom: Element, labelsOfNotes: string[]) {
-//   // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
-//   let nameOfCategory = arrayLabels2CategoryName(labelsOfNotes); //labelsOfCategory.join(', ');
+//     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
+//     let nameOfCategory = arrayLabels2CategoryName(labelsOfNotes); //labelsOfCategory.join(', ');
 
-//   // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
-//   // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
+//     // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
+//     // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
 
-//   const d_category = document.createElement('div');
-//   // d_category.id = nameOfCategory.replace(' ', '');
-//   d_category.className = 'grid-category';
+//     const d_category = document.createElement('div');
+//     // d_category.id = nameOfCategory.replace(' ', '');
+//     d_category.className = 'grid-category';
 
-//   const d_category_name = document.createElement('div');
-//   d_category_name.textContent = nameOfCategory;
-//   d_category_name.className = 'grid-category-name';
-//   // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
-//   // d_category_name.oncontextmenu = (e) => {
-//   //     e.preventDefault();
-//   //     // todo for rename
-//   // };
+//     const d_category_name = document.createElement('div');
+//     d_category_name.textContent = nameOfCategory;
+//     d_category_name.className = 'grid-category-name';
+//     // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
+//     // d_category_name.oncontextmenu = (e) => {
+//     //     e.preventDefault();
+//     //     // todo for rename
+//     // };
 
-//   d_category_name.appendChild(elemSpaces());
-//   // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
-//   d_category_name.appendChild(elemSpaces());
-//   d_category_name.appendChild(
-//     elemIcon('fa-pen', (ev: MouseEvent) => {
-//       nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
-//         labels: labelsOfNotes.map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
-//       });
-//     })
-//   );
-//   d_category_name.appendChild(elemSpaces());
-//   // const d_category_labels = document.createElement('span');
-//   // d_category_labels.style.fontSize = '10px';
-//   // d_category_labels.textContent = this.labels.join(',');
-//   // d_category_name.append(d_category_labels);
+//     d_category_name.appendChild(elemSpaces());
+//     // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
+//     d_category_name.appendChild(elemSpaces());
+//     d_category_name.appendChild(
+//         elemIcon('fa-pen', (ev: MouseEvent) => {
+//             nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
+//                 labels: labelsOfNotes.map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
+//             });
+//         })
+//     );
+//     d_category_name.appendChild(elemSpaces());
+//     // const d_category_labels = document.createElement('span');
+//     // d_category_labels.style.fontSize = '10px';
+//     // d_category_labels.textContent = this.labels.join(',');
+//     // d_category_name.append(d_category_labels);
 
-//   const d_category_body = document.createElement('div');
-//   d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
-//   d_category_body.className = 'grid-category-body';
+//     const d_category_body = document.createElement('div');
+//     d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
+//     d_category_body.className = 'grid-category-body';
 
-//   for (const n of gs.notes) {
-//     if (issubset(n.labels, labelsOfNotes)) {
-//       const notesDom = document.createElement('div');
-//       notesDom.id = `note-${n.nId}`;
-//       d_category_body.appendChild(notesDom);
-//       readerNote(notesDom, n);
+//     for (const n of gs.notes) {
+//         if (issubset(n.labels, labelsOfNotes)) {
+//             const notesDom = document.createElement('div');
+//             notesDom.id = `note-${n.nId}`;
+//             d_category_body.appendChild(notesDom);
+//             readerNote(notesDom, n);
+//         }
+
+//         d_category.append(d_category_name, d_category_body);
+//         fDom.append(d_category);
+//         // d_category.append(d_category_name, d_category_body);
+//         // return d_category;
 //     }
-
-//     d_category.append(d_category_name, d_category_body);
-//     fDom.append(d_category);
-//     // d_category.append(d_category_name, d_category_body);
-//     // return d_category;
-//   }
 // }
 
 // function readerNotesCategories() {
-//   const localDom = document.getElementById('domain-categories')!;
-//   localDom.replaceChildren();
-//   // this.nIds = domainNotes.map(n => n.nId);
-//   const labelsOfNotes = new Set<string>();
-//   for (const note of gs.notes) {
+//     const localDom = document.getElementById('domain-categories')!;
+//     localDom.replaceChildren();
+//     // this.nIds = domainNotes.map(n => n.nId);
+//     const labelsOfNotes = new Set<string>();
+//     for (const note of gs.notes) {
 
-//     // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
-//     if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
-//       labelsOfNotes.add(note.labels.sort().join('|||'));
+//         // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
+//         if (intersection(note.labels, gs.checkedLabels).length === gs.checkedLabels.length) {
+//             labelsOfNotes.add(note.labels.sort().join('|||'));
+//         }
+//         // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
+//         // if (cname in categories) {
+//         //   categories[cname].push(note);
+//         // } else {
+//         //   categories[cname] = [note];
+//         //   // const cDom = document.createElement('div');
+//         //   // localDom.append(cDom)
+//         //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
+//         // }
 //     }
-//     // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
-//     // if (cname in categories) {
-//     //   categories[cname].push(note);
-//     // } else {
-//     //   categories[cname] = [note];
-//     //   // const cDom = document.createElement('div');
-//     //   // localDom.append(cDom)
-//     //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
-//     // }
-//   }
-//   // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
-//   for (const cname of labelsOfNotes.values()) {
-//     readerCategory(localDom, cname.split('|||'));
-//     // document.getElementById(`domain-category-${cname.replace(' ', '')}`)?.append(document.createElement('p'));
-//   }
+//     // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
+//     for (const cname of labelsOfNotes.values()) {
+//         readerCategory(localDom, cname.split('|||'));
+//         // document.getElementById(`domain-category-${cname.replace(' ', '')}`)?.append(document.createElement('p'));
+//     }
 // }
 
 // interface NoteLabel {
-//   checked: boolean;
-//   label: string;
-//   group: string;
-//   // group label: `${group}->${label}`
-//   gl: string;
-//   available: boolean;
+//     checked: boolean;
+//     label: string;
+//     group: string;
+//     // group label: `${group}->${label}`
+//     gl: string;
+//     available: boolean;
 
-//   //   dom(){
+//     //   dom(){
 
-//   // }
+//     // }
 // }
 
 // class GroupLabel {
-//   constructor(private readonly name: string, private readonly lables: string[]) { }
+//     constructor(private readonly name: string, private readonly lables: string[]) { }
 // }
 
 // function arrComEle(...abc: string[][]) {
@@ -400,258 +339,258 @@
 // }
 
 // function readerNotesLabels() {
-//   const localDom = document.getElementById('notes-labels')!;
-//   localDom.replaceChildren();
+//     const localDom = document.getElementById('notes-labels')!;
+//     localDom.replaceChildren();
 
-//   const _gl: { [g: string]: NoteLabel[] } = {};
+//     const _gl: { [g: string]: NoteLabel[] } = {};
 
-//   // for (const l of groupLaelOfnotes.values()) {
-//   //   const ll = l.split('|||')
-//   //   intersection(l, gs.checkedLabels)
-//   // }
-//   const notesGroupedByLabelCache = [...gs.notesGroupedByLabelCache.values()].map(l => l.split('|||'));
-//   console.log('notesGroupedByLabelCache', notesGroupedByLabelCache)
-//   console.log("111 unCheckedLabels", gs.unCheckedLabels)
-//   console.log("111 checkedLabels", gs.checkedLabels)
-//   const commonlabel2 = gs.checkedLabels.length >= 1 ? notesGroupedByLabelCache
-//     .filter(ls => issubset(gs.checkedLabels, ls))
-//     .map(ls => { console.log(ls); return ls })
-//     : notesGroupedByLabelCache
-
-//   console.log("commonlabel2", commonlabel2)
-//   const commonlabel1 = commonlabel2.reduce((p, c) => p.filter(e => c.includes(e)))
-//   console.log("commonlabel1", commonlabel1)
-//   commonlabel1.filter(l => !gs.checkedLabels.includes(l)).forEach(l => {
-//     gs.checkedLabels.push(l)
-//     gs.unCheckedLabels = gs.unCheckedLabels.filter(e => e !== l)
-//   })
-
-//   let availableLabels = notesGroupedByLabelCache
-//     .filter(ls => intersection(ls, gs.checkedLabels).length >= 1)
-//     .flatMap(l => l)
-//     .filter(l => !gs.checkedLabels.includes(l))
-
-//   availableLabels = [...(new Set(availableLabels).values())]
-//   // .reduce((p, c) => p.filter(e => c.includes(e)))
-//   console.log('availableLabels', availableLabels)
-
-
-//   // .reduce((p, c) => p.filter(e => c.includes(e)));
-
-//   console.log("unCheckedLabels", gs.unCheckedLabels)
-//   console.log("checkedLabels", gs.checkedLabels)
-
-
-//   const commonlabel: string[] = commonlabel1;// = [...gs.notesGroupedByLabelCache.values()]
-//   //   .map(l =>
-//   //     l.split('|||')
-//   //       .filter(_l => _l !== 'common->lll')
-//   //   ).reduce((p, c) => p.filter(e => c.includes(e)));
-
-//   // console.log(commonlabel, 'commonlabel1', commonlabel1,);
-//   // const chosselabel = commonlabel.
-//   for (const label of gs.unCheckedLabels) {
-//     const [g, l] = label.split('->');
-//     let nl: NoteLabel;
-//     if (commonlabel.includes(label)) {
-//       nl = {
-//         group: g,
-//         label: l,
-//         gl: `${g}->${l}`,
-//         checked: true,
-//         available: true //&& groupLaelOfnotes.size >= 2
-//       };
-//     } else if (1 === 1) {
-//       nl = {
-//         group: g,
-//         label: l,
-//         gl: `${g}->${l}`,
-//         checked: false,
-//         available: true //&& groupLaelOfnotes.size >= 2
-//       };
-//     } else {
-//       nl = {
-//         group: g,
-//         label: l,
-//         gl: `${g}->${l}`,
-//         checked: false,
-//         available: false //&& groupLaelOfnotes.size >= 2
-//       };
-//     }
-//     if (g in _gl) {
-//       _gl[g].push(nl);
-//     } else {
-//       _gl[g] = [nl];
-//     }
-//   }
-
-//   for (const label of gs.checkedLabels) {
-//     const [g, l] = label.split('->');
-//     const nl: NoteLabel = {
-//       group: g,
-//       label: l,
-//       gl: `${g}->${l}`,
-//       checked: true,
-//       available: true //&& groupLaelOfnotes.size >= 2
-//     };
-//     if (g in _gl) {
-//       _gl[g].push(nl);
-//     } else {
-//       _gl[g] = [nl];
-//     }
-//     // _gl[g].sort(l => l.checked ? 0 : 1);
-//     // const gl_dom = document.createElement('div');
-//     // gl_dom.textContent = g;
-//     // for (const l of ls) {
-//     //   const l_dom = document.createElement('label');
-//     //   l_dom.className = gs.checkedLabels.includes(`${g}->${l}`) ? 'checkedLabel' : 'unCheckedLabel';
-//     //   l_dom.textContent = l;
-//     //   l_dom.id = `${g}->${l}`;
-//     //   gl_dom.append(l_dom, elemSpaces());
+//     // for (const l of groupLaelOfnotes.values()) {
+//     //   const ll = l.split('|||')
+//     //   intersection(l, gs.checkedLabels)
 //     // }
-//   }
+//     const notesGroupedByLabelCache = [...gs.notesGroupedByLabelCache.values()].map(l => l.split('|||'));
+//     console.log('notesGroupedByLabelCache', notesGroupedByLabelCache)
+//     console.log("111 unCheckedLabels", gs.unCheckedLabels)
+//     console.log("111 checkedLabels", gs.checkedLabels)
+//     const commonlabel2 = gs.checkedLabels.length >= 1 ? notesGroupedByLabelCache
+//         .filter(ls => issubset(gs.checkedLabels, ls))
+//         .map(ls => { console.log(ls); return ls })
+//         : notesGroupedByLabelCache
 
-//   // console.log("common1", commonlabel1)
-//   for (const [g, noteLabels] of Object.entries(_gl)) {
-//     const group_dom = document.createElement('div');
-//     // group_dom.textContent = g;
-//     const group_name_dom = document.createElement('label');
-//     group_name_dom.textContent = g;
-//     group_dom.append(group_name_dom, elemSpaces());
+//     console.log("commonlabel2", commonlabel2)
+//     const commonlabel1 = commonlabel2.reduce((p, c) => p.filter(e => c.includes(e)))
+//     console.log("commonlabel1", commonlabel1)
+//     commonlabel1.filter(l => !gs.checkedLabels.includes(l)).forEach(l => {
+//         gs.checkedLabels.push(l)
+//         gs.unCheckedLabels = gs.unCheckedLabels.filter(e => e !== l)
+//     })
 
-//     for (const nl of noteLabels.sort()) {
-//       const group_label_dom = document.createElement('label');
-//       group_label_dom.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
-//       // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
-//       group_label_dom.textContent = nl.label;
-//       group_label_dom.onclick = () => {
-//         vscode.postMessage({ command: 'web-update-labels', data: { nId: 'nid' } })
-//         console.log("0000000", group_label_dom.className)
-//         if (group_label_dom.className === 'unCheckedLabel') {
-//           gs.checkedLabels.push(nl.gl);
-//           gs.unCheckedLabels = gs.unCheckedLabels.filter(l => l !== nl.gl);
-//         } else if (group_label_dom.className === 'checkedLabel') {
-//           gs.unCheckedLabels.push(nl.gl);
-//           gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl.gl);
-//         } else if (group_label_dom.className === 'unCheckedLabel notavailable') {
+//     let availableLabels = notesGroupedByLabelCache
+//         .filter(ls => intersection(ls, gs.checkedLabels).length >= 1)
+//         .flatMap(l => l)
+//         .filter(l => !gs.checkedLabels.includes(l))
 
+//     availableLabels = [...(new Set(availableLabels).values())]
+//     // .reduce((p, c) => p.filter(e => c.includes(e)))
+//     console.log('availableLabels', availableLabels)
+
+
+//     // .reduce((p, c) => p.filter(e => c.includes(e)));
+
+//     console.log("unCheckedLabels", gs.unCheckedLabels)
+//     console.log("checkedLabels", gs.checkedLabels)
+
+
+//     const commonlabel: string[] = commonlabel1;// = [...gs.notesGroupedByLabelCache.values()]
+//     //   .map(l =>
+//     //     l.split('|||')
+//     //       .filter(_l => _l !== 'common->lll')
+//     //   ).reduce((p, c) => p.filter(e => c.includes(e)));
+
+//     // console.log(commonlabel, 'commonlabel1', commonlabel1,);
+//     // const chosselabel = commonlabel.
+//     for (const label of gs.unCheckedLabels) {
+//         const [g, l] = label.split('->');
+//         let nl: NoteLabel;
+//         if (commonlabel.includes(label)) {
+//             nl = {
+//                 group: g,
+//                 label: l,
+//                 gl: `${g}->${l}`,
+//                 checked: true,
+//                 available: true //&& groupLaelOfnotes.size >= 2
+//             };
+//         } else if (1 === 1) {
+//             nl = {
+//                 group: g,
+//                 label: l,
+//                 gl: `${g}->${l}`,
+//                 checked: false,
+//                 available: true //&& groupLaelOfnotes.size >= 2
+//             };
+//         } else {
+//             nl = {
+//                 group: g,
+//                 label: l,
+//                 gl: `${g}->${l}`,
+//                 checked: false,
+//                 available: false //&& groupLaelOfnotes.size >= 2
+//             };
 //         }
-//         console.log("0000000", gs.checkedLabels)
-//         console.log("0000000", gs.unCheckedLabels)
-//         // group_label_dom.className = group_label_dom.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-//         // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
-//         readerNotesLabels();
-//         readerNotesCategories();
-//       };
-//       // labelDoms.push(d);
-//       group_dom.append(group_label_dom, elemSpaces());
+//         if (g in _gl) {
+//             _gl[g].push(nl);
+//         } else {
+//             _gl[g] = [nl];
+//         }
 //     }
-//     localDom.append(group_dom);
-//   }
 
-//   // // patch
-//   // for (
-//   //   const label of gs.domainLabels
-//   //     .filter(l => l !== gs.domainNode[0])
-//   // ) {
-//   //   const d = document.createElement('label');
-//   //   d.className = 'checkedFixLabel';
-//   //   d.textContent = label;
-//   //   // labelDoms.push(d);
-//   //   localDom.append(d, elemSpaces());
-//   // }
+//     for (const label of gs.checkedLabels) {
+//         const [g, l] = label.split('->');
+//         const nl: NoteLabel = {
+//             group: g,
+//             label: l,
+//             gl: `${g}->${l}`,
+//             checked: true,
+//             available: true //&& groupLaelOfnotes.size >= 2
+//         };
+//         if (g in _gl) {
+//             _gl[g].push(nl);
+//         } else {
+//             _gl[g] = [nl];
+//         }
+//         // _gl[g].sort(l => l.checked ? 0 : 1);
+//         // const gl_dom = document.createElement('div');
+//         // gl_dom.textContent = g;
+//         // for (const l of ls) {
+//         //   const l_dom = document.createElement('label');
+//         //   l_dom.className = gs.checkedLabels.includes(`${g}->${l}`) ? 'checkedLabel' : 'unCheckedLabel';
+//         //   l_dom.textContent = l;
+//         //   l_dom.id = `${g}->${l}`;
+//         //   gl_dom.append(l_dom, elemSpaces());
+//         // }
+//     }
 
-//   // for (const { label, checked } of _labels) {
-//   //   const d = document.createElement('label');
-//   //   d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
-//   //   d.textContent = label;
-//   //   d.onclick = () => {
-//   //     d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-//   //     if (d.className === 'unCheckedLabel') {
-//   //       gs.checkedLabels = gs.checkedLabels.filter(l => l !== label);
-//   //     } else {
-//   //       gs.checkedLabels.push(label);
-//   //     }
-//   //     readerCategories();
-//   //   };
-//   //   // labelDoms.push(d);
-//   //   localDom.append(d, elemSpaces());
-//   // }
+//     // console.log("common1", commonlabel1)
+//     for (const [g, noteLabels] of Object.entries(_gl)) {
+//         const group_dom = document.createElement('div');
+//         // group_dom.textContent = g;
+//         const group_name_dom = document.createElement('label');
+//         group_name_dom.textContent = g;
+//         group_dom.append(group_name_dom, elemSpaces());
+
+//         for (const nl of noteLabels.sort()) {
+//             const group_label_dom = document.createElement('label');
+//             group_label_dom.className = nl.checked ? 'checkedLabel' : 'unCheckedLabel';
+//             // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
+//             group_label_dom.textContent = nl.label;
+//             group_label_dom.onclick = () => {
+//                 vscode.postMessage({ command: 'web-update-labels', data: { nId: 'nid' } })
+//                 console.log("0000000", group_label_dom.className)
+//                 if (group_label_dom.className === 'unCheckedLabel') {
+//                     gs.checkedLabels.push(nl.gl);
+//                     gs.unCheckedLabels = gs.unCheckedLabels.filter(l => l !== nl.gl);
+//                 } else if (group_label_dom.className === 'checkedLabel') {
+//                     gs.unCheckedLabels.push(nl.gl);
+//                     gs.checkedLabels = gs.checkedLabels.filter(l => l !== nl.gl);
+//                 } else if (group_label_dom.className === 'unCheckedLabel notavailable') {
+
+//                 }
+//                 console.log("0000000", gs.checkedLabels)
+//                 console.log("0000000", gs.unCheckedLabels)
+//                 // group_label_dom.className = group_label_dom.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
+//                 // group_label_dom.className = nl.available ? group_label_dom.className : 'unAvailableLabel';
+//                 readerNotesLabels();
+//                 readerNotesCategories();
+//             };
+//             // labelDoms.push(d);
+//             group_dom.append(group_label_dom, elemSpaces());
+//         }
+//         localDom.append(group_dom);
+//     }
+
+//     // // patch
+//     // for (
+//     //   const label of gs.domainLabels
+//     //     .filter(l => l !== gs.domainNode[0])
+//     // ) {
+//     //   const d = document.createElement('label');
+//     //   d.className = 'checkedFixLabel';
+//     //   d.textContent = label;
+//     //   // labelDoms.push(d);
+//     //   localDom.append(d, elemSpaces());
+//     // }
+
+//     // for (const { label, checked } of _labels) {
+//     //   const d = document.createElement('label');
+//     //   d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
+//     //   d.textContent = label;
+//     //   d.onclick = () => {
+//     //     d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
+//     //     if (d.className === 'unCheckedLabel') {
+//     //       gs.checkedLabels = gs.checkedLabels.filter(l => l !== label);
+//     //     } else {
+//     //       gs.checkedLabels.push(label);
+//     //     }
+//     //     readerCategories();
+//     //   };
+//     //   // labelDoms.push(d);
+//     //   localDom.append(d, elemSpaces());
+//     // }
 // }
 
 // function readerDomainName() {
-//   const e_domain = document.createElement('div');
-//   const e_title = document.createElement('h2');
-//   const e_domain_name = document.createElement('span');
-//   const e_search = document.createElement('input');
-//   e_search.type = 'text';
-//   e_search.style.display = 'none';
-//   e_search.focus();
-//   e_search.onkeydown = () => {
-//     // this.readerCategories(i.value);
-//   };
+//     const e_domain = document.createElement('div');
+//     const e_title = document.createElement('h2');
+//     const e_domain_name = document.createElement('span');
+//     const e_search = document.createElement('input');
+//     e_search.type = 'text';
+//     e_search.style.display = 'none';
+//     e_search.focus();
+//     e_search.onkeydown = () => {
+//         // this.readerCategories(i.value);
+//     };
 
-//   e_domain_name.textContent = gs.domainNode.join(' / ');
-//   // const e_search = elemNotesSearch();
-//   e_title.appendChild(e_domain_name);
-//   e_title.appendChild(elemSpaces());
-//   e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
-//   e_title.appendChild(elemSpaces());
-//   e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'edgl', params: {} } })));
-//   e_title.appendChild(elemSpaces());
-//   e_title.appendChild(
-//     elemIcon('fa-search', () => {
-//       if (!gs.search) {
-//         gs.search = true;
-//         e_search.style.display = 'block';
-//       } else {
-//         gs.search = false;
-//         e_search.style.display = 'none';
-//       }
-//     })
-//   );
-//   e_title.appendChild(e_search);
+//     e_domain_name.textContent = gs.domainNode.join(' / ');
+//     // const e_search = elemNotesSearch();
+//     e_title.appendChild(e_domain_name);
+//     e_title.appendChild(elemSpaces());
+//     e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
+//     e_title.appendChild(elemSpaces());
+//     e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'edgl', params: {} } })));
+//     e_title.appendChild(elemSpaces());
+//     e_title.appendChild(
+//         elemIcon('fa-search', () => {
+//             if (!gs.search) {
+//                 gs.search = true;
+//                 e_search.style.display = 'block';
+//             } else {
+//                 gs.search = false;
+//                 e_search.style.display = 'none';
+//             }
+//         })
+//     );
+//     e_title.appendChild(e_search);
 
-//   // labels
-//   const labelsDom = document.createElement('div');
-//   labelsDom.id = 'notes-labels';
+//     // labels
+//     const labelsDom = document.createElement('div');
+//     labelsDom.id = 'notes-labels';
 
-//   // categories
-//   const categoriesDom = document.createElement('div');
-//   categoriesDom.id = 'domain-categories';
+//     // categories
+//     const categoriesDom = document.createElement('div');
+//     categoriesDom.id = 'domain-categories';
 
-//   e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
-//   document.getElementById('content')?.replaceChildren(e_domain);
+//     e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
+//     document.getElementById('content')?.replaceChildren(e_domain);
 // }
 
 // const nccm = new ContextMenuDom();
 // document.addEventListener(
-//   'click',
-//   () => {
-//     nccm.hide();
-//   },
-//   true
+//     'click',
+//     () => {
+//         nccm.hide();
+//     },
+//     true
 // );
 // document.addEventListener(
-//   'contextmenu',
-//   () => {
-//     console.log('global contextmenu click');
-//     nccm.hide();
-//   },
-//   true
+//     'contextmenu',
+//     () => {
+//         console.log('global contextmenu click');
+//         nccm.hide();
+//     },
+//     true
 // );
 
 // class GlobalState {
-//   s_s: number = 0
-//   domainLabels: string[] = [];
-//   checkedLabels: string[] = [];
-//   unCheckedLabels: string[] = [];
-//   notesArrayLabels: string[] = [];
-//   notes: PostNote[] = [];
-//   domainNode: string[] = [];
-//   search: boolean = false;
-//   domainArrayLabels: string[] = [];
-//   notesGroupedByLabelCache = new Set<string>;
+//     s_s: number = 0
+//     domainLabels: string[] = [];
+//     checkedLabels: string[] = [];
+//     unCheckedLabels: string[] = [];
+//     notesArrayLabels: string[] = [];
+//     notes: PostNote[] = [];
+//     domainNode: string[] = [];
+//     search: boolean = false;
+//     domainArrayLabels: string[] = [];
+//     notesGroupedByLabelCache = new Set<string>;
 // }
 
 // // const vnDomain = new VNDomain();
@@ -667,102 +606,102 @@
 // // function readerNoteLabels() {
 // // }
 
-// function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
-//   const labels = [];
-//   for (const [g, ls] of Object.entries(groupLabels)) {
-//     for (const l of ls) {
-//       labels.push(`${g}->${l}`);
-//     }
-//   }
-//   return labels;
-// }
+// // function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
+// //     const labels = [];
+// //     for (const [g, ls] of Object.entries(groupLabels)) {
+// //         for (const l of ls) {
+// //             labels.push(`${g}->${l}`);
+// //         }
+// //     }
+// //     return labels;
+// // }
 
 // type GroupLables = { [gl: string]: string[] };
 
-// function sortGroupLables(obj1: GroupLables): GroupLables {
-//   return Object.keys(obj1).sort().reduce(
-//     (obj, key) => {
-//       obj[key] = obj1[key].sort();
-//       return obj;
-//     },
-//     {} as GroupLables
-//   );
-// }
+// // function sortGroupLables(obj1: GroupLables): GroupLables {
+// //     return Object.keys(obj1).sort().reduce(
+// //         (obj, key) => {
+// //             obj[key] = obj1[key].sort();
+// //             return obj;
+// //         },
+// //         {} as GroupLables
+// //     );
+// // }
 
-// function labels2GroupLabel(labels: string[]): GroupLables {
-//   const gl: { [g: string]: string[] } = {};
-//   for (const label of labels) {
-//     const [g, l] = label.split('->');
-//     if (g in gl) {
-//       gl[g].push(l);
-//     } else {
-//       gl[g] = [l];
-//     }
-//   }
-//   return sortGroupLables(gl);
-// }
+// // function labels2GroupLabel(labels: string[]): GroupLables {
+// //     const gl: { [g: string]: string[] } = {};
+// //     for (const label of labels) {
+// //         const [g, l] = label.split('->');
+// //         if (g in gl) {
+// //             gl[g].push(l);
+// //         } else {
+// //             gl[g] = [l];
+// //         }
+// //     }
+// //     return sortGroupLables(gl);
+// // }
 
 
 // window.addEventListener('message', (event) => {
-//   const message: DataProtocol = event.data;
-//   console.log('vscode-notes webview open.', message);
-//   switch (message.command) {
-//     case 'post-data':
-//       // gs.domainLabels = message.data.domainLabels;
-//       gs.domainArrayLabels = message.data.domainArrayLabel;
-//       gs.notes = message.data.domainNotes;
-//       gs.domainNode = message.data.domainNode;
+//     const message: DataProtocol = event.data;
+//     console.log('vscode-notes webview open.', message);
+//     switch (message.command) {
+//         case 'post-data':
+//             // gs.domainLabels = message.data.domainLabels;
+//             gs.domainArrayLabels = message.data.domainArrayLabel;
+//             gs.notes = message.data.domainNotes;
+//             gs.domainNode = message.data.domainNode;
 
-//       // const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
+//             // const labelesOfNotes = gs.domainNotes.map(n => n.labels).flatMap(l => l);
 
-//       // When remove a note, the note label is selected and the note is the only one in the category.
-//       // gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
+//             // When remove a note, the note label is selected and the note is the only one in the category.
+//             // gs.checkedLabels = gs.checkedLabels.filter(l => labelesOfNotes.includes(l));
 
-//       // if (gs.checkedLabels.length === 0) {
-//       gs.checkedLabels = [];
-//       gs.notesArrayLabels = [...(new Set<string>(gs.notes.map(n => n.labels).flatMap(ls => ls))).values()];
+//             // if (gs.checkedLabels.length === 0) {
+//             gs.checkedLabels = [];
+//             gs.notesArrayLabels = [...(new Set<string>(gs.notes.map(n => n.labels).flatMap(ls => ls))).values()];
 
-//       for (const n of gs.notes) {
-//         // const labels = n.labels
-//         const labels = n.labels.filter(l => !gs.domainArrayLabels.includes(l));
-//         if (labels.length >= 1) {
-//           gs.notesGroupedByLabelCache.add(labels.join('|||'));
-//         }
-//       }
-//       // gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
+//             for (const n of gs.notes) {
+//                 // const labels = n.labels
+//                 const labels = n.labels.filter(l => !gs.domainArrayLabels.includes(l));
+//                 if (labels.length >= 1) {
+//                     gs.notesGroupedByLabelCache.add(labels.join('|||'));
+//                 }
+//             }
+//             // gs.unCheckedLabels = gs.notesArrayLabels.filter(l => !gs.domainArrayLabels.includes(l)); //Array.from(new Set(labelesOfNotes.filter(l => !gs.domainLabels.includes(l)).filter(l => l !== gs.domainNode[0])));
 
-//       readerDomainName();
-//       readerNotesLabels();
-//       readerNotesCategories();
+//             readerDomainName();
+//             readerNotesLabels();
+//             readerNotesCategories();
 
-//       // vnDomain.updateDomainLabels(message.data.domainLabels);
-//       // vnDomain.updateDomainNotes(message.data.domainNotes);
-//       // vnDomain.updateDomainNode(message.data.domainNode);
+//             // vnDomain.updateDomainLabels(message.data.domainLabels);
+//             // vnDomain.updateDomainNotes(message.data.domainNotes);
+//             // vnDomain.updateDomainNode(message.data.domainNode);
 
-//       // document.getElementById('content')?.replaceChildren(vnDomain.dom());
+//             // document.getElementById('content')?.replaceChildren(vnDomain.dom());
 
-//       // readerCategories(gs.domainLabels, gs.domainNotes, gs.checkedLabels);
-//       // domain.readerNotes()
-//       // vscode.postMessage({ command: 'get-notes' });
-//       break;
-//     // case 'delete-note':
-//     //   document.getElementById(`note - ${ message.data.nId }`)?.remove();
-//     //   break;
-//     // case 'post-note':
-//     //   const el = document.getElementById(`note - ${ message.data.note.nId }`);
-//     //   if (el !== null) {
-//     //     readerNote(el, message.data.note);
-//     //   } else {
-//     //     const cname = message.data.note.labels.filter(l => !gs.domainLabels.includes(l)).sort().join(', ').replace(/\s/g, '');
-//     //     const noteDom = document.createElement('div');
-//     //     noteDom.id = `note - ${ message.data.note.nId }`;
-//     //     document.getElementById(`category - body - ${ cname }`)?.append(noteDom);
-//     //     readerNote(noteDom, message.data.note);
-//     //   }
-//     //   break;
-//     default:
-//       document.body.innerHTML = '<h1>loading...{message}</h1>';
-//   }
+//             // readerCategories(gs.domainLabels, gs.domainNotes, gs.checkedLabels);
+//             // domain.readerNotes()
+//             // vscode.postMessage({ command: 'get-notes' });
+//             break;
+//         // case 'delete-note':
+//         //   document.getElementById(`note - ${ message.data.nId }`)?.remove();
+//         //   break;
+//         // case 'post-note':
+//         //   const el = document.getElementById(`note - ${ message.data.note.nId }`);
+//         //   if (el !== null) {
+//         //     readerNote(el, message.data.note);
+//         //   } else {
+//         //     const cname = message.data.note.labels.filter(l => !gs.domainLabels.includes(l)).sort().join(', ').replace(/\s/g, '');
+//         //     const noteDom = document.createElement('div');
+//         //     noteDom.id = `note - ${ message.data.note.nId }`;
+//         //     document.getElementById(`category - body - ${ cname }`)?.append(noteDom);
+//         //     readerNote(noteDom, message.data.note);
+//         //   }
+//         //   break;
+//         default:
+//             document.body.innerHTML = '<h1>loading...{message}</h1>';
+//     }
 // });
 
 // //
