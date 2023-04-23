@@ -89,7 +89,7 @@ export class LNotes {
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
         this.notesCache = new Map(Object.entries(vfs.readJsonSync(this.notesFile)));
-        [...this.notesCache.values()].forEach(n => n.labels['##nb'] = [this.nb]);
+        // [...this.notesCache.values()].forEach(n => n.labels['##nb'] = [this.nb]);
         this.cacheNotesGroupedByLabelCache();
     }
 
