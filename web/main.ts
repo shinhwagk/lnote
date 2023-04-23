@@ -255,7 +255,6 @@ function readerNote(container: HTMLElement, note: DataNote): void {
             note.doc || cmas[1].push(necms[1][0]);
             note.files || cmas[1].push(necms[1][1]);
             if (cmas[1].length === 0) {
-                console.log("note", note);
                 vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } });
                 return;
             }
@@ -358,7 +357,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_body.className = 'grid-category-body';
 
     for (const n of gs.notes) {
-        if (issubset(n.labels, labelsOfNotes)) {
+        if (intersection(n.labels, labelsOfNotes).length === labelsOfNotes.length) {
             const notesDom = document.createElement('div');
             notesDom.id = `note-${n.id}`;
             d_category_body.appendChild(notesDom);
@@ -373,47 +372,48 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
 }
 
 function readerNotesCategories() {
-    let localDom = document.getElementById('domain-categories')!;
+    let localDom = document.getElementById('notes-categories')!;
     localDom.replaceChildren();
 
     // const categoriesDom = document.createElement('div');
-    // categoriesDom.id = 'domain-categories';
+    // categoriesDom.id = 'notes-categories';
     // document.getElementById('content')?.replaceChildren(categoriesDom);
 
     // this.nIds = domainNotes.map(n => n.nId);
     const labelsOfNotes = new Set<string>();
-    for (const note of gs.notes) {
-        // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
-        if (gs.checkedLabels.size === 0) {
-            labelsOfNotes.add(note.labels.sort().join('|||'));
-        } else {
-            if (intersection(note.labels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
-                labelsOfNotes.add(note.labels.sort().join('|||'));
-            }
-        }
 
-        // const n = { nId: note.nId, contents: note.contents, cDate: note.cts.toString(), mDate: note.mts.toString(), doc: note.doc, files: note.files };
-        // if (cname in categories) {
-        //   categories[cname].push(note);
-        // } else {
-        //   categories[cname] = [note];
-        //   // const cDom = document.createElement('div');
-        //   // localDom.append(cDom)
-        //   // cDom.id = `domain-category-${cname.replace(' ', '')}`;
-        // }
+    if (gs.checkedLabels.size === 0) {
+        gs.notes.map(n => n.labels.sort().join('|||')).forEach(l => labelsOfNotes.add(l));
+    } else {
+        gs.notes.filter(n => intersection(n.labels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size)
+            .map(n => n.labels.sort().join('|||'))
+            .forEach(l => labelsOfNotes.add(l));
     }
-    // const _categories = this.search && filter ? filterSearch(this.categories, filter) : this.categories;
+    // for (const note of gs.notes) {
+    //     const nlabels = note.labels.sort();
+    //     // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
+    //     if (gs.checkedLabels.size === 0) {
+    //         labelsOfNotes.add(nlabels.join('|||'));
+    //     } else {
+    //         if (intersection(nlabels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
+    //             labelsOfNotes.add(nlabels.join('|||'));
+    //         }
+    //     }
+    // }
+
     for (const cname of labelsOfNotes.values()) {
         readerCategory(localDom, cname.split('|||'));
-        // document.getElementById(`domain-category-${cname.replace(' ', '')}`)?.append(document.createElement('p'));
     }
 }
 
 function readerNotesLabels() {
+    console.log("readerNotesLabels", gs.checkedLabels);
     const localDom = document.getElementById('notes-labels')!;
     localDom.replaceChildren();
 
+    // labels for all the checked notes
     const _ava = new Set<string>();
+    // common labels for every the checked notes
     const _com: string[][] = [];
 
     for (const n of gs.notes) {
@@ -427,7 +427,7 @@ function readerNotesLabels() {
             _com.push(n.labels);
         }
     }
-    const _com1 = _com.reduce((p, c) => p.filter(e => c.includes(e)));
+    const _com1 = _com.length >= 1 ? _com.reduce((p, c) => p.filter(e => c.includes(e))) : [];
 
     for (const [g, ls] of gs.allGroupLabels.entries()) {
         const group_dom = document.createElement('div');
@@ -438,18 +438,37 @@ function readerNotesLabels() {
         for (const nl of Array.from(ls).sort()) {
             const group_label_dom = document.createElement('label');
             // importance!!!
-            group_label_dom.className =
-                gs.checkedLabels.size >= 1 ?
-                    _com1.includes(nl) ?
-                        'checkedLabel'
-                        : gs.checkedLabels.has(nl)
-                            ? 'checkedLabel'
-                            : _ava.has(nl)
-                                ? 'unCheckedLabel'
-                                : 'unAvailableLabel'
-                    : _com1.includes(nl)
-                        ? 'checkedLabel'
-                        : 'unCheckedLabel';
+            if (gs.checkedLabels.size >= 1) {
+                if (gs.checkedLabels.has(nl) && _com1.includes(nl)) {
+                    group_label_dom.className = 'checkedLabel';
+                } else if (_com1.includes(nl)) {
+                    group_label_dom.className = 'forceCheckedLabel';
+                } else if (_ava.has(nl)) {
+                    group_label_dom.className = 'unCheckedLabel';
+                } else {
+                    group_label_dom.className = 'unAvailableLabel';
+                }
+            } else {
+                if (_com1.includes(nl)) {
+                    group_label_dom.className = 'forceCheckedLabel';
+                } else {
+                    group_label_dom.className = 'unCheckedLabel';
+                }
+            }
+            // group_label_dom.className =
+            //     gs.checkedLabels.size >= 1 ?
+            //         gs.checkedLabels.has(nl) && _com1.includes(nl) ?
+            //             _com1.includes(nl) ?
+            //                 'forceCheckedLabel'
+            //                 : gs.checkedLabels.has(nl)
+            //                     ? 'checkedLabel'
+            //                     : _ava.has(nl)
+            //                         ? 'unCheckedLabel'
+            //                         : 'unAvailableLabel'
+            //             : "checkedLabel"
+            //         : _com1.includes(nl)
+            //             ? 'checkedLabel'
+            //             : 'unCheckedLabel';
             group_label_dom.textContent = nl.split('->')[1];
             group_label_dom.onclick = () => {
                 if (group_label_dom.className === 'unCheckedLabel') {
@@ -539,11 +558,11 @@ function readerDomainName() {
 
     // // categories
     // const categoriesDom = document.createElement('div');
-    // categoriesDom.id = 'domain-categories';
+    // categoriesDom.id = 'notes-categories';
 
     // e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
     // document.getElementById('content')?.replaceChildren(e_domain);
-    console.log(e_title);
+    // console.log(e_title);
     e_domain?.append(e_title);
 }
 
@@ -647,7 +666,7 @@ function initFrameDoms() {
 
     // categories
     const categoriesDom = document.createElement('div');
-    categoriesDom.id = 'domain-categories';
+    categoriesDom.id = 'notes-categories';
 
     // const e_domain = document.createElement('div');
     // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);

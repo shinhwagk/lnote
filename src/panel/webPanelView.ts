@@ -141,6 +141,7 @@ export class LWebPanelView {
                     case 'search':
                         this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
+                        console.log(this.keywords)
                         this.postSerach();
                         break;
                     case 'domain':
