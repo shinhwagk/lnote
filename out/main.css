@@ -175,23 +175,23 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
 
 .checkedFixLabel {
     padding: 1px 4px 2px;
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(32, 32, 32);
+    color: green;
 }
 
 .checkedLabel {
     padding: 1px 4px 2px;
-    background-color: rgb(80, 80, 80);
+    background-color: rgb(74, 74, 74);
 }
 
-.checkedLabel {
+.unCheckedLabel {
     padding: 1px 4px 2px;
-    background-color: rgb(80, 80, 80);
+    background-color: rgb(39, 39, 39);
 }
 
 .forceCheckedLabel {
     padding: 1px 4px 2px;
-    background-color: rgb(39, 39, 39);
-    color: red;
+    background-color: rgb(74, 74, 74);
 }
 
 .unAvailableLabel {

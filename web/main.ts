@@ -439,25 +439,32 @@ function readerNotesLabels() {
             const group_label_dom = document.createElement('label');
             // importance!!!
             if (gs.checkedLabels.size >= 1) {
-                if (gs.checkedLabels.has(nl) && _com1.includes(nl)) {
+                if (gs.checkedLabels.has(nl)) {
                     group_label_dom.className = 'checkedLabel';
-                } else if (_com1.includes(nl)) {
-                    group_label_dom.className = 'forceCheckedLabel';
-                } else if (_ava.has(nl)) {
-                    group_label_dom.className = 'unCheckedLabel';
                 } else {
-                    group_label_dom.className = 'unAvailableLabel';
+                    if (_ava.has(nl)) {
+                        if (_com1.includes(nl)) {
+                            group_label_dom.className = 'forceCheckedLabel';
+                        } else {
+                            group_label_dom.className = 'unCheckedLabel';
+                        }
+                    } else {
+                        group_label_dom.className = 'unAvailableLabel';
+                    }
                 }
             } else {
-                if (_com1.includes(nl)) {
-                    group_label_dom.className = 'forceCheckedLabel';
+                if (_ava.has(nl)) {
+                    if (_com1.includes(nl)) {
+                        group_label_dom.className = 'forceCheckedLabel';
+                    } else {
+                        group_label_dom.className = 'unCheckedLabel';
+                    }
                 } else {
-                    group_label_dom.className = 'unCheckedLabel';
+                    group_label_dom.className = 'unAvailableLabel';
                 }
             }
             // group_label_dom.className =
             //     gs.checkedLabels.size >= 1 ?
-            //         gs.checkedLabels.has(nl) && _com1.includes(nl) ?
             //             _com1.includes(nl) ?
             //                 'forceCheckedLabel'
             //                 : gs.checkedLabels.has(nl)
