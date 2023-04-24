@@ -71,7 +71,7 @@ export class LWebPanelView {
 
     async refresh(): Promise<void> {
         if (this.webKind === 'domain') {
-            await this.postDomain()
+            await this.postDomain();
         } else if (this.webKind === 'search') {
             await this.postSerach();
         }
@@ -141,7 +141,7 @@ export class LWebPanelView {
                     case 'search':
                         this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
-                        console.log(this.keywords)
+                        console.log(this.keywords);
                         this.postSerach();
                         break;
                     case 'domain':
@@ -154,7 +154,10 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlNoteAdd(msg.params);
                         break;
                     case 'domain-note-add':
-                        ExtCmds.cmdHdlDomainNoteAdd(msg.params)
+                        ExtCmds.cmdHdlDomainNoteAdd(msg.params);
+                        break;
+                    case 'category-note-add':
+                        ExtCmds.cmdHdlDomainNoteAdd(msg.params);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);

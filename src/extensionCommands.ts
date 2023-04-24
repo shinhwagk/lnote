@@ -2,6 +2,7 @@ import { existsSync, statSync } from 'fs-extra';
 import { commands, Uri, window, workspace } from 'vscode';
 
 import { ctxFilesExplorer, pathSplit, section } from './constants';
+import { arrayLabels2GroupLabel } from './database/notes';
 import { DomainNode } from './explorer/domainExplorer';
 import { ext } from './extensionVariables';
 import { tools } from './helper';
@@ -64,7 +65,7 @@ export namespace ExtCmds {
     // !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {
-    ext.gs.update(dn.split(pathSplit)[0]);
+    // ext.gs.update(dn.split(pathSplit)[0]);
     const s = (new Date()).getTime();
     await ext.lwebPanelView.setDomainNode(dn.split(pathSplit)).show();
     // await ext.lwebPanelView.show();
@@ -185,9 +186,9 @@ export namespace ExtCmds {
     // }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile1()));
   }
-  export async function cmdHdlNoteAdd(params: { labels: string[], nb: string }) {
+  export async function cmdHdlNoteAdd(params: { als: string[], nb: string }) {
     // const nb = ext.lnbs.get(params.nb);
-    ext.lnbs.get(params.nb as string).addNoteByAl(params.labels);
+    ext.lnbs.get(params.nb as string).addNoteByAl(params.als);
     const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()];
     const nid = notes[notes.length - 1][0];
     console.log(params.nb, nid);
@@ -207,11 +208,15 @@ export namespace ExtCmds {
   export async function cmdHdlDomainNoteAdd(params: { dn: string[] }) {
     // const nb = ext.lnbs.get(params.nb);
     const als = ext.lnbs.get(params.dn[0]).getArrayLabelsOfDomain(params.dn)
-    cmdHdlNoteAdd({ labels: als, nb: params.dn[0] });
+    cmdHdlNoteAdd({ als: als, nb: params.dn[0] });
     // const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()];
     // const nid = notes[notes.length - 1][0];
     // console.log(params.nb, nid);
     // cmdHdlNoteEditor({ nb: params.nb, nId: nid });
+  }
+
+  export async function cmdHdlCategoryNoteAdd(params: { nb: string, als: string[] }) {
+    cmdHdlNoteAdd(params);
   }
 
   // export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {

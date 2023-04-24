@@ -179,6 +179,12 @@ body.vscode-high-contrast .contextMenu li.contextMenuItem:hover {
     color: green;
 }
 
+.pinCheckedLabel {
+    padding: 1px 4px 2px;
+    background-color: rgb(138, 22, 22);
+    /* background-color: rgb(74, 74, 74); */
+}
+
 .checkedLabel {
     padding: 1px 4px 2px;
     background-color: rgb(74, 74, 74);

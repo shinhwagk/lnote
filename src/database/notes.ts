@@ -97,7 +97,7 @@ export class LNotes {
         // all note have an nb name label
         this.notesGroupedByLabelCache.set(`##nb->${this.nb}`, new Set<string>(this.notesCache.keys()));
         for (const [nId, note] of this.notesCache.entries()) {
-            for (const label of groupLabel2ArrayLabels(note.labels)) {
+            for (const label of groupLabel2ArrayLabels(note.gls)) {
                 if (this.notesGroupedByLabelCache.get(label)?.add(nId) === undefined) {
                     this.notesGroupedByLabelCache.set(label, new Set<string>([nId]));
                 }
@@ -105,9 +105,10 @@ export class LNotes {
         }
     }
 
-    public addNote(nId: string, gl: GroupLables) {
+    public addNote(nId: string, gls: GroupLables) {
         const ts = (new Date()).getTime();
-        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, labels: gl });
+        gls['##nb'] = [this.nb];
+        this.notesCache.set(nId, { contents: [''], cts: ts, mts: ts, gls: gls });
         // this.getNoteById(nId).updateDataArrayLabels(labels);
         this.addCache(nId);
         this.permanent();
@@ -146,7 +147,7 @@ export class LNotes {
     public getNIdsByStrictArrayLabels(labels: ArrayLabels): string[] {
         const ids = [];
         for (const [nId, n] of this.notesCache.entries()) {
-            if (labels.sort().join() === groupLabel2ArrayLabels(n.labels).join()) {
+            if (labels.sort().join() === groupLabel2ArrayLabels(n.gls).join()) {
                 ids.push(nId);
             }
         }

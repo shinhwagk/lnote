@@ -53,30 +53,6 @@ interface ContextMenuAction {
     onClick: (data: any) => void;
 }
 
-
-
-
-// interface DataCategory {
-//     name: string;
-//     labels: string[]
-//     notes: DataNote[];
-// }
-
-// interface DataNote1 {
-//     nb: string;
-//     nId: string;
-//     contents: string[];
-//     doc: boolean;
-//     files: boolean;
-//     cts: number;
-//     mts: number;
-//     labels: string[];
-//     category: string;
-// }
-
-
-
-
 const NoteEditContextMenuActions: ContextMenuAction[][] = [
     [
         {
@@ -116,48 +92,13 @@ const CategoryEditContextMenuActions: ContextMenuAction[][] = [
             onClick: (data) => vscode.postMessage({ command: 'note-add', params: { nb: data.nb, labels: data.labels } })
         }
     ],
-    // [
-    //     {
-    //         title: 'edit labels',
-    //         onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
-    //     }
-    // ]
+    [
+        {
+            title: 'edit gls',
+            onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
+        }
+    ]
 ];
-
-// const NoteColContextMenuActions: ContextMenuAction[][] = [
-//   [
-//     {
-//       title: 'edit short document',
-//       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId } })
-//     }
-//   ], [
-//     {
-//       title: 'delete short document',
-//       onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId } })
-//     }
-//   ]
-//   // [
-//   //   {
-//   //     title: 'send to active terminal',
-//   //     onClick: (data: any) => vscode.postMessage({ command: 'col-to-terminal', data: { id: data.id, cidx: data.i } })
-//   //   },
-//   //   {
-//   //     title: 'send to active terminal with args',
-//   //     onClick: (_data: any) => {
-//   //       // new abc(context, e).show();
-//   //     } /* vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } } */
-//   //   }
-//   // ]
-// ];
-
-// const DomainContextMenuActions: ContextMenuAction[][] = [
-//   [
-//     {
-//       title: 'relabels',
-//       onClick: (data: any) => vscode.postMessage({ command: 'notebook-editor', params: { labels: data.labels } })
-//     }
-//   ]
-// ];
 
 class ContextMenuDom {
     private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
@@ -313,9 +254,9 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
     return name;
 }
 
-function readerCategory(fDom: Element, labelsOfNotes: string[]) {
+function readerCategory(fDom: Element, als: string[]) {
     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
-    let nameOfCategory = arrayLabels2CategoryName(labelsOfNotes); //labelsOfCategory.join(', ');
+    let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
 
     // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
     // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
@@ -332,17 +273,19 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     //     e.preventDefault();
     //     // todo for rename
     // };
+    // console.log(als)
+    // const nb = als.filter(l => l.startsWith('##nb'))[0].split('->')[1];
 
     d_category_name.appendChild(elemSpaces());
-    // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
+    d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-note-add', params: { nb: "nb", als: als } })));
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(
         elemIcon('fa-pen', (ev: MouseEvent) => {
             // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
             gs.nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
                 // nb:
-                nb: labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1],
-                labels: labelsOfNotes.concat(gs.dn.map(n => `domain->${n}`)).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
+                nb: als.filter(l => l.startsWith('##nb'))[0].split('->')[1],
+                labels: als.concat(gs.dn.map(n => `domain->${n}`)).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
             });
         })
     );
@@ -357,7 +300,7 @@ function readerCategory(fDom: Element, labelsOfNotes: string[]) {
     d_category_body.className = 'grid-category-body';
 
     for (const n of gs.notes) {
-        if (intersection(n.labels, labelsOfNotes).length === labelsOfNotes.length) {
+        if (intersection(n.labels, als).length === als.length) {
             const notesDom = document.createElement('div');
             notesDom.id = `note-${n.id}`;
             d_category_body.appendChild(notesDom);
@@ -440,11 +383,11 @@ function readerNotesLabels() {
             // importance!!!
             if (gs.checkedLabels.size >= 1) {
                 if (gs.checkedLabels.has(nl)) {
-                    group_label_dom.className = 'checkedLabel';
+                    group_label_dom.className = 'pinCheckedLabel';
                 } else {
                     if (_ava.has(nl)) {
                         if (_com1.includes(nl)) {
-                            group_label_dom.className = 'forceCheckedLabel';
+                            group_label_dom.className = 'checkedLabel';
                         } else {
                             group_label_dom.className = 'unCheckedLabel';
                         }
@@ -480,7 +423,7 @@ function readerNotesLabels() {
             group_label_dom.onclick = () => {
                 if (group_label_dom.className === 'unCheckedLabel') {
                     gs.checkedLabels.add(nl);
-                } else if (group_label_dom.className === 'checkedLabel') {
+                } else if (['checkedLabel', 'pinCheckedLabel'.includes(group_label_dom.className)]) {
                     gs.checkedLabels.delete(nl);
                 } else {
                     return;
@@ -492,35 +435,7 @@ function readerNotesLabels() {
         }
         localDom.append(group_dom);
     }
-
-    // // patch
-    // for (
-    //   const label of gs.domainLabels
-    //     .filter(l => l !== gs.domainNode[0])
-    // ) {
-    //   const d = document.createElement('label');
-    //   d.className = 'checkedFixLabel';
-    //   d.textContent = label;
-    //   // labelDoms.push(d);
-    //   localDom.append(d, elemSpaces());
-    // }
-
-    // for (const { label, checked } of _labels) {
-    //   const d = document.createElement('label');
-    //   d.className = checked ? 'checkedLabel' : 'unCheckedLabel';
-    //   d.textContent = label;
-    //   d.onclick = () => {
-    //     d.className = d.className === 'unCheckedLabel' ? 'checkedLabel' : 'unCheckedLabel';
-    //     if (d.className === 'unCheckedLabel') {
-    //       gs.checkedLabels = gs.checkedLabels.filter(l => l !== label);
-    //     } else {
-    //       gs.checkedLabels.push(label);
-    //     }
-    //     readerCategories();
-    //   };
-    //   // labelDoms.push(d);
-    //   localDom.append(d, elemSpaces());
-    // }
+    localDom.append(document.createElement('p'))
 }
 
 function readerDomainName() {
@@ -607,19 +522,6 @@ function sortGroupLables(obj1: GroupLables): GroupLables {
     );
 }
 
-// function labels2GroupLabel(labels: string[]): GroupLables {
-//     const gl: { [g: string]: string[] } = {};
-//     for (const label of labels) {
-//         const [g, l] = label.split('->');
-//         if (g in gl) {
-//             gl[g].push(l);
-//         } else {
-//             gl[g] = [l];
-//         }
-//     }
-//     return sortGroupLables(gl);
-// }
-
 function searchAction() {
     gs.s_s = (new Date()).getTime();
     const x = (<HTMLTextAreaElement>document.getElementById("APjFqb"))?.value;
@@ -632,11 +534,6 @@ function searchAction() {
     }
     // document.getElementById("content").innerHTML = "You selected: " + x;
 }
-
-// <div id="root">
-// <div id="content"></div>
-// <ul id="contextMenu" class="contextMenu"></ul>
-// </div>
 
 function initFrameDoms() {
     // search 

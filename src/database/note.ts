@@ -54,7 +54,7 @@ export class LNote {
     }
 
     public getDataArrayLabels(): ArrayLabels {
-        return groupLabel2ArrayLabels(this.getData().labels).sort();
+        return groupLabel2ArrayLabels(this.getData().gls).sort();
     }
 
     public removeDataArrayLabels(...al: ArrayLabels) {
@@ -106,7 +106,7 @@ export class LNote {
     }
 
     public updateDataArrayLabels(al: string[]) {
-        this.data.labels = arrayLabels2GroupLabel(al);
+        this.data.gls = arrayLabels2GroupLabel(al);
     }
 
     public getDocMainFile() {

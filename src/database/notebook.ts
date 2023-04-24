@@ -109,7 +109,7 @@ export class LNotebook {
         const notes: LNote[] = [];
         const res = keywords.map(kw => new RegExp(kw));
         for (const [nId, note] of this.lnotes.getCache().entries()) {
-            const contentOfNote = note.contents.concat(Object.values(note.labels).flatMap(l => l)).filter(c => c.length >= 1);
+            const contentOfNote = note.contents.concat(Object.values(note.gls).flatMap(l => l)).filter(c => c.length >= 1);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
                 // n.getData().labels['##nb'] = [n.getnb()];
                 notes.push(new LNote(this.nb, this.dir, nId, note));

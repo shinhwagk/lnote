@@ -9,7 +9,7 @@ import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    '.labels'?: any; // { [cname: string]: string[] }
+    '.gls'?: any; // { [cname: string]: string[] }
 }
 
 export class VNBDomain {
@@ -29,11 +29,11 @@ export class VNBDomain {
     }
 
     public getGroupLabel(domainNode: string[]): GroupLables {
-        return objectPath.get(this.domainCache, [...domainNode, '.labels']);
+        return objectPath.get(this.domainCache, [...domainNode, '.gls']);
     }
 
     // public getArrayLabel(domainNode: string[]): GroupLables {
-    //     return objectPath.get(this.domainCache, [...domainNode, '.labels']);
+    //     return objectPath.get(this.domainCache, [...domainNode, '.gls']);
     // }
 
     public deleteDomain(domainNode: string[]): void {
@@ -48,7 +48,7 @@ export class VNBDomain {
         if (domainNode.length === 0) {
             return;
         }
-        objectPath.del(this.domainCache, [...domainNode, '.labels']);
+        objectPath.del(this.domainCache, [...domainNode, '.gls']);
         this.permanent();
     }
 
@@ -74,8 +74,8 @@ export class VNBDomain {
         this.permanent();
     }
 
-    public updateGroupLabels(domainNode: string[], gl: GroupLables) {
-        objectPath.set(this.domainCache, [...domainNode, '.labels'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gl)));
+    public updateGroupLabels(domainNode: string[], gls: GroupLables) {
+        objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gls)));
         this.permanent();
     }
 
@@ -85,11 +85,11 @@ export class VNBDomain {
 
     // check domain node is a notes
     public isNotes(domainNode: string[]) {
-        return objectPath.has(this.domainCache, [...domainNode, '.labels']);
+        return objectPath.has(this.domainCache, [...domainNode, '.gls']);
     }
 
     public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
-        return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.labels');
+        return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.gls');
     }
 
 }

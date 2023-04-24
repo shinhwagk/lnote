@@ -204,7 +204,7 @@ export class LNotebooks {
 
     public createNoteEditor(nb: string, nId: string,) {
         const nd = this.get(nb).getNoteById(nId).getData();
-        this.editor.createNoteEditorFile1(nb, nId, nd.contents, nd.labels);
+        this.editor.createNoteEditorFile1(nb, nId, nd.contents, nd.gls);
         // if (nId !== '0') {
 
         //     return;
