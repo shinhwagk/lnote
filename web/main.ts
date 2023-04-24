@@ -10,7 +10,7 @@ declare const vscode: vscode;
 
 type GroupLables = { [gl: string]: string[] };
 
-declare const webKind: 'search' | 'domain';
+// declare const webKind: 'search' | 'domain';
 
 const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
@@ -29,6 +29,7 @@ interface DataDomain {
     nId: string;
     domainArrayLabel: string[];
     domainGroupLabel: { [g: string]: string[] };
+    webKind: 'domain' | 'search';
 }
 
 interface DataProtocol {
@@ -350,7 +351,6 @@ function readerNotesCategories() {
 }
 
 function readerNotesLabels() {
-    console.log("readerNotesLabels", gs.checkedLabels);
     const localDom = document.getElementById('notes-labels')!;
     localDom.replaceChildren();
 
@@ -435,7 +435,7 @@ function readerNotesLabels() {
         }
         localDom.append(group_dom);
     }
-    localDom.append(document.createElement('p'))
+    localDom.append(document.createElement('p'));
 }
 
 function readerDomainName() {
@@ -488,8 +488,11 @@ function readerDomainName() {
     e_domain?.append(e_title);
 }
 
+let gWebKind: 'search' | 'domain' = "domain";
+
 class GlobalState {
     notes: DataNote[] = [];
+
     s_s = 0;
     checkedLabels = new Set<string>();
     // init once
@@ -536,6 +539,7 @@ function searchAction() {
 }
 
 function initFrameDoms() {
+    document.getElementById('root')?.replaceChildren();
     // search 
     const searchDom = document.createElement('div');
     searchDom.className = "search";
@@ -576,7 +580,7 @@ function initFrameDoms() {
     // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
 
     // document.getElementById('content')?.replaceChildren(e_domain);
-    const doms = webKind === 'domain' ? [domainDom, labelsDom, categoriesDom, menuDom] : [searchDom, labelsDom, categoriesDom, menuDom];
+    const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom, menuDom] : [searchDom, labelsDom, categoriesDom, menuDom];
     document.getElementById('root')?.append(...doms);
 
     // gs.nccm = new ContextMenuDom();
@@ -605,8 +609,30 @@ document.addEventListener('contextmenu', () => gs.nccm.hide(), true);
 
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
-    console.log('vscode-notes webview open.', webKind, message);
+    console.log(message)
     switch (message.command) {
+        case 'kind':
+            if (message.data.webKind !== gWebKind) {
+                console.log("now", message.data.webKind);
+                gWebKind = message.data.webKind;
+                initFrameDoms();
+                gs = new GlobalState();
+
+                gWebKind === message.data.webKind
+            }
+            if (gWebKind === 'domain') {
+                vscode.postMessage({ command: 'domain' });
+            }
+            break;
+        // case 'refresh':
+        //     console.log("webview init.");
+        //     initFrameDoms();
+        //     gs = new GlobalState();
+        //     const _m = message as any;
+        //     if ((_m.params.webKind) === 'domain') {
+        //         vscode.postMessage({ command: 'domain' });
+        //     }
+        //     break;
         case 'post-search':
             const e_s = (new Date()).getTime();
             gs.notes = message.data.notes;
@@ -633,11 +659,9 @@ window.addEventListener('message', (event) => {
     }
 });
 
-
+console.log('lnotes webview open.');
 initFrameDoms();
 // new GlobalState after initFrameDoms
-const gs = new GlobalState();
+let gs = new GlobalState();
 
-if (webKind === 'domain') {
-    vscode.postMessage({ command: 'domain' });
-}
+vscode.postMessage({ command: 'get-kind' });

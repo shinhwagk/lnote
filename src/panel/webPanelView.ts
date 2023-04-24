@@ -15,7 +15,8 @@ export class LWebPanelView {
 
     public setKind(kind: 'domain' | 'search') {
         if (kind !== this.webKind) {
-            this.panel?.dispose();
+            // this.panel?.webview.postMessage({ command: 'refresh', params: { webKind: kind } });
+            // this.panel?.dispose();
         }
         this.webKind = kind;
         return this;
@@ -45,7 +46,6 @@ export class LWebPanelView {
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <link href="${stylesMainUri}" rel="stylesheet">
                     <script nonce="${nonce}" src="https://kit.fontawesome.com/61b8139299.js" crossorigin="anonymous" ></script>
-                    <script type="text/javascript" >const webKind = "${this.webKind}"; </script>
                     <title>lnote</title>
                 </head>
                 <body>
@@ -59,14 +59,14 @@ export class LWebPanelView {
     }
 
     async show(): Promise<void> {
-        if (this.panel) {
-            if (this.webKind === 'domain') {
-                this.postDomain();
-            }
-            this.panel.reveal(vscode.ViewColumn.One);
-            return;
+        console.log("panel", this.panel);
+        if (this.panel === undefined) {
+            this.initPanel();
         }
-        this.initPanel();
+        // this.panel!.webview.html = this.getWebviewContent();
+        this.panel!.title = `lnote ${this.webKind}`;
+        await this.panel!.webview.postMessage({ command: 'kind', data: { webKind: this.webKind } });
+        // 
     }
 
     async refresh(): Promise<void> {
@@ -117,7 +117,7 @@ export class LWebPanelView {
         this.panel = vscode.window.createWebviewPanel(
             'lnote',
             `lnote ${this.webKind}`,
-            vscode.ViewColumn.One,
+            vscode.ViewColumn.Active,
             {
                 enableScripts: true,
                 localResourceRoots: [
@@ -138,6 +138,9 @@ export class LWebPanelView {
         this.panel.webview.onDidReceiveMessage(
             async (msg) => {
                 switch (msg.command) {
+                    case 'get-kind':
+                        await this.panel!.webview.postMessage({ command: 'kind', data: { webKind: this.webKind } });
+                        break;
                     case 'search':
                         this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
