@@ -7,22 +7,34 @@ interface vscode {
 declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
+
 type GroupLables = { [gl: string]: string[] };
+
+// declare const webKind: 'search' | 'domain';
 
 const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
-// const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
+const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
 
-interface IData {
+interface DataDomain {
+    domainNode: string[];
     dn: string[];
+    checkedLabels: string[];
+    // categories: DataCategory[];
     notes: DataNote[];
-    wk: 'domain' | 'search'; // webkind
-    dals: string[]
+    // note: PostNote
+    labels: string[];
+    domainLabels: string[];
+    domainNotes: DataNote[];
+    nId: string;
+    domainArrayLabel: string[];
+    domainGroupLabel: { [g: string]: string[] };
+    webKind: 'domain' | 'search';
 }
 
 interface DataProtocol {
     command: string;
-    data: IData;
+    data: DataDomain;
 }
 
 interface DataNote {
@@ -36,6 +48,99 @@ interface DataNote {
     labels: string[];
     category: string;
 }
+
+interface ContextMenuAction {
+    title: string;
+    onClick: (data: any) => void;
+}
+
+const NoteEditContextMenuActions: ContextMenuAction[][] = [
+    [
+        {
+            title: 'edit',
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-edit', params: { nb: data.note.nb, nId: data.note.id } })
+        }
+    ],
+    [
+        {
+            title: 'create document',
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-doc-create', params: { nb: data.note.nb, nId: data.note.id } })
+        },
+        {
+            title: 'create files',
+            onClick: (data: { note: DataNote }) => vscode.postMessage({ command: 'note-files-create', params: { nb: data.note.nb, nId: data.note.id } })
+        }
+    ],
+    // [
+    //   {
+    //     title: 'remove',
+    //     onClick: (data) => vscode.postMessage({ command: 'note-remove', data: { nId: data.note.nId } })
+    //   }
+    // ]
+    // ,
+    // [
+    //   {
+    //     title: 'open note folder',
+    //     onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
+    //   }
+    // ]
+];
+
+// const CategoryEditContextMenuActions: ContextMenuAction[][] = [
+//     [
+//         {
+//             title: 'add note',
+//             onClick: (data) => vscode.postMessage({ command: 'note-add', params: { nb: data.nb, labels: data.labels } })
+//         }
+//     ],
+//     [
+//         {
+//             title: 'edit gls',
+//             onClick: (data) => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'nsgl', params: { labels: data.labels } } })
+//         }
+//     ]
+// ];
+
+// class ContextMenuDom {
+//     private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
+//     public hide() {
+//         this.elem.style.display = 'none';
+//     }
+
+//     public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
+//         this.elem.replaceChildren();
+//         let gidx = 0; // group index
+//         for (const l of menus) {
+//             if (gidx >= 1 && gidx < menus.length) {
+//                 const d_li = document.createElement('li');
+//                 d_li.className = 'contextMenuDivider';
+//                 this.elem.appendChild(d_li);
+//             }
+//             for (const i of l) {
+//                 const d_li = document.createElement('li');
+//                 d_li.className = 'contextMenuItem';
+//                 d_li.textContent = i.title;
+//                 d_li.onclick = () => i.onClick(data);
+//                 this.elem.appendChild(d_li);
+//             }
+//             gidx += 1;
+//         };
+//         this.elem!.style.display = 'block';
+//         this.elem!.style.position = 'absolute';
+
+//         this.elem!.style.top =
+//             (frameElem.getBoundingClientRect().bottom + this.elem.clientHeight <= document.documentElement.clientHeight
+//                 ? e.pageY
+//                 : e.pageY - this.elem.clientHeight) + 'px';
+//         this.elem!.style.left =
+//             (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
+//                 ? e.pageX
+//                 : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
+//     }
+// }
+
+// class NoteEditContextMenu { }
+
 
 function elemSpaces(num: number = 1) {
     const s = document.createElement('span');
@@ -54,6 +159,7 @@ function readerNote(container: HTMLElement, note: DataNote): void {
 
     const d_note_id = document.createElement('div');
     d_note_id.className = 'grid-note-id';
+    d_note_id.oncontextmenu = (e) => { e.preventDefault(); };
 
     const d_cion = note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
     const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
@@ -62,9 +168,9 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     d_space.title = `id: ${note.id}, create date: ${note.cts}, modify date: ${note.mts}`;
     d_space.appendChild(elemSpaces(2));
 
-    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: note.id } })));
+    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: nid } })));
     d_note_id.appendChild(d_space);
-    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: note.id } })));
+    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: nid } })));
 
     const d_note_content = document.createElement('div');
     d_note_content.className = 'grid-note-contents';
@@ -79,14 +185,31 @@ function readerNote(container: HTMLElement, note: DataNote): void {
 
     const d_note_edit = document.createElement('div');
     d_note_edit.className = 'grid-note-edit';
+    d_note_edit.oncontextmenu = (e) => { e.preventDefault(); };
+    const nid = note.id;
 
-    d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
+    // if (this.note.doc) { necma[0].shift() }
+    // if (this.note.files) { necma[0].pop() }
+    // d_note_edit.appendChild(
+    //     elemIcon('fa-pen', (ev: MouseEvent) => {
+    //         const necms = NoteEditContextMenuActions;
+    //         const cmas: ContextMenuAction[][] = [necms[0], []];
+    //         note.doc || cmas[1].push(necms[1][0]);
+    //         note.files || cmas[1].push(necms[1][1]);
+    //         if (cmas[1].length === 0) {
+    //             vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } });
+    //             return;
+    //         }
+    //         gs.nccm.show(ev, d_note_edit, cmas, { note: note });
+    //     })
+    // );
+    d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: nid } })));
     if (!note.doc) {
-        d_note_edit.appendChild(elemSpaces());
+        d_note_edit.appendChild(d_space);
         d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
     }
     if (!note.files) {
-        d_note_edit.appendChild(elemSpaces());
+        d_note_edit.appendChild(d_space);
         d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
     }
 
@@ -141,12 +264,9 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
     return name;
 }
 
-function readerCategory(fdom: Element, als: string[]) {
+function readerCategory(fDom: Element, als: string[]) {
     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
     let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
-
-    const _notes = gs.notes.filter(n => intersection(n.labels, als).length === als.length);
-
 
     // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
     // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
@@ -159,21 +279,19 @@ function readerCategory(fdom: Element, als: string[]) {
     d_category_name.textContent = nameOfCategory;
     d_category_name.className = 'grid-category-name';
     // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
+    // d_category_name.oncontextmenu = (e) => {
+    //     e.preventDefault();
+    //     // todo for rename
+    // };
+    // console.log(als)
     // const nb = als.filter(l => l.startsWith('##nb'))[0].split('->')[1];
 
-    // const _nb = gWebKind === 'domain' ? gs.dn[0] : als.filter(l => l.startsWith('##nb->'))[0]
-
     d_category_name.appendChild(elemSpaces());
-    d_category_name.appendChild(elemIcon('fa-plus',
-        () => vscode.postMessage({ command: 'common-category-note-add', params: { als: als } }))
-    );
-
+    d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'note-add', params: { nb: "nb", als: als } })));
     d_category_name.appendChild(elemSpaces());
-    d_category_name.appendChild(elemIcon('fa-pen',
-        () => vscode.postMessage({ command: 'common-notes-labels-edit', params: { ids: _notes.map(n => n.id), als: als } }))
-    );
+    d_category_name.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'notebook-editor', params: { nb: "nb", als: als } })));
     // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
-
+    // gs.nccm.show(ev, d_category_name, CategoryEditContextMenuActions, {
     //     // nb:
     //     nb: als.filter(l => l.startsWith('##nb'))[0].split('->')[1],
     //     labels: als.concat(gs.dn.map(n => `domain->${n}`)).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
@@ -188,14 +306,16 @@ function readerCategory(fdom: Element, als: string[]) {
     d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
     d_category_body.className = 'grid-category-body';
 
-    for (const n of _notes) {
-        const notesDom = document.createElement('div');
-        notesDom.id = `note-${n.id}`;
-        d_category_body.appendChild(notesDom);
-        readerNote(notesDom, n);
+    for (const n of gs.notes) {
+        if (intersection(n.labels, als).length === als.length) {
+            const notesDom = document.createElement('div');
+            notesDom.id = `note-${n.id}`;
+            d_category_body.appendChild(notesDom);
+            readerNote(notesDom, n);
+        }
 
         d_category.append(d_category_name, d_category_body);
-        fdom.append(d_category, document.createElement('p'));
+        fDom.append(d_category, document.createElement('p'));
         // d_category.append(d_category_name, d_category_body);
         // return d_category;
     }
@@ -236,7 +356,7 @@ function readerCategories() {
     }
 }
 
-function readerLabels() {
+function readerNotesLabels() {
     const localDom = document.getElementById('notes-labels')!;
     localDom.replaceChildren();
 
@@ -314,7 +434,7 @@ function readerLabels() {
                 } else {
                     return;
                 }
-                readerLabels();
+                readerNotesLabels();
                 readerCategories();
             };
             group_dom.append(group_label_dom, elemSpaces());
@@ -345,7 +465,7 @@ function readerDomainName() {
     // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
     e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'domain-note-add', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
+    e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-labels-edit', params: {} })));
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(
     //     elemIcon('fa-search', () => {
@@ -378,6 +498,7 @@ let gWebKind: 'search' | 'domain' = "domain";
 
 class GlobalState {
     notes: DataNote[] = [];
+
     s_s = 0;
     checkedLabels = new Set<string>();
     // init once
@@ -385,10 +506,9 @@ class GlobalState {
     // init once
     allGroupLabels = new Map<string, Set<string>>();
 
-    // domain only
-    dals: string[] = [];
+    domainNode: string[] = [];
     dn: string[] = [];
-    nb: string = "";
+    // nccm: ContextMenuDom = new ContextMenuDom();
 }
 
 function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
@@ -425,8 +545,7 @@ function searchAction() {
 }
 
 function initFrameDoms() {
-    const rootDom = document.getElementById('root');
-    rootDom?.replaceChildren();
+    document.getElementById('root')?.replaceChildren();
     // search 
     const searchDom = document.createElement('div');
     searchDom.className = "search";
@@ -445,6 +564,12 @@ function initFrameDoms() {
 
     searchDom.append(searchTextAreaDom, searchButtonDom, searchTimeDom);
 
+    // const contentDom = document.createElement('div');
+    // contentDom.id = "content";
+    const menuDom = document.createElement('ul');
+    menuDom.id = "contextMenu";
+    menuDom.className = "contextMenu";
+
     // domain 
     const domainDom = document.createElement('div');
     domainDom.id = "domain";
@@ -461,9 +586,10 @@ function initFrameDoms() {
     // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
 
     // document.getElementById('content')?.replaceChildren(e_domain);
-    const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom] : [searchDom, labelsDom, categoriesDom];
-    rootDom?.append(...doms);
+    const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom, menuDom] : [searchDom, labelsDom, categoriesDom, menuDom];
+    document.getElementById('root')?.append(...doms);
 
+    // gs.nccm = new ContextMenuDom();
 }
 
 function processNotes() {
@@ -483,23 +609,25 @@ function processNotes() {
     }
 }
 
+// document.addEventListener('click', () => gs.nccm.hide(), true);
+
+// document.addEventListener('contextmenu', () => gs.nccm.hide(), true);
+
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
-    // console.log(message);
+    console.log(message)
     switch (message.command) {
         case 'kind':
-            if (message.data.wk !== gWebKind) {
-                console.log("now", message.data.wk);
-                gWebKind = message.data.wk;
+            if (message.data.webKind !== gWebKind) {
+                console.log("now", message.data.webKind);
+                gWebKind = message.data.webKind;
                 initFrameDoms();
                 gs = new GlobalState();
 
-                // gWebKind === message.data.webKind;
+                gWebKind === message.data.webKind
             }
             if (gWebKind === 'domain') {
-                gs.nb = gs.dn[0];
-                gs.dals = message.data.dals;
-                vscode.postMessage({ command: 'get-domain' });
+                vscode.postMessage({ command: 'domain' });
             }
             break;
         // case 'refresh':
@@ -518,7 +646,7 @@ window.addEventListener('message', (event) => {
 
             processNotes();
 
-            readerLabels();
+            readerNotesLabels();
             readerCategories();
             break;
         case 'post-domain':
@@ -527,8 +655,9 @@ window.addEventListener('message', (event) => {
 
             processNotes();
 
+            // gs.allGroupLabels.delete('##nb');
             readerDomainName();
-            readerLabels();
+            readerNotesLabels();
             readerCategories();
             break;
         default:

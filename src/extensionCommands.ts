@@ -2,7 +2,6 @@ import { existsSync, statSync } from 'fs-extra';
 import { commands, Uri, window, workspace } from 'vscode';
 
 import { ctxFilesExplorer, pathSplit, section } from './constants';
-import { arrayLabels2GroupLabel } from './database/notes';
 import { DomainNode } from './explorer/domainExplorer';
 import { ext } from './extensionVariables';
 import { tools } from './helper';
@@ -32,7 +31,7 @@ export namespace ExtCmds {
     // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
     // ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
-    ext.lwebPanelView.setDomainNode(dna).show();
+    ext.lwebPanelView.setDomainNode(dna).show('domain');
     // await cmdHdlDomainPin(dn);
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
@@ -67,7 +66,7 @@ export namespace ExtCmds {
   export async function cmdHdlDomainPin(dn: DomainNode) {
     // ext.gs.update(dn.split(pathSplit)[0]);
     const s = (new Date()).getTime();
-    await ext.lwebPanelView.setDomainNode(dn.split(pathSplit)).show();
+    await ext.lwebPanelView.setDomainNode(dn.split(pathSplit)).show('domain');
     // await ext.lwebPanelView.show();
     console.log("get notes time " + `${new Date().getTime() - s}`);
     await ext.setContext(ctxFilesExplorer, false);
@@ -115,7 +114,7 @@ export namespace ExtCmds {
     ext.domainProvider.refresh();
   }
   export async function cmdHdlGlobalSearch() {
-    await ext.lwebPanelView.setKind('search').show();
+    await ext.lwebPanelView.show('search');
   }
   export async function cmdHdlNoteOpenFolder(_nId: string) {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
@@ -207,7 +206,7 @@ export namespace ExtCmds {
 
   export async function cmdHdlDomainNoteAdd(params: { dn: string[] }) {
     // const nb = ext.lnbs.get(params.nb);
-    const als = ext.lnbs.get(params.dn[0]).getArrayLabelsOfDomain(params.dn)
+    const als = ext.lnbs.get(params.dn[0]).getArrayLabelsOfDomain(params.dn);
     cmdHdlNoteAdd({ als: als, nb: params.dn[0] });
     // const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()];
     // const nid = notes[notes.length - 1][0];
@@ -217,6 +216,10 @@ export namespace ExtCmds {
 
   export async function cmdHdlCategoryNoteAdd(params: { nb: string, als: string[] }) {
     cmdHdlNoteAdd(params);
+  }
+
+  export async function cmdHdlCategoryNotesLabelsEdit(params: { nb: string, als: string[] }) {
+    // cmdHdlNoteAdd(params);
   }
 
   // export async function cmdHdlNoteColToActiveTermianlWithArgs(_nId: string, _cIdx: string) {

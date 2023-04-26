@@ -13,23 +13,9 @@ export class LWebPanelView {
     // only for domain web
     private domainNode: string[] = [];
 
-    public setKind(kind: 'domain' | 'search') {
-        if (kind !== this.webKind) {
-            // this.panel?.webview.postMessage({ command: 'refresh', params: { webKind: kind } });
-            // this.panel?.dispose();
-        }
-        this.webKind = kind;
-        return this;
-    }
-
     public setDomainNode(dn: string[]) {
-        this.setKind('domain');
         this.domainNode = dn;
         return this;
-    }
-
-    public getKind() {
-        return this.webKind;
     }
 
     private getWebviewContent() {
@@ -58,15 +44,17 @@ export class LWebPanelView {
                 </html>`;
     }
 
-    async show(): Promise<void> {
-        console.log("panel", this.panel);
+    async show(webKind: 'domain' | 'search'): Promise<void> {
         if (this.panel === undefined) {
             this.initPanel();
         }
         // this.panel!.webview.html = this.getWebviewContent();
-        this.panel!.title = `lnote ${this.webKind}`;
-        await this.panel!.webview.postMessage({ command: 'kind', data: { webKind: this.webKind } });
-        // 
+        this.panel!.title = `lnote ${webKind}`;
+
+        if (this.webKind !== webKind) {
+            await this.panel!.webview.postMessage({ command: 'kind', data: { wk: webKind } });
+        }
+        this.webKind = webKind;
     }
 
     async refresh(): Promise<void> {
@@ -83,13 +71,13 @@ export class LWebPanelView {
                 const _n = n.getData();
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
-                const al = n.getDataArrayLabels();
+                const als = n.getDataArrayLabels();
                 return {
                     nb: n.getnb(),
                     id: n.getId(),
                     doc: isDoc,
                     files: isFiles,
-                    labels: al,
+                    labels: als,
                     contents: _n.contents,
                     mts: _n.mts,
                     cts: _n.cts
@@ -106,10 +94,12 @@ export class LWebPanelView {
     }
 
     private async postDomain() {
-        const notes = ext.lnbs.get(this.domainNode[0]).getNotes(this.domainNode);
+        const d = ext.lnbs.get(this.domainNode[0]);
+        const dals = d.getArrayLabelsOfDomain(this.domainNode);
+        const notes = d.getNotes(this.domainNode);
         await this.panel!.webview.postMessage({
             command: 'post-domain',
-            data: { dn: this.domainNode, notes: this.convertForWebStruct(notes) }
+            data: { dn: this.domainNode, dals: dals, notes: this.convertForWebStruct(notes) }
         });
     }
 
@@ -139,7 +129,7 @@ export class LWebPanelView {
             async (msg) => {
                 switch (msg.command) {
                     case 'get-kind':
-                        await this.panel!.webview.postMessage({ command: 'kind', data: { webKind: this.webKind } });
+                        await this.panel!.webview.postMessage({ command: 'kind', data: { wk: this.webKind } });
                         break;
                     case 'search':
                         this.keywords.clear();
@@ -147,20 +137,26 @@ export class LWebPanelView {
                         console.log(this.keywords);
                         this.postSerach();
                         break;
-                    case 'domain':
+                    case 'get-domain':
                         this.postDomain();
                         break;
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
-                    case 'note-add':
+                    case 'common-category-note-add':
                         ExtCmds.cmdHdlNoteAdd(msg.params);
+                        break;
+                    case 'common-category-notes-labels-edit':
+                        ExtCmds.cmdHdlCategoryNotesLabelsEdit(msg.params);
                         break;
                     case 'domain-note-add':
                         ExtCmds.cmdHdlDomainNoteAdd(msg.params);
                         break;
-                    case 'category-note-add':
+                    case 'domain-note-add':
                         ExtCmds.cmdHdlDomainNoteAdd(msg.params);
+                        break;
+                    case 'notes-labels-edit':
+                        ExtCmds.cmdHdlCategoryNotesLabelsEdit(msg.params);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
