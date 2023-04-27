@@ -91,14 +91,19 @@
                     "group": "0_domain"
                 },
                 {
-                    "command": "lnote.domain.remove",
+                    "command": "lnote.domain.rename",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
                 },
                 {
                     "command": "lnote.domain.notes.create",
-                    "when": "view == domainExplorer && viewItem == emptyNotes",
+                    "when": "view == domainExplorer && viewItem =~ /emptyNotes/",
                     "group": "1_domain"
+                },
+                {
+                    "command": "lnote.domain.search",
+                    "when": "view == domainExplorer && viewItem =~ /notebook/",
+                    "group": "2_domain"
                 }
             ]
         },
@@ -132,8 +137,8 @@
                 }
             },
             {
-                "command": "lnote.domain.remove",
-                "title": "Remove"
+                "command": "lnote.domain.rename",
+                "title": "Rename"
             },
             {
                 "command": "lnote.domain.refresh",
@@ -162,6 +167,10 @@
             {
                 "command": "lnote.domain.notes.create",
                 "title": "Create Notes"
+            },
+            {
+                "command": "lnote.domain.search",
+                "title": "Serach"
             },
             {
                 "command": "lnote.files.open",

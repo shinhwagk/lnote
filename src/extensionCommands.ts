@@ -116,6 +116,9 @@ export namespace ExtCmds {
   export async function cmdHdlGlobalSearch() {
     await ext.lwebPanelView.show('search');
   }
+  export async function cmdHdlNotebookSearch() {
+    await ext.lwebPanelView.show('search');
+  }
   export async function cmdHdlNoteOpenFolder(_nId: string) {
     // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
   }
@@ -218,7 +221,8 @@ export namespace ExtCmds {
     cmdHdlNoteAdd(params);
   }
 
-  export async function cmdHdlCategoryNotesLabelsEdit(params: { nb: string, als: string[] }) {
+  export async function cmdHdlNotesLabelsEdit(params: { als: string[] }) {
+    ext.lnbs.createNotesNoteLabelsEditor(als);
     // cmdHdlNoteAdd(params);
   }
 

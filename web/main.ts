@@ -165,12 +165,12 @@ function readerCategory(fdom: Element, als: string[]) {
 
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(elemIcon('fa-plus',
-        () => vscode.postMessage({ command: 'common-category-note-add', params: { als: als } }))
+        () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } }))
     );
 
     d_category_name.appendChild(elemSpaces());
     d_category_name.appendChild(elemIcon('fa-pen',
-        () => vscode.postMessage({ command: 'common-notes-labels-edit', params: { ids: _notes.map(n => n.id), als: als } }))
+        () => vscode.postMessage({ command: 'common-notes-labels-edit', params: { als: als } }))
     );
     // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
 
@@ -386,9 +386,9 @@ class GlobalState {
     allGroupLabels = new Map<string, Set<string>>();
 
     // domain only
-    dals: string[] = [];
-    dn: string[] = [];
-    nb: string = "";
+    dals: string[] = []; // domain arraylabels
+    dn: string[] = []; // domainnode
+    nb: string = "";   // notebook
 }
 
 function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
@@ -463,7 +463,6 @@ function initFrameDoms() {
     // document.getElementById('content')?.replaceChildren(e_domain);
     const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom] : [searchDom, labelsDom, categoriesDom];
     rootDom?.append(...doms);
-
 }
 
 function processNotes() {

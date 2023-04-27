@@ -111,9 +111,9 @@ export class DomainPanelView {
           case 'notebook-note-doc-create':
             ExtCmds.cmdHdlNBNoteDocCreate(msg.data.nId);
             break;
-          case 'edit-note-openfolder':
-            ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
-            break;
+          // case 'edit-note-openfolder':
+          //   ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
+          //   break;
         }
       },
       undefined,

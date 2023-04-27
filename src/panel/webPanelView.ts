@@ -143,20 +143,14 @@ export class LWebPanelView {
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
-                    case 'common-category-note-add':
+                    case 'common-notes-note-add':
                         ExtCmds.cmdHdlNoteAdd(msg.params);
                         break;
-                    case 'common-category-notes-labels-edit':
-                        ExtCmds.cmdHdlCategoryNotesLabelsEdit(msg.params);
+                    case 'common-notes-labels-edit':
+                        ExtCmds.cmdHdlNotesLabelsEdit(msg.params);
                         break;
                     case 'domain-note-add':
                         ExtCmds.cmdHdlDomainNoteAdd(msg.params);
-                        break;
-                    case 'domain-note-add':
-                        ExtCmds.cmdHdlDomainNoteAdd(msg.params);
-                        break;
-                    case 'notes-labels-edit':
-                        ExtCmds.cmdHdlCategoryNotesLabelsEdit(msg.params);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
@@ -170,9 +164,9 @@ export class LWebPanelView {
                     case 'note-doc-create':
                         ExtCmds.cmdHdlNBNoteDocCreate(msg.params);
                         break;
-                    case 'edit-note-openfolder':
-                        ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
-                        break;
+                    // case 'edit-note-openfolder':
+                    //     ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
+                    //     break;
                 }
             },
             undefined,

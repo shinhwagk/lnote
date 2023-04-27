@@ -33,6 +33,10 @@ function getTreeItem(dn: DomainNode): TreeItem {
   } else {
     item.contextValue = 'emptyNotes';
   }
+
+  if (domainNode.length === 1) {
+    item.contextValue = item.contextValue ? `${item.contextValue}-notebook` : 'notebook';
+  }
   return item;
 }
 

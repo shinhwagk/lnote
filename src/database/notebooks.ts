@@ -8,6 +8,7 @@ import { LNote } from './note';
 import { LNotebook } from './notebook';
 import { IEditBase, IEditNoteData, IEditNoteData1, LEditor } from './editor';
 import { tools } from '../helper';
+import { ArrayLabels } from '../types';
 
 export class LNotebooks {
     private readonly nbs = new Map<string, LNotebook>();
@@ -202,7 +203,7 @@ export class LNotebooks {
         return this.editor.checkEditorCleaned();
     }
 
-    public createNoteEditor(nb: string, nId: string,) {
+    public createNoteEditor(nb: string, nId: string) {
         const nd = this.get(nb).getNoteById(nId).getData();
         this.editor.createNoteEditorFile1(nb, nId, nd.contents, nd.gls);
         // if (nId !== '0') {
@@ -215,6 +216,10 @@ export class LNotebooks {
         //     this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
         //     return;
         // }
+    }
+
+    public createNotesNoteLabelsEditor(als: ArrayLabels) {
+
     }
 
     // public createDomainEditor(domainNode: string[]) {
