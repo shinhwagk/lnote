@@ -222,7 +222,8 @@ export namespace ExtCmds {
   }
 
   export async function cmdHdlNotesLabelsEdit(params: { als: string[] }) {
-    ext.lnbs.createNotesNoteLabelsEditor(als);
+    ext.lnbs.createNotesLabelsEditor(params.als);
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile2()));
     // cmdHdlNoteAdd(params);
   }
 

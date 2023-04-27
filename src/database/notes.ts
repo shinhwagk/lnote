@@ -144,10 +144,10 @@ export class LNotes {
         return labels.map(l => [...this.notesGroupedByLabelCache.get(l) || []]).flatMap(i => i);
     }
 
-    public getNIdsByStrictArrayLabels(labels: ArrayLabels): string[] {
+    public getNIdsByStrictArrayLabels(als: ArrayLabels): string[] {
         const ids = [];
         for (const [nId, n] of this.notesCache.entries()) {
-            if (labels.sort().join() === groupLabel2ArrayLabels(n.gls).join()) {
+            if (als.sort().join() === groupLabel2ArrayLabels(n.gls).sort().join()) {
                 ids.push(nId);
             }
         }

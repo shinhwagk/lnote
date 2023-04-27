@@ -33,8 +33,8 @@ export class LNotebook {
      * notes & note
      * 
      */
-    public getNotesByArrayLabels(al: string[]) {
-        return this.lnotes.getNotesByArrayLabels(al, false);
+    public getNotesByArrayLabels(al: string[], strict: boolean = false) {
+        return this.lnotes.getNotesByArrayLabels(al, strict);
     }
 
     public craeteNotes(dn: string[]) {

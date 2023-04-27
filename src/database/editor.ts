@@ -30,6 +30,12 @@ export interface IEditNoteData1 {
     contents: string[]
 }
 
+export interface IEditNoteData2 {
+    nb: string,
+    ids: string[],
+    gls: GroupLables,
+}
+
 export interface IEditNoteData extends IEditBase {
     kind: 'EditNote';
     immutable: {
@@ -105,6 +111,8 @@ export class LEditor {
 
     public getEditorFile1 = () => path.join(this.editDir, `${section}-editnote.yml`);
 
+    public getEditorFile2 = () => path.join(this.editDir, `${section}-editnotesgls.yml`);
+
     public createNoteEditorFile1(nb: string, id: string, contents: string[], gls: GroupLables) {
         const ed: IEditNoteData1 = {
             nb: nb,
@@ -113,6 +121,15 @@ export class LEditor {
             contents: contents
         };
         tools.writeYamlSync(this.getEditorFile1(), ed);
+    }
+
+    public createNotesLabelsEditor(nb: string, ids: string[], gls: GroupLables) {
+        const ed: IEditNoteData2 = {
+            nb: nb,
+            ids: ids,
+            gls: gls
+        };
+        tools.writeYamlSync(this.getEditorFile2(), ed);
     }
 
     public createNoteEditorFile(nb: string, nId: string, contents: string[], gl: GroupLables) {
