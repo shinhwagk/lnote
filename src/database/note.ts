@@ -53,16 +53,20 @@ export class LNote {
         return this.data;
     }
 
-    public getDataArrayLabels(): ArrayLabels {
+    public getAls(): ArrayLabels {
         return groupLabel2ArrayLabels(this.getData().gls).sort();
     }
 
+    public getGls(): GroupLables {
+        return this.getData().gls;
+    }
+
     public removeDataArrayLabels(...al: ArrayLabels) {
-        this.updateDataArrayLabels(this.getDataArrayLabels().filter(l => !al.includes(l)));
+        this.updateDataArrayLabels(this.getAls().filter(l => !al.includes(l)));
     }
 
     public addDataArrayLabels(...al: ArrayLabels) {
-        this.updateDataArrayLabels(this.getDataArrayLabels().concat(al));
+        this.updateDataArrayLabels(this.getAls().concat(al));
     }
 
     // public update()
@@ -101,8 +105,8 @@ export class LNote {
         this.data.mts = mts;
     }
 
-    public updateDataGroupLabels(gl: GroupLables) {
-        this.updateDataArrayLabels(groupLabel2ArrayLabels(gl));
+    public updateDataGroupLabels(gls: GroupLables) {
+        this.updateDataArrayLabels(groupLabel2ArrayLabels(gls));
     }
 
     public updateDataArrayLabels(al: string[]) {

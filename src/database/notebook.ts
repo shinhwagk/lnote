@@ -89,12 +89,21 @@ export class LNotebook {
         this.ldomain.add(dn);
     }
 
-    public deleteDomain(dn: string[]) {
-        this.ldomain.deleteDomain(dn);
-    }
-
     public renameDomain(dn: string[], domainName: string) {
         this.ldomain.renameDomain(dn, domainName);
+    }
+
+    public removeDomain(dn: string[]) {
+        this.ldomain.remove(dn);
+    }
+
+    public deleteDomainNotes(domainNode: string[]): void {
+        this.ldomain.deleteDomainNotes(domainNode)
+    }
+
+    public setGlsOfDomain(dn: string[], name: string, gls: GroupLables) {
+        this.ldomain.updateGroupLabels(dn, gls);
+        this.ldomain.renameDomain(dn, name);
     }
 
     public getArrayLabelsOfDomain(dn: string[]) {

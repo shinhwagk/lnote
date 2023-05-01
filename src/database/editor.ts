@@ -1,9 +1,8 @@
-import { statSync } from 'fs';
 import * as path from 'path';
 
 import { existsSync, mkdirpSync, moveSync } from 'fs-extra';
-import { pathSplit, section } from '../constants';
-import { tools, vfs } from '../helper';
+import { section } from '../constants';
+import { tools } from '../helper';
 import { GroupLables } from '../types';
 
 export interface IEditBase {
@@ -36,19 +35,19 @@ export interface IEditNoteData2 {
     gls: GroupLables,
 }
 
-export interface IEditNoteData extends IEditBase {
-    kind: 'EditNote';
-    immutable: {
-        nb: string,
-        nId: string,
-        groupLabels: GroupLables,
-        contents: string[]
-    },
-    editable: {
-        // delete: boolean,
-        groupLabels: GroupLables,
-        contents: string[]
-    }
+export interface IEditNoteData {
+    // delete: boolean,
+    nb: string,
+    id: string,
+    gls: GroupLables,
+    contents: string[]
+}
+
+export interface IEditNotesLabels {
+    // delete: boolean,
+    nb: string,
+    ids: string[],
+    gls: GroupLables,
 }
 
 export interface IEditNotesCommonGroupLabels extends IEditBase {
@@ -87,10 +86,13 @@ export interface IEditDomain extends IEditBase {
 }
 
 
+type IEditor = 'note' | 'notesgls' | 'domain';
+
 export class LEditor {
     public readonly editDir: string;
-    public readonly editorFile: string;
+    // public readonly editorFile: string;
     public readonly editArchiveDir: string;
+    public curEditor: IEditor = 'note';
 
     constructor(
         private readonly dir: string
@@ -98,114 +100,124 @@ export class LEditor {
         this.editDir = path.join(this.dir, '.editor');
         existsSync(this.editDir) || mkdirpSync(this.editDir);
 
-        this.editorFile = path.join(this.editDir, `${section}@editor.yml`);
-        existsSync(this.editorFile) || vfs.writeFileSync(this.editorFile, '');
+        // this.editorFile = path.join(this.editDir, `${section}@editor.yml`);
+        // existsSync(this.editorFile) || vfs.writeFileSync(this.editorFile, '');
 
         this.editArchiveDir = path.join(this.editDir, 'archives');
         existsSync(this.editArchiveDir) || mkdirpSync(this.editArchiveDir);
     }
 
-    public getEditorFile = () => this.editorFile;
+    // public getEditorFile = () => this.editorFile;
 
-    public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
+    // public getEditorObj = () => tools.readYamlSync(this.editorFile) as IEditBase;
 
-    public getEditorFile1 = () => path.join(this.editDir, `${section}-editnote.yml`);
+    public getEditorFile = () => path.join(this.editDir, `${section}-${this.curEditor}.yml`);
 
-    public getEditorFile2 = () => path.join(this.editDir, `${section}-editnotesgls.yml`);
+    public checkEditorFile = () => existsSync(this.getEditorFile());
 
-    public createNoteEditorFile1(nb: string, id: string, contents: string[], gls: GroupLables) {
+    public createNoteEditor(nb: string, id: string, gls: GroupLables, contents: string[]) {
         const ed: IEditNoteData1 = {
             nb: nb,
             id: id,
             gls: gls,
             contents: contents
         };
-        tools.writeYamlSync(this.getEditorFile1(), ed);
+        tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
-    public createNotesLabelsEditor(nb: string, ids: string[], gls: GroupLables) {
+    public createNotesGroupLabelsEditor(ps: { nb: string, ids: string[], gls: GroupLables }) {
         const ed: IEditNoteData2 = {
-            nb: nb,
-            ids: ids,
+            nb: ps.nb,
+            ids: ps.ids,
+            gls: ps.gls
+        };
+        tools.writeYamlSync(this.getEditorFile(), ed);
+    }
+
+    public createDomainEditor(dn: string[], gls?: GroupLables) {
+        const ed = gls ? {
+            dn: dn,
+            name: dn[dn.length - 1],
             gls: gls
-        };
-        tools.writeYamlSync(this.getEditorFile2(), ed);
+        } : {
+            dn: dn,
+            name: dn[dn.length - 1]
+        }
+        tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
-    public createNoteEditorFile(nb: string, nId: string, contents: string[], gl: GroupLables) {
-        const ed: IEditNoteData = {
-            kind: 'EditNote',
-            immutable: {
-                nb: nb,
-                nId: nId,
-                groupLabels: gl,
-                contents: contents
-            },
-            editable: {
-                // delete: false,
-                groupLabels: gl,
-                contents: contents,
-            }
-        };
-        tools.writeYamlSync(this.editorFile, ed);
-    }
+    // public createNoteEditorFile(nb: string, nId: string, contents: string[], gl: GroupLables) {
+    //     const ed: IEditNoteData = {
+    //         kind: 'EditNote',
+    //         immutable: {
+    //             nb: nb,
+    //             nId: nId,
+    //             groupLabels: gl,
+    //             contents: contents
+    //         },
+    //         editable: {
+    //             // delete: false,
+    //             groupLabels: gl,
+    //             contents: contents,
+    //         }
+    //     };
+    //     tools.writeYamlSync(this.editorFile, ed);
+    // }
 
-    public createDomainEditorFile(domainNode: string[], notes: boolean, gl: GroupLables) {
-        const ed: IEditDomain = {
-            kind: 'EditDomain',
-            immutable: {
-                nbName: domainNode[0],
-                domainNode: domainNode.join(pathSplit),
-                notes: notes,
-                commonGroupLabels: gl
-            },
-            editable: {
-                // delete: {
-                //     notes: false,
-                //     domainNode: false
-                // },
-                domainName: domainNode[domainNode.length - 1],
-                commonGroupLabels: gl
-            }
-        };
-        tools.writeYamlSync(this.editorFile, ed);
-    }
+    // public createDomainEditorFile(domainNode: string[], notes: boolean, gl: GroupLables) {
+    //     const ed: IEditDomain = {
+    //         kind: 'EditDomain',
+    //         immutable: {
+    //             nbName: domainNode[0],
+    //             domainNode: domainNode.join(pathSplit),
+    //             notes: notes,
+    //             commonGroupLabels: gl
+    //         },
+    //         editable: {
+    //             // delete: {
+    //             //     notes: false,
+    //             //     domainNode: false
+    //             // },
+    //             domainName: domainNode[domainNode.length - 1],
+    //             commonGroupLabels: gl
+    //         }
+    //     };
+    //     tools.writeYamlSync(this.editorFile, ed);
+    // }
 
-    public createNotesSetGroupLabelsEditorFile(domainNode: string[], dgl: GroupLables, gl: GroupLables) {
-        const ed = {
-            kind: 'EditCommonGroupLabels',
-            immutable: {
-                nbName: domainNode[0],
-                domainNode: domainNode.join(pathSplit),
-                domainGroupLabes: dgl,
-                commonGroupLabels: gl
-            },
-            editable: {
-                commonGroupLabels: gl
-            }
-        };
-        tools.writeYamlSync(this.editorFile, ed);
-    }
+    // public createNotesSetGroupLabelsEditorFile(domainNode: string[], dgl: GroupLables, gl: GroupLables) {
+    //     const ed = {
+    //         kind: 'EditCommonGroupLabels',
+    //         immutable: {
+    //             nbName: domainNode[0],
+    //             domainNode: domainNode.join(pathSplit),
+    //             domainGroupLabes: dgl,
+    //             commonGroupLabels: gl
+    //         },
+    //         editable: {
+    //             commonGroupLabels: gl
+    //         }
+    //     };
+    //     tools.writeYamlSync(this.editorFile, ed);
+    // }
 
-    public checkEditorCleaned() {
-        return statSync(this.editorFile).size === 0;
-    }
+    // public checkEditorCleaned() {
+    //     return statSync(this.editorFile).size === 0;
+    // }
 
-    public archiveEditor(editorFile: string) {
+    public archiveEditor() {
         const ts = tools.formatDate(new Date());
-        const e: IEditBase = tools.readYamlSync(this.editorFile);
-        const k = e.kind.toLocaleLowerCase();
-        const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
-        moveSync(this.editorFile, archiveFile);
+        const archiveFile = path.join(this.editArchiveDir, `${ts}.${this.curEditor}.yml`);
+        moveSync(this.getEditorFile(), archiveFile);
     }
 
-    public archiveEditor1(editorFile: string) {
-        const ts = tools.formatDate(new Date());
-        const e: IEditBase = tools.readYamlSync(this.editorFile);
-        const k = e.kind.toLocaleLowerCase();
-        const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
-        moveSync(editorFile, archiveFile);
-    }
+    // public archiveEditor1(editorFile: string) {
+    //     const ts = tools.formatDate(new Date());
+    //     const e: IEditBase = tools.readYamlSync(this.editorFile);
+    //     const k = e.kind.toLocaleLowerCase();
+    //     const archiveFile = path.join(this.editArchiveDir, `${ts}.${k}.yml`);
+    //     moveSync(editorFile, archiveFile);
+    // }
 
 
 }

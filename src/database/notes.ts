@@ -4,7 +4,7 @@ import {
     existsSync
 } from 'fs-extra';
 
-import { vfs } from '../helper';
+import { tools, vfs } from '../helper';
 import { LNote } from './note';
 
 import { ArrayLabels, GroupLables, INBNote } from '../types';
@@ -140,11 +140,17 @@ export class LNotes {
         return LNote.get(this.nb, this.dir, nId, this.notesCache.get(nId)!);
     }
 
-    public getNIdsByArrayLabels(labels: ArrayLabels): string[] {
-        return labels.map(l => [...this.notesGroupedByLabelCache.get(l) || []]).flatMap(i => i);
+    public getIdsByAls(als: ArrayLabels): string[] {
+        const ids = [];
+        for (const [nId, n] of this.notesCache.entries()) {
+            if (tools.issubset(als, LNote.get(this.nb, this.dir, nId, n).getAls())) {
+                ids.push(nId);
+            }
+        }
+        return ids;
     }
 
-    public getNIdsByStrictArrayLabels(als: ArrayLabels): string[] {
+    public getidsByStrictAls(als: ArrayLabels): string[] {
         const ids = [];
         for (const [nId, n] of this.notesCache.entries()) {
             if (als.sort().join() === groupLabel2ArrayLabels(n.gls).sort().join()) {
@@ -155,7 +161,7 @@ export class LNotes {
     }
 
     public getNotesByArrayLabels(al: ArrayLabels, strict: boolean) {
-        const ids = strict ? this.getNIdsByStrictArrayLabels(al) : this.getNIdsByArrayLabels(al);
+        const ids = strict ? this.getidsByStrictAls(al) : this.getIdsByAls(al);
         return Array.from(new Set<string>(ids)).sort().map(nId => this.getNoteById(nId));
     }
 
@@ -173,13 +179,13 @@ export class LNotes {
 
     public addCache(nId: string) {
         const n = this.getNoteById(nId);
-        n.getDataArrayLabels().forEach(l => this.notesGroupedByLabelCache.get(l)?.add(nId));
+        n.getAls().forEach(l => this.notesGroupedByLabelCache.get(l)?.add(nId));
     }
 
     public deleteCache(nId: string) {
         // [...this.notesGroupedByLabelCache.values()].forEach(ids => ids.delete(nId));
         this.getNoteById(nId)
-            .getDataArrayLabels()
+            .getAls()
             .forEach(l => this.notesGroupedByLabelCache.get(l)?.delete(nId));
     }
 

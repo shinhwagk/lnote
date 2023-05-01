@@ -36,7 +36,7 @@ export class VNBDomain {
     //     return objectPath.get(this.domainCache, [...domainNode, '.gls']);
     // }
 
-    public deleteDomain(domainNode: string[]): void {
+    public remove(domainNode: string[]): void {
         if (domainNode.length === 0) {
             return;
         }
@@ -59,7 +59,7 @@ export class VNBDomain {
     public moveDomain(oldDomainNode: string[], newDomainNode: string[]) {
         const domain = this.getDomain(oldDomainNode);
         objectPath.set(this.domainCache, newDomainNode, domain);
-        this.deleteDomain(oldDomainNode);
+        this.remove(oldDomainNode);
         this.permanent();
     }
 

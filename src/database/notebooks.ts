@@ -1,14 +1,14 @@
 import * as path from 'path';
 
 import {
-    existsSync, mkdirpSync, readdirSync, statSync
+    existsSync, mkdirpSync, readdirSync, removeSync, statSync
 } from 'fs-extra';
 
 import { LNote } from './note';
 import { LNotebook } from './notebook';
-import { IEditBase, IEditNoteData, IEditNoteData1, LEditor } from './editor';
+import { IEditNoteData1, LEditor } from './editor';
 import { tools } from '../helper';
-import { ArrayLabels } from '../types';
+import { ArrayLabels, GroupLables, NoteId } from '../types';
 import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
 
 export class LNotebooks {
@@ -23,7 +23,7 @@ export class LNotebooks {
 
         const s = (new Date()).getTime();
         this.refresh();
-        console.log(`cache notebooks success, time: ${new Date().getTime() - s} ms.`);
+        console.log(`lnotes: cache notebooks success, time: ${new Date().getTime() - s} ms.`);
     }
 
     public refresh(nb: string | undefined = undefined): void {
@@ -53,6 +53,11 @@ export class LNotebooks {
 
     public create(nb: string) {
         this.cache(nb);
+    }
+
+    public remove(nb: string) {
+        this.nbs.delete(nb);
+        removeSync(path.join(this.getDir(nb)));
     }
 
     private getDir(nb: string) {
@@ -133,42 +138,76 @@ export class LNotebooks {
      * edit
      * 
      */
-    public processEditorNote() {
-        const en = tools.readYamlSync(this.getEditorFile1()) as IEditNoteData1;
+
+    public processEditor() {
+        console.log(this.editor.curEditor, 'noteslabels11');
+        switch (this.editor.curEditor) {
+            case 'note':
+                this.processEditNote();
+                break;
+            case 'notesgls':
+                this.processEditNotesGroupLabels();
+                break;
+            case 'domain':
+                this.processEditDomain();
+                break;
+            default:
+                console.log("non.");
+        }
+    }
+
+    // public processEditEnv() {
+    //     const eb: IEditBase = this.editor.getEditorObj();
+    //     if (eb.kind === 'EditNote') {
+    //         this.processEditNote(eb);
+    //     } else if (eb.kind === 'EditCommonGroupLabels') {
+    //         // this.processEditCommonGroupLabels(eb);
+    //     } else if (eb.kind === 'EditDomain') {
+    //         // this.processEditDomain(eb);
+    //     }
+    //     // else if (eb.kind === 'EditNoteDelete') {
+    //     //     this.processEditNoteDelete(eb)
+    //     // }
+    //     else {
+    //         return;
+    //     }
+    //     // this.editor.archiveEditor();
+    // }
+
+    private processEditNote() {
+        const en = tools.readYamlSync(this.getEditorFile()) as IEditNoteData1;
         const lnb = this.get(en.nb);
         const n = lnb.getNoteById(en.id);
         // n.getNoteById(eo.immutable.nId);
         n.updateDataContents(en.contents);
         n.updateDataGroupLabels(en.gls);
         lnb.getln().permanent();
+        // const eo = eb;
+        // const lnb = this.get(eo.immutable.nb);
+        // const n = lnb.getNoteById(eo.immutable.nId);
+        // // n.getNoteById(eo.immutable.nId);
+        // n.updateDataContents(eo.editable.contents);
+        // n.updateDataGroupLabels(eo.editable.groupLabels);
+        // lnb.getln().permanent();
     }
 
-    public processEditEnv() {
-        const eb: IEditBase = this.editor.getEditorObj();
-        if (eb.kind === 'EditNote') {
-            this.processEditNote(eb);
-        } else if (eb.kind === 'EditCommonGroupLabels') {
-            // this.processEditCommonGroupLabels(eb);
-        } else if (eb.kind === 'EditDomain') {
-            // this.processEditDomain(eb);
+    private processEditNotesGroupLabels() {
+        const e = tools.readYamlSync(this.getEditorFile()) as { ids: NoteId[], gls: GroupLables };
+        const als = groupLabel2ArrayLabels(e.gls);
+        const nb = als[0].split('->')[1];
+        for (const id of e.ids) {
+            this.get(nb).getNoteById(id).updateDataGroupLabels(e.gls);
         }
-        // else if (eb.kind === 'EditNoteDelete') {
-        //     this.processEditNoteDelete(eb)
-        // }
-        else {
-            return;
-        }
-        // this.editor.archiveEditor();
+        this.get(nb).getln().permanent();
     }
 
-    private processEditNote(eb: IEditBase) {
-        const eo = eb as IEditNoteData;
-        const lnb = this.get(eo.immutable.nb);
-        const n = lnb.getNoteById(eo.immutable.nId);
-        // n.getNoteById(eo.immutable.nId);
-        n.updateDataContents(eo.editable.contents);
-        n.updateDataGroupLabels(eo.editable.groupLabels);
-        lnb.getln().permanent();
+    private processEditDomain() {
+        const e = tools.readYamlSync(this.getEditorFile()) as { dn: string[], name: string, gls?: GroupLables };
+        if (e.gls) {
+            this.get(e.dn[0]).setGlsOfDomain(e.dn, e.name, e.gls);
+        } else {
+            this.get(e.dn[0]).deleteDomainNotes(e.dn);
+        }
     }
 
     // private processEditCommonGroupLabels(eb: IEditBase) {
@@ -200,13 +239,14 @@ export class LNotebooks {
     //     eo.editable.delete && this.notes.deleteNote(eo.immutable.nId)
     // }
 
-    public checkEditorCleaned() {
-        return this.editor.checkEditorCleaned();
-    }
+    // public checkEditorCleaned() {
+    //     return this.editor.checkEditorCleaned();
+    // }
 
-    public createNoteEditor(nb: string, nId: string) {
-        const nd = this.get(nb).getNoteById(nId).getData();
-        this.editor.createNoteEditorFile1(nb, nId, nd.contents, nd.gls);
+    public createNoteEditor(nb: string, id: NoteId) {
+        this.editor.curEditor = 'note';
+        const nd = this.get(nb).getNoteById(id).getData();
+        this.editor.createNoteEditor(nb, id, nd.gls, nd.contents);
         // if (nId !== '0') {
 
         //     return;
@@ -219,12 +259,22 @@ export class LNotebooks {
         // }
     }
 
-    public createNotesLabelsEditor(als: ArrayLabels) {
+    public createNotesGroupLabelsEditor(als: ArrayLabels) {
         const nbl = als.filter(al => al.startsWith('##nb->'));
+        this.editor.curEditor = 'notesgls';
         if (nbl.length >= 1) {
             const nb = nbl[0].split('->')[1];
             const notes = this.get(nb).getNotesByArrayLabels(als, true);
-            this.editor.createNotesLabelsEditor(nb, notes.map(n => n.getId()), arrayLabels2GroupLabel(als));
+            this.editor.createNotesGroupLabelsEditor({ nb: nb, ids: notes.map(n => n.getId()), gls: arrayLabels2GroupLabel(als) });
+        }
+    }
+
+    public createDomainEditor(dn: string[]) {
+        this.editor.curEditor = 'domain';
+        if (this.get(dn[0]).checkDomainIsNotes(dn)) {
+            this.editor.createDomainEditor(dn, this.get(dn[0]).getGroupLabelOfDomain(dn));
+        } else {
+            this.editor.createDomainEditor(dn, undefined)
         }
     }
 
@@ -250,15 +300,10 @@ export class LNotebooks {
     //     this.editor.archiveEditor();
     // }
 
+
     public getEditorFile() {
         return this.editor.getEditorFile();
     }
 
-    public getEditorFile1() {
-        return this.editor.getEditorFile1();
-    }
 
-    public getEditorFile2() {
-        return this.editor.getEditorFile2();
-    }
 }

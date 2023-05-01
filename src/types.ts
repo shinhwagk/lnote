@@ -7,5 +7,7 @@ export interface INBNote {
     mts: number;
     gls: GroupLables; // label group
 }
+
+export type NoteId = string;
 // export type NoteDataLabel = { [gl: string]: string[] };
 // export type EditKind = 'NotesSetCommonGroupLabels' | 'NoteData' | 'DomainGroupLabel' = 'DomainGroupLabel'

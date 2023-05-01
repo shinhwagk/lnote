@@ -62,9 +62,9 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     d_space.title = `id: ${note.id}, create date: ${note.cts}, modify date: ${note.mts}`;
     d_space.appendChild(elemSpaces(2));
 
-    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: note.id } })));
+    d_note_id.appendChild(elemIcon(d_cion, 'show doc', () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: note.id } })));
     d_note_id.appendChild(d_space);
-    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: note.id } })));
+    d_note_id.appendChild(elemIcon(f_cion, 'show files', () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: note.id } })));
 
     const d_note_content = document.createElement('div');
     d_note_content.className = 'grid-note-contents';
@@ -80,14 +80,14 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     const d_note_edit = document.createElement('div');
     d_note_edit.className = 'grid-note-edit';
 
-    d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
+    d_note_edit.appendChild(elemIcon('fa-pen', "edit note", () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
     if (!note.doc) {
         d_note_edit.appendChild(elemSpaces());
-        d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
+        d_note_edit.appendChild(elemIcon('fa-pen', 'create doc', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
     }
     if (!note.files) {
         d_note_edit.appendChild(elemSpaces());
-        d_note_edit.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
+        d_note_edit.appendChild(elemIcon('fa-pen', 'create files', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
     }
 
     d_note.appendChild(d_note_id);
@@ -96,10 +96,11 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     // return d_note;
 }
 
-function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
+function elemIcon(name: string, title: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
     const i = document.createElement('i');
     i.className = `fas ${name} fa-sm`;
     i.onclick = onclick;
+    i.title = title;
     return i;
 }
 
@@ -164,12 +165,12 @@ function readerCategory(fdom: Element, als: string[]) {
     // const _nb = gWebKind === 'domain' ? gs.dn[0] : als.filter(l => l.startsWith('##nb->'))[0]
 
     d_category_name.appendChild(elemSpaces());
-    d_category_name.appendChild(elemIcon('fa-plus',
+    d_category_name.appendChild(elemIcon('fa-plus', 'create note',
         () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } }))
     );
 
     d_category_name.appendChild(elemSpaces());
-    d_category_name.appendChild(elemIcon('fa-pen',
+    d_category_name.appendChild(elemIcon('fa-pen', 'edit labels',
         () => vscode.postMessage({ command: 'common-notes-labels-edit', params: { als: als } }))
     );
     // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
@@ -338,14 +339,14 @@ function readerDomainName() {
         // this.readerCategories(i.value);
     };
 
-    e_domain_name.textContent = `Domain: ${gs.dn.join(' / ')}`;
+    e_domain_name.textContent = `${gs.dn.join(' / ')}`;
     // const e_search = elemNotesSearch();
     e_title.appendChild(e_domain_name);
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
-    e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'domain-note-add', params: { dn: gs.dn } })));
+    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'domain-note-add', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(elemIcon('fa-pen', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
+    e_title.appendChild(elemIcon('fa-pen', 'edit labes', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(
     //     elemIcon('fa-search', () => {

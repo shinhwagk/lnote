@@ -4,7 +4,18 @@ import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { LNote } from '../database/note';
-import { IWebNote } from './types';
+import { ArrayLabels } from '../types';
+
+export interface IWebNote {
+    nb: string;
+    id: string;
+    contents: string[]
+    doc: boolean;
+    files: boolean;
+    cts: number;
+    mts: number;
+    labels: ArrayLabels
+}
 
 export class LWebPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -13,7 +24,7 @@ export class LWebPanelView {
     // only for domain web
     private domainNode: string[] = [];
 
-    public setDomainNode(dn: string[]) {
+    public setdn(dn: string[]) {
         this.domainNode = dn;
         return this;
     }
@@ -45,16 +56,19 @@ export class LWebPanelView {
     }
 
     async show(webKind: 'domain' | 'search'): Promise<void> {
+        console.log("show")
         if (this.panel === undefined) {
             this.initPanel();
         }
-        // this.panel!.webview.html = this.getWebviewContent();
         this.panel!.title = `lnote ${webKind}`;
 
         if (this.webKind !== webKind) {
             await this.panel!.webview.postMessage({ command: 'kind', data: { wk: webKind } });
+            this.webKind = webKind;
+        } else if (this.webKind === 'domain') {
+            await this.postDomain();
         }
-        this.webKind = webKind;
+
     }
 
     async refresh(): Promise<void> {
@@ -71,7 +85,7 @@ export class LWebPanelView {
                 const _n = n.getData();
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
-                const als = n.getDataArrayLabels();
+                const als = n.getAls();
                 return {
                     nb: n.getnb(),
                     id: n.getId(),
@@ -96,6 +110,7 @@ export class LWebPanelView {
     private async postDomain() {
         const d = ext.lnbs.get(this.domainNode[0]);
         const dals = d.getArrayLabelsOfDomain(this.domainNode);
+        console.log(dals);
         const notes = d.getNotes(this.domainNode);
         await this.panel!.webview.postMessage({
             command: 'post-domain',
@@ -147,10 +162,13 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlNoteAdd(msg.params);
                         break;
                     case 'common-notes-labels-edit':
-                        ExtCmds.cmdHdlNotesLabelsEdit(msg.params);
+                        ExtCmds.cmdHdlNotesGroupLabelsEdit(msg.params);
                         break;
                     case 'domain-note-add':
                         ExtCmds.cmdHdlDomainNoteAdd(msg.params);
+                        break;
+                    case 'domain-labels-edit':
+                        ExtCmds.cmdHdlDomainGroupLabelsEdit(msg.params);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);

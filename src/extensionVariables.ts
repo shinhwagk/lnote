@@ -73,10 +73,10 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
       // if (ext.vnNotebookSet === undefined) { return; }
       if (
         ext.lnbs
-        && existsSync(ext.lnbs.getEditorFile1())
-        && ext.lnbs.getEditorFile() === e.fileName
+        && ext.lnbs.editor.checkEditorFile()
+        // && ext.lnbs.getEditorFile() === e.fileName
       ) {
-        ext.lnbs.editor.archiveEditor(ext.lnbs.getEditorFile1());
+        ext.lnbs.editor.archiveEditor();
         // ext.gs.nb.processEditEnv();
         // if (!ext.gs.nb.checkEditorCleaned()) {
         //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
@@ -101,33 +101,15 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument(async () => {
       if (
-        ext.lnbs && existsSync(ext.lnbs.getEditorFile1())
+        ext.lnbs && ext.lnbs.editor.checkEditorFile()
       ) {
         try {
-          ext.lnbs.processEditorNote();
+          ext.lnbs.processEditor();
         } catch (e) {
           window.showErrorMessage(`${e}`);
           return;
         }
         ext.lwebPanelView.refresh();
-        // if (ext.lwebPanelView.getKind() === 'domain') {
-        //   ext.domainPanelView.show();
-        // } else if (ext.lwebPanelView.getKind() === 'search') {
-
-        // }
-        // ext.lnbs.editor.archiveEditor();
-        // const fileName = path.basename(f.uri.fsPath);
-        // if (fileName.endsWith('.yaml')) {
-        //   const [nId,] = fileName.split('.');
-        //   const enote = tools.readYamlSync(f.uri.fsPath);
-        //   // ext.gs.nb.updateNote(nId, enote.contents, enote.labels);
-        //   const n = ext.gs.nb.getNoteById(nId);
-        //   n.updateDataContents(enote.contents);
-        //   n.updateLabels(enote.labels);
-        //   // const note = ext.gs.nbNotes.getNoteByid(nId)
-        //   // ext.notesPanelView.postNote({ nId: nId, ...note });
-        //   await ext.notesPanelView.postData();
-        // }
       }
     })
   );
