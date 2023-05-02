@@ -1,11 +1,12 @@
 // import * as path from 'path';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHash } from 'crypto';
 import { readFileSync } from 'fs';
 
 import * as fse from 'fs-extra';
 import * as yaml from 'yaml';
 
-import { pathSplit } from './constants';
+import { jointMark, pathSplit } from './constants';
+import { ArrayLabels, GroupLables } from './types';
 
 export namespace vfs {
   const encoding = 'utf-8';
@@ -106,10 +107,62 @@ export namespace tools {
   //     {} as GroupLables
   //   );
   // }
+
+
+
+  export function checkFileSame(f1: string, f2: string) {
+    const fc1 = vfs.readFileSync(f1);
+    const fc2 = vfs.readFileSync(f2);
+    const fs1 = createHash('sha256').update(fc1).digest('hex');
+    const fs2 = createHash('sha256').update(fc2).digest('hex');
+    return fs1 === fs2
+  }
 }
 
 export namespace debug {
   export function print(message?: any, ...optionalParams: any[]) {
     console.log(message, optionalParams);
   }
+}
+
+
+/**
+ * grouplabels:
+ * {
+ *   common: ["label1", "labels"]
+ * }
+ * 
+ * arraylabels:
+ * ["common->labels", "common->labels"]
+ */
+export function arrayLabels2GroupLabels(al: ArrayLabels): GroupLables {
+  const tmpgl: { [g: string]: Set<string> } = {};
+  for (const label of al) {
+    const [g, l] = label.split(jointMark);
+    if (g in tmpgl) {
+      tmpgl[g].add(l);
+    } else {
+      tmpgl[g] = new Set([l]);
+    }
+  }
+  return Object.fromEntries(Object.entries(tmpgl)
+    .map((v) =>
+      [v[0], Array.from(v[1])]
+    ));
+}
+
+/**
+* grouplabels:
+* {
+*   common: ["label1", "labels"]
+* }
+*/
+export function groupLabels2ArrayLabels(gls: GroupLables): ArrayLabels {
+  const labels = new Set<string>();
+  for (const [g, ls] of Object.entries(gls)) {
+    for (const l of ls) {
+      labels.add(`${g}${jointMark}${l}`);
+    }
+  }
+  return Array.from(labels);
 }

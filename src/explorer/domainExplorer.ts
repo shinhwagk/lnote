@@ -1,29 +1,26 @@
 import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
+import { jointMark, nbGroup } from '../constants';
 
 import { ext } from '../extensionVariables';
 import { tools } from '../helper';
+import { DomainNode } from '../types';
 
-export type DomainNode = string;
+
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);
   const nb = ext.lnbs.get(domainNode[0]);
-  const isNotes = nb.isNotesOfDomain(domainNode);
-  const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
-  const notesNumberOfDomain = isNotes ? "notes" : '';//isNotes
+  const isNotes = nb.getld().isNotes(domainNode);
+  // const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
+  const notesNumberOfDomain = isNotes ? nb.getNotesOfDomain(domainNode, true).length : '-';//isNotes
   // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
   // : 0; // domain['.notes'].length;
 
   const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-  item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain} `;
-  item.collapsibleState = nb.getChildrenNameOfDomain(domainNode).length >= 1 ? 1 : 0;
-  // if (domainNode.length === 1) {
-  //   item.command = {
-  //     arguments: [dn],
-  //     command: 'lnote.domain.pin.level.0',
-  //     title: 'Show Vscode Note'
-  //   };
-  // } else 
+  // item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain}`;
+  item.description = `${notesNumberOfDomain}`;
+  item.collapsibleState = nb.getld().getChildrenNamesOfDomain(domainNode).length >= 1 ? 1 : 0;
+
   if (isNotes) {
     item.command = {
       arguments: [dn],
@@ -36,6 +33,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
 
   if (domainNode.length === 1) {
     item.contextValue = item.contextValue ? `${item.contextValue}-notebook` : 'notebook';
+    item.description = nb.getln().getNotesByAls([`${nbGroup}${jointMark}${domainNode[0]}`]).length.toString();
   }
   return item;
 }
@@ -58,7 +56,8 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     } else {
       const domainNode = tools.splitDomaiNode(element);
       return ext.lnbs.get(domainNode[0])
-        .getChildrenNameOfDomain(domainNode)
+        .getld()
+        .getChildrenNamesOfDomain(domainNode)
         .sort()
         .map((name) => tools.joinDomainNode(domainNode.concat(name)));
     }

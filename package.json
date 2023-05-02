@@ -91,9 +91,14 @@
                     "group": "0_domain"
                 },
                 {
-                    "command": "lnote.domain.remove",
+                    "command": "lnote.domain.rename",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
+                },
+                {
+                    "command": "lnote.domain.remove",
+                    "when": "view == domainExplorer",
+                    "group": "4_domain"
                 },
                 {
                     "command": "lnote.domain.notes.create",
@@ -139,6 +144,10 @@
             {
                 "command": "lnote.domain.remove",
                 "title": "Remove"
+            },
+            {
+                "command": "lnote.domain.rename",
+                "title": "Rename"
             },
             {
                 "command": "lnote.domain.refresh",

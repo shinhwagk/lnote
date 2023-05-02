@@ -2,6 +2,10 @@ export type ArrayLabel = string; // exp: "group->label"
 export type ArrayLabels = ArrayLabel[];
 export type GroupLables = { [g: string]: string[] };
 
+export type DomainNode = string;
+export type DomainNodeSplit = string[];
+
+// used note permanent
 export interface INBNote {
     contents: string[];
     cts: number;

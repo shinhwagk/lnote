@@ -1,1 +1,1 @@
-{"@test":{"ccc":{}}}
+{"@test":{"ccc":{".gls":{"domain":["@test","ccc"],"##nb":["@test"]}},"abc1":{".gls":{"domain":["@test","abc"],"##nb":["@test"]},"xxx":{".gls":{"domain":["@test","abc","xxx"],"##nb":["@test"]}}}}}

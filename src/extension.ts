@@ -34,7 +34,7 @@ export async function activate(context: ExtensionContext) {
    ext.registerCommand('lnote.domain.create', ExtCmds.cmdHdlDomainCreate);
    ext.registerCommand('lnote.domain.pin', ExtCmds.cmdHdlDomainPin);
    ext.registerCommand('lnote.domain.remove', ExtCmds.cmdHdlDomainRemove);
-   // ext.registerCommand('lnote.domain.remove', ExtCmds.cmdHdlDomainRemove);
+   ext.registerCommand('lnote.domain.rename', ExtCmds.cmdHdlDomainRename);
    ext.registerCommand('lnote.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
    ext.registerCommand('lnote.domain.search', ExtCmds.cmdHdlNotebookSearch);
    ext.registerCommand('lnote.domain.refresh', ExtCmds.cmdHdlDomainRefresh);

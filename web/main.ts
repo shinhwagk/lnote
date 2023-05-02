@@ -8,6 +8,7 @@ declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
 type GroupLables = { [gl: string]: string[] };
+const jointMark = '->';
 
 const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 

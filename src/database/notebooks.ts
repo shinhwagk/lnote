@@ -7,9 +7,8 @@ import {
 import { LNote } from './note';
 import { LNotebook } from './notebook';
 import { IEditNoteData1, LEditor } from './editor';
-import { tools } from '../helper';
+import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools } from '../helper';
 import { ArrayLabels, GroupLables, NoteId } from '../types';
-import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
 import { jointMark, nbGroup } from '../constants';
 
 export class LNotebooks {
@@ -77,7 +76,7 @@ export class LNotebooks {
         return Array.from(this.nbs.entries()).map(([n, nb]) => {
             if (keywords.includes(n)) {
                 const _kws = keywords.filter(kw => kw !== n);
-                return nb.search(_kws);
+                return nb.getln().search(_kws);
             }
             return [];
         }).flatMap(n => n);
@@ -149,7 +148,7 @@ export class LNotebooks {
             case 'notesgls':
                 this.processEditNotesGroupLabels();
                 break;
-            case 'domain':
+            case 'domaingls':
                 this.processEditDomain();
                 break;
             default:
@@ -157,30 +156,13 @@ export class LNotebooks {
         }
     }
 
-    // public processEditEnv() {
-    //     const eb: IEditBase = this.editor.getEditorObj();
-    //     if (eb.kind === 'EditNote') {
-    //         this.processEditNote(eb);
-    //     } else if (eb.kind === 'EditCommonGroupLabels') {
-    //         // this.processEditCommonGroupLabels(eb);
-    //     } else if (eb.kind === 'EditDomain') {
-    //         // this.processEditDomain(eb);
-    //     }
-    //     // else if (eb.kind === 'EditNoteDelete') {
-    //     //     this.processEditNoteDelete(eb)
-    //     // }
-    //     else {
-    //         return;
-    //     }
-    //     // this.editor.archiveEditor();
-    // }
-
     private processEditNote() {
         const en = tools.readYamlSync(this.getEditorFile()) as IEditNoteData1;
         const lnb = this.get(en.nb);
         const n = lnb.getNoteById(en.id);
         n.updateContents(en.contents);
         n.updateGroupLabels(en.gls);
+        n.updateMts();
         lnb.getln().permanent();
     }
 
@@ -195,37 +177,37 @@ export class LNotebooks {
     }
 
     private processEditDomain() {
-        const e = tools.readYamlSync(this.getEditorFile()) as { dn: string[], name: string, gls?: GroupLables };
+        const e = tools.readYamlSync(this.editor.getEditorFile()) as { dn: string[], gls?: GroupLables };
         if (e.gls) {
-            this.get(e.dn[0]).setGroupLabelsOfDomain(e.dn, e.name, e.gls);
+            this.get(e.dn[0]).getld().updateGroupLabels(e.dn, e.gls);
         } else {
-            this.get(e.dn[0]).removeNotesOfDomain(e.dn);
+            this.get(e.dn[0]).getld().deleteDomainNotes(e.dn);
         }
+        this.cache(e.dn[0]);
     }
 
     public createNoteEditor(nb: string, id: NoteId) {
-        this.editor.curEditor = 'note';
         const nd = this.get(nb).getNoteById(id);
         this.editor.createNoteEditor(nb, id, nd.getGls(), nd.getContents());
     }
 
     public createNotesGroupLabelsEditor(als: ArrayLabels) {
-        const nbl = als.filter(al => al.startsWith(`${nbGroup}${jointMark}'`));
-        this.editor.curEditor = 'notesgls';
+        const nbl = als.filter(al => al.startsWith(`${nbGroup}${jointMark}`));
+        if (this.editor.trySetEditor('notesgls')) {
+            return;
+        }
         if (nbl.length >= 1) {
             const nb = nbl[0].split(jointMark)[1];
-            const notes = this.get(nb).getNotesByArrayLabels(als, true);
-            this.editor.createNotesGroupLabelsEditor({ nb: nb, ids: notes.map(n => n.getId()), gls: arrayLabels2GroupLabel(als) });
+            const notes = this.get(nb).getln().getNotesByAls(als, true);
+            this.editor.createNotesGlsEditor({ nb: nb, ids: notes.map(n => n.getId()), gls: arrayLabels2GroupLabels(als) });
         }
     }
 
-    public createDomainEditor(dn: string[]) {
-        this.editor.curEditor = 'domain';
-        if (this.get(dn[0]).isNotesOfDomain(dn)) {
-            this.editor.createDomainEditor(dn, this.get(dn[0]).getGroupLabelsOfDomain(dn));
-        } else {
-            this.editor.createDomainEditor(dn, undefined);
+    public createDomainGlsEditor(dn: string[]) {
+        if (this.editor.trySetEditor('domaingls')) {
+            return;
         }
+        this.editor.createDomainEditor(dn, this.get(dn[0]).getld().getGroupLabels(dn));
     }
 
     // public createDomainEditor(domainNode: string[]) {

@@ -1,26 +1,9 @@
 import * as path from 'path';
 
-import { existsSync, mkdirpSync, moveSync, removeSync } from 'fs-extra';
+import { existsSync, mkdirpSync, removeSync } from 'fs-extra';
 import { section } from '../constants';
-import { tools } from '../helper';
+import { tools, vfs } from '../helper';
 import { GroupLables } from '../types';
-
-export interface IEditBase {
-    kind: 'EditCommonGroupLabels' | 'EditNote' | 'EditNoteDelete' | 'EditDomain' | 'None';
-}
-
-// export interface IEditDeleteNote extends IEditBase {
-//     kind: 'EditNoteDelete';
-//     immutable: {
-//         nbName: string,
-//         nId: string,
-//         groupLabels: GroupLables,
-//         contents: string[]
-//     },
-//     editable: {
-//         delete: boolean
-//     }
-// }
 
 export interface IEditNoteData1 {
     nb: string,
@@ -50,43 +33,7 @@ export interface IEditNotesLabels {
     gls: GroupLables,
 }
 
-export interface IEditNotesCommonGroupLabels extends IEditBase {
-    kind: 'EditCommonGroupLabels';
-    immutable: {
-        nBName: string,
-        domainNode: string[],
-        domainGroupLabes: GroupLables
-        commonGroupLabels: GroupLables
-    },
-    editable: {
-        commonGroupLabels: GroupLables
-    }
-
-}
-
-export interface IEditDomain extends IEditBase {
-    kind: 'EditDomain';
-    immutable: {
-        nbName: string,
-        domainNode: string,
-        notes: boolean,
-        commonGroupLabels: GroupLables
-    },
-    editable: {
-        // delete: {
-        //     notes: boolean,
-        //     domainNode: boolean
-        // }
-        domainName: string,
-        commonGroupLabels: GroupLables,
-        orderBy?: {
-            notesGroupLabels?: GroupLables
-        }
-    }
-}
-
-
-type IEditor = 'note' | 'notesgls' | 'domain';
+type IEditor = 'note' | 'notesgls' | 'domaingls';
 
 export class LEditor {
     public readonly editDir: string;
@@ -109,6 +56,11 @@ export class LEditor {
 
     public checkEditorFile = () => existsSync(this.getEditorFile());
 
+    public trySetEditor(ekind: IEditor) {
+        this.curEditor = ekind;
+        return this.checkEditorFile();
+    }
+
     public createNoteEditor(nb: string, id: string, gls: GroupLables, contents: string[]) {
         const ed: IEditNoteData1 = {
             nb: nb,
@@ -120,7 +72,7 @@ export class LEditor {
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
-    public createNotesGroupLabelsEditor(ps: { nb: string, ids: string[], gls: GroupLables }) {
+    public createNotesGlsEditor(ps: { nb: string, ids: string[], gls: GroupLables }) {
         const ed: IEditNoteData2 = {
             nb: ps.nb,
             ids: ps.ids,
@@ -131,25 +83,24 @@ export class LEditor {
     }
 
     public createDomainEditor(dn: string[], gls?: GroupLables) {
-        const ed = gls ? {
+        const ed = {
             dn: dn,
-            name: dn[dn.length - 1],
             gls: gls
-        } : {
-            dn: dn,
-            name: dn[dn.length - 1]
         };
         tools.writeYamlSync(this.getEditorPreviousVersionFile(), ed);
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
     public archiveEditor() {
-        const aef = {
-            source: tools.readYamlSync(this.getEditorPreviousVersionFile()),
-            target: tools.readYamlSync(this.getEditorFile())
-        };
-
+        if (tools.checkFileSame(this.getEditorPreviousVersionFile(), this.getEditorFile())) {
+            return;
+        }
         const ts = tools.formatDate(new Date());
+        const aef = {
+            previous: tools.readYamlSync(this.getEditorPreviousVersionFile()),
+            modified: tools.readYamlSync(this.getEditorFile()),
+            timestamp: ts
+        };
         const archiveFile = path.join(this.editArchiveDir, `${ts}.${this.curEditor}.yml`);
         tools.writeYamlSync(archiveFile, aef);
         removeSync(this.getEditorFile());

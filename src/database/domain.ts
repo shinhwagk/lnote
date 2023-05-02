@@ -2,9 +2,9 @@ import { existsSync } from 'fs-extra';
 import objectPath from 'object-path';
 import * as path from 'path';
 
-import { vfs } from '../helper';
-import { GroupLables } from '../types';
-import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
+import { arrayLabels2GroupLabels, vfs } from '../helper';
+import { ArrayLabels, GroupLables } from '../types';
+import { groupLabels2ArrayLabels } from '../helper';
 
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -30,6 +30,10 @@ export class VNBDomain {
 
     public getGroupLabels(domainNode: string[]): GroupLables {
         return objectPath.get(this.domainCache, [...domainNode, '.gls']);
+    }
+
+    public getArrayLabels(domainNode: string[]): ArrayLabels {
+        return groupLabels2ArrayLabels(this.getGroupLabels(domainNode));
     }
 
     // public getArrayLabel(domainNode: string[]): GroupLables {
@@ -75,7 +79,7 @@ export class VNBDomain {
     }
 
     public updateGroupLabels(domainNode: string[], gls: GroupLables) {
-        objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabel(groupLabels2ArrayLabels(gls)));
+        objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabels(groupLabels2ArrayLabels(gls)));
         this.permanent();
     }
 
@@ -88,7 +92,7 @@ export class VNBDomain {
         return objectPath.has(this.domainCache, [...domainNode, '.gls']);
     }
 
-    public getChildrenNameOfDomain(domainNode: string[] = []): string[] {
+    public getChildrenNamesOfDomain(domainNode: string[] = []): string[] {
         return Object.keys(this.getDomain(domainNode)).filter(f => f !== '.gls');
     }
 

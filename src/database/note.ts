@@ -5,8 +5,8 @@ import {
 } from 'fs-extra';
 
 import { vfs } from '../helper';
-import { ArrayLabels, GroupLables } from '../types';
-import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
+import { ArrayLabels, GroupLables, INBNote } from '../types';
+import { arrayLabels2GroupLabels, groupLabels2ArrayLabels } from '../helper';
 
 export class LNote {
     filesPath: string;
@@ -36,30 +36,21 @@ export class LNote {
         // this.nbName = nbName
     }
 
-    static get(
-        nb: string,
-        dir: string,
-        id: string,
-        contents: string[],
-        cts: number,
-        mts: number,
-        gls: GroupLables,
-    ) {
-        return new LNote(nb, dir, id, contents, cts, mts, gls);
-    }
-
-    getnb() {
+    public getnb() {
         return this.nb;
     }
 
-    getId() {
+    public getId() {
         return this.id;
     }
 
-    toJSON() {
+    // important !!!
+    public toJSON(): INBNote {
         return {
-            contents: this.getContents()
-
+            cts: this.cts,
+            contents: this.contents,
+            mts: this.mts,
+            gls: this.gls
         };
     }
 
@@ -83,11 +74,11 @@ export class LNote {
         return this.gls;
     }
 
-    public removeDataArrayLabels(...al: ArrayLabels) {
+    public removeArrayLabels(...al: ArrayLabels) {
         this.updateDataArrayLabels(this.getAls().filter(l => !al.includes(l)));
     }
 
-    public addDataArrayLabels(...al: ArrayLabels) {
+    public addArrayLabels(...al: ArrayLabels) {
         this.updateDataArrayLabels(this.getAls().concat(al));
     }
 
@@ -107,12 +98,12 @@ export class LNote {
         return existsSync(this.filesPath);
     }
 
-    public addDoc() {
+    public createDoc() {
         mkdirpSync(this.docPath);
         vfs.writeFileSync(this.docMainFile, '');
     }
 
-    public addFiles() {
+    public createFiles() {
         mkdirpSync(this.filesPath);
     }
 
@@ -121,8 +112,8 @@ export class LNote {
         this.mts = (new Date()).getTime();
     }
 
-    public updateDataMts(mts: number) {
-        this.mts = mts;
+    public updateMts() {
+        this.mts = (new Date()).getTime();
     }
 
     public updateGroupLabels(gls: GroupLables) {
@@ -130,7 +121,7 @@ export class LNote {
     }
 
     public updateDataArrayLabels(als: ArrayLabels) {
-        this.gls = arrayLabels2GroupLabel(als);
+        this.gls = arrayLabels2GroupLabels(als);
     }
 
     public getDocMainFile() {

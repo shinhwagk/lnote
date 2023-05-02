@@ -4,7 +4,7 @@ import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { LNote } from '../database/note';
-import { ArrayLabels } from '../types';
+import { ArrayLabels, DomainNodeSplit } from '../types';
 
 export interface IWebNote {
     nb: string;
@@ -22,10 +22,10 @@ export class LWebPanelView {
     private keywords = new Set<string>();
     private webKind: 'domain' | 'search' = 'domain';
     // only for domain web
-    private domainNode: string[] = [];
+    private dns: DomainNodeSplit = [];
 
     public setdn(dn: string[]) {
-        this.domainNode = dn;
+        this.dns = dn;
         return this;
     }
 
@@ -56,7 +56,6 @@ export class LWebPanelView {
     }
 
     async show(webKind: 'domain' | 'search'): Promise<void> {
-        console.log("show")
         if (this.panel === undefined) {
             this.initPanel();
         }
@@ -107,13 +106,12 @@ export class LWebPanelView {
     }
 
     private async postDomain() {
-        const d = ext.lnbs.get(this.domainNode[0]);
-        const dals = d.getArrayLabelsOfDomain(this.domainNode);
-        console.log(dals);
-        const notes = d.getNotesOfDomain(this.domainNode);
+        const d = ext.lnbs.get(this.dns[0]);
+        const dals = d.getld().getArrayLabels(this.dns);
+        const notes = d.getNotesOfDomain(this.dns);
         await this.panel!.webview.postMessage({
             command: 'post-domain',
-            data: { dn: this.domainNode, dals: dals, notes: this.convertForWebStruct(notes) }
+            data: { dn: this.dns, dals: dals, notes: this.convertForWebStruct(notes) }
         });
     }
 
@@ -167,7 +165,7 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlDomainNoteAdd(msg.params);
                         break;
                     case 'domain-labels-edit':
-                        ExtCmds.cmdHdlDomainGroupLabelsEdit(msg.params);
+                        ExtCmds.cmdHdlDomainGlsEdit(msg.params);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
