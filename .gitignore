@@ -8,4 +8,5 @@
 /package-lock.json
 token
 test-notesdata
-!main.css
+!out/main.css
+!out/static

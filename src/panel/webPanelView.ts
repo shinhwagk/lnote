@@ -4,18 +4,10 @@ import { ext } from '../extensionVariables';
 import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { LNote } from '../database/note';
-import { ArrayLabels, DomainNodeSplit } from '../types';
+import { DomainNodeSplit } from '../types';
+import { IWebNote } from './types';
 
-export interface IWebNote {
-    nb: string;
-    id: string;
-    contents: string[]
-    doc: boolean;
-    files: boolean;
-    cts: number;
-    mts: number;
-    als: ArrayLabels
-}
+
 
 export class LWebPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -154,6 +146,10 @@ export class LWebPanelView {
                         break;
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
+                        break;
+                    case 'note-remove':
+                        console.log("asdfdf", msg.params);
+                        ExtCmds.cmdHdlNoteRemove(msg.params);
                         break;
                     case 'common-notes-note-add':
                         ExtCmds.cmdHdlNoteAdd(msg.params);

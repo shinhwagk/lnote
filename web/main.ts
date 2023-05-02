@@ -82,14 +82,27 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     d_note_edit.className = 'grid-note-edit';
 
     d_note_edit.appendChild(elemIcon('fa-pen', "edit note", () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
-    if (!note.doc) {
+    d_note_edit.appendChild(elemSpaces());
+
+    // const d_note_edit_extend = document.createElement('div');
+    // d_note_edit_extend.className = 'grid-note-edit';
+
+    const d_note_edit_extend = elemIcon('fa-right-long', 'extend', () => {
+        document.getElementById("note-edit-extend")?.remove();
+        if (!note.doc) {
+            d_note_edit.appendChild(elemSpaces());
+            d_note_edit.appendChild(elemIcon('fa-file-circle-plus', 'create doc', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
+        }
+        if (!note.files) {
+            d_note_edit.appendChild(elemSpaces());
+            d_note_edit.appendChild(elemIcon('fa-folder-plus', 'create files', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
+        }
         d_note_edit.appendChild(elemSpaces());
-        d_note_edit.appendChild(elemIcon('fa-pen', 'create doc', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
-    }
-    if (!note.files) {
-        d_note_edit.appendChild(elemSpaces());
-        d_note_edit.appendChild(elemIcon('fa-pen', 'create files', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
-    }
+        d_note_edit.appendChild(elemIcon('fa-xmark', 'create files', () => vscode.postMessage({ command: 'note-remove', params: { nb: note.nb, id: note.id } })));
+
+    });
+    d_note_edit_extend.id = 'note-edit-extend';
+    d_note_edit.appendChild(d_note_edit_extend);
 
     d_note.appendChild(d_note_id);
     d_note.appendChild(d_note_content);

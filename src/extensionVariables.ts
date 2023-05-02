@@ -11,14 +11,13 @@ import { DomainExplorerProvider } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { vfs } from './helper';
 import { LWebPanelView } from './panel/webPanelView';
-import { DomainNode, DomainNodeSplit, NoteId } from './types';
+import { DomainNode, NoteId } from './types';
 // import { WebStatus } from './panel/web';
 
 export class GlobalState {
   id: NoteId = '';
   nb: string | undefined; //notebook name
   lnb: LNotebook | undefined;
-  domainNode: DomainNodeSplit = [];
 
   update(nb: string) {
     this.nb = nb;
@@ -32,7 +31,7 @@ export namespace ext {
   export let domainTreeView: TreeView<DomainNode>;
   export let filesProvider: FilesExplorerProvider;
   export let lwebPanelView: LWebPanelView;
-  export let notebookPath: string;
+  export let notespath: string;
   export let shortcutsFilePath: string;
   export const gs: GlobalState = new GlobalState();
   export let lnbs: LNotebooks;
@@ -54,13 +53,13 @@ export function listenConfiguration(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidChangeConfiguration(async (e: ConfigurationChangeEvent) => {
       if (e.affectsConfiguration(section)) {
-        const notebookPath = workspace.getConfiguration(section).get<string>('notespath');
-        if (notebookPath === undefined || notebookPath === '') {
+        const notespath = workspace.getConfiguration(section).get<string>('notespath');
+        if (notespath === undefined || notespath === '') {
           window.showInformationMessage('configuretion "notespath" wrong.');
           return;
         }
-        ext.notebookPath = notebookPath;
-        ext.lnbs = new LNotebooks(ext.notebookPath);
+        ext.notespath = notespath;
+        ext.lnbs = new LNotebooks(ext.notespath);
         initializeExtensionVariables(ctx);
         ext.domainProvider.refresh();
       }
@@ -71,28 +70,14 @@ export function listenConfiguration(ctx: ExtensionContext) {
 export function listenEditorFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
-      // if (ext.vnNotebookSet === undefined) { return; }
+      console.log(e.fileName, ext.lnbs.editor.getEditorFile())
       if (
         ext.lnbs
+        && e.fileName === ext.lnbs.editor.getEditorFile()
         && ext.lnbs.editor.checkEditorFile()
-        // && ext.lnbs.getEditorFile() === e.fileName
       ) {
         ext.lnbs.editor.archiveEditor();
-        // ext.gs.nb.processEditEnv();
-        // if (!ext.gs.nb.checkEditorCleaned()) {
-        //   window.showErrorMessage(`The editing environment is not cleaned up.\n File: ${ext.gs.nb.getEditorFile()}`);
-        //   // commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.gs.nb.getEditorFile()));
-        //   return
-        // }
-        // ext.gs.nb.clearEditor();
 
-        // ext.gs.nb.deleteEditEnv();
-        // const fileName = path.basename(f.uri.fsPath);
-        // if (fileName.endsWith('.yaml')) {
-        //   const [nId,] = fileName.split('.');
-        //   ext.gs.nbNotes.removeEditNoteEnv(nId);
-        //   // ext.notesPanelView.postNote(ext.gs.nbNotes.getNoteByid(nId));
-        // }
       }
     })
   );
@@ -100,9 +85,11 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
 
 export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
-    workspace.onDidSaveTextDocument(async () => {
+    workspace.onDidSaveTextDocument((e) => {
       if (
-        ext.lnbs && ext.lnbs.editor.checkEditorFile()
+        ext.lnbs
+        && e.fileName === ext.lnbs.editor.getEditorFile()
+        && ext.lnbs.editor.checkEditorFile()
       ) {
         try {
           ext.lnbs.processEditor();
@@ -117,7 +104,7 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
 }
 
 export function listenVscodeWindowChange() {
-  const vscodeWindowCheckFile = path.join(ext.notebookPath, 'windowid');
+  const vscodeWindowCheckFile = path.join(ext.notespath, 'windowid');
   if (!existsSync(vscodeWindowCheckFile)) {
     vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId);
   }
@@ -138,8 +125,8 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
   if (notespath === undefined || notespath === '') {
     return;
   }
-  ext.notebookPath = notespath.endsWith('/') ? notespath : notespath + '/';
-  ext.lnbs = new LNotebooks(ext.notebookPath);
+  ext.notespath = notespath.endsWith('/') ? notespath : notespath + '/';
+  ext.lnbs = new LNotebooks(ext.notespath);
   // ext.gs = new GlobalState();
 
   if (!ext.lwebPanelView) {
@@ -155,10 +142,6 @@ export function initializeExtensionVariables(ctx: ExtensionContext): void {
     ext.filesProvider = new FilesExplorerProvider();
     window.createTreeView('filesExplorer', { treeDataProvider: ext.filesProvider });
   }
-
-  // if (!ext.notesPanelView) {
-  //     ext.notesPanelView = new NotesPanelView();
-  // }
 
   // if (!ext.domainProvider || !ext.domainTreeView) {
   //     ext.domainProvider = new DomainExplorerProvider(ext.domainDB);

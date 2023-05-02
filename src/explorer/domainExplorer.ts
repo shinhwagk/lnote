@@ -1,11 +1,9 @@
-import { TreeDataProvider, EventEmitter, Event, TreeItem, ProviderResult } from 'vscode';
+import { Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem } from 'vscode';
 import { jointMark, nbGroup } from '../constants';
 
 import { ext } from '../extensionVariables';
 import { tools } from '../helper';
 import { DomainNode } from '../types';
-
-
 
 function getTreeItem(dn: DomainNode): TreeItem {
   const domainNode = tools.splitDomaiNode(dn);

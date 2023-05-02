@@ -68,7 +68,7 @@ export class LNotes {
         this.cacheNotesByGls();
     }
 
-    public deleteNote(id: NoteId) {
+    public delete(id: NoteId) {
         this.getById(id)
             .getAls()
             .forEach(l => this.notesGlsCache.get(l)?.delete(id));
