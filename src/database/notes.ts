@@ -69,14 +69,14 @@ export class LNotes {
     }
 
     public deleteNote(id: NoteId) {
-        this.getNoteById(id)
+        this.getById(id)
             .getAls()
             .forEach(l => this.notesGlsCache.get(l)?.delete(id));
         this.notesCache.delete(id);
         this.permanent();
     }
 
-    public getNoteById(id: NoteId): LNote {
+    public getById(id: NoteId): LNote {
         return this.notesCache.get(id)!;
     }
 
@@ -102,7 +102,7 @@ export class LNotes {
 
     public getNotesByAls(als: ArrayLabels, strict: boolean = false) {
         const ids = strict ? this.getIdsByStrictAls(als) : this.getIdsByAls(als);
-        return Array.from(new Set<string>(ids)).sort().map(nId => this.getNoteById(nId));
+        return Array.from(new Set<string>(ids)).sort().map(nId => this.getById(nId));
     }
 
     public permanent() {

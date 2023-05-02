@@ -92,19 +92,17 @@ export class LEditor {
     }
 
     public archiveEditor() {
-        if (tools.checkFileSame(this.getEditorPreviousVersionFile(), this.getEditorFile())) {
-            return;
+        if (!tools.checkFileSame(this.getEditorPreviousVersionFile(), this.getEditorFile())) {
+            const ts = tools.formatDate(new Date());
+            const aef = {
+                previous: tools.readYamlSync(this.getEditorPreviousVersionFile()),
+                modified: tools.readYamlSync(this.getEditorFile()),
+                timestamp: ts
+            };
+            const archiveFile = path.join(this.editArchiveDir, `${ts}.${this.curEditor}.yml`);
+            tools.writeYamlSync(archiveFile, aef);
         }
-        const ts = tools.formatDate(new Date());
-        const aef = {
-            previous: tools.readYamlSync(this.getEditorPreviousVersionFile()),
-            modified: tools.readYamlSync(this.getEditorFile()),
-            timestamp: ts
-        };
-        const archiveFile = path.join(this.editArchiveDir, `${ts}.${this.curEditor}.yml`);
-        tools.writeYamlSync(archiveFile, aef);
         removeSync(this.getEditorFile());
         removeSync(this.getEditorPreviousVersionFile());
     }
-
 }

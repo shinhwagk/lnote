@@ -2,9 +2,7 @@
 import {
     existsSync, mkdirpSync
 } from 'fs-extra';
-import { arrayLabels2GroupLabels, groupLabels2ArrayLabels } from '../helper';
 
-import { ArrayLabels, GroupLables } from '../types';
 import { VNBDomain as LDomain } from './domain';
 
 import { LNote } from './note';
@@ -30,42 +28,6 @@ export class LNotebook {
 
     public getld() {
         return this.ldomain;
-    }
-
-    /**
-     * 
-     * notes & note
-     * 
-     */
-
-    public craeteNotes(dn: string[]) {
-        const gls = { "domain": dn };
-        this.addNoteByGls(gls);
-        this.ldomain.updateGroupLabels(dn, gls);
-        // public craeteNotes(dn: string[],) {
-        //     this.addNote(["common->default"]);
-        //     this.domain.updateGroupLabels(dn, { 'common': ['default'] });
-        // }
-    }
-
-    public addNoteByGls(gls: GroupLables) {
-        this.lnotes.create(gls);
-    }
-
-    public addNoteByAls(als: ArrayLabels) {
-        this.addNoteByGls(arrayLabels2GroupLabels(als));
-    }
-
-    public deleteNote(nId: string) {
-        this.lnotes.deleteNote(nId);
-    }
-
-    public getNoteById(nId: string) {
-        return this.lnotes.getNoteById(nId);
-    }
-
-    public getNodeFilePath(nId: string) {
-        return this.lnotes.getNoteById(nId).getFilesPath();
     }
 
     /**

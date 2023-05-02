@@ -159,7 +159,7 @@ export class LNotebooks {
     private processEditNote() {
         const en = tools.readYamlSync(this.getEditorFile()) as IEditNoteData1;
         const lnb = this.get(en.nb);
-        const n = lnb.getNoteById(en.id);
+        const n = lnb.getln().getById(en.id);
         n.updateContents(en.contents);
         n.updateGroupLabels(en.gls);
         n.updateMts();
@@ -171,7 +171,7 @@ export class LNotebooks {
         const als = groupLabels2ArrayLabels(e.gls);
         const nb = als[0].split(jointMark)[1];
         for (const id of e.ids) {
-            this.get(nb).getNoteById(id).updateGroupLabels(e.gls);
+            this.get(nb).getln().getById(id).updateGroupLabels(e.gls);
         }
         this.get(nb).getln().permanent();
     }
@@ -187,7 +187,7 @@ export class LNotebooks {
     }
 
     public createNoteEditor(nb: string, id: NoteId) {
-        const nd = this.get(nb).getNoteById(id);
+        const nd = this.get(nb).getln().getById(id);
         this.editor.createNoteEditor(nb, id, nd.getGls(), nd.getContents());
     }
 

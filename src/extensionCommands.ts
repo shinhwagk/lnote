@@ -22,8 +22,8 @@ export namespace ExtCmds {
     }
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
-    const dna = dn.split(pathSplit);
-    ext.lnbs.get(dna[0]).craeteNotes(dna);
+    const dns = dn.split(pathSplit);
+    ext.lnbs.get(dns[0]).getld().updateGroupLabels(dns, { 'domain': dns });
     // ext.gs.update(dn.split(pathSplit)[0]);
     // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
     // if (labelsOfDomain === undefined) { return; };
@@ -31,7 +31,7 @@ export namespace ExtCmds {
     // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
     // ext.vnNotebookSet.refresh(ext.gs.nbName);
     ext.domainProvider.refresh(dn);
-    ext.lwebPanelView.setdn(dna).show('domain');
+    ext.lwebPanelView.setdn(dns).show('domain');
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
     const name: string | undefined = await window.showInputBox();
@@ -71,7 +71,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteFilesCreate(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
-    nb.getNoteById(params.nId).createFiles();
+    nb.getln().getById(params.nId).createFiles();
     // ext.notesPanelView.parseDomain().showNotesPlanView();
     await cmdHdlNoteFilesOpen(params);
   }
@@ -80,10 +80,10 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNBNoteDocCreate(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
-    nb.getNoteById(params.nId).createDoc();
+    nb.getln().getById(params.nId).createDoc();
     await commands.executeCommand(
       'editExplorer.openFileResource',
-      Uri.file(nb.getNoteById(params.nId).getDocMainFile())
+      Uri.file(nb.getln().getById(params.nId).getDocMainFile())
     );
     await ext.lwebPanelView.refresh();
   }
@@ -128,7 +128,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteDocShow(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
-    const docMainfFile = nb.getNoteById(params.nId).getDocMainFile();
+    const docMainfFile = nb.getln().getById(params.nId).getDocMainFile();
     // // Uri.file(ext.domainDB.noteDB.getDocIndexFile(nId, 'main.md')
     // if (basename(readmeFile).split('.')[1] === 'md') {
     const uri = Uri.file(docMainfFile);
@@ -139,7 +139,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteFilesOpen(params: { nb: string, nId: string }) {
     ext.gs.update(params.nb);
-    ext.gs.nId = params.nId;
+    ext.gs.id = params.nId;
     ext.filesProvider.refresh();
     await ext.setContext(ctxFilesExplorer, true);
   }
@@ -148,7 +148,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlFilesOpen() {
     if (ext.gs.lnb) {
-      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.lnb.getNoteById(ext.gs.nId).getFilesPath()), true);
+      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.lnb.getln().getById(ext.gs.id).getFilesPath()), true);
     }
   }
   export async function cmdHdlFilesRefresh() {

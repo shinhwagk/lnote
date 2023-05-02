@@ -7,17 +7,18 @@ import {
 import { section } from './constants';
 import { LNotebook } from './database/notebook';
 import { LNotebooks } from './database/notebooks';
-import { DomainExplorerProvider, DomainNode } from './explorer/domainExplorer';
+import { DomainExplorerProvider } from './explorer/domainExplorer';
 import { FilesExplorerProvider } from './explorer/filesExplorer';
 import { vfs } from './helper';
 import { LWebPanelView } from './panel/webPanelView';
+import { DomainNode, DomainNodeSplit, NoteId } from './types';
 // import { WebStatus } from './panel/web';
 
 export class GlobalState {
-  nId: string = '';
+  id: NoteId = '';
   nb: string | undefined; //notebook name
   lnb: LNotebook | undefined;
-  domainNode: string[] = [];
+  domainNode: DomainNodeSplit = [];
 
   update(nb: string) {
     this.nb = nb;

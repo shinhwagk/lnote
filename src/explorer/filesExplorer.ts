@@ -20,7 +20,7 @@ export class FilesExplorerProvider implements TreeDataProvider<TreeItem> {
   async getChildren(element?: TreeItem): Promise<TreeItem[]> {
     const fPath: string | undefined = element
       ? element.resourceUri!.fsPath
-      : ext.gs.lnb?.getNodeFilePath(ext.gs.nId);
+      : ext.gs.lnb?.getln().getById(ext.gs.id).getFilesPath();
     if (!fPath) {
       return [];
     }
