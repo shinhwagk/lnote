@@ -53,9 +53,9 @@ export class DomainPanelView {
         const isDoc = n.checkDocExist();
         const isFiles = n.checkFilesExist();
         const _n = JSON.parse(JSON.stringify(n)); // clone obj
-        const alOfNote = n.getDataArrayLabels(); //.concat(ext.gs.nbName);
-        _n['labels'] = alOfNote;
-        return { nb: n.getnb(), nId: n.getId(), doc: isDoc, files: isFiles, labels: alOfNote, ..._n };
+        const als = n.getAls(); //.concat(ext.gs.nbName);
+        _n['labels'] = als;
+        return { nb: n.getnb(), nId: n.getId(), doc: isDoc, files: isFiles, labels: als, ..._n };
       });
   }
 
@@ -90,7 +90,7 @@ export class DomainPanelView {
       async (msg) => {
         switch (msg.command) {
           case 'get-data':
-            const notes = ext.lnbs.get(ext.gs.domainNode[0]).getNotes(ext.gs.domainNode);
+            const notes = ext.lnbs.get(ext.gs.domainNode[0]).getNotesOfDomain(ext.gs.domainNode);
             await this.postNotes(this.convertForWebStruct(notes));
             break;
           case 'web-update-labels':

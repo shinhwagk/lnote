@@ -14,7 +14,7 @@ export interface IWebNote {
     files: boolean;
     cts: number;
     mts: number;
-    labels: ArrayLabels
+    als: ArrayLabels
 }
 
 export class LWebPanelView {
@@ -82,19 +82,18 @@ export class LWebPanelView {
     private convertForWebStruct(notes: LNote[]): IWebNote[] {
         return notes
             .map(n => {
-                const _n = n.getData();
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
                 const als = n.getAls();
                 return {
-                    nb: n.getnb(),
-                    id: n.getId(),
+                    nb: n.nb,
+                    id: n.id,
                     doc: isDoc,
                     files: isFiles,
-                    labels: als,
-                    contents: _n.contents,
-                    mts: _n.mts,
-                    cts: _n.cts
+                    als: als,
+                    contents: n.contents,
+                    mts: n.mts,
+                    cts: n.cts
                 };
             });
     }
@@ -111,7 +110,7 @@ export class LWebPanelView {
         const d = ext.lnbs.get(this.domainNode[0]);
         const dals = d.getArrayLabelsOfDomain(this.domainNode);
         console.log(dals);
-        const notes = d.getNotes(this.domainNode);
+        const notes = d.getNotesOfDomain(this.domainNode);
         await this.panel!.webview.postMessage({
             command: 'post-domain',
             data: { dn: this.domainNode, dals: dals, notes: this.convertForWebStruct(notes) }

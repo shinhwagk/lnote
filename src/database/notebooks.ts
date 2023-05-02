@@ -9,7 +9,8 @@ import { LNotebook } from './notebook';
 import { IEditNoteData1, LEditor } from './editor';
 import { tools } from '../helper';
 import { ArrayLabels, GroupLables, NoteId } from '../types';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
+import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
+import { jointMark, nbGroup } from '../constants';
 
 export class LNotebooks {
     private readonly nbs = new Map<string, LNotebook>();
@@ -21,9 +22,9 @@ export class LNotebooks {
 
         this.editor = new LEditor(masterPath);
 
-        const s = (new Date()).getTime();
+        const _s = (new Date()).getTime();
         this.refresh();
-        console.log(`lnotes: cache notebooks success, time: ${new Date().getTime() - s} ms.`);
+        console.log(`lnotes: cache notebooks success, time: ${new Date().getTime() - _s} ms.`);
     }
 
     public refresh(nb: string | undefined = undefined): void {
@@ -178,25 +179,17 @@ export class LNotebooks {
         const en = tools.readYamlSync(this.getEditorFile()) as IEditNoteData1;
         const lnb = this.get(en.nb);
         const n = lnb.getNoteById(en.id);
-        // n.getNoteById(eo.immutable.nId);
-        n.updateDataContents(en.contents);
-        n.updateDataGroupLabels(en.gls);
+        n.updateContents(en.contents);
+        n.updateGroupLabels(en.gls);
         lnb.getln().permanent();
-        // const eo = eb;
-        // const lnb = this.get(eo.immutable.nb);
-        // const n = lnb.getNoteById(eo.immutable.nId);
-        // // n.getNoteById(eo.immutable.nId);
-        // n.updateDataContents(eo.editable.contents);
-        // n.updateDataGroupLabels(eo.editable.groupLabels);
-        // lnb.getln().permanent();
     }
 
     private processEditNotesGroupLabels() {
         const e = tools.readYamlSync(this.getEditorFile()) as { ids: NoteId[], gls: GroupLables };
-        const als = groupLabel2ArrayLabels(e.gls);
-        const nb = als[0].split('->')[1];
+        const als = groupLabels2ArrayLabels(e.gls);
+        const nb = als[0].split(jointMark)[1];
         for (const id of e.ids) {
-            this.get(nb).getNoteById(id).updateDataGroupLabels(e.gls);
+            this.get(nb).getNoteById(id).updateGroupLabels(e.gls);
         }
         this.get(nb).getln().permanent();
     }
@@ -204,66 +197,23 @@ export class LNotebooks {
     private processEditDomain() {
         const e = tools.readYamlSync(this.getEditorFile()) as { dn: string[], name: string, gls?: GroupLables };
         if (e.gls) {
-            this.get(e.dn[0]).setGlsOfDomain(e.dn, e.name, e.gls);
+            this.get(e.dn[0]).setGroupLabelsOfDomain(e.dn, e.name, e.gls);
         } else {
-            this.get(e.dn[0]).deleteDomainNotes(e.dn);
+            this.get(e.dn[0]).removeNotesOfDomain(e.dn);
         }
     }
 
-    // private processEditCommonGroupLabels(eb: IEditBase) {
-    //     const eo = eb as IEditNotesCommonGroupLabels;
-
-    //     const mcgl = groupLabel2ArrayLabels(eo.immutable.commonGroupLabels);
-    //     const ecgl = groupLabel2ArrayLabels(eo.editable.commonGroupLabels);
-    //     const dcgl = groupLabel2ArrayLabels(eo.immutable.domainGroupLabes);
-
-    //     const notes = this.notes.getNotesByArrayLabels(mcgl.concat(dcgl), true);
-    //     for (const n of notes) {
-    //         const nlabels = n.getDataArrayLabels().filter(l => !mcgl.includes(l)).concat(ecgl).concat(dcgl);
-    //         this.notes.reLabels(n.getId(), nlabels);
-    //     }
-    // }
-
-    // private processEditDomain(eb: IEditBase) {
-    //     const eo = eb as IEditDomain;
-    //     // if (eo.editable.delete.notes) {
-    //     //     this.domain.deleteDomainNotes(eo.immutable.domainNode.split(pathSplit));
-    //     // } else if (eo.editable.delete.domainNode) {
-    //     //     this.domain.deleteDomain(eo.immutable.domainNode.split(pathSplit));
-    //     // }
-    //     this.domain.updateGroupLabels(eo.immutable.domainNode.split(pathSplit), eo.editable.commonGroupLabels);
-    // }
-
-    // private processEditNoteDelete(eb: IEditBase) {
-    //     const eo = eb as IEditDeleteNote;
-    //     eo.editable.delete && this.notes.deleteNote(eo.immutable.nId)
-    // }
-
-    // public checkEditorCleaned() {
-    //     return this.editor.checkEditorCleaned();
-    // }
-
     public createNoteEditor(nb: string, id: NoteId) {
         this.editor.curEditor = 'note';
-        const nd = this.get(nb).getNoteById(id).getData();
-        this.editor.createNoteEditor(nb, id, nd.gls, nd.contents);
-        // if (nId !== '0') {
-
-        //     return;
-        // } else {
-        //     const _nId = tools.generateSixString();
-        //     this.notes.addNote(_nId, arrayLabels2GroupLabel(al));
-        //     const nd = this.notes.getNoteById(_nId).getData();
-        //     this.editor.createNoteEditorFile(_nId, nd.contents, nd.labels);
-        //     return;
-        // }
+        const nd = this.get(nb).getNoteById(id);
+        this.editor.createNoteEditor(nb, id, nd.getGls(), nd.getContents());
     }
 
     public createNotesGroupLabelsEditor(als: ArrayLabels) {
-        const nbl = als.filter(al => al.startsWith('##nb->'));
+        const nbl = als.filter(al => al.startsWith(`${nbGroup}${jointMark}'`));
         this.editor.curEditor = 'notesgls';
         if (nbl.length >= 1) {
-            const nb = nbl[0].split('->')[1];
+            const nb = nbl[0].split(jointMark)[1];
             const notes = this.get(nb).getNotesByArrayLabels(als, true);
             this.editor.createNotesGroupLabelsEditor({ nb: nb, ids: notes.map(n => n.getId()), gls: arrayLabels2GroupLabel(als) });
         }
@@ -271,10 +221,10 @@ export class LNotebooks {
 
     public createDomainEditor(dn: string[]) {
         this.editor.curEditor = 'domain';
-        if (this.get(dn[0]).checkDomainIsNotes(dn)) {
-            this.editor.createDomainEditor(dn, this.get(dn[0]).getGroupLabelOfDomain(dn));
+        if (this.get(dn[0]).isNotesOfDomain(dn)) {
+            this.editor.createDomainEditor(dn, this.get(dn[0]).getGroupLabelsOfDomain(dn));
         } else {
-            this.editor.createDomainEditor(dn, undefined)
+            this.editor.createDomainEditor(dn, undefined);
         }
     }
 

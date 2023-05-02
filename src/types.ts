@@ -1,5 +1,6 @@
-export type ArrayLabels = string[];
-export type GroupLables = { [gl: string]: string[] };
+export type ArrayLabel = string; // exp: "group->label"
+export type ArrayLabels = ArrayLabel[];
+export type GroupLables = { [g: string]: string[] };
 
 export interface INBNote {
     contents: string[];

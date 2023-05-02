@@ -249,7 +249,7 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
     const gl: { [g: string]: string[] } = {};
     let name = "";
     for (const l of labelsOfCategory) {
-        const [gname, label] = l.split('->');
+        const [gname, label] = l.split(jointMark);
         if (gname in gl) {
             gl[gname].push(label);
         } else {
@@ -425,7 +425,7 @@ function readerNotesLabels() {
             //         : _com1.includes(nl)
             //             ? 'checkedLabel'
             //             : 'unCheckedLabel';
-            group_label_dom.textContent = nl.split('->')[1];
+            group_label_dom.textContent = nl.split(jointMark)[1];
             group_label_dom.onclick = () => {
                 if (group_label_dom.className === 'unCheckedLabel') {
                     gs.checkedLabels.add(nl);
@@ -599,7 +599,7 @@ function processNotes() {
     for (const n of gs.notes) {
         n.labels.forEach(n => gs.allArrayLabels.add(n));
         for (const label of n.labels) {
-            const [g] = label.split('->');
+            const [g] = label.split(jointMark);
             if (gs.allGroupLabels.has(g)) {
                 gs.allGroupLabels.get(g)?.add(label);
             } else {

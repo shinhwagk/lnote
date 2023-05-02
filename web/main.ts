@@ -33,7 +33,7 @@ interface DataNote {
     files: boolean;
     cts: number;
     mts: number;
-    labels: string[];
+    als: string[];
     category: string;
 }
 
@@ -127,7 +127,7 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
     const gl: { [g: string]: string[] } = {};
     let name = "";
     for (const l of labelsOfCategory) {
-        const [gname, label] = l.split('->');
+        const [gname, label] = l.split(jointMark);
         if (gname in gl) {
             gl[gname].push(label);
         } else {
@@ -146,7 +146,7 @@ function readerCategory(fdom: Element, als: string[]) {
     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
     let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
 
-    const _notes = gs.notes.filter(n => intersection(n.labels, als).length === als.length);
+    const _notes = gs.notes.filter(n => intersection(n.als, als).length === als.length);
 
 
     // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
@@ -214,10 +214,10 @@ function readerCategories() {
     const labelsOfNotes = new Set<string>();
 
     if (gs.checkedLabels.size === 0) {
-        gs.notes.map(n => n.labels.sort().join('|||')).forEach(l => labelsOfNotes.add(l));
+        gs.notes.map(n => n.als.sort().join('|||')).forEach(l => labelsOfNotes.add(l));
     } else {
-        gs.notes.filter(n => intersection(n.labels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size)
-            .map(n => n.labels.sort().join('|||'))
+        gs.notes.filter(n => intersection(n.als, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size)
+            .map(n => n.als.sort().join('|||'))
             .forEach(l => labelsOfNotes.add(l));
     }
     // for (const note of gs.notes) {
@@ -248,13 +248,13 @@ function readerLabels() {
 
     for (const n of gs.notes) {
         if (gs.checkedLabels.size >= 1) {
-            if (intersection(n.labels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
-                n.labels.forEach(l => _ava.add(l));
-                _com.push(n.labels);
+            if (intersection(n.als, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
+                n.als.forEach(l => _ava.add(l));
+                _com.push(n.als);
             }
         } else {
             gs.allArrayLabels.forEach(l => _ava.add(l));
-            _com.push(n.labels);
+            _com.push(n.als);
         }
     }
     const _com1 = _com.length >= 1 ? _com.reduce((p, c) => p.filter(e => c.includes(e))) : [];
@@ -306,7 +306,7 @@ function readerLabels() {
             //         : _com1.includes(nl)
             //             ? 'checkedLabel'
             //             : 'unCheckedLabel';
-            group_label_dom.textContent = nl.split('->')[1];
+            group_label_dom.textContent = nl.split(jointMark)[1];
             group_label_dom.onclick = () => {
                 if (group_label_dom.className === 'unCheckedLabel') {
                     gs.checkedLabels.add(nl);
@@ -471,9 +471,9 @@ function processNotes() {
     gs.allGroupLabels.clear();
 
     for (const n of gs.notes) {
-        n.labels.forEach(n => gs.allArrayLabels.add(n));
-        for (const label of n.labels) {
-            const [g] = label.split('->');
+        n.als.forEach(n => gs.allArrayLabels.add(n));
+        for (const label of n.als) {
+            const [g] = label.split(jointMark);
             if (gs.allGroupLabels.has(g)) {
                 gs.allGroupLabels.get(g)?.add(label);
             } else {

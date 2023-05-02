@@ -3,12 +3,11 @@ import {
     existsSync, mkdirpSync
 } from 'fs-extra';
 
-import { tools } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
 import { VNBDomain as LDomain } from './domain';
 
 import { LNote } from './note';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels, LNotes } from './notes';
+import { arrayLabels2GroupLabel as arrayLabels2GroupLabels, groupLabels2ArrayLabels, LNotes } from './notes';
 
 export class LNotebook {
     private readonly ldomain: LDomain;
@@ -39,7 +38,7 @@ export class LNotebook {
 
     public craeteNotes(dn: string[]) {
         const gls = { "domain": dn };
-        this.addNote(gls);
+        this.addNoteByGls(gls);
         this.ldomain.updateGroupLabels(dn, gls);
         // public craeteNotes(dn: string[],) {
         //     this.addNote(["common->default"]);
@@ -47,13 +46,12 @@ export class LNotebook {
         // }
     }
 
-    public addNote(gl: GroupLables) {
-        const nId = tools.generateSixString();
-        this.lnotes.addNote(nId, gl);
+    public addNoteByGls(gls: GroupLables) {
+        this.lnotes.add(gls);
     }
-    public addNoteByAl(gl: ArrayLabels) {
-        const nId = tools.generateSixString();
-        this.lnotes.addNote(nId, arrayLabels2GroupLabel(gl));
+
+    public addNoteByAls(als: ArrayLabels) {
+        this.addNoteByGls(arrayLabels2GroupLabels(als));
     }
 
     public deleteNote(nId: string) {
@@ -77,16 +75,16 @@ export class LNotebook {
         return this.ldomain.getChildrenNameOfDomain(domainNode);
     }
 
-    public checkDomainIsNotes(domainNode: string[]) {
+    public isNotesOfDomain(domainNode: string[]) {
         return this.ldomain.isNotes(domainNode);
     }
 
-    public getDomainByNode(dn: string[]) {
+    public getDomainByDomainNode(dn: string[]) {
         return this.ldomain.getDomain(dn);
     }
 
     public addDomain(dn: string[]) {
-        this.ldomain.add(dn);
+        this.ldomain.create(dn);
     }
 
     public renameDomain(dn: string[], domainName: string) {
@@ -97,37 +95,36 @@ export class LNotebook {
         this.ldomain.remove(dn);
     }
 
-    public deleteDomainNotes(domainNode: string[]): void {
-        this.ldomain.deleteDomainNotes(domainNode)
+    public removeNotesOfDomain(domainNode: string[]): void {
+        this.ldomain.deleteDomainNotes(domainNode);
     }
 
-    public setGlsOfDomain(dn: string[], name: string, gls: GroupLables) {
+    public setGroupLabelsOfDomain(dn: string[], name: string, gls: GroupLables) {
         this.ldomain.updateGroupLabels(dn, gls);
         this.ldomain.renameDomain(dn, name);
     }
 
     public getArrayLabelsOfDomain(dn: string[]) {
-        return groupLabel2ArrayLabels(this.getGroupLabelOfDomain(dn));
+        return groupLabels2ArrayLabels(this.getGroupLabelsOfDomain(dn));
     }
 
-    public getGroupLabelOfDomain(dn: string[]) {
-        return this.ldomain.getGroupLabel(dn);
+    public getGroupLabelsOfDomain(dn: string[]) {
+        return this.ldomain.getGroupLabels(dn);
     }
 
     public search(keywords: string[]): LNote[] {
         const notes: LNote[] = [];
         const res = keywords.map(kw => new RegExp(kw));
-        for (const [nId, note] of this.lnotes.getCache().entries()) {
+        for (const note of this.lnotes.getCache().values()) {
             const contentOfNote = note.contents.concat(Object.values(note.gls).flatMap(l => l)).filter(c => c.length >= 1);
             if (res.filter(re => re.test(contentOfNote.join("   "))).length === keywords.length) {
-                // n.getData().labels['##nb'] = [n.getnb()];
-                notes.push(new LNote(this.nb, this.dir, nId, note));
+                notes.push(note);
             }
         }
         return notes;
     }
 
-    public getNotes(domainNode: string[]): LNote[] {
+    public getNotesOfDomain(domainNode: string[]): LNote[] {
         const al = this.getArrayLabelsOfDomain(domainNode);
         return this.getNotesByArrayLabels(al);
     }

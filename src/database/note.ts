@@ -5,8 +5,8 @@ import {
 } from 'fs-extra';
 
 import { vfs } from '../helper';
-import { ArrayLabels, GroupLables, INBNote } from '../types';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
+import { ArrayLabels, GroupLables } from '../types';
+import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
 
 export class LNote {
     filesPath: string;
@@ -17,24 +17,35 @@ export class LNote {
     // grouplabels: NoteDataGroupLabel
 
     constructor(
-        private readonly nb: string,
+        public readonly nb: string,
         private readonly dir: string,
-        private readonly nId: string,
-        private data: INBNote
+        public readonly id: string,
+        public contents: string[],
+        public readonly cts: number,
+        public mts: number,
+        public gls: GroupLables,
     ) {
-        this.filesPath = path.join(this.dir, "files", this.nId);
-        this.docPath = path.join(this.dir, "doc", this.nId);
+        this.filesPath = path.join(this.dir, "files", this.id);
+        this.docPath = path.join(this.dir, "doc", this.id);
         this.docMainFile = path.join(this.docPath, 'main.md');
+
+        this.contents = contents;
+        this.cts = cts;
+        this.mts = mts;
+        this.gls = gls;
         // this.nbName = nbName
     }
 
     static get(
-        nbName: string,
-        nbDir: string,
-        nId: string,
-        data: INBNote
+        nb: string,
+        dir: string,
+        id: string,
+        contents: string[],
+        cts: number,
+        mts: number,
+        gls: GroupLables,
     ) {
-        return new LNote(nbName, nbDir, nId, data);
+        return new LNote(nb, dir, id, contents, cts, mts, gls);
     }
 
     getnb() {
@@ -42,23 +53,34 @@ export class LNote {
     }
 
     getId() {
-        return this.nId;
+        return this.id;
     }
 
     toJSON() {
-        return this.data;
+        return {
+            contents: this.getContents()
+
+        };
     }
 
-    public getData() {
-        return this.data;
+    public getContents() {
+        return this.contents;
+    }
+
+    public getMts() {
+        return this.mts;
+    }
+
+    public getCts() {
+        return this.cts;
     }
 
     public getAls(): ArrayLabels {
-        return groupLabel2ArrayLabels(this.getData().gls).sort();
+        return groupLabels2ArrayLabels(this.gls).sort();
     }
 
     public getGls(): GroupLables {
-        return this.getData().gls;
+        return this.gls;
     }
 
     public removeDataArrayLabels(...al: ArrayLabels) {
@@ -68,8 +90,6 @@ export class LNote {
     public addDataArrayLabels(...al: ArrayLabels) {
         this.updateDataArrayLabels(this.getAls().concat(al));
     }
-
-    // public update()
 
     public removeDoc() {
         removeSync(this.docPath);
@@ -96,21 +116,21 @@ export class LNote {
         mkdirpSync(this.filesPath);
     }
 
-    public updateDataContents(contents: string[]) {
-        this.data.contents = contents;
-        this.data.mts = (new Date()).getTime();
+    public updateContents(contents: string[]) {
+        this.contents = contents;
+        this.mts = (new Date()).getTime();
     }
 
     public updateDataMts(mts: number) {
-        this.data.mts = mts;
+        this.mts = mts;
     }
 
-    public updateDataGroupLabels(gls: GroupLables) {
-        this.updateDataArrayLabels(groupLabel2ArrayLabels(gls));
+    public updateGroupLabels(gls: GroupLables) {
+        this.updateDataArrayLabels(groupLabels2ArrayLabels(gls));
     }
 
-    public updateDataArrayLabels(al: string[]) {
-        this.data.gls = arrayLabels2GroupLabel(al);
+    public updateDataArrayLabels(als: ArrayLabels) {
+        this.gls = arrayLabels2GroupLabel(als);
     }
 
     public getDocMainFile() {

@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { vfs } from '../helper';
 import { GroupLables } from '../types';
-import { arrayLabels2GroupLabel, groupLabel2ArrayLabels } from './notes';
+import { arrayLabels2GroupLabel, groupLabels2ArrayLabels } from './notes';
 
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -23,12 +23,12 @@ export class VNBDomain {
     ) {
         this.domainFile = path.join(this.dir, 'domains.json');
 
-        existsSync(this.domainFile) || this.add([this.nb]);
+        existsSync(this.domainFile) || this.create([this.nb]);
 
         this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);
     }
 
-    public getGroupLabel(domainNode: string[]): GroupLables {
+    public getGroupLabels(domainNode: string[]): GroupLables {
         return objectPath.get(this.domainCache, [...domainNode, '.gls']);
     }
 
@@ -69,13 +69,13 @@ export class VNBDomain {
     }
 
     // , labels: GroupLables = { 'common': [] }
-    public add(domainNode: string[]) {
+    public create(domainNode: string[]) {
         objectPath.set(this.domainCache, [...domainNode], {});
         this.permanent();
     }
 
     public updateGroupLabels(domainNode: string[], gls: GroupLables) {
-        objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabel(groupLabel2ArrayLabels(gls)));
+        objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabel(groupLabels2ArrayLabels(gls)));
         this.permanent();
     }
 

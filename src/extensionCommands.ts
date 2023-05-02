@@ -193,7 +193,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteAdd(params: { als: string[], nb: string }) {
     // const nb = ext.lnbs.get(params.nb);
-    ext.lnbs.get(params.nb as string).addNoteByAl(params.als);
+    ext.lnbs.get(params.nb as string).addNoteByAls(params.als);
     const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()];
     const nid = notes[notes.length - 1][0];
     console.log(params.nb, nid);
