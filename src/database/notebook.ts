@@ -1,6 +1,6 @@
 
 import {
-    existsSync, mkdirpSync, removeSync
+    existsSync, mkdirpSync, moveSync, removeSync
 } from 'fs-extra';
 
 import { VNBDomain as LDomain } from './domain';
@@ -28,10 +28,6 @@ export class LNotebook {
 
     public getld() {
         return this.ldomain;
-    }
-
-    public destroy() {
-        removeSync(this.dir);
     }
 
     /**

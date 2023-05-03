@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {
-    existsSync, mkdirpSync, readdirSync, statSync
+    existsSync, mkdirpSync, moveSync, readdirSync, statSync
 } from 'fs-extra';
 
 import { jointMark, nbGroup } from '../constants';
@@ -51,11 +51,15 @@ export class LNotebooks {
         this.nbs.set(nb, new LNotebook(nb, this.getDir(nb)));
     }
 
-    public create = (nb: string) => this.cache(nb);
+    public create = this.cache;
 
     public remove(nb: string) {
-        this.nbs.get(nb)?.destroy();
+        this.destroy(nb);
         this.nbs.delete(nb);
+    }
+
+    public destroy(nb: string) {
+        moveSync(this.getDir(nb), path.join(this.masterPath, '.trash', nb))
     }
 
     private getDir(nb: string) {

@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {
-    existsSync
+    existsSync, mkdirpSync, moveSync
 } from 'fs-extra';
 
 import { groupLabels2ArrayLabels, tools, vfs } from '../helper';
@@ -22,6 +22,7 @@ export class LNotes {
     private lastId = tools.generateSixString();
 
     private readonly notesFile: string;
+    private readonly trashDir: string;
 
     constructor(
         private readonly nb: string,
@@ -29,6 +30,9 @@ export class LNotes {
     ) {
         this.notesFile = path.join(this.dir, notesFileName);
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
+
+        this.trashDir = path.join(this.dir, '.trash');
+        existsSync(this.trashDir) || mkdirpSync(this.trashDir);
 
         this.cacheNotesById();
         this.cacheNotesByGls();
@@ -69,11 +73,25 @@ export class LNotes {
     }
 
     public delete(id: NoteId) {
-        this.getById(id)
-            .getAls()
-            .forEach(l => this.notesGlsCache.get(l)?.delete(id));
+        this.trash(id);
+
+        this.getById(id).getAls().forEach(l => this.notesGlsCache.get(l)?.delete(id));
         this.notesCache.delete(id);
         this.permanent();
+    }
+
+    private trash(id: NoteId) {
+        const n = this.getById(id);
+        const ts = tools.formatDate(new Date());
+        const noteTrashDir = path.join(this.trashDir, `${ts}-${id}`);
+        mkdirpSync(noteTrashDir);
+        vfs.writeJsonSync(path.join(noteTrashDir, 'n.json'), n);
+        if (n.checkDocExist()) {
+            moveSync(n.docPath, path.join(noteTrashDir, 'doc'), { overwrite: true });
+        }
+        if (n.checkFilesExist()) {
+            moveSync(n.filesPath, path.join(noteTrashDir, 'files'), { overwrite: true });
+        }
     }
 
     public getById(id: NoteId): LNote {

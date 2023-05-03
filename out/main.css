@@ -73,6 +73,10 @@ body {
 
 .grid-note-edit {
     text-align: center;
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.18);
+    border-left-style: dashed;
+    padding-left: 1px;
 }
 
 .grid-note-contents {
