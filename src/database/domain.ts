@@ -77,7 +77,7 @@ export class VNBDomain {
         this.permanent();
     }
 
-    public updateGroupLabels(domainNode: string[], gls: GroupLables) {
+    public updateGls(domainNode: string[], gls: GroupLables) {
         objectPath.set(this.domainCache, [...domainNode, '.gls'], arrayLabels2GroupLabels(groupLabels2ArrayLabels(gls)));
         this.permanent();
     }

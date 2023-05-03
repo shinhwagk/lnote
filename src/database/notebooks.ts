@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import {
+    copySync,
     existsSync, mkdirpSync, moveSync, readdirSync, statSync
 } from 'fs-extra';
 
@@ -36,9 +37,7 @@ export class LNotebooks {
     }
 
     private cacheAll() {
-        for (const nb of readdirSync(this.masterPath)
-            .filter(f => statSync(this.getDir(f)).isDirectory())
-            .filter(f => f !== '.editor')) {
+        for (const nb of this.getNames()) {
             try {
                 this.cache(nb);
             } catch (e) {
@@ -54,12 +53,13 @@ export class LNotebooks {
     public create = this.cache;
 
     public remove(nb: string) {
-        this.destroy(nb);
+        this.trash(nb);
         this.nbs.delete(nb);
     }
 
-    public destroy(nb: string) {
-        moveSync(this.getDir(nb), path.join(this.masterPath, '.trash', nb))
+    public trash(nb: string) {
+        const ts = tools.formatDate(new Date());
+        moveSync(this.getDir(nb), path.join(this.masterPath, '.trash', `${ts}-${nb}`), { overwrite: true });
     }
 
     private getDir(nb: string) {
@@ -70,8 +70,18 @@ export class LNotebooks {
         return this.nbs.get(nb)!;
     }
 
+    public rename(nb: string, nnb: string) {
+        if (!existsSync(this.getDir(nnb))) {
+            copySync(this.getDir(nb), this.getDir(nnb));
+            this.trash(nb);
+            this.cache(nnb);
+        }
+    }
+
     public getNames(): string[] {
-        return Array.from(this.nbs.keys());
+        return readdirSync(this.masterPath)
+            .filter(f => statSync(this.getDir(f)).isDirectory())
+            .filter(f => !['.editor', '.trash'].includes(f));
     }
 
     public search(keywords: string[]): LNote[] {
@@ -90,7 +100,6 @@ export class LNotebooks {
      * 
      */
     public processEditor() {
-        console.log(this.editor.curEditor, 'noteslabels11');
         switch (this.editor.curEditor) {
             case 'note':
                 this.processEditNote();
@@ -129,7 +138,7 @@ export class LNotebooks {
     private processEditDomain() {
         const e = tools.readYamlSync(this.editor.getEditorFile()) as { dn: string[], gls?: GroupLables };
         if (e.gls) {
-            this.get(e.dn[0]).getld().updateGroupLabels(e.dn, e.gls);
+            this.get(e.dn[0]).getld().updateGls(e.dn, e.gls);
         } else {
             this.get(e.dn[0]).getld().deleteDomainNotes(e.dn);
         }

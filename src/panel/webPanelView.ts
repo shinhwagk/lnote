@@ -61,6 +61,10 @@ export class LWebPanelView {
         }
     }
 
+    check() {
+        return this.panel?.visible
+    }
+
     async dispose() {
         await this.panel?.dispose();
     }

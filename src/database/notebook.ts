@@ -1,6 +1,6 @@
 
 import {
-    existsSync, mkdirpSync, moveSync, removeSync
+    existsSync, mkdirpSync
 } from 'fs-extra';
 
 import { VNBDomain as LDomain } from './domain';

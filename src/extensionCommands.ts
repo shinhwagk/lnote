@@ -23,13 +23,8 @@ export namespace ExtCmds {
   }
   export async function cmdHdlDomainNotesCreate(dn: DomainNode) {
     const dns = dn.split(pathSplit);
-    ext.lnbs.get(dns[0]).getld().updateGroupLabels(dns, { 'domain': dns });
-    // ext.gs.update(dn.split(pathSplit)[0]);
-    // const labelsOfDomain = await window.showInputBox({ value: ext.gs.domainNodeFormat.join(', ') });
-    // if (labelsOfDomain === undefined) { return; };
-    // const _l = labelsOfDomain.split(',').map(l => l.trim());
-    // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
-    // ext.vnNotebookSet.refresh(ext.gs.nbName);
+    ext.lnbs.get(dns[0]).getld().updateGls(dns, { 'domain': dns });
+    ext.lnbs.get(dns[0]).getln().create({ 'domain': dns });
     ext.domainProvider.refresh(dn);
     ext.lwebPanelView.setdn(dns).show('domain');
   }
@@ -89,14 +84,25 @@ export namespace ExtCmds {
     await ext.lwebPanelView.refresh();
   }
   export async function cmdHdlDomainRename(dn: DomainNode) {
-    const _dn = tools.splitDomaiNode(dn);
-    const orgName = _dn[_dn.length - 1];
-    const newName: string | undefined = await window.showInputBox({ value: orgName });
-    if (!newName || orgName === newName) { return; }
-    ext.lnbs.get(_dn[0]).getld().renameDomain(_dn, newName);
-    _dn[_dn.length - 1] = newName;
-    ext.lwebPanelView.setdn(_dn).show('domain');
-    ext.domainProvider.refresh(tools.joinDomainNode(_dn.slice(0, _dn.length - 1)));
+    const dns = tools.splitDomaiNode(dn);
+    const oname = dns[dns.length - 1];
+    const nname: string | undefined = await window.showInputBox({ value: oname });
+    if (!nname || oname === nname) { return; }
+
+    ext.lnbs.get(dns[0]).getld().renameDomain(dns, nname);
+    if (dns.length === 1) {
+      ext.lnbs.rename(dns[0], nname);
+    }
+
+    dns[dns.length - 1] = nname;
+
+    if (
+      ext.lwebPanelView.check()
+      && ext.lnbs.get(dns[0]).getNotesOfDomain(dns).length >= 1
+    ) {
+      ext.lwebPanelView.setdn(dns).show('domain');
+    }
+    ext.domainProvider.refresh(tools.joinDomainNode(dns.slice(0, dns.length - 1)));
   }
   export async function cmdHdlDomainRemove(dn: DomainNode) {
     const _dn = tools.splitDomaiNode(dn);

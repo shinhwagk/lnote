@@ -57,6 +57,8 @@ export class LNotes {
                 }
             }
         }
+        // force modify ##nb
+        this.permanent();
     }
 
     public getLastId(): NoteId {
