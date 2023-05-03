@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'fs-extra';
 import { commands, Uri, window, workspace } from 'vscode';
 
-import { ctxFilesExplorer, pathSplit, section } from './constants';
+import { ctxFilesExplorer, jointMark, nbGroup, pathSplit, section } from './constants';
 import { ext } from './extensionVariables';
 import { arrayLabels2GroupLabels, tools } from './helper';
 import { DomainNode } from './types';
@@ -38,25 +38,10 @@ export namespace ExtCmds {
     if (dn === undefined) {
       ext.lnbs.create(name);
     } else {
-      console.log("211", dn);
       const dna = dn.split(pathSplit);
       ext.lnbs.get(dn.split(pathSplit)[0]).getld().create(dna.concat(name));
     }
-    // ext.updateGS(dn!);
-    // console.log('dfsdfds', ext.gs.domainNodeFormat);
-    // ext.gs.lnb.createDomainEditor(ext.gs.domainNodeFormat);
-    // const name: string | undefined = await window.showInputBox();
-    // if (!name) { return; };
-    // if (name.includes('/')) {
-    //   window.showErrorMessage('domain name cannot contain "/".');
-    // }
-    // if (dn === undefined) {
-    //   ext.vnNotebookSet.createNB(name);
-    // }
-    // ext.updateGS(dn || name);
-    // ext.gs.nb.addDomain(_dn.concat(name));
     ext.domainProvider.refresh(dn);
-    // !dn || ext.domainTreeView.reveal(dn, { expand: true });
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {
     // ext.gs.update(dn.split(pathSplit)[0]);
@@ -97,7 +82,7 @@ export namespace ExtCmds {
     dns[dns.length - 1] = nname;
 
     if (
-      ext.lwebPanelView.check()
+      ext.lwebPanelView.visible()
       && ext.lnbs.get(dns[0]).getNotesOfDomain(dns).length >= 1
     ) {
       ext.lwebPanelView.setdn(dns).show('domain');
@@ -107,19 +92,29 @@ export namespace ExtCmds {
   export async function cmdHdlDomainRemove(dn: DomainNode) {
     const _dn = tools.splitDomaiNode(dn);
     const domainName = _dn[_dn.length - 1];
+
+    const nd = await window.showQuickPick(['remove: notes', 'remove: domain']);
+    if (nd === undefined) {
+      return;
+    }
+
     const confirm = await window.showInputBox({
       title: 'Are you absolutely sure?',
-      placeHolder: `Please type '${domainName}' to confirm.`,
-      prompt: `Please type '${domainName}' to confirm.`
+      placeHolder: `Please type '${nd}' to confirm.`,
+      prompt: `Please type '${nd}' to confirm.`
     });
     if (confirm !== domainName) {
       window.showInformationMessage(`Input is not '${domainName}'.`);
       return;
     }
-    if (_dn.length === 1) {
-      ext.lnbs.remove(_dn[0]);
-    } else {
-      ext.lnbs.get(_dn[0]).getld().remove(_dn);
+    if (nd.includes('domain')) {
+      if (_dn.length === 1) {
+        ext.lnbs.remove(_dn[0]);
+      } else {
+        ext.lnbs.get(_dn[0]).getld().remove(_dn);
+      }
+    } else if (nd.includes('notes')) {
+      ext.lnbs.get(_dn[0]).getld().deleteNotes(_dn);
     }
     ext.domainProvider.refresh();
     await ext.lwebPanelView.dispose();
@@ -184,29 +179,11 @@ export namespace ExtCmds {
     }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.editor.getEditorFile()));
   }
-  export async function cmdHdlNoteAdd(params: { als: string[], nb: string }) {
-    ext.lnbs.get(params.nb).getln().create(arrayLabels2GroupLabels(params.als));
-    const lid = ext.lnbs.get(params.nb).getln().getLastId();
-    cmdHdlNoteEditor({ nb: params.nb, nId: lid });
-    // cmdHdlNoteEditor()
-    // ext.gs.nb.createNoteEditor(params.nId, params.labels);
-    // if (kind === 'nsgl') {
-    //   ext.gs.nb.createNotesSetGroupLabelsEditor(ext.gs.domainNodeFormat, params.labels);
-    // } else if (kind === 'edgl') {
-    //   ext.gs.nb.createDomainEditor(ext.gs.domainNodeFormat);
-    // } else if (kind === 'end') {
-    //   ext.gs.nb.createNoteEditor(params.nbName, params.nId, params.labels);
-    // }
-    // commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile1()));
-  }
-  export async function cmdHdlDomainNoteAdd(params: { dn: string[] }) {
-    // const nb = ext.lnbs.get(params.nb);
-    const als = ext.lnbs.get(params.dn[0]).getld().getArrayLabels(params.dn);
-    cmdHdlNoteAdd({ nb: params.dn[0], als });
-    // const notes = [...ext.lnbs.get(params.nb).getln().getCache().entries()];
-    // const nid = notes[notes.length - 1][0];
-    // console.log(params.nb, nid);
-    // cmdHdlNoteEditor({ nb: params.nb, nId: nid });
+  export async function cmdHdlNoteAdd(als: string[]) {
+    const nbn = als.filter(l => l.startsWith(`${nbGroup}${jointMark}`))[0].split(jointMark)[1];
+    ext.lnbs.get(nbn).getln().create(arrayLabels2GroupLabels(als));
+    const lid = ext.lnbs.get(nbn).getln().getLastId();
+    cmdHdlNoteEditor({ nb: nbn, nId: lid });
   }
   export async function cmdHdlDomainGlsEdit(params: { dn: string[] }) {
     if (ext.lnbs.editor.trySetEditor('domaingls')) {
@@ -217,7 +194,7 @@ export namespace ExtCmds {
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.editor.getEditorFile()));
   }
   export async function cmdHdlCategoryNoteAdd(params: { nb: string, als: string[] }) {
-    cmdHdlNoteAdd(params);
+    cmdHdlNoteAdd(params.als);
   }
   export async function cmdHdlNotesGroupLabelsEdit(params: { als: string[] }) {
     if (ext.lnbs.editor.trySetEditor('notesgls')) {

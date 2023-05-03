@@ -49,12 +49,12 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
     if (element === undefined) {
       return ext.lnbs.getNames();
     } else {
-      const domainNode = tools.splitDomaiNode(element);
-      return ext.lnbs.get(domainNode[0])
+      const dns = tools.splitDomaiNode(element);
+      return ext.lnbs.get(dns[0])
         .getld()
-        .getChildrenNamesOfDomain(domainNode)
+        .getChildrenNamesOfDomain(dns)
         .sort()
-        .map((name) => tools.joinDomainNode(domainNode.concat(name)));
+        .map((name) => tools.joinDomainNode(dns.concat(name)));
     }
   }
 

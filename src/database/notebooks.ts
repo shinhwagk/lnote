@@ -80,8 +80,8 @@ export class LNotebooks {
 
     public getNames(): string[] {
         return readdirSync(this.masterPath)
-            .filter(f => statSync(this.getDir(f)).isDirectory())
-            .filter(f => !['.editor', '.trash'].includes(f));
+            .filter(f => !['.editor', '.trash'].includes(f))
+            .filter(f => statSync(this.getDir(f)).isDirectory());
     }
 
     public search(keywords: string[]): LNote[] {
@@ -140,7 +140,7 @@ export class LNotebooks {
         if (e.gls) {
             this.get(e.dn[0]).getld().updateGls(e.dn, e.gls);
         } else {
-            this.get(e.dn[0]).getld().deleteDomainNotes(e.dn);
+            this.get(e.dn[0]).getld().deleteNotes(e.dn);
         }
         this.cache(e.dn[0]);
     }

@@ -8,9 +8,7 @@ import { groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { LNote } from './note';
 
 import { ArrayLabel, ArrayLabels, GroupLables, INBNote, NoteId } from '../types';
-import { notesFileName } from '../constants';
-
-
+import { nbGroup, notesFileName } from '../constants';
 
 // lnotes
 export class LNotes {
@@ -48,8 +46,8 @@ export class LNotes {
         this.notesGlsCache.clear();
         for (const [nId, note] of this.notesCache.entries()) {
             // force add nb labels to note
-            if (note.gls['##nb']) {
-                note.gls['##nb'] = [this.nb];
+            if (!(nbGroup in note.gls)) {
+                note.gls[nbGroup] = [this.nb];
             }
             for (const label of groupLabels2ArrayLabels(note.gls)) {
                 if (this.notesGlsCache.get(label)?.add(nId) === undefined) {

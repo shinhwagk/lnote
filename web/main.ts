@@ -197,7 +197,7 @@ function readerCategory(fdom: Element, als: string[]) {
     // d_category_name.append(d_category_labels);
 
     const d_category_body = document.createElement('div');
-    d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
+    // d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
     d_category_body.className = 'grid-category-body';
 
     for (const n of _notes) {
@@ -250,6 +250,7 @@ function readerCategories() {
 
 function readerLabels() {
     const localDom = document.getElementById('notes-labels')!;
+    localDom.className = 'group-labels';
     localDom.replaceChildren();
 
     // labels for all the checked notes
@@ -355,7 +356,8 @@ function readerDomainName() {
     e_title.appendChild(e_domain_name);
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
-    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'domain-note-add', params: { dn: gs.dn } })));
+    const als = gs.dn.map(d => `domain->${d}`).concat(`##nb->${gs.dn[0]}`);
+    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } })));
     e_title.appendChild(elemSpaces());
     e_title.appendChild(elemIcon('fa-pen', 'edit labes', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
@@ -430,7 +432,7 @@ function searchAction() {
     if (x) {
         const keywords = x.trim().split(/\s+/);
         if (keywords.length >= 1) {
-            vscode.postMessage({ command: 'search', params: { keywords: keywords } });
+            vscode.postMessage({ command: 'get-search', params: { keywords: keywords } });
         }
     }
     // document.getElementById("content").innerHTML = "You selected: " + x;

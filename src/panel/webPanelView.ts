@@ -11,8 +11,11 @@ import { IWebNote } from '../types';
 
 export class LWebPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
-    private keywords = new Set<string>();
     private webKind: 'domain' | 'search' = 'domain';
+
+    // only for search web 
+    private keywords = new Set<string>();
+
     // only for domain web
     private dns: DomainNodeSplit = [];
 
@@ -26,7 +29,6 @@ export class LWebPanelView {
         const jsPathMainPath = vscode.Uri.joinPath(ext.context.extensionUri, 'out', `main.js`);
         const stylesMainUri = this.panel?.webview.asWebviewUri(stylesPathMainPath);
         const jsMainUrl = this.panel?.webview.asWebviewUri(jsPathMainPath);
-        // const cspSource = this.panel?.webview.cspSource
         const nonce = tools.getNonce();
         return `<!DOCTYPE html>
                 <html lang="en">
@@ -49,6 +51,7 @@ export class LWebPanelView {
 
     async show(webKind: 'domain' | 'search'): Promise<void> {
         if (this.panel === undefined) {
+            this.webKind = webKind;
             this.initPanel();
         }
         this.panel!.title = `lnote ${webKind}`;
@@ -61,8 +64,8 @@ export class LWebPanelView {
         }
     }
 
-    check() {
-        return this.panel?.visible
+    visible() {
+        return this.panel?.visible;
     }
 
     async dispose() {
@@ -142,11 +145,11 @@ export class LWebPanelView {
                     case 'get-kind':
                         await this.panel!.webview.postMessage({ command: 'kind', data: { wk: this.webKind } });
                         break;
-                    case 'search':
+                    case 'get-search':
                         this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
-                        console.log(this.keywords);
-                        this.postSerach();
+                        await this.postSerach();
+                        this.keywords.clear();
                         break;
                     case 'get-domain':
                         this.postDomain();
@@ -158,13 +161,11 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlNoteRemove(msg.params);
                         break;
                     case 'common-notes-note-add':
-                        ExtCmds.cmdHdlNoteAdd(msg.params);
+                        const ps: { als: string[] } = msg.params;
+                        ExtCmds.cmdHdlNoteAdd(ps.als);
                         break;
                     case 'common-notes-labels-edit':
                         ExtCmds.cmdHdlNotesGroupLabelsEdit(msg.params);
-                        break;
-                    case 'domain-note-add':
-                        ExtCmds.cmdHdlDomainNoteAdd(msg.params);
                         break;
                     case 'domain-labels-edit':
                         ExtCmds.cmdHdlDomainGlsEdit(msg.params);
@@ -181,9 +182,6 @@ export class LWebPanelView {
                     case 'note-doc-create':
                         ExtCmds.cmdHdlNBNoteDocCreate(msg.params);
                         break;
-                    // case 'edit-note-openfolder':
-                    //     ExtCmds.cmdHdlNoteOpenFolder(msg.data.nId);
-                    //     break;
                 }
             },
             undefined,

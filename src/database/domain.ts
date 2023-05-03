@@ -11,7 +11,7 @@ interface NBDomainStruct {
     '.gls'?: any; // { [cname: string]: string[] }
 }
 
-export class VNBDomain {
+export class LDomain {
 
     private readonly domainFile: string;
     private domainCache: NBDomainStruct = {};
@@ -47,7 +47,7 @@ export class VNBDomain {
         this.permanent();
     }
 
-    public deleteDomainNotes(domainNode: string[]): void {
+    public deleteNotes(domainNode: string[]): void {
         if (domainNode.length === 0) {
             return;
         }

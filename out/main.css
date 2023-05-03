@@ -10,6 +10,11 @@ body {
     grid-row-gap: 5px;
 }
 
+.group-labels {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
 .grid-category {
     padding: 5px;
     border-radius: 0.25rem;

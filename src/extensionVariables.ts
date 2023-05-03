@@ -70,7 +70,6 @@ export function listenConfiguration(ctx: ExtensionContext) {
 export function listenEditorFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
-      console.log(e.fileName, ext.lnbs.editor.getEditorFile())
       if (
         ext.lnbs
         && e.fileName === ext.lnbs.editor.getEditorFile()

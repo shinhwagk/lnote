@@ -3,7 +3,7 @@ import {
     existsSync, mkdirpSync
 } from 'fs-extra';
 
-import { VNBDomain as LDomain } from './domain';
+import { LDomain } from './domain';
 
 import { LNote } from './note';
 import { LNotes } from './notes';
