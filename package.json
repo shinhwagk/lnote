@@ -2,21 +2,22 @@
     "name": "lnote",
     "displayName": "lnote",
     "description": "A simple note-taking extension.",
-    "version": "0.0.9",
+    "version": "1.0.0",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
-        "vscode": "^1.75.0"
+        "vscode": "^1.77.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/shinhwagk/vscode-note"
+        "url": "https://github.com/shinhwagk/lnote"
     },
     "categories": [
         "Other"
     ],
     "keywords": [
+        "labels",
         "note",
         "vscode"
     ],
@@ -210,7 +211,7 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": "rm -fr out && webpack --mode production",
+        "vscode:prepublish": "webpack --mode production",
         "compile": "tsc -p ./",
         "compile-watch": "tsc -p ./ -w",
         "compile-web": "tsc -p ./web/tsconfig.json",
