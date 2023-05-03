@@ -2,38 +2,8 @@ import * as path from 'path';
 
 import { existsSync, mkdirpSync, removeSync } from 'fs-extra';
 import { section } from '../constants';
-import { tools, vfs } from '../helper';
-import { GroupLables } from '../types';
-
-export interface IEditNoteData1 {
-    nb: string,
-    id: string,
-    gls: GroupLables,
-    contents: string[]
-}
-
-export interface IEditNoteData2 {
-    nb: string,
-    ids: string[],
-    gls: GroupLables,
-}
-
-export interface IEditNoteData {
-    // delete: boolean,
-    nb: string,
-    id: string,
-    gls: GroupLables,
-    contents: string[]
-}
-
-export interface IEditNotesLabels {
-    // delete: boolean,
-    nb: string,
-    ids: string[],
-    gls: GroupLables,
-}
-
-type IEditor = 'note' | 'notesgls' | 'domaingls';
+import { tools } from '../helper';
+import { GroupLables, IEditNote, IEditNotesGls, IEditor } from '../types';
 
 export class LEditor {
     public readonly editDir: string;
@@ -62,7 +32,7 @@ export class LEditor {
     }
 
     public createNoteEditor(nb: string, id: string, gls: GroupLables, contents: string[]) {
-        const ed: IEditNoteData1 = {
+        const ed: IEditNote = {
             nb: nb,
             id: id,
             gls: gls,
@@ -73,7 +43,7 @@ export class LEditor {
     }
 
     public createNotesGlsEditor(ps: { nb: string, ids: string[], gls: GroupLables }) {
-        const ed: IEditNoteData2 = {
+        const ed: IEditNotesGls = {
             nb: ps.nb,
             ids: ps.ids,
             gls: ps.gls

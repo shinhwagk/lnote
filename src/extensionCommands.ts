@@ -105,7 +105,6 @@ export namespace ExtCmds {
       title: 'Are you absolutely sure?',
       placeHolder: `Please type '${domainName}' to confirm.`,
       prompt: `Please type '${domainName}' to confirm.`
-
     });
     if (confirm !== domainName) {
       window.showInformationMessage(`Input is not '${domainName}'.`);
@@ -117,15 +116,13 @@ export namespace ExtCmds {
       ext.lnbs.get(_dn[0]).getld().remove(_dn);
     }
     ext.domainProvider.refresh();
+    await ext.lwebPanelView.dispose();
   }
   export async function cmdHdlGlobalSearch() {
     await ext.lwebPanelView.show('search');
   }
   export async function cmdHdlNotebookSearch() {
     await ext.lwebPanelView.show('search');
-  }
-  export async function cmdHdlNoteOpenFolder(_nId: string) {
-    // await commands.executeCommand('vscode.openFolder', Uri.file(ext.domainDB.noteDB.getDirectory(nId)), true);
   }
   export async function cmdHdlNoteDocShow(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
@@ -179,7 +176,7 @@ export namespace ExtCmds {
     } else {
       ext.lnbs.createNoteEditor(params.nb, params.nId);
     }
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile()));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.editor.getEditorFile()));
   }
   export async function cmdHdlNoteAdd(params: { als: string[], nb: string }) {
     ext.lnbs.get(params.nb).getln().create(arrayLabels2GroupLabels(params.als));
@@ -211,7 +208,7 @@ export namespace ExtCmds {
     } else {
       ext.lnbs.createDomainGlsEditor(params.dn);
     }
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile()));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.editor.getEditorFile()));
   }
   export async function cmdHdlCategoryNoteAdd(params: { nb: string, als: string[] }) {
     cmdHdlNoteAdd(params);
@@ -222,7 +219,7 @@ export namespace ExtCmds {
     } else {
       ext.lnbs.createNotesGroupLabelsEditor(params.als);
     }
-    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.getEditorFile()));
+    commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.lnbs.editor.getEditorFile()));
   }
   export async function cmdHdlNoteRemove(params: { nb: string, id: string }) {
     if (await window.showQuickPick(['Yes', 'No'], { title: `Confirm delete nb:${params.nb}, id:${params.id}.`, placeHolder: `Confirm delete nb:${params.nb}, id:${params.id}.` }) === "Yes") {

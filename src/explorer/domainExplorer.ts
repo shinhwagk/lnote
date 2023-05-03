@@ -3,21 +3,18 @@ import { jointMark, nbGroup } from '../constants';
 
 import { ext } from '../extensionVariables';
 import { tools } from '../helper';
-import { DomainNode } from '../types';
+import { DomainNode, DomainNodeSplit } from '../types';
 
 function getTreeItem(dn: DomainNode): TreeItem {
-  const domainNode = tools.splitDomaiNode(dn);
-  const nb = ext.lnbs.get(domainNode[0]);
-  const isNotes = nb.getld().isNotes(domainNode);
-  // const notesTotalNumberUnderDomain = 1;//ext.notebookDatabase.getNotesNumberUnderDomain(domainNode); // ext.notesDatabase.getAllNotesNumberOfDomain(domainNode);
-  const notesNumberOfDomain = isNotes ? nb.getNotesOfDomain(domainNode, true).length : '-';//isNotes
-  // ? ext.notebookDatabase.getNotesNumberOfDomain(domainNode) //  Object.values(ext.notebookDatabase.getDomain(domainNode)['.categories']).flat().length //Object.values<any[]>(ext.notesDatabase.getNotes(domainNode)).map(c => c.length).reduce((a, b) => a + b, 0)
-  // : 0; // domain['.notes'].length;
+  const dns: DomainNodeSplit = tools.splitDomaiNode(dn);
+  const nbn = dns[0]; // notebook name
 
-  const item: TreeItem = { label: domainNode[domainNode.length - 1] };
-  // item.description = `${notesNumberOfDomain}/${notesTotalNumberUnderDomain}`;
-  item.description = `${notesNumberOfDomain}`;
-  item.collapsibleState = nb.getld().getChildrenNamesOfDomain(domainNode).length >= 1 ? 1 : 0;
+  const nb = ext.lnbs.get(nbn);
+  const isNotes = nb.getld().isNotes(dns);
+
+  const item: TreeItem = { label: dns[dns.length - 1] };
+  item.description = isNotes ? nb.getNotesOfDomain(dns, false).length.toString() : '-';//isNotes
+  item.collapsibleState = nb.getld().getChildrenNamesOfDomain(dns).length >= 1 ? 1 : 0;
 
   if (isNotes) {
     item.command = {
@@ -29,9 +26,9 @@ function getTreeItem(dn: DomainNode): TreeItem {
     item.contextValue = 'emptyNotes';
   }
 
-  if (domainNode.length === 1) {
+  if (dns.length === 1) {
     item.contextValue = item.contextValue ? `${item.contextValue}-notebook` : 'notebook';
-    item.description = nb.getln().getNotesByAls([`${nbGroup}${jointMark}${domainNode[0]}`]).length.toString();
+    item.description = nb.getln().getNotesByAls([`${nbGroup}${jointMark}${nbn}`]).length.toString();
   }
   return item;
 }

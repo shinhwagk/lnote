@@ -8,6 +8,7 @@ declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
 type GroupLables = { [gl: string]: string[] };
+
 const jointMark = '->';
 
 const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
@@ -84,11 +85,8 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     d_note_edit.appendChild(elemIcon('fa-pen', "edit note", () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
     d_note_edit.appendChild(elemSpaces());
 
-    // const d_note_edit_extend = document.createElement('div');
-    // d_note_edit_extend.className = 'grid-note-edit';
-
     const d_note_edit_extend = elemIcon('fa-right-long', 'extend', () => {
-        document.getElementById("note-edit-extend")?.remove();
+        document.getElementById(`note-edit-extend-${note.id}`)?.remove();
         if (!note.doc) {
             d_note_edit.appendChild(elemSpaces());
             d_note_edit.appendChild(elemIcon('fa-file-circle-plus', 'create doc', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
@@ -101,13 +99,12 @@ function readerNote(container: HTMLElement, note: DataNote): void {
         d_note_edit.appendChild(elemIcon('fa-xmark', 'create files', () => vscode.postMessage({ command: 'note-remove', params: { nb: note.nb, id: note.id } })));
 
     });
-    d_note_edit_extend.id = 'note-edit-extend';
+    d_note_edit_extend.id = `note-edit-extend-${note.id}`;
     d_note_edit.appendChild(d_note_edit_extend);
 
     d_note.appendChild(d_note_id);
     d_note.appendChild(d_note_content);
     d_note.appendChild(d_note_edit);
-    // return d_note;
 }
 
 function elemIcon(name: string, title: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {

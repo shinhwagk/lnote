@@ -44,7 +44,6 @@ export async function activate(context: ExtensionContext) {
     */
    ext.registerCommand('lnote.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
    ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNoteDocShow);
-   ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
    // ext.registerCommand('lnote.note.add', ExtCmds.cmdHdlNoteCreate);
    /**
       * note
@@ -54,7 +53,6 @@ export async function activate(context: ExtensionContext) {
    // ext.registerCommand('lnote.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
    // ext.registerCommand('lnote.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
    // ext.registerCommand('lnote.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
-   // ext.registerCommand('lnote.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
    // ext.registerCommand('lnote.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
    // ext.registerCommand('lnote.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
    // ext.registerCommand('lnote.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);

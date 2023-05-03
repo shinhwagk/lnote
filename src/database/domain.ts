@@ -2,9 +2,8 @@ import { existsSync } from 'fs-extra';
 import objectPath from 'object-path';
 import * as path from 'path';
 
-import { arrayLabels2GroupLabels, vfs } from '../helper';
+import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
-import { groupLabels2ArrayLabels } from '../helper';
 
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;

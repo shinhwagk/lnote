@@ -5,7 +5,7 @@ import { ExtCmds } from '../extensionCommands';
 import { tools } from '../helper';
 import { LNote } from '../database/note';
 import { DomainNodeSplit } from '../types';
-import { IWebNote } from './types';
+import { IWebNote } from '../types';
 
 
 
@@ -59,7 +59,10 @@ export class LWebPanelView {
         } else if (this.webKind === 'domain') {
             await this.postDomain();
         }
+    }
 
+    async dispose() {
+        await this.panel?.dispose();
     }
 
     async refresh(): Promise<void> {
@@ -148,7 +151,6 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlNoteEditor(msg.params);
                         break;
                     case 'note-remove':
-                        console.log("asdfdf", msg.params);
                         ExtCmds.cmdHdlNoteRemove(msg.params);
                         break;
                     case 'common-notes-note-add':
