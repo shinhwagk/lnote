@@ -1,0 +1,16 @@
+{
+    "name": "lnote",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "16"
+        }
+    },
+    "extensions": [
+        "dbaeumer.vscode-eslint",
+        "howardzuo.vscode-npm-dependency",
+        "shinhwagk.lnote",
+        "amodio.tsl-problem-matcher"
+    ],
+    "remoteUser": "node"
+}

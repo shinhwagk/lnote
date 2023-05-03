@@ -1,0 +1,36 @@
+{
+    "@test": {
+        "ccc": {
+            ".gls": {
+                "domain": [
+                    "@test",
+                    "ccc"
+                ],
+                "##nb": [
+                    "@test"
+                ]
+            },
+            "x": {
+                ".gls": {
+                    "domain": [
+                        "@test",
+                        "ccc",
+                        "x"
+                    ]
+                },
+                "x1": {}
+            }
+        },
+        "abc1": {
+            ".gls": {
+                "domain": [
+                    "@test",
+                    "abc"
+                ],
+                "##nb": [
+                    "@test"
+                ]
+            }
+        }
+    }
+}

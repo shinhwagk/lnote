@@ -1,66 +1,75 @@
-import { ExtensionContext, ViewColumn, commands } from 'vscode';
+import { commands, ExtensionContext, ViewColumn } from 'vscode';
 
-import { ext, initializeExtensionVariables, listenConfiguration, listenNoteClose as listenNoteFileClose, listenNoteSave as listenNoteFileSave } from './extensionVariables';
 import { ExtCmds } from './extensionCommands';
+import {
+   ext,
+   initializeExtensionVariables,
+   listenConfiguration,
+   listenEditorFileClose,
+   listenEditorFileSave,
+   listenVscodeWindowChange
+} from './extensionVariables';
 
 export async function activate(context: ExtensionContext) {
-   console.log('vscode extension "vscode-note" is now active!');
+   console.log('vscode extension "lnote" is now active!');
 
    listenConfiguration(context);
-   listenNoteFileSave(context);
-   listenNoteFileClose(context);
+   listenEditorFileSave(context);
+   listenEditorFileClose(context);
 
    initializeExtensionVariables(context);
 
-   // context.subscriptions.push(
-   //     commands.registerCommand('openFolderWelcome', () => {
+   listenVscodeWindowChange();
 
-   //     })
-   // );
-   ext.registerCommand('vscode-note.choose-location', ExtCmds.cmdHdlChooseLocation);
+   ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
+
    /**
-      * domain
-      */
-   ext.registerCommand('vscode-note.domain.create', ExtCmds.cmdHdlDomainCreate);
-   ext.registerCommand('vscode-note.domain.pin', ExtCmds.cmdHdlDomainPin);
-   ext.registerCommand('vscode-note.domain.move', ExtCmds.cmdHdlDomainMove);
-   ext.registerCommand('vscode-note.domain.rename', ExtCmds.cmdHdlDomainRename);
-   ext.registerCommand('vscode-note.domain.remove', ExtCmds.cmdHdlDomainRemove);
-   ext.registerCommand('vscode-note.domain.search', ExtCmds.cmdHdlDomainSearch);
-   ext.registerCommand('vscode-note.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
-   ext.registerCommand('vscode-note.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
+    * global search
+    */
+   ext.registerCommand('lnote.search', ExtCmds.cmdHdlGlobalSearch);
+
    /**
-      * notes view
-      */
-   // ext.registerCommand('vscode-note.category.add', ExtCmds.cmdHdlCategoryAdd);
-   ext.registerCommand('vscode-note.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
-   ext.registerCommand('vscode-note.note.doc.show', ExtCmds.cmdHdlNotebookNoteDocShow);
-   // ext.registerCommand('vscode-note.note.add', ExtCmds.cmdHdlNoteCreate);
+    * domain
+    */
+   ext.registerCommand('lnote.domain.create', ExtCmds.cmdHdlDomainCreate);
+   ext.registerCommand('lnote.domain.pin', ExtCmds.cmdHdlDomainPin);
+   ext.registerCommand('lnote.domain.remove', ExtCmds.cmdHdlDomainRemove);
+   ext.registerCommand('lnote.domain.rename', ExtCmds.cmdHdlDomainRename);
+   ext.registerCommand('lnote.domain.notes.create', ExtCmds.cmdHdlDomainNotesCreate);
+   ext.registerCommand('lnote.domain.search', ExtCmds.cmdHdlNotebookSearch);
+   ext.registerCommand('lnote.domain.refresh', ExtCmds.cmdHdlDomainRefresh);
+
+   /**
+    * notes view
+    */
+   ext.registerCommand('lnote.note.files.open', ExtCmds.cmdHdlNoteFilesOpen);
+   ext.registerCommand('lnote.note.doc.show', ExtCmds.cmdHdlNoteDocShow);
+   // ext.registerCommand('lnote.note.add', ExtCmds.cmdHdlNoteCreate);
    /**
       * note
       */
-   // ext.registerCommand('vscode-note.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
-   // ext.registerCommand('vscode-note.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
-   // ext.registerCommand('vscode-note.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
-   // ext.registerCommand('vscode-note.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
-   // ext.registerCommand('vscode-note.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
-   ext.registerCommand('vscode-note.note.edit.openFolder', ExtCmds.cmdHdlNoteOpenFolder);
-   // ext.registerCommand('vscode-note.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
-   // ext.registerCommand('vscode-note.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
-   // ext.registerCommand('vscode-note.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);
-   // ext.registerCommand('vscode-note.note.edit.doc.full', ExtCmds.cmdHdlNoteEditDocFull);
+   // ext.registerCommand('lnote.note.edit.delete', ExtCmds.cmdHdlNoteEditRemove);
+   // ext.registerCommand('lnote.note.edit.col', ExtCmds.cmdHdlNoteEditCol);
+   // ext.registerCommand('lnote.note.edit.col.content', ExtCmds.cmdHdlNoteEditColContent);
+   // ext.registerCommand('lnote.note.edit.col.add', ExtCmds.cmdHdlNoteEditColAdd);
+   // ext.registerCommand('lnote.note.edit.col.remove', ExtCmds.cmdHdlNoteColRemove);
+   // ext.registerCommand('lnote.note.edit.category.rename', ExtCmds.cmdHdlNoteEditCategoryRename);
+   // ext.registerCommand('lnote.note.edit.files.create', ExtCmds.cmdHdlNoteEditFilesCreate);
+   // ext.registerCommand('lnote.note.edit.doc.create', ExtCmds.cmdHdlNoteEditDocCreate);
+   // ext.registerCommand('lnote.note.edit.doc.full', ExtCmds.cmdHdlNoteEditDocFull);
+
    /**
-      * note files
-      */
-   ext.registerCommand('vscode-note.files.close', ExtCmds.cmdHdlFilesClose);
-   ext.registerCommand('vscode-note.files.edit.open', ExtCmds.cmdHdlFilesEditOpen);
-   ext.registerCommand('vscode-note.files.openTerminal', ExtCmds.cmdHdlFilesOpenTerminal);
-   ext.registerCommand('vscode-note.files.refresh', ExtCmds.cmdHdlFilesRefresh);
+    * note files
+    */
+   ext.registerCommand('lnote.files.close', ExtCmds.cmdHdlFilesClose);
+   ext.registerCommand('lnote.files.open', ExtCmds.cmdHdlFilesOpen);
+   ext.registerCommand('lnote.files.openerminal', ExtCmds.cmdHdlFilesOpenTerminal);
+   ext.registerCommand('lnote.files.refresh', ExtCmds.cmdHdlFilesRefresh);
    /**
       *  extension
       */
    // if (checkFirst) {
-   //     if ((await window.showInformationMessage('vscode-note installed.', 'Open it.', 'Not now.')) === 'Open it.') {
+   //     if ((await window.showInformationMessage('lnote installed.', 'Open it.', 'Not now.')) === 'Open it.') {
    //         commands.executeCommand('workbench.view.extension.vsnote-explorer');
    //         ext.notesPanelView.parseDomain(['powershell', 'install']).showNotesPlanView();
    //     }
@@ -69,7 +78,7 @@ export async function activate(context: ExtensionContext) {
    /**
       * shortcutes
       */
-   // ext.registerCommand('vscode-note.shortcuts.last', ExtCmds.cmdHdShortcutsLast);
+   // ext.registerCommand('lnote.shortcuts.last', ExtCmds.cmdHdShortcutsLast);
 
    ext.registerCommand('editExplorer.openFileResource', async (resource: any) => {
       await commands.executeCommand('vscode.open', resource, ViewColumn.Two);

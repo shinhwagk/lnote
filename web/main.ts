@@ -1,458 +1,557 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 interface vscode {
-  postMessage(message: any): void;
+    postMessage(message: any): void;
 }
 
 declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
-namespace Tools {
-  const splitter = '@!$';
-  export function joinDomainNode(domain: string[]): string {
-    return domain.join(splitter);
-  }
+type GroupLables = { [gl: string]: string[] };
 
-  export function splitDomaiNode(domain: string): string[] {
-    return domain.split(splitter);
-  }
-}
+const jointMark = '->';
 
-interface DataDomain {
-  dpath: string[];
-  categories: DataCategory[];
-}
+const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
-interface DataCategory {
-  name: string;
-  notes: DataNote[];
-}
+// const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
 
-interface DataNote {
-  nId: string;
-  contents: string[];
-  doc: boolean;
-  files: boolean;
-  cDate: string;
-  mDate: string;
+interface IData {
+    dn: string[];
+    notes: DataNote[];
+    wk: 'domain' | 'search'; // webkind
+    dals: string[]
 }
 
 interface DataProtocol {
-  command: 'data';
-  data: DataDomain;
+    command: string;
+    data: IData;
 }
 
-interface ContextMenuAction {
-  title: string;
-  onClick: (data: any) => void;
+interface DataNote {
+    nb: string;
+    id: string;
+    contents: string[];
+    doc: boolean;
+    files: boolean;
+    cts: number;
+    mts: number;
+    als: string[];
+    category: string;
 }
 
-const NoteEditContextMenuActions: ContextMenuAction[][] = [
-  [
-    {
-      title: 'create document',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-note-doc-create', data: { nId: data.note.nId } })
-    },
-    {
-      title: 'create files',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-note-files-create', data: { nId: data.note.nId } })
+function elemSpaces(num: number = 1) {
+    const s = document.createElement('span');
+    for (let i = 0; i < num; i++) {
+        s.innerHTML += '&nbsp;';
     }
-  ],
-  [
-    {
-      title: 'category rename',
-      onClick: (data) => vscode.postMessage({ command: 'edit-note-notebook-domain-category-rename', data: { nId: data.note.nId } })
-    }
-  ],
-  [
-    {
-      title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-note-remove', data: { category: data.category, nId: data.note.nId } })
-    }
-  ]
-  // ,
-  // [
-  //   {
-  //     title: 'open note folder',
-  //     onClick: (data) => vscode.postMessage({ command: 'edit-note-openfolder', data: { nId: data.note.nId } })
-  //   }
-  // ]
-];
-
-const CategoryEditContextMenuActions: ContextMenuAction[][] = [
-  [
-    {
-      title: 'add note',
-      onClick: (data) => vscode.postMessage({ command: 'note-add', data: { category: data.category } })
-    }
-  ],
-  [
-    {
-      title: 'rename',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-rename', data: { category: data.category } })
-    }
-  ],
-  [
-    {
-      title: 'move to other domain',
-      onClick: (data) => vscode.postMessage({ command: 'category-to-domain', data: { category: data.category } })
-    }
-  ],
-  [
-    {
-      title: 'remove',
-      onClick: (data) => vscode.postMessage({ command: 'notebook-domain-category-remove', data: { category: data.category } })
-    }
-  ]
-];
-
-const NoteColContextMenuActions: ContextMenuAction[][] = [
-  [
-    {
-      title: 'edit short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: data.nId, cn: data.i } })
-    },
-    {
-      title: 'add short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-add', data: { nId: data.nId, cn: data.i } })
-    }
-  ], [
-    {
-      title: 'delete short document',
-      onClick: (data: any) => vscode.postMessage({ command: 'notebook-note-contents-remove', data: { nId: data.nId, cn: data.i } })
-    }
-  ]
-  // [
-  //   {
-  //     title: 'send to active terminal',
-  //     onClick: (data: any) => vscode.postMessage({ command: 'col-to-terminal', data: { id: data.id, cidx: data.i } })
-  //   },
-  //   {
-  //     title: 'send to active terminal with args',
-  //     onClick: (_data: any) => {
-  //       // new abc(context, e).show();
-  //     } /* vscode.postMessage({ command: 'col-to-terminal-args', data: { id: nid, args: colIdx } } */
-  //   }
-  // ]
-];
-
-const DomainContextMenuActions: ContextMenuAction[][] = [
-  [
-    {
-      title: 'edit labels',
-      onClick: (data: any) => vscode.postMessage({ command: 'domain-edit-labels', data })
-    }
-  ]
-];
-
-// class abc {
-//     constructor(private readonly _context: string, e: MouseEvent) {
-//         const f = document.createElement('form');
-//         f.className = 'contextMenu';
-//         const args1 = document.createElement('input');
-//         args1.type = 'text' + this._context;
-//         args1.name = 'args1';
-
-//         const but = document.createElement('input');
-//         but.type = 'button';
-//         but.name = 'button';
-//         f.appendChild(args1);
-//         f.appendChild(but);
-//         f!.style.display = 'block';
-//         f!.style.position = 'absolute';
-//         f!.style.top = e.pageY + 'px';
-//         f!.style.left = e.pageX + 'px';
-//         document.getElementById('root')?.appendChild(f);
-//     }
-
-//     show() { }
-// }
-
-class ContextMenuDom {
-  private readonly elem: HTMLElement = document.getElementById('contextMenu')!;
-  public hide() {
-    this.elem.style.display = 'none';
-  }
-
-  public show(e: MouseEvent, frameElem: HTMLElement, menus: ContextMenuAction[][], data: any) {
-    this.elem.replaceChildren();
-    let gidx = 0; // group index
-    for (const l of menus) {
-      if (gidx >= 1 && gidx < menus.length) {
-        const d_li = document.createElement('li');
-        d_li.className = 'contextMenuDivider';
-        this.elem.appendChild(d_li);
-      }
-      for (const i of l) {
-        const d_li = document.createElement('li');
-        d_li.className = 'contextMenuItem';
-        d_li.textContent = i.title;
-        d_li.onclick = () => i.onClick(data);
-        this.elem.appendChild(d_li);
-      }
-      gidx += 1;
-    };
-    this.elem!.style.display = 'block';
-    this.elem!.style.position = 'absolute';
-
-    this.elem!.style.top =
-      (frameElem.getBoundingClientRect().bottom + this.elem.clientHeight <= document.documentElement.clientHeight
-        ? e.pageY
-        : e.pageY - this.elem.clientHeight) + 'px';
-    this.elem!.style.left =
-      (e.pageX + this.elem.clientWidth <= document.documentElement.clientWidth
-        ? e.pageX
-        : document.documentElement.clientWidth - this.elem.clientWidth) + 'px';
-    // console.log(document.documentElement.clientHeight);
-    // console.log(aaa.getBoundingClientRect().bottom, aaa.getBoundingClientRect().top, e.pageY);
-  }
+    return s;
 }
 
-class NoteEditContextMenu { }
+function readerNote(container: HTMLElement, note: DataNote): void {
+    container.replaceChildren();
 
-class VNNote {
-  constructor(private readonly category: string, private readonly note: DataNote) { }
-  dom(): HTMLHeadingElement {
-    const d_note = document.createElement('div');
+    const d_note = container;
     d_note.className = 'grid-note';
+    // d_note.id = `note_${note.nId}`;
 
     const d_note_id = document.createElement('div');
     d_note_id.className = 'grid-note-id';
-    d_note_id.oncontextmenu = (e) => {
-      e.preventDefault();
-    };
 
-    const d_cion = this.note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
-    const f_cion = this.note.files ? 'fa-folder' : 'fa-ellipsis-h';
+    const d_cion = note.doc ? 'fa-file-word' : 'fa-ellipsis-h';
+    const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
     const d_space = document.createElement('span');
-    d_space.title = `id: ${this.note.nId}, create date: ${this.note.cDate}, modify date: ${this.note.mDate}`;
+    d_space.title = `id: ${note.id}, create date: ${note.cts}, modify date: ${note.mts}`;
     d_space.appendChild(elemSpaces(2));
 
-    d_note_id.appendChild(elemIcon(d_cion, () => vscode.postMessage({ command: 'notebook-note-doc-show', data: { nId: nid } })));
+    d_note_id.appendChild(elemIcon(d_cion, 'show doc', () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: note.id } })));
     d_note_id.appendChild(d_space);
-    d_note_id.appendChild(elemIcon(f_cion, () => vscode.postMessage({ command: 'notebook-note-files-open', data: { nId: nid } })));
+    d_note_id.appendChild(elemIcon(f_cion, 'show files', () => vscode.postMessage({ command: 'note-files-open', params: { nb: note.nb, nId: note.id } })));
 
     const d_note_content = document.createElement('div');
     d_note_content.className = 'grid-note-contents';
-    d_note_content.style.gridTemplateColumns = `repeat(${this.note.contents.length}, 1fr)`;
+    d_note_content.style.gridTemplateColumns = `repeat(${note.contents.length}, 1fr)`;
 
-    for (let i = 0; i < this.note.contents.length; i++) {
-      const d = document.createElement('div');
-      d.className = 'grid-note-content';
-      // d.ondblclick = () => {
-      //     vscode.postMessage({ command: 'notebook-note-contents-edit', data: { nId: this.note.nId } });
-      // };
-      d.textContent = this.note.contents[i];
-      d.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        nccm.hide();
-        // nccm.show(this.note.nId, i.toString(), this.note.contents[i], e);
-        const nccma = i === 0 ? [[NoteColContextMenuActions[0][0], NoteColContextMenuActions[0][1]]] : NoteColContextMenuActions;
-        nccm.show(e, d, nccma, { nId: this.note.nId, i: i });
-      });
-      // d.oncontextmenu =
-      d_note_content.appendChild(d);
-    }
+    note.contents.forEach(c => {
+        const d = document.createElement('div');
+        d.className = 'grid-note-content';
+        d.textContent = c;
+        d_note_content.appendChild(d);
+    });
 
     const d_note_edit = document.createElement('div');
     d_note_edit.className = 'grid-note-edit';
-    const nid = this.note.nId;
-    // d_note_edit.onclick = () => {
-    //     vscode.postMessage({ command: 'edit', data: { id: nid, category: '' } });
-    // };
 
-    // const delColContext: ContextMenuAction[] = [];
-    // for (let i = 1; i <= this.note.contents.length; i++) {
-    //     delColContext.push({
-    //         title: `remove col ${i}`,
-    //         onClick: () => vscode.postMessage({ command: 'edit-col-remove', data: { nId: this.note.nId, cIdx: i } }),
-    //     });
-    // }
+    d_note_edit.appendChild(elemIcon('fa-pen', "edit note", () => vscode.postMessage({ command: 'note-edit', params: { nb: note.nb, nId: note.id } })));
+    d_note_edit.appendChild(elemSpaces());
 
-    // const newContxt = NoteEditContextMenuActions.slice();
-    // if (this.note.contents.length >= 2) {
-    //     newContxt.splice(2, 0, delColContext);
-    // }
+    const d_note_edit_extend = elemIcon('fa-right-long', 'extend', () => {
+        document.getElementById(`note-edit-extend-${note.id}`)?.remove();
+        if (!note.doc) {
+            d_note_edit.appendChild(elemSpaces());
+            d_note_edit.appendChild(elemIcon('fa-file-circle-plus', 'create doc', () => vscode.postMessage({ command: 'note-doc-create', params: { nb: note.nb, nId: note.id } })));
+        }
+        if (!note.files) {
+            d_note_edit.appendChild(elemSpaces());
+            d_note_edit.appendChild(elemIcon('fa-folder-plus', 'create files', () => vscode.postMessage({ command: 'note-files-create', params: { nb: note.nb, nId: note.id } })));
+        }
+        d_note_edit.appendChild(elemSpaces());
+        d_note_edit.appendChild(elemIcon('fa-xmark', 'create files', () => vscode.postMessage({ command: 'note-remove', params: { nb: note.nb, id: note.id } })));
 
-    // let necma = this.note.doc ? NoteEditContextMenuActions[0].filter(n => n.title !== 'create document') : NoteEditContextMenuActions;
-    // const necma = Object.assign({}, NoteEditContextMenuActions);
-    const necma = NoteEditContextMenuActions;
-    // if (this.note.doc) { necma[0].shift() }
-    // if (this.note.files) { necma[0].pop() }
-    d_note_edit.appendChild(
-      elemIcon('fa-pen', (ev: MouseEvent) => {
-        nccm.show(ev, d_note_edit, necma, { note: this.note, category: this.category });
-      })
-    );
+    });
+    d_note_edit_extend.id = `note-edit-extend-${note.id}`;
+    d_note_edit.appendChild(d_note_edit_extend);
 
     d_note.appendChild(d_note_id);
     d_note.appendChild(d_note_content);
     d_note.appendChild(d_note_edit);
-    return d_note;
-  }
 }
 
-function elemSpaces(num: number = 1) {
-  const s = document.createElement('span');
-  for (let i = 0; i < num; i++) {
-    s.innerHTML += '&nbsp;';
-  }
-  return s;
+function elemIcon(name: string, title: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
+    const i = document.createElement('i');
+    i.className = `fas ${name} fa-sm`;
+    i.onclick = onclick;
+    i.title = title;
+    return i;
 }
 
-class VNCategory {
-  constructor(private readonly name: string, private readonly notes: DataNote[]) { }
-  doms() {
+// function filterSearch(categories: DataCategory[], key: string) {
+//     const newCategory: DataCategory[] = [];
+//     for (const category of categories) {
+//         const newNotes: DataNote[] = [];
+//         for (const note of category.notes) {
+//             for (const content of note.contents) {
+//                 if (new RegExp(key).test(content)) {
+//                     newNotes.push(note);
+//                     break;
+//                 }
+//             }
+//         }
+//         if (newNotes.length >= 1) {
+//             newCategory.push({ name: category.name, notes: newNotes, labels: category.labels });
+//         }
+//     }
+//     return newCategory;
+// }
+
+function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
+    const gl: { [g: string]: string[] } = {};
+    let name = "";
+    for (const l of labelsOfCategory) {
+        const [gname, label] = l.split(jointMark);
+        if (gname in gl) {
+            gl[gname].push(label);
+        } else {
+            gl[gname] = [label];
+        }
+    }
+    for (const [g, ls] of Object.entries(gl)) {
+        name += `${g} -> `;
+        name += ls.sort().join(',');
+        name += '; ';
+    }
+    return name;
+}
+
+function readerCategory(fdom: Element, als: string[]) {
+    // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
+    let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
+
+    const _notes = gs.notes.filter(n => intersection(n.als, als).length === als.length);
+
+
+    // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
+    // const localDom = document.getElementById(`domain-category-${categoryName.replace(' ', '')}`)!;
+
     const d_category = document.createElement('div');
+    // d_category.id = nameOfCategory.replace(' ', '');
     d_category.className = 'grid-category';
 
     const d_category_name = document.createElement('div');
-    d_category_name.textContent = this.name;
+    d_category_name.textContent = nameOfCategory;
     d_category_name.className = 'grid-category-name';
     // d_category_name.ondblclick = () => vscode.postMessage({ command: 'edit-category', data: { category: this.name } })
-    // d_category_name.oncontextmenu = (e) => {
-    //     e.preventDefault();
-    //     // todo for rename
-    // };
+    // const nb = als.filter(l => l.startsWith('##nb'))[0].split('->')[1];
+
+    // const _nb = gWebKind === 'domain' ? gs.dn[0] : als.filter(l => l.startsWith('##nb->'))[0]
 
     d_category_name.appendChild(elemSpaces());
-    // d_category_name.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'add', data: this.name })));
-    d_category_name.appendChild(elemSpaces());
-    d_category_name.appendChild(
-      elemIcon('fa-pen', (ev: MouseEvent) => {
-        nccm.show(ev, d_category_name, CategoryEditContextMenuActions, { category: this.name });
-      })
+    d_category_name.appendChild(elemIcon('fa-plus', 'create note',
+        () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } }))
     );
 
+    d_category_name.appendChild(elemSpaces());
+    d_category_name.appendChild(elemIcon('fa-pen', 'edit labels',
+        () => vscode.postMessage({ command: 'common-notes-labels-edit', params: { als: als } }))
+    );
+    // labelsOfNotes.filter(l => l.startsWith('##nb'))[0].split('->')[1];
+
+    //     // nb:
+    //     nb: als.filter(l => l.startsWith('##nb'))[0].split('->')[1],
+    //     labels: als.concat(gs.dn.map(n => `domain->${n}`)).map(l => l.trim()) //.concat(`common->${gs.domainNode}`)
+    // });
+    // d_category_name.appendChild(elemSpaces());
+    // const d_category_labels = document.createElement('span');
+    // d_category_labels.style.fontSize = '10px';
+    // d_category_labels.textContent = this.labels.join(',');
+    // d_category_name.append(d_category_labels);
+
     const d_category_body = document.createElement('div');
+    // d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
     d_category_body.className = 'grid-category-body';
 
-    for (const n of this.notes) {
-      const d_n = new VNNote(this.name, n).dom();
-      d_category_body.appendChild(d_n);
+    for (const n of _notes) {
+        const notesDom = document.createElement('div');
+        notesDom.id = `note-${n.id}`;
+        d_category_body.appendChild(notesDom);
+        readerNote(notesDom, n);
+
+        d_category.append(d_category_name, d_category_body);
+        fdom.append(d_category, document.createElement('p'));
+        // d_category.append(d_category_name, d_category_body);
+        // return d_category;
     }
-
-    d_category.append(d_category_name, d_category_body);
-    return d_category;
-  }
 }
 
-function elemIcon(name: string, onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = null) {
-  const i = document.createElement('i');
-  i.className = `fas ${name} fa-sm`;
-  i.onclick = onclick;
-  return i;
+function readerCategories() {
+    let localDom = document.getElementById('notes-categories')!;
+    localDom.replaceChildren();
+
+    // const categoriesDom = document.createElement('div');
+    // categoriesDom.id = 'notes-categories';
+    // document.getElementById('content')?.replaceChildren(categoriesDom);
+
+    // this.nIds = domainNotes.map(n => n.nId);
+    const labelsOfNotes = new Set<string>();
+
+    if (gs.checkedLabels.size === 0) {
+        gs.notes.map(n => n.als.sort().join('|||')).forEach(l => labelsOfNotes.add(l));
+    } else {
+        gs.notes.filter(n => intersection(n.als, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size)
+            .map(n => n.als.sort().join('|||'))
+            .forEach(l => labelsOfNotes.add(l));
+    }
+    // for (const note of gs.notes) {
+    //     const nlabels = note.labels.sort();
+    //     // const cname = note.labels.filter(f => !gs.domainLabels.concat(gs.domainNode[0]).includes(f)).sort().join(',');
+    //     if (gs.checkedLabels.size === 0) {
+    //         labelsOfNotes.add(nlabels.join('|||'));
+    //     } else {
+    //         if (intersection(nlabels, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
+    //             labelsOfNotes.add(nlabels.join('|||'));
+    //         }
+    //     }
+    // }
+
+    for (const cname of labelsOfNotes.values()) {
+        readerCategory(localDom, cname.split('|||'));
+    }
 }
 
-function filterSearch(categories: DataCategory[], key: string) {
-  const newCategory: DataCategory[] = [];
-  for (const category of categories) {
-    const newNotes: DataNote[] = [];
-    for (const note of category.notes) {
-      for (const content of note.contents) {
-        if (new RegExp(key).test(content)) {
-          newNotes.push(note);
-          break;
+function readerLabels() {
+    const localDom = document.getElementById('notes-labels')!;
+    localDom.className = 'group-labels';
+    localDom.replaceChildren();
+
+    // labels for all the checked notes
+    const _ava = new Set<string>();
+    // common labels for every the checked notes
+    const _com: string[][] = [];
+
+    for (const n of gs.notes) {
+        if (gs.checkedLabels.size >= 1) {
+            if (intersection(n.als, Array.from(gs.checkedLabels)).length === gs.checkedLabels.size) {
+                n.als.forEach(l => _ava.add(l));
+                _com.push(n.als);
+            }
+        } else {
+            gs.allArrayLabels.forEach(l => _ava.add(l));
+            _com.push(n.als);
         }
-      }
     }
-    if (newNotes.length >= 1) {
-      newCategory.push({ name: category.name, notes: newNotes });
+    const _com1 = _com.length >= 1 ? _com.reduce((p, c) => p.filter(e => c.includes(e))) : [];
+
+    for (const [g, ls] of gs.allGroupLabels.entries()) {
+        const group_dom = document.createElement('div');
+        const group_name_dom = document.createElement('label');
+        group_name_dom.textContent = g;
+        group_dom.append(group_name_dom, elemSpaces());
+
+        for (const nl of Array.from(ls).sort()) {
+            const group_label_dom = document.createElement('label');
+            // importance!!!
+            if (gs.checkedLabels.size >= 1) {
+                if (gs.checkedLabels.has(nl)) {
+                    group_label_dom.className = 'pinCheckedLabel';
+                } else {
+                    if (_ava.has(nl)) {
+                        if (_com1.includes(nl)) {
+                            group_label_dom.className = 'checkedLabel';
+                        } else {
+                            group_label_dom.className = 'unCheckedLabel';
+                        }
+                    } else {
+                        group_label_dom.className = 'unAvailableLabel';
+                    }
+                }
+            } else {
+                if (_ava.has(nl)) {
+                    if (_com1.includes(nl)) {
+                        group_label_dom.className = 'forceCheckedLabel';
+                    } else {
+                        group_label_dom.className = 'unCheckedLabel';
+                    }
+                } else {
+                    group_label_dom.className = 'unAvailableLabel';
+                }
+            }
+            // group_label_dom.className =
+            //     gs.checkedLabels.size >= 1 ?
+            //             _com1.includes(nl) ?
+            //                 'forceCheckedLabel'
+            //                 : gs.checkedLabels.has(nl)
+            //                     ? 'checkedLabel'
+            //                     : _ava.has(nl)
+            //                         ? 'unCheckedLabel'
+            //                         : 'unAvailableLabel'
+            //             : "checkedLabel"
+            //         : _com1.includes(nl)
+            //             ? 'checkedLabel'
+            //             : 'unCheckedLabel';
+            group_label_dom.textContent = nl.split(jointMark)[1];
+            group_label_dom.onclick = () => {
+                if (group_label_dom.className === 'unCheckedLabel') {
+                    gs.checkedLabels.add(nl);
+                } else if (['checkedLabel', 'pinCheckedLabel'.includes(group_label_dom.className)]) {
+                    gs.checkedLabels.delete(nl);
+                } else {
+                    return;
+                }
+                readerLabels();
+                readerCategories();
+            };
+            group_dom.append(group_label_dom, elemSpaces());
+        }
+        localDom.append(group_dom);
     }
-  }
-  return newCategory;
+    localDom.append(document.createElement('p'));
 }
 
-class VNNoteBook {
-  search: boolean = false;
-  categoriesDom = document.createElement('div');
-  searchDom = this.createSerachDom();
-  constructor(private readonly domain: DataDomain) {
-    this.readerCategories();
-  }
+function readerDomainName() {
+    const e_domain = document.getElementById('domain');
+    e_domain?.replaceChildren();
 
-  createSerachDom() {
-    const i = document.createElement('input');
-    i.type = 'text';
-    i.style.display = 'none';
-    i.focus();
-    i.onkeydown = () => {
-      this.readerCategories(i.value);
-    };
-    return i;
-  }
-
-  readerCategories(filter: string | undefined = undefined) {
-    const _categories = this.search && filter ? filterSearch(this.domain.categories, filter) : this.domain.categories;
-    this.categoriesDom.innerHTML = ''; // remove all child
-    for (const c of _categories) {
-      this.categoriesDom.appendChild(new VNCategory(c.name, c.notes).doms());
-      this.categoriesDom.appendChild(document.createElement('p'));
-    }
-  }
-
-  doms() {
-    const e_domain = document.createElement('div');
     const e_title = document.createElement('h2');
     const e_domain_name = document.createElement('span');
-    e_domain_name.textContent = this.domain.dpath.join(' / ');
+    const e_search = document.createElement('input');
+    e_search.type = 'text';
+    e_search.style.display = 'none';
+    e_search.focus();
+    e_search.onkeydown = () => {
+        // this.readerCategories(i.value);
+    };
+
+    e_domain_name.textContent = `${gs.dn.join(' / ')}`;
     // const e_search = elemNotesSearch();
     e_title.appendChild(e_domain_name);
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'category-add' })));
+    // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
+    const als = gs.dn.map(d => `domain->${d}`).concat(`##nb->${gs.dn[0]}`);
+    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } })));
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(
-      elemIcon('fa-pen', (e) => {
-        nccm.show(e, e_title, DomainContextMenuActions, Tools.joinDomainNode(this.domain.dpath));
-      })
-    );
+    e_title.appendChild(elemIcon('fa-pen', 'edit labes', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
-    e_title.appendChild(
-      elemIcon('fa-search', () => {
-        if (!this.search) {
-          this.search = true;
-          this.searchDom.style.display = 'block';
-        } else {
-          this.search = false;
-          this.searchDom.style.display = 'none';
-          this.readerCategories();
-        }
-      })
-    );
-    e_title.appendChild(this.searchDom);
+    // e_title.appendChild(
+    //     elemIcon('fa-search', () => {
+    //         if (!gs.search) {
+    //             gs.search = true;
+    //             e_search.style.display = 'block';
+    //         } else {
+    //             gs.search = false;
+    //             e_search.style.display = 'none';
+    //         }
+    //     })
+    // );
+    // e_title.appendChild(e_search);
 
-    e_domain.append(e_title, this.categoriesDom);
-    return e_domain;
-  }
+    // labels
+    // const labelsDom = document.createElement('div');
+    // labelsDom.id = 'notes-labels';
+
+    // // categories
+    // const categoriesDom = document.createElement('div');
+    // categoriesDom.id = 'notes-categories';
+
+    // e_domain.append(e_title, labelsDom, document.createElement('br'), categoriesDom);
+    // document.getElementById('content')?.replaceChildren(e_domain);
+    // console.log(e_title);
+    e_domain?.append(e_title);
 }
-const nccm = new ContextMenuDom();
-document.addEventListener(
-  'click',
-  () => {
-    nccm.hide();
-  },
-  true
-);
-document.addEventListener(
-  'contextmenu',
-  () => {
-    console.log('global contextmenu click');
-    nccm.hide();
-  },
-  true
-);
 
-let domain;
+let gWebKind: 'search' | 'domain' = "domain";
+
+class GlobalState {
+    notes: DataNote[] = [];
+    s_s = 0;
+    checkedLabels = new Set<string>();
+    // init once
+    allArrayLabels = new Set<string>();
+    // init once
+    allGroupLabels = new Map<string, Set<string>>();
+
+    // domain only
+    dals: string[] = []; // domain arraylabels
+    dn: string[] = []; // domainnode
+    nb: string = "";   // notebook
+}
+
+function groupLabel2Labels(groupLabels: { [gl: string]: string[] }) {
+    const labels = [];
+    for (const [g, ls] of Object.entries(groupLabels)) {
+        for (const l of ls) {
+            labels.push(`${g}->${l}`);
+        }
+    }
+    return labels;
+}
+
+function sortGroupLables(obj1: GroupLables): GroupLables {
+    return Object.keys(obj1).sort().reduce(
+        (obj, key) => {
+            obj[key] = obj1[key].sort();
+            return obj;
+        },
+        {} as GroupLables
+    );
+}
+
+function searchAction() {
+    gs.s_s = (new Date()).getTime();
+    const x = (<HTMLTextAreaElement>document.getElementById("APjFqb"))?.value;
+    // document.createElement('textarea')
+    if (x) {
+        const keywords = x.trim().split(/\s+/);
+        if (keywords.length >= 1) {
+            vscode.postMessage({ command: 'get-search', params: { keywords: keywords } });
+        }
+    }
+    // document.getElementById("content").innerHTML = "You selected: " + x;
+}
+
+function initFrameDoms() {
+    const rootDom = document.getElementById('root');
+    rootDom?.replaceChildren();
+    // search 
+    const searchDom = document.createElement('div');
+    searchDom.className = "search";
+    const searchTextAreaDom = document.createElement('textarea');
+    searchTextAreaDom.id = "APjFqb";
+    searchTextAreaDom.className = "searchTextArea";
+    searchTextAreaDom.maxLength = 2048;
+    searchTextAreaDom.rows = 1;
+    // searchTextAreaDom.value = "@test default";
+    const searchButtonDom = document.createElement('button');
+    searchButtonDom.className = "searchButton";
+    searchButtonDom.onclick = searchAction;
+    searchButtonDom.textContent = "search";
+    const searchTimeDom = document.createElement('span');
+    searchTimeDom.id = "search-time";
+
+    searchDom.append(searchTextAreaDom, searchButtonDom, searchTimeDom);
+
+    // domain 
+    const domainDom = document.createElement('div');
+    domainDom.id = "domain";
+
+    // lables
+    const labelsDom = document.createElement('div');
+    labelsDom.id = 'notes-labels';
+
+    // categories
+    const categoriesDom = document.createElement('div');
+    categoriesDom.id = 'notes-categories';
+
+    // const e_domain = document.createElement('div');
+    // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
+
+    // document.getElementById('content')?.replaceChildren(e_domain);
+    const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom] : [searchDom, labelsDom, categoriesDom];
+    rootDom?.append(...doms);
+}
+
+function processNotes() {
+    gs.allArrayLabels.clear();
+    gs.allGroupLabels.clear();
+
+    for (const n of gs.notes) {
+        n.als.forEach(n => gs.allArrayLabels.add(n));
+        for (const label of n.als) {
+            const [g] = label.split(jointMark);
+            if (gs.allGroupLabels.has(g)) {
+                gs.allGroupLabels.get(g)?.add(label);
+            } else {
+                gs.allGroupLabels.set(g, new Set([label]));
+            }
+        }
+    }
+}
 
 window.addEventListener('message', (event) => {
-  const message: DataProtocol = event.data;
-  console.log('view notes.');
-  switch (message.command) {
-    case 'data':
-      console.log(message.data);
-      domain = new VNNoteBook(message.data);
-      document.getElementById('content')?.replaceChildren(domain.doms());
-      break;
-    default:
-      document.body.innerHTML = '<h1>loading...{message}</h1>';
-  }
+    const message: DataProtocol = event.data;
+    // console.log(message);
+    switch (message.command) {
+        case 'kind':
+            if (message.data.wk !== gWebKind) {
+                console.log("now", message.data.wk);
+                gWebKind = message.data.wk;
+                initFrameDoms();
+                gs = new GlobalState();
+
+                // gWebKind === message.data.webKind;
+            }
+            if (gWebKind === 'domain') {
+                gs.nb = gs.dn[0];
+                gs.dals = message.data.dals;
+                vscode.postMessage({ command: 'get-domain' });
+            }
+            break;
+        // case 'refresh':
+        //     console.log("webview init.");
+        //     initFrameDoms();
+        //     gs = new GlobalState();
+        //     const _m = message as any;
+        //     if ((_m.params.webKind) === 'domain') {
+        //         vscode.postMessage({ command: 'domain' });
+        //     }
+        //     break;
+        case 'post-search':
+            const e_s = (new Date()).getTime();
+            gs.notes = message.data.notes;
+            document.getElementById('search-time')!.textContent = `${e_s - gs.s_s} ms`;
+
+            processNotes();
+
+            readerLabels();
+            readerCategories();
+            break;
+        case 'post-domain':
+            gs.dn = message.data.dn;
+            gs.notes = message.data.notes;
+
+            processNotes();
+
+            readerDomainName();
+            readerLabels();
+            readerCategories();
+            break;
+        default:
+            document.body.innerHTML = '<h1>loading...{message}</h1>';
+    }
 });
+
+console.log('lnotes webview open.');
+initFrameDoms();
+// new GlobalState after initFrameDoms
+let gs = new GlobalState();
+
+vscode.postMessage({ command: 'get-kind' });

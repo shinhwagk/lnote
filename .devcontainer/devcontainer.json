@@ -1,16 +1,8 @@
+// See https://containers.dev/implementors/json_reference/ for configuration reference
 {
-    "name": "vscode-note",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "args": {
-            "VARIANT": "16"
-        }
-    },
-    "extensions": [
-        "dbaeumer.vscode-eslint",
-        "howardzuo.vscode-npm-dependency",
-        "shinhwagk.vscode-note",
-        "amodio.tsl-problem-matcher"
-    ],
-    "remoteUser": "node"
+	"name": "Untitled Node.js project",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+  "remoteUser": "node"
 }

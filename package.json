@@ -1,36 +1,35 @@
 {
-    "name": "vscode-note",
-    "displayName": "vscode-note",
+    "name": "lnote",
+    "displayName": "lnote",
     "description": "A simple note-taking extension.",
-    "version": "0.20.12",
+    "version": "1.0.0",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
-        "vscode": "^1.71.0"
+        "vscode": "^1.77.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/shinhwagk/vscode-note"
+        "url": "https://github.com/shinhwagk/lnote"
     },
     "categories": [
         "Other"
     ],
     "keywords": [
+        "labels",
         "note",
         "vscode"
     ],
     "license": "MIT",
-    "activationEvents": [
-        "onView:domainExplorer"
-    ],
+    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "viewsContainers": {
             "activitybar": [
                 {
                     "id": "vsnote-explorer",
-                    "title": "vscode-note",
+                    "title": "lnote",
                     "icon": "images/note.svg"
                 }
             ]
@@ -44,91 +43,91 @@
                 {
                     "id": "filesExplorer",
                     "name": "files",
-                    "when": "vscode-note.files-explorer"
+                    "when": "lnote.files-explorer"
                 }
             ]
         },
         "menus": {
             "view/title": [
                 {
-                    "command": "vscode-note.domain.create",
+                    "command": "lnote.domain.create",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.domain.refresh",
+                    "command": "lnote.domain.refresh",
                     "group": "navigation",
                     "when": "view == domainExplorer"
                 },
                 {
-                    "command": "vscode-note.files.openTerminal",
+                    "command": "lnote.search",
+                    "group": "navigation",
+                    "when": "view == domainExplorer"
+                },
+                {
+                    "command": "lnote.files.open.terminal",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
                 {
-                    "command": "vscode-note.files.edit.open",
+                    "command": "lnote.files.open",
                     "when": "view == filesExplorer",
                     "group": "navigation@3"
                 },
                 {
-                    "command": "vscode-note.files.close",
+                    "command": "lnote.files.close",
                     "group": "navigation@1",
                     "when": "view == filesExplorer"
                 },
                 {
-                    "command": "vscode-note.files.refresh",
+                    "command": "lnote.files.refresh",
                     "group": "navigation@2",
                     "when": "view == filesExplorer"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-note.domain.create",
+                    "command": "lnote.domain.create",
                     "when": "view == domainExplorer",
                     "group": "0_domain"
                 },
                 {
-                    "command": "vscode-note.domain.rename",
-                    "when": "view == domainExplorer",
-                    "group": "2_domain"
-                },
-                {
-                    "command": "vscode-note.domain.remove",
+                    "command": "lnote.domain.rename",
                     "when": "view == domainExplorer",
                     "group": "3_domain"
                 },
                 {
-                    "command": "vscode-note.domain.search",
+                    "command": "lnote.domain.remove",
                     "when": "view == domainExplorer",
                     "group": "4_domain"
                 },
                 {
-                    "command": "vscode-note.domain.move",
-                    "when": "view == domainExplorer",
-                    "group": "2_domain"
+                    "command": "lnote.domain.notes.create",
+                    "when": "view == domainExplorer && viewItem =~ /emptyNotes/",
+                    "group": "1_domain"
                 },
                 {
-                    "command": "vscode-note.domain.notes.create",
-                    "when": "view == domainExplorer && viewItem == emptyNotes",
-                    "group": "1_domain"
+                    "command": "lnote.domain.search",
+                    "when": "view == domainExplorer && viewItem =~ /notebook/",
+                    "group": "2_domain"
                 }
             ]
         },
         "configuration": [
             {
                 "type": "object",
-                "title": "vscode-note",
+                "title": "lnote",
                 "properties": {
-                    "vscode-note.notespath": {
+                    "lnote.notespath": {
                         "type": "string",
-                        "description": "vscode-note data location"
+                        "description": "lnote data location"
                     }
                 }
             }
         ],
         "commands": [
             {
-                "command": "vscode-note.domain.create",
+                "command": "lnote.domain.create",
                 "title": "New",
                 "icon": {
                     "light": "images/light/add.svg",
@@ -136,23 +135,23 @@
                 }
             },
             {
-                "command": "vscode-note.domain.move",
-                "title": "Move"
+                "command": "lnote.search",
+                "title": "Search",
+                "icon": {
+                    "light": "images/light/search.svg",
+                    "dark": "images/dark/search.svg"
+                }
             },
             {
-                "command": "vscode-note.domain.rename",
-                "title": "Rename"
-            },
-            {
-                "command": "vscode-note.domain.remove",
+                "command": "lnote.domain.remove",
                 "title": "Remove"
             },
             {
-                "command": "vscode-note.domain.search",
-                "title": "Search"
+                "command": "lnote.domain.rename",
+                "title": "Rename"
             },
             {
-                "command": "vscode-note.domain.refresh",
+                "command": "lnote.domain.refresh",
                 "title": "Refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -160,7 +159,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.close",
+                "command": "lnote.files.close",
                 "title": "Close",
                 "icon": {
                     "light": "images/light/close.svg",
@@ -168,7 +167,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.openTerminal",
+                "command": "lnote.files.open.terminal",
                 "title": "open terminal",
                 "icon": {
                     "light": "images/light/terminal.svg",
@@ -176,11 +175,15 @@
                 }
             },
             {
-                "command": "vscode-note.domain.notes.create",
+                "command": "lnote.domain.notes.create",
                 "title": "Create Notes"
             },
             {
-                "command": "vscode-note.files.edit.open",
+                "command": "lnote.domain.search",
+                "title": "Serach"
+            },
+            {
+                "command": "lnote.files.open",
                 "title": "open edit window",
                 "icon": {
                     "light": "images/light/edit.svg",
@@ -188,7 +191,7 @@
                 }
             },
             {
-                "command": "vscode-note.files.refresh",
+                "command": "lnote.files.refresh",
                 "title": "refresh",
                 "icon": {
                     "light": "images/light/refresh.svg",
@@ -199,7 +202,7 @@
         "viewsWelcome": [
             {
                 "view": "domainExplorer",
-                "contents": "Please select a location to save the notes.\n[Notes Location](command:vscode-note.choose-location)"
+                "contents": "Please select a location to save the notes.\n[Notes Location](command:lnote.choose-location)"
             }
         ]
     },
@@ -208,7 +211,7 @@
         "docsmsft.docs-preview"
     ],
     "scripts": {
-        "vscode:prepublish": "rm -fr out && webpack --mode production",
+        "vscode:prepublish": "webpack --mode production",
         "compile": "tsc -p ./",
         "compile-watch": "tsc -p ./ -w",
         "compile-web": "tsc -p ./web/tsconfig.json",
@@ -217,33 +220,35 @@
         "lint": "eslint src --ext ts"
     },
     "devDependencies": {
-        "@types/fs-extra": "^9.0.13",
-        "@types/object-path": "^0.11.1",
-        "@types/webpack-env": "^1.18.0",
-        "copy-webpack-plugin": "^11.0.0",
-        "eslint-config-standard": "^17.0.0",
-        "eslint-plugin-import": "^2.26.0",
-        "eslint-plugin-n": "^15.2.5",
-        "eslint-plugin-promise": "^6.0.1",
-        "ts-node": "^10.9.1",
-        "@types/vscode": "^1.71.0",
-        "@types/glob": "^8.0.0",
-        "@types/mocha": "^9.1.1",
+        "@types/fs-extra": "^11.0.1",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
-        "@typescript-eslint/eslint-plugin": "^5.36.1",
-        "@typescript-eslint/parser": "^5.36.1",
-        "eslint": "^8.23.0",
-        "glob": "^8.0.3",
-        "mocha": "^10.0.0",
-        "typescript": "^4.8.2",
-        "ts-loader": "^9.3.1",
-        "webpack": "^5.74.0",
-        "webpack-cli": "^4.10.0",
-        "@vscode/test-electron": "^2.1.5"
+        "@types/object-path": "^0.11.1",
+        "@types/vscode": "^1.77.0",
+        "@types/webpack-env": "^1.18.0",
+        "@typescript-eslint/eslint-plugin": "^5.59.1",
+        "@typescript-eslint/parser": "^5.59.1",
+        "@vscode/test-electron": "^2.3.0",
+        "copy-webpack-plugin": "^11.0.0",
+        "eslint": "^8.39.0",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-n": "^15.7.0",
+        "eslint-plugin-promise": "^6.1.1",
+        "glob": "^10.2.2",
+        "mocha": "^10.2.0",
+        "ts-loader": "^9.4.2",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.0.4",
+        "webpack": "^5.81.0",
+        "webpack-cli": "^5.0.2"
     },
     "dependencies": {
-        "fs-extra": "^10.1.0",
+        "@types/flexsearch": "^0.7.3",
+        "flexsearch": "^0.7.31",
+        "fs-extra": "^11.1.1",
         "object-path": "^0.11.8",
-        "yaml": "^2.1.1"
+        "yaml": "^2.2.2"
     }
 }

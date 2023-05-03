@@ -1,4 +1,4 @@
-/out/
+/out/*
 /node_modules/
 /.vscode-test/
 /*.vsix
@@ -7,3 +7,6 @@
 /vscode-note/
 /package-lock.json
 token
+test-notesdata
+!out/main.css
+!out/static
