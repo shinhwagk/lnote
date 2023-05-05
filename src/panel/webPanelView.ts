@@ -17,6 +17,9 @@ export class LWebPanelView {
     private keywords = new Set<string>();
 
     // only for domain web
+    private arrayLabels = new Set<string>();
+
+    // only for domain web
     private dns: DomainNodeSplit = [];
 
     public setdn(dn: string[]) {
@@ -49,18 +52,19 @@ export class LWebPanelView {
                 </html>`;
     }
 
-    async show(webKind: 'domain' | 'search'): Promise<void> {
-        if (this.panel === undefined) {
-            this.webKind = webKind;
-            this.initPanel();
-        }
-        this.panel!.title = `lnote ${webKind}`;
-
+    setwk(webKind: 'domain' | 'search') {
         if (this.webKind !== webKind) {
-            await this.panel!.webview.postMessage({ command: 'kind', data: { wk: webKind } });
             this.webKind = webKind;
-        } else if (this.webKind === 'domain') {
-            await this.postDomain();
+        }
+        return this;
+    }
+
+    async show(): Promise<void> {
+        if (this.panel === undefined) {
+            this.initPanel();
+        } else {
+            this.panel!.title = `lnote ${this.webKind}`;
+            this.panel!.webview.postMessage({ command: 'init-frame-doms', data: { wk: this.webKind } });
         }
     }
 
@@ -103,17 +107,23 @@ export class LWebPanelView {
         const notes = ext.lnbs.search(Array.from(this.keywords));
         await this.panel!.webview.postMessage({
             command: 'post-search',
-            data: { notes: this.convertForWebStruct(notes) }
+            data: {
+                notes: this.convertForWebStruct(notes)
+            }
         });
     }
 
     private async postDomain() {
-        const d = ext.lnbs.get(this.dns[0]);
+        const d = ext.glnbs().get(this.dns[0]);
         const dals = d.getld().getArrayLabels(this.dns);
         const notes = d.getNotesOfDomain(this.dns);
         await this.panel!.webview.postMessage({
             command: 'post-domain',
-            data: { dn: this.dns, dals: dals, notes: this.convertForWebStruct(notes) }
+            data: {
+                dn: this.dns,
+                dals: dals,
+                notes: this.convertForWebStruct(notes)
+            }
         });
     }
 
@@ -142,17 +152,22 @@ export class LWebPanelView {
         this.panel.webview.onDidReceiveMessage(
             async (msg) => {
                 switch (msg.command) {
+                    case 'web-ready':
+                        await this.show();
+                        break;
+                    case 'web-init-ready':
+                        if (this.webKind === 'domain') {
+                            await this.postDomain();
+                        }
+                        break;
                     case 'get-kind':
                         await this.panel!.webview.postMessage({ command: 'kind', data: { wk: this.webKind } });
                         break;
                     case 'get-search':
-                        this.keywords.clear();
+                        // this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
                         await this.postSerach();
-                        this.keywords.clear();
-                        break;
-                    case 'get-domain':
-                        this.postDomain();
+                        // this.keywords.clear();
                         break;
                     case 'note-edit':
                         ExtCmds.cmdHdlNoteEditor(msg.params);
@@ -169,6 +184,9 @@ export class LWebPanelView {
                         break;
                     case 'domain-labels-edit':
                         ExtCmds.cmdHdlDomainGlsEdit(msg.params);
+                        break;
+                    case 'domain-refresh':
+                        await this.refresh();
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);

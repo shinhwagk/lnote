@@ -20,6 +20,7 @@ interface IData {
     notes: DataNote[];
     wk: 'domain' | 'search'; // webkind
     dals: string[]
+    dgls: GroupLables
 }
 
 interface DataProtocol {
@@ -355,11 +356,14 @@ function readerDomainName() {
     // const e_search = elemNotesSearch();
     e_title.appendChild(e_domain_name);
     e_title.appendChild(elemSpaces());
+    // 
     // e_title.appendChild(elemIcon('fa-plus', () => vscode.postMessage({ command: 'notebook-editor', data: { kind: 'end', params: { nId: "0", labels: gs.domainArrayLabels } } })));
-    const als = gs.dn.map(d => `domain->${d}`).concat(`##nb->${gs.dn[0]}`);
-    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: als } })));
+    // const als = gs.dn.map(d => `domain->${d}`).concat(`##nb->${gs.dn[0]}`);
+    e_title.appendChild(elemIcon('fa-plus', 'create note', () => vscode.postMessage({ command: 'common-notes-note-add', params: { als: gs.dals } })));
     e_title.appendChild(elemSpaces());
     e_title.appendChild(elemIcon('fa-pen', 'edit labes', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
+    e_title.appendChild(elemSpaces());
+    e_title.appendChild(elemIcon('fa-rotate-right', 'refresh', () => vscode.postMessage({ command: 'domain-refresh', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(
     //     elemIcon('fa-search', () => {
@@ -388,8 +392,6 @@ function readerDomainName() {
     e_domain?.append(e_title);
 }
 
-let gWebKind: 'search' | 'domain' = "domain";
-
 class GlobalState {
     notes: DataNote[] = [];
     s_s = 0;
@@ -401,6 +403,7 @@ class GlobalState {
 
     // domain only
     dals: string[] = []; // domain arraylabels
+    // dgls: GroupLables = {};
     dn: string[] = []; // domainnode
     nb: string = "";   // notebook
 }
@@ -438,7 +441,7 @@ function searchAction() {
     // document.getElementById("content").innerHTML = "You selected: " + x;
 }
 
-function initFrameDoms() {
+function initFrameDoms(webKind: 'domain' | 'search') {
     const rootDom = document.getElementById('root');
     rootDom?.replaceChildren();
     // search 
@@ -475,7 +478,7 @@ function initFrameDoms() {
     // e_domain.append(labelsDom, document.createElement('br'), categoriesDom);
 
     // document.getElementById('content')?.replaceChildren(e_domain);
-    const doms = gWebKind === 'domain' ? [domainDom, labelsDom, categoriesDom] : [searchDom, labelsDom, categoriesDom];
+    const doms = webKind === 'domain' ? [domainDom, labelsDom, categoriesDom] : [searchDom, labelsDom, categoriesDom];
     rootDom?.append(...doms);
 }
 
@@ -496,34 +499,25 @@ function processNotes() {
     }
 }
 
+function sendWebReady() {
+    vscode.postMessage({ command: 'web-ready' });
+}
+
+function sendWebInitReady() {
+    vscode.postMessage({ command: 'web-init-ready' });
+}
+
+
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
     // console.log(message);
     switch (message.command) {
-        case 'kind':
-            if (message.data.wk !== gWebKind) {
-                console.log("now", message.data.wk);
-                gWebKind = message.data.wk;
-                initFrameDoms();
-                gs = new GlobalState();
-
-                // gWebKind === message.data.webKind;
-            }
-            if (gWebKind === 'domain') {
-                gs.nb = gs.dn[0];
-                gs.dals = message.data.dals;
-                vscode.postMessage({ command: 'get-domain' });
-            }
+        // case 'init-search':
+        case 'init-frame-doms':
+            initFrameDoms(message.data.wk);
+            gs = new GlobalState();
+            sendWebInitReady();
             break;
-        // case 'refresh':
-        //     console.log("webview init.");
-        //     initFrameDoms();
-        //     gs = new GlobalState();
-        //     const _m = message as any;
-        //     if ((_m.params.webKind) === 'domain') {
-        //         vscode.postMessage({ command: 'domain' });
-        //     }
-        //     break;
         case 'post-search':
             const e_s = (new Date()).getTime();
             gs.notes = message.data.notes;
@@ -537,6 +531,7 @@ window.addEventListener('message', (event) => {
         case 'post-domain':
             gs.dn = message.data.dn;
             gs.notes = message.data.notes;
+            gs.dals = message.data.dals;
 
             processNotes();
 
@@ -550,8 +545,8 @@ window.addEventListener('message', (event) => {
 });
 
 console.log('lnotes webview open.');
-initFrameDoms();
+// initFrameDoms();
 // new GlobalState after initFrameDoms
 let gs = new GlobalState();
 
-vscode.postMessage({ command: 'get-kind' });
+sendWebReady();

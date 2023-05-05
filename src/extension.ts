@@ -6,8 +6,7 @@ import {
    initializeExtensionVariables,
    listenConfiguration,
    listenEditorFileClose,
-   listenEditorFileSave,
-   listenVscodeWindowChange
+   listenEditorFileSave
 } from './extensionVariables';
 
 export async function activate(context: ExtensionContext) {
@@ -18,8 +17,6 @@ export async function activate(context: ExtensionContext) {
    listenEditorFileClose(context);
 
    initializeExtensionVariables(context);
-
-   listenVscodeWindowChange();
 
    ext.registerCommand('lnote.choose-location', ExtCmds.cmdHdlChooseLocation);
 

@@ -26,7 +26,7 @@ export namespace ExtCmds {
     ext.lnbs.get(dns[0]).getld().updateGls(dns, { 'domain': dns });
     ext.lnbs.get(dns[0]).getln().create({ 'domain': dns });
     ext.domainProvider.refresh(dn);
-    ext.lwebPanelView.setdn(dns).show('domain');
+    ext.lwebPanelView.setdn(dns).setwk('domain').show();
   }
   export async function cmdHdlDomainCreate(dn?: DomainNode) {
     const name: string | undefined = await window.showInputBox();
@@ -45,7 +45,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlDomainPin(dn: DomainNode) {
     // ext.gs.update(dn.split(pathSplit)[0]);
-    await ext.lwebPanelView.setdn(dn.split(pathSplit)).show('domain');
+    await ext.lwebPanelView.setdn(dn.split(pathSplit)).setwk('domain').show();
     // await ext.lwebPanelView.show();
     await ext.setContext(ctxFilesExplorer, false);
   }
@@ -85,7 +85,7 @@ export namespace ExtCmds {
       ext.lwebPanelView.visible()
       && ext.lnbs.get(dns[0]).getNotesOfDomain(dns).length >= 1
     ) {
-      ext.lwebPanelView.setdn(dns).show('domain');
+      ext.lwebPanelView.setwk('domain').setdn(dns).show();
     }
     ext.domainProvider.refresh(tools.joinDomainNode(dns.slice(0, dns.length - 1)));
   }
@@ -120,10 +120,10 @@ export namespace ExtCmds {
     await ext.lwebPanelView.dispose();
   }
   export async function cmdHdlGlobalSearch() {
-    await ext.lwebPanelView.show('search');
+    await ext.lwebPanelView.setwk('search').show();
   }
   export async function cmdHdlNotebookSearch() {
-    await ext.lwebPanelView.show('search');
+    await ext.lwebPanelView.setwk('search').show();
   }
   export async function cmdHdlNoteDocShow(params: { nb: string, nId: string }) {
     const nb = ext.lnbs.get(params.nb);
