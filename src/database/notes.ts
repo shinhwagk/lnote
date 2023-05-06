@@ -1,26 +1,24 @@
 import * as path from 'path';
 
-import {
-    existsSync, mkdirpSync, moveSync
-} from 'fs-extra';
+import { copyFileSync, existsSync, mkdirpSync } from 'fs-extra';
 
 import { groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { LNote } from './note';
 
-import { ArrayLabel, ArrayLabels, GroupLables, INBNote, NoteId } from '../types';
 import { nbGroup, notesFileName } from '../constants';
+import { ArrayLabel, ArrayLabels, GroupLables, INBNote, NoteId } from '../types';
 
 // lnotes
 export class LNotes {
-    private notesCache = new Map<NoteId, LNote>();
+    private readonly notesCache = new Map<NoteId, LNote>();
     // Set<string>: note ids
     // example: key: "<group name> -> label1", [id1,id2]
-    private notesGlsCache = new Map<ArrayLabel, Set<string>>();
+    private readonly notesGlsCache = new Map<ArrayLabel, Set<string>>();
 
-    private lastId = tools.generateSixString();
+    private lastNoteId = tools.generateSixString();
 
     private readonly notesFile: string;
-    private readonly trashDir: string;
+    private readonly historyDir: string;
 
     constructor(
         private readonly nb: string,
@@ -29,8 +27,8 @@ export class LNotes {
         this.notesFile = path.join(this.dir, notesFileName);
         existsSync(this.notesFile) || vfs.writeJsonSync(this.notesFile, {});
 
-        this.trashDir = path.join(this.dir, '.trash');
-        existsSync(this.trashDir) || mkdirpSync(this.trashDir);
+        this.historyDir = path.join(this.dir, 'history');
+        existsSync(this.historyDir) || mkdirpSync(this.historyDir);
 
         this.cacheNotesById();
         this.cacheNotesByGls();
@@ -55,43 +53,25 @@ export class LNotes {
                 }
             }
         }
-        // force modify ##nb
-        this.permanent();
     }
 
     public getLastId(): NoteId {
-        return this.lastId;
+        return this.lastNoteId;
     }
 
     public create(gls: GroupLables) {
-        this.lastId = tools.generateSixString();
+        this.lastNoteId = tools.generateSixString();
         const ts = (new Date()).getTime();
         gls['##nb'] = [this.nb];
-        this.notesCache.set(this.lastId, new LNote(this.nb, this.dir, this.lastId, [''], ts, ts, gls));
+        this.notesCache.set(this.lastNoteId, new LNote(this.nb, this.dir, this.lastNoteId, [''], ts, ts, gls));
         this.permanent();
         this.cacheNotesByGls();
     }
 
     public delete(id: NoteId) {
-        this.trash(id);
-
         this.getById(id).getAls().forEach(l => this.notesGlsCache.get(l)?.delete(id));
         this.notesCache.delete(id);
         this.permanent();
-    }
-
-    private trash(id: NoteId) {
-        const n = this.getById(id);
-        const ts = tools.formatDate(new Date());
-        const noteTrashDir = path.join(this.trashDir, `${ts}-${id}`);
-        mkdirpSync(noteTrashDir);
-        vfs.writeJsonSync(path.join(noteTrashDir, 'n.json'), n);
-        if (n.checkDocExist()) {
-            moveSync(n.docPath, path.join(noteTrashDir, 'doc'), { overwrite: true });
-        }
-        if (n.checkFilesExist()) {
-            moveSync(n.filesPath, path.join(noteTrashDir, 'files'), { overwrite: true });
-        }
     }
 
     public getById(id: NoteId): LNote {
@@ -124,6 +104,9 @@ export class LNotes {
     }
 
     public permanent() {
+        console.log("permanent notes", this.nb);
+        const ts = tools.formatDate(new Date());
+        copyFileSync(this.notesFile, path.join(this.historyDir, `${ts}.notes.json`));
         vfs.writeJsonSync(this.notesFile, Object.fromEntries(this.notesCache.entries()));
     }
 

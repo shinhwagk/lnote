@@ -507,7 +507,6 @@ function sendWebInitReady() {
     vscode.postMessage({ command: 'web-init-ready' });
 }
 
-
 window.addEventListener('message', (event) => {
     const message: DataProtocol = event.data;
     // console.log(message);
