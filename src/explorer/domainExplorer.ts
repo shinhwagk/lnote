@@ -9,7 +9,7 @@ function getTreeItem(dn: DomainNode): TreeItem {
   const dns: DomainNodeSplit = tools.splitDomaiNode(dn);
   const nbn = dns[0]; // notebook name
 
-  const nb = ext.lnbs.get(nbn);
+  const nb = ext.glnbs().get(nbn);
   const isNotes = nb.getld().isNotes(dns);
 
   const item: TreeItem = { label: dns[dns.length - 1] };
@@ -47,10 +47,10 @@ export class DomainExplorerProvider implements TreeDataProvider<DomainNode> {
 
   public getChildren(element?: DomainNode): ProviderResult<DomainNode[]> {
     if (element === undefined) {
-      return ext.lnbs.getNames();
+      return ext.glnbs().getNames();
     } else {
       const dns = tools.splitDomaiNode(element);
-      return ext.lnbs.get(dns[0])
+      return ext.glnbs().get(dns[0])
         .getld()
         .getChildrenNamesOfDomain(dns)
         .sort()

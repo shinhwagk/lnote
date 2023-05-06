@@ -1,4 +1,4 @@
-import { existsSync, watchFile } from 'fs';
+import { existsSync } from 'fs';
 import path from 'path';
 import {
   commands, ConfigurationChangeEvent, ExtensionContext, StatusBarItem, TreeView, window, workspace
@@ -21,7 +21,7 @@ export class GlobalState {
 
   update(nb: string) {
     this.nb = nb;
-    this.lnb = ext.lnbs.get(nb);
+    this.lnb = ext.glnbs().get(nb);
   }
 }
 
@@ -73,11 +73,11 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
       if (
-        ext.lnbs
-        && e.fileName === ext.lnbs.editor.getEditorFile()
-        && ext.lnbs.editor.checkEditorFile()
+        ext.glnbs()
+        && e.fileName === ext.glnbs().editor.getEditorFile()
+        && ext.glnbs().editor.checkEditorFile()
       ) {
-        ext.lnbs.editor.archiveEditor();
+        ext.glnbs().editor.archiveEditor();
         ext.lwebPanelView.refresh();
         ext.domainProvider.refresh();
       }
@@ -89,12 +89,12 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument((e) => {
       if (
-        ext.lnbs
-        && e.fileName === ext.lnbs.editor.getEditorFile()
-        && ext.lnbs.editor.checkEditorFile()
+        ext.glnbs()
+        && e.fileName === ext.glnbs().editor.getEditorFile()
+        && ext.glnbs().editor.checkEditorFile()
       ) {
         try {
-          ext.lnbs.processEditor();
+          ext.glnbs().processEditor();
         } catch (e) {
           window.showErrorMessage(`${e}`);
           return;
@@ -114,7 +114,7 @@ export function checkVscodeWindowChange() {
     window.showWarningMessage("vscode window change, lnote force refresh.")
     ext.windowId = (new Date()).getTime().toString();
     vfs.writeFileSync(vscodeWindowChangeFile, ext.windowId);
-    ext.lnbs.refresh();
+    ext.glnbs().refresh();
   } else {
     vfs.writeFileSync(vscodeWindowChangeFile, ext.windowId);
   }

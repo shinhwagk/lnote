@@ -64,7 +64,7 @@ export class LWebPanelView {
             this.initPanel();
         } else {
             this.panel!.title = `lnote ${this.webKind}`;
-            this.panel!.webview.postMessage({ command: 'init-frame-doms', data: { wk: this.webKind } });
+            await this.panel!.webview.postMessage({ command: 'init-frame-doms', data: { wk: this.webKind } });
         }
     }
 
@@ -104,7 +104,7 @@ export class LWebPanelView {
     }
 
     private async postSerach() {
-        const notes = ext.lnbs.search(Array.from(this.keywords));
+        const notes = ext.glnbs().search(Array.from(this.keywords));
         await this.panel!.webview.postMessage({
             command: 'post-search',
             data: {
@@ -164,7 +164,7 @@ export class LWebPanelView {
                         await this.panel!.webview.postMessage({ command: 'kind', data: { wk: this.webKind } });
                         break;
                     case 'get-search':
-                        // this.keywords.clear();
+                        this.keywords.clear();
                         (msg.params.keywords as string[]).forEach(kw => this.keywords.add(kw));
                         await this.postSerach();
                         // this.keywords.clear();
