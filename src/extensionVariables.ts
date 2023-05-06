@@ -77,7 +77,6 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
         && e.fileName === ext.glnbs().editor.getEditorFile()
         && ext.glnbs().editor.checkEditorFile()
       ) {
-        ext.glnbs().editor.archiveEditor();
         ext.lwebPanelView.refresh();
         ext.domainProvider.refresh();
       }
@@ -111,7 +110,7 @@ export function checkVscodeWindowChange() {
     existsSync(vscodeWindowChangeFile)
     && vfs.readFileSync(vscodeWindowChangeFile) !== ext.windowId
   ) {
-    window.showWarningMessage("vscode window change, lnote force refresh.")
+    window.showWarningMessage("vscode window change, lnote force refresh.");
     ext.windowId = (new Date()).getTime().toString();
     vfs.writeFileSync(vscodeWindowChangeFile, ext.windowId);
     ext.glnbs().refresh();
