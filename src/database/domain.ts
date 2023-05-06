@@ -1,8 +1,8 @@
-import { existsSync } from 'fs-extra';
+import { copyFileSync, existsSync, mkdirpSync } from 'fs-extra';
 import objectPath from 'object-path';
 import * as path from 'path';
 
-import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, vfs } from '../helper';
+import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
 
 interface NBDomainStruct {
@@ -14,15 +14,18 @@ interface NBDomainStruct {
 export class LDomain {
 
     private readonly domainFile: string;
-    private domainCache: NBDomainStruct = {};
+    private readonly domainCache: NBDomainStruct = {};
+    private readonly historyDir: string;
 
     constructor(
         readonly nb: string,
         readonly dir: string
     ) {
         this.domainFile = path.join(this.dir, 'domains.json');
-
         existsSync(this.domainFile) || this.create([this.nb]);
+
+        this.historyDir = path.join(this.dir, 'history');
+        existsSync(this.historyDir) || mkdirpSync(this.historyDir);
 
         this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);
     }
@@ -83,6 +86,8 @@ export class LDomain {
     }
 
     public permanent() {
+        const ts = tools.formatDate(new Date());
+        copyFileSync(this.domainFile, path.join(this.historyDir, `${ts}.domain.json`));
         vfs.writeJsonSync(this.domainFile, this.domainCache);
     }
 

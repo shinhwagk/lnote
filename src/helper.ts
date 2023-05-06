@@ -19,7 +19,7 @@ export namespace vfs {
   }
 
   export function writeJsonSync(file: string, obj: any) {
-    fse.writeJsonSync(file, obj, { encoding });
+    fse.writeJsonSync(file, obj, { encoding, spaces: "  ", replacer: undefined });
   }
 
   export function readJsonSync<T>(file: string): T {
@@ -28,13 +28,6 @@ export namespace vfs {
   export function removeSync(file: string) {
     fse.removeSync(file);
   }
-  // export function ensureFileSync(file: string) {
-  //     if (fse.existsSync(file)) return;
-  //     if (fse.existsSync(path.dirname(file))) {
-  //         vfs.writeFileSync(file, '');
-  //     } else {
-  //     }
-  // }
 }
 
 export namespace tools {
@@ -115,7 +108,7 @@ export namespace tools {
     const fc2 = vfs.readFileSync(f2);
     const fs1 = createHash('sha256').update(fc1).digest('hex');
     const fs2 = createHash('sha256').update(fc2).digest('hex');
-    return fs1 === fs2
+    return fs1 === fs2;
   }
 }
 

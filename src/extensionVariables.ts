@@ -1,4 +1,4 @@
-import { existsSync, watchFile } from 'fs';
+import { existsSync } from 'fs';
 import path from 'path';
 import {
   commands, ConfigurationChangeEvent, ExtensionContext, StatusBarItem, TreeView, window, workspace
@@ -21,7 +21,7 @@ export class GlobalState {
 
   update(nb: string) {
     this.nb = nb;
-    this.lnb = ext.lnbs.get(nb);
+    this.lnb = ext.glnbs().get(nb);
   }
 }
 
@@ -40,6 +40,8 @@ export namespace ext {
     context.subscriptions.push(commands.registerCommand(command, callback, thisArg));
   export let domainShortcutStatusBarItem: StatusBarItem;
   export let windowId = (new Date()).getTime().toString();
+  // for check active vscode windows when open multiple-vscode
+  export const glnbs = () => { checkVscodeWindowChange(); return lnbs; };
   // export const webState = new WebStatus();
 
   // export const editNotes = new Map<string, string[]>();
@@ -71,12 +73,13 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidCloseTextDocument((e) => {
       if (
-        ext.lnbs
-        && e.fileName === ext.lnbs.editor.getEditorFile()
-        && ext.lnbs.editor.checkEditorFile()
+        ext.glnbs()
+        && e.fileName === ext.glnbs().editor.getEditorFile()
+        && ext.glnbs().editor.checkEditorFile()
       ) {
-        ext.lnbs.editor.archiveEditor();
-
+        ext.glnbs().editor.clearEditorFile();
+        ext.lwebPanelView.refresh();
+        ext.domainProvider.refresh();
       }
     })
   );
@@ -86,12 +89,12 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
   ctx.subscriptions.push(
     workspace.onDidSaveTextDocument((e) => {
       if (
-        ext.lnbs
-        && e.fileName === ext.lnbs.editor.getEditorFile()
-        && ext.lnbs.editor.checkEditorFile()
+        ext.glnbs()
+        && e.fileName === ext.glnbs().editor.getEditorFile()
+        && ext.glnbs().editor.checkEditorFile()
       ) {
         try {
-          ext.lnbs.processEditor();
+          ext.glnbs().processEditor();
         } catch (e) {
           window.showErrorMessage(`${e}`);
           return;
@@ -102,18 +105,19 @@ export function listenEditorFileSave(ctx: ExtensionContext) {
   );
 }
 
-export function listenVscodeWindowChange() {
-  const vscodeWindowCheckFile = path.join(ext.notespath, 'windowid');
-  if (!existsSync(vscodeWindowCheckFile)) {
-    vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId);
+export function checkVscodeWindowChange() {
+  const vscodeWindowChangeFile = path.join(ext.notespath, 'vswin');
+  if (
+    existsSync(vscodeWindowChangeFile)
+    && vfs.readFileSync(vscodeWindowChangeFile) !== ext.windowId
+  ) {
+    window.showWarningMessage("vscode window change, lnote force refresh.");
+    ext.windowId = (new Date()).getTime().toString();
+    vfs.writeFileSync(vscodeWindowChangeFile, ext.windowId);
+    ext.glnbs().refresh();
+  } else {
+    vfs.writeFileSync(vscodeWindowChangeFile, ext.windowId);
   }
-  watchFile(vscodeWindowCheckFile, () => {
-    if (vfs.readFileSync(vscodeWindowCheckFile) !== ext.windowId) {
-      ext.windowId = (new Date()).getTime().toString();
-      vfs.writeFileSync(vscodeWindowCheckFile, ext.windowId);
-      ext.lnbs.refresh();
-    }
-  });
 }
 
 export function initializeExtensionVariables(ctx: ExtensionContext): void {

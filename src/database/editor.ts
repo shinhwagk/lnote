@@ -8,7 +8,6 @@ import { GroupLables, IEditNote, IEditNotesGls, IEditor } from '../types';
 export class LEditor {
     public readonly editDir: string;
     // public readonly editorFile: string;
-    public readonly editArchiveDir: string;
     public curEditor: IEditor = 'note';
 
     constructor(
@@ -16,15 +15,13 @@ export class LEditor {
     ) {
         this.editDir = path.join(this.dir, '.editor');
         existsSync(this.editDir) || mkdirpSync(this.editDir);
-
-        this.editArchiveDir = path.join(this.editDir, 'archives');
-        existsSync(this.editArchiveDir) || mkdirpSync(this.editArchiveDir);
     }
 
     public getEditorFile = () => path.join(this.editDir, `${section}-${this.curEditor}.yml`);
-    public getEditorPreviousVersionFile = () => path.join(this.editDir, `${section}-${this.curEditor}-pv.yml`);
 
     public checkEditorFile = () => existsSync(this.getEditorFile());
+
+    public clearEditorFile = () => removeSync(this.getEditorFile());
 
     public trySetEditor(ekind: IEditor) {
         this.curEditor = ekind;
@@ -38,7 +35,6 @@ export class LEditor {
             gls: gls,
             contents: contents
         };
-        tools.writeYamlSync(this.getEditorPreviousVersionFile(), ed);
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
@@ -48,7 +44,6 @@ export class LEditor {
             ids: ps.ids,
             gls: ps.gls
         };
-        tools.writeYamlSync(this.getEditorPreviousVersionFile(), ed);
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
@@ -57,22 +52,7 @@ export class LEditor {
             dn: dn,
             gls: gls
         };
-        tools.writeYamlSync(this.getEditorPreviousVersionFile(), ed);
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
-    public archiveEditor() {
-        if (!tools.checkFileSame(this.getEditorPreviousVersionFile(), this.getEditorFile())) {
-            const ts = tools.formatDate(new Date());
-            const aef = {
-                previous: tools.readYamlSync(this.getEditorPreviousVersionFile()),
-                modified: tools.readYamlSync(this.getEditorFile()),
-                timestamp: ts
-            };
-            const archiveFile = path.join(this.editArchiveDir, `${ts}.${this.curEditor}.yml`);
-            tools.writeYamlSync(archiveFile, aef);
-        }
-        removeSync(this.getEditorFile());
-        removeSync(this.getEditorPreviousVersionFile());
-    }
 }

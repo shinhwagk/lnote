@@ -7,6 +7,7 @@ import {
 import { vfs } from '../helper';
 import { ArrayLabels, GroupLables, INBNote } from '../types';
 import { arrayLabels2GroupLabels, groupLabels2ArrayLabels } from '../helper';
+import { nbGroup } from '../constants';
 
 export class LNote {
     filesPath: string;
@@ -122,6 +123,7 @@ export class LNote {
 
     public updateDataArrayLabels(als: ArrayLabels) {
         this.gls = arrayLabels2GroupLabels(als);
+        this.gls[nbGroup] = [this.nb];
     }
 
     public getDocMainFile() {
