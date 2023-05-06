@@ -17,7 +17,7 @@ export class LWebPanelView {
     private keywords = new Set<string>();
 
     // only for domain web
-    private arrayLabels = new Set<string>();
+    // private arrayLabels = new Set<string>();
 
     // only for domain web
     private dns: DomainNodeSplit = [];

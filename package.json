@@ -2,12 +2,12 @@
     "name": "lnote",
     "displayName": "lnote",
     "description": "A simple note-taking extension.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
     "engines": {
-        "vscode": "^1.77.0"
+        "vscode": "^1.78.0"
     },
     "repository": {
         "type": "git",
