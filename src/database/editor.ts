@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { existsSync, mkdirpSync } from 'fs-extra';
+import { existsSync, mkdirpSync, removeSync } from 'fs-extra';
 import { section } from '../constants';
 import { tools } from '../helper';
 import { GroupLables, IEditNote, IEditNotesGls, IEditor } from '../types';
@@ -20,6 +20,8 @@ export class LEditor {
     public getEditorFile = () => path.join(this.editDir, `${section}-${this.curEditor}.yml`);
 
     public checkEditorFile = () => existsSync(this.getEditorFile());
+
+    public clearEditorFile = () => removeSync(this.getEditorFile());
 
     public trySetEditor(ekind: IEditor) {
         this.curEditor = ekind;

@@ -77,6 +77,7 @@ export function listenEditorFileClose(ctx: ExtensionContext) {
         && e.fileName === ext.glnbs().editor.getEditorFile()
         && ext.glnbs().editor.checkEditorFile()
       ) {
+        ext.glnbs().editor.clearEditorFile();
         ext.lwebPanelView.refresh();
         ext.domainProvider.refresh();
       }
