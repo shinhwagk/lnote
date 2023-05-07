@@ -5,8 +5,8 @@ import {
     existsSync, mkdirpSync, moveSync, readdirSync, statSync
 } from 'fs-extra';
 
-import { jointMark, nbGroup } from '../constants';
-import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools } from '../helper';
+import { nbGroup } from '../constants';
+import { arrayLabels2GroupLabels, tools } from '../helper';
 import { ArrayLabels, GroupLables, IEditNote, NoteId } from '../types';
 import { LEditor } from './editor';
 import { LNote } from './note';
