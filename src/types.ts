@@ -22,7 +22,6 @@ export interface IWebNote {
     doc: boolean;
     files: boolean;
     cts: number;
-    mts: number;
     als: ArrayLabels
 }
 

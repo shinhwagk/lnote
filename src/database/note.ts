@@ -14,8 +14,7 @@ export class LNote {
     docPath: string;
     docMainFile: string;
 
-    // arrayLabels: Set<string> = new Set();
-    // grouplabels: NoteDataGroupLabel
+    als: ArrayLabels;
 
     constructor(
         public readonly nb: string,
@@ -34,15 +33,8 @@ export class LNote {
         this.cts = cts;
         this.mts = mts;
         this.gls = gls;
+        this.als = groupLabels2ArrayLabels(gls).sort();
         // this.nbName = nbName
-    }
-
-    public getnb() {
-        return this.nb;
-    }
-
-    public getId() {
-        return this.id;
     }
 
     // important !!!
@@ -55,32 +47,12 @@ export class LNote {
         };
     }
 
-    public getContents() {
-        return this.contents;
-    }
-
-    public getMts() {
-        return this.mts;
-    }
-
-    public getCts() {
-        return this.cts;
-    }
-
-    public getAls(): ArrayLabels {
-        return groupLabels2ArrayLabels(this.gls).sort();
-    }
-
-    public getGls(): GroupLables {
-        return this.gls;
-    }
-
     public removeArrayLabels(...al: ArrayLabels) {
-        this.updateDataArrayLabels(this.getAls().filter(l => !al.includes(l)));
+        this.updateArrayLabels(this.als.filter(l => !al.includes(l)));
     }
 
     public addArrayLabels(...al: ArrayLabels) {
-        this.updateDataArrayLabels(this.getAls().concat(al));
+        this.updateArrayLabels(this.als.concat(al));
     }
 
     public removeDoc() {
@@ -110,7 +82,7 @@ export class LNote {
 
     public updateContents(contents: string[]) {
         this.contents = contents;
-        this.mts = (new Date()).getTime();
+        this.updateMts();
     }
 
     public updateMts() {
@@ -118,19 +90,12 @@ export class LNote {
     }
 
     public updateGroupLabels(gls: GroupLables) {
-        this.updateDataArrayLabels(groupLabels2ArrayLabels(gls));
+        this.updateArrayLabels(groupLabels2ArrayLabels(gls));
     }
 
-    public updateDataArrayLabels(als: ArrayLabels) {
+    public updateArrayLabels(als: ArrayLabels) {
         this.gls = arrayLabels2GroupLabels(als);
         this.gls[nbGroup] = [this.nb];
-    }
-
-    public getDocMainFile() {
-        return this.docMainFile;
-    }
-
-    public getFilesPath() {
-        return this.filesPath;
+        this.als = als;
     }
 }

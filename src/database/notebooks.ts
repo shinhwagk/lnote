@@ -121,14 +121,12 @@ export class LNotebooks {
         const n = lnb.getln().getById(en.id);
         n.updateContents(en.contents);
         n.updateGroupLabels(en.gls);
-        n.updateMts();
         lnb.getln().permanent();
     }
 
     private processEditNotesGroupLabels() {
-        const e = tools.readYamlSync(this.editor.getEditorFile()) as { ids: NoteId[], gls: GroupLables };
-        const als = groupLabels2ArrayLabels(e.gls);
-        const nb = als[0].split(jointMark)[1];
+        const e = tools.readYamlSync(this.editor.getEditorFile()) as { nb: string, ids: NoteId[], gls: GroupLables };
+        const nb = e.nb;
         for (const id of e.ids) {
             this.get(nb).getln().getById(id).updateGroupLabels(e.gls);
         }
@@ -146,26 +144,27 @@ export class LNotebooks {
     }
 
     public createNoteEditor(nb: string, id: NoteId) {
-        const nd = this.get(nb).getln().getById(id);
-        this.editor.createNoteEditor(nb, id, nd.getGls(), nd.getContents());
+        if (!this.editor.trySetEditor('note')) {
+            const nd = this.get(nb).getln().getById(id);
+            this.editor.createNoteEditor(nb, id, nd.gls, nd.contents);
+        }
     }
 
-    public createNotesGroupLabelsEditor(als: ArrayLabels) {
-        const nbl = als.filter(al => al.startsWith(`${nbGroup}${jointMark}`));
-        if (this.editor.trySetEditor('notesgls')) {
-            return;
-        }
-        if (nbl.length >= 1) {
-            const nb = nbl[0].split(jointMark)[1];
-            const notes = this.get(nb).getln().getNotesByAls(als, true);
-            this.editor.createNotesGlsEditor({ nb: nb, ids: notes.map(n => n.getId()), gls: arrayLabels2GroupLabels(als) });
+    public createNotesGlsEditor(als: ArrayLabels) {
+        if (!this.editor.trySetEditor('notesgls')) {
+            const gls = arrayLabels2GroupLabels(als);
+            const nbg = gls[nbGroup];
+            if (nbg) {
+                const nb = nbg[0];
+                const notes = this.get(nb).getln().getNotesByAls(als, true);
+                this.editor.createNotesGlsEditor(nb, notes.map(n => n.id), arrayLabels2GroupLabels(als));
+            }
         }
     }
 
     public createDomainGlsEditor(dn: string[]) {
-        if (this.editor.trySetEditor('domaingls')) {
-            return;
+        if (!this.editor.trySetEditor('domaingls')) {
+            this.editor.createDomainEditor(dn, this.get(dn[0]).getld().getGroupLabels(dn));
         }
-        this.editor.createDomainEditor(dn, this.get(dn[0]).getld().getGroupLabels(dn));
     }
 }

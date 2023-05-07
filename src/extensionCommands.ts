@@ -64,7 +64,7 @@ export namespace ExtCmds {
     nb.getln().getById(params.nId).createDoc();
     await commands.executeCommand(
       'editExplorer.openFileResource',
-      Uri.file(nb.getln().getById(params.nId).getDocMainFile())
+      Uri.file(nb.getln().getById(params.nId).docMainFile)
     );
     await ext.lwebPanelView.refresh();
   }
@@ -127,7 +127,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlNoteDocShow(params: { nb: string, nId: string }) {
     const nb = ext.glnbs().get(params.nb);
-    const docMainfFile = nb.getln().getById(params.nId).getDocMainFile();
+    const docMainfFile = nb.getln().getById(params.nId).docMainFile;
     await commands.executeCommand('markdown.showPreviewToSide', Uri.file(docMainfFile));
   }
   export async function cmdHdlNoteFilesOpen(params: { nb: string, nId: string }) {
@@ -141,7 +141,7 @@ export namespace ExtCmds {
   }
   export async function cmdHdlFilesOpen() {
     if (ext.gs.lnb) {
-      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.lnb.getln().getById(ext.gs.id).getFilesPath()), true);
+      await commands.executeCommand('vscode.openFolder', Uri.file(ext.gs.lnb.getln().getById(ext.gs.id).filesPath), true);
     }
   }
   export async function cmdHdlFilesRefresh() {
@@ -200,7 +200,7 @@ export namespace ExtCmds {
     if (ext.glnbs().editor.trySetEditor('notesgls')) {
       window.showWarningMessage('Please process the editor first.');
     } else {
-      ext.glnbs().createNotesGroupLabelsEditor(params.als);
+      ext.glnbs().createNotesGlsEditor(params.als);
     }
     commands.executeCommand('editExplorer.openFileResource', Uri.file(ext.glnbs().editor.getEditorFile()));
   }

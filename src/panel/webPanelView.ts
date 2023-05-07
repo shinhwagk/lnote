@@ -89,15 +89,13 @@ export class LWebPanelView {
             .map(n => {
                 const isDoc = n.checkDocExist();
                 const isFiles = n.checkFilesExist();
-                const als = n.getAls();
                 return {
                     nb: n.nb,
                     id: n.id,
                     doc: isDoc,
                     files: isFiles,
-                    als: als,
+                    als: n.als,
                     contents: n.contents,
-                    mts: n.mts,
                     cts: n.cts
                 };
             });

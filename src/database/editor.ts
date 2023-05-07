@@ -38,11 +38,11 @@ export class LEditor {
         tools.writeYamlSync(this.getEditorFile(), ed);
     }
 
-    public createNotesGlsEditor(ps: { nb: string, ids: string[], gls: GroupLables }) {
+    public createNotesGlsEditor(nb: string, ids: string[], gls: GroupLables) {
         const ed: IEditNotesGls = {
-            nb: ps.nb,
-            ids: ps.ids,
-            gls: ps.gls
+            nb: nb,
+            ids: ids,
+            gls: gls
         };
         tools.writeYamlSync(this.getEditorFile(), ed);
     }

@@ -35,7 +35,6 @@ interface DataNote {
     doc: boolean;
     files: boolean;
     cts: number;
-    mts: number;
     als: string[];
     category: string;
 }
@@ -62,7 +61,7 @@ function readerNote(container: HTMLElement, note: DataNote): void {
     const f_cion = note.files ? 'fa-folder' : 'fa-ellipsis-h';
 
     const d_space = document.createElement('span');
-    d_space.title = `id: ${note.id}, create date: ${note.cts}, modify date: ${note.mts}`;
+    d_space.title = `id: ${note.id}, create date: ${note.cts}`;
     d_space.appendChild(elemSpaces(2));
 
     d_note_id.appendChild(elemIcon(d_cion, 'show doc', () => vscode.postMessage({ command: 'note-doc-show', params: { nb: note.nb, nId: note.id } })));

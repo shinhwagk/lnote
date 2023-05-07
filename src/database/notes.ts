@@ -69,7 +69,7 @@ export class LNotes {
     }
 
     public delete(id: NoteId) {
-        this.getById(id).getAls().forEach(l => this.notesGlsCache.get(l)?.delete(id));
+        this.getById(id).als.forEach(l => this.notesGlsCache.get(l)?.delete(id));
         this.notesCache.delete(id);
         this.permanent();
     }
@@ -81,7 +81,7 @@ export class LNotes {
     public getIdsByAls(als: ArrayLabels): string[] {
         const ids = [];
         for (const id of this.notesCache.keys()) {
-            if (tools.issubset(als, this.notesCache.get(id)!.getAls())) {
+            if (tools.issubset(als, this.notesCache.get(id)!.als)) {
                 ids.push(id);
             }
         }
