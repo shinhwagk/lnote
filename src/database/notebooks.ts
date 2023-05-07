@@ -71,11 +71,11 @@ export class LNotebooks {
     }
 
     public rename(nb: string, nnb: string) {
-        if (!existsSync(this.getDir(nnb))) {
-            copySync(this.getDir(nb), this.getDir(nnb));
-            this.trash(nb);
-            this.cache(nnb);
-        }
+        copySync(this.getDir(nb), this.getDir(nnb));
+        this.nbs.delete(nb);
+        this.cache(nnb);
+        this.get(nnb).getld().rename([nb], nnb);
+        this.trash(nb);
     }
 
     public getNames(): string[] {

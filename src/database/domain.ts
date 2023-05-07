@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
+import { nbGroup } from '../constants';
 
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
@@ -69,7 +70,7 @@ export class LDomain {
         this.permanent();
     }
 
-    public renameDomain(domainNode: string[], domainName: string) {
+    public rename(domainNode: string[], domainName: string) {
         const newDomainNode = domainNode.slice(0, domainNode.length - 1).concat(domainName);
         this.moveDomain(domainNode, newDomainNode);
     }

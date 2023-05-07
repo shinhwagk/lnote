@@ -44,9 +44,7 @@ export class LNotes {
         this.notesGlsCache.clear();
         for (const [nId, note] of this.notesCache.entries()) {
             // force add nb labels to note
-            if (!(nbGroup in note.gls)) {
-                note.gls[nbGroup] = [this.nb];
-            }
+            note.gls[nbGroup] = [this.nb];
             for (const label of groupLabels2ArrayLabels(note.gls)) {
                 if (this.notesGlsCache.get(label)?.add(nId) === undefined) {
                     this.notesGlsCache.set(label, new Set<string>([nId]));

@@ -74,9 +74,10 @@ export namespace ExtCmds {
     const nname: string | undefined = await window.showInputBox({ value: oname });
     if (!nname || oname === nname) { return; }
 
-    ext.glnbs().get(dns[0]).getld().renameDomain(dns, nname);
     if (dns.length === 1) {
       ext.glnbs().rename(dns[0], nname);
+    } else {
+      ext.glnbs().get(dns[0]).getld().rename(dns, nname);
     }
 
     dns[dns.length - 1] = nname;
