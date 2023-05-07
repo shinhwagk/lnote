@@ -4,7 +4,6 @@ import * as path from 'path';
 
 import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
-import { nbGroup } from '../constants';
 
 interface NBDomainStruct {
     [domain: string]: NBDomainStruct;
