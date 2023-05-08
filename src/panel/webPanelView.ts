@@ -184,7 +184,7 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlDomainGlsEdit(msg.params);
                         break;
                     case 'domain-refresh':
-                        await this.refresh();
+                        ExtCmds.cmdHdlDomainPin(msg.params.dn);
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
