@@ -6,6 +6,7 @@ import { tools } from '../helper';
 import { LNote } from '../database/note';
 import { DomainNodeSplit } from '../types';
 import { IWebNote } from '../types';
+import { pathSplit } from '../constants';
 
 
 
@@ -184,7 +185,7 @@ export class LWebPanelView {
                         ExtCmds.cmdHdlDomainGlsEdit(msg.params);
                         break;
                     case 'domain-refresh':
-                        ExtCmds.cmdHdlDomainPin(msg.params.dn);
+                        ExtCmds.cmdHdlDomainPin((msg.params.dn as string[]).join(pathSplit));
                         break;
                     case 'note-doc-show':
                         ExtCmds.cmdHdlNoteDocShow(msg.params);
