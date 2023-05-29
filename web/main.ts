@@ -153,7 +153,7 @@ function arrayLabels2CategoryName(labelsOfCategory: string[]): string {
     return name;
 }
 
-function readerCategory(fdom: Element, als: string[]) {
+function readerCategory(fdom: Element, als: string[], filter: string[]) {
     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
     let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
 
@@ -201,6 +201,16 @@ function readerCategory(fdom: Element, als: string[]) {
     d_category_body.className = 'grid-category-body';
 
     for (const n of _notes) {
+        if (filter.length >= 1) {
+            let pin = false;
+            for (const f of filter) {
+                for (const c of n.contents) {
+                    if (c.includes(f)) { pin = true; break; }
+                }
+                if (pin) { break; }
+            }
+            if (!pin) { continue; }
+        }
         const notesDom = document.createElement('div');
         notesDom.id = `note-${n.id}`;
         d_category_body.appendChild(notesDom);
@@ -213,7 +223,7 @@ function readerCategory(fdom: Element, als: string[]) {
     }
 }
 
-function readerCategories() {
+function readerCategories(filter: string[] = []) {
     let localDom = document.getElementById('notes-categories')!;
     localDom.replaceChildren();
 
@@ -244,7 +254,7 @@ function readerCategories() {
     // }
 
     for (const cname of labelsOfNotes.values()) {
-        readerCategory(localDom, cname.split('|||'));
+        readerCategory(localDom, cname.split('|||'), filter);
     }
 }
 
@@ -328,7 +338,8 @@ function readerLabels() {
                     return;
                 }
                 readerLabels();
-                readerCategories();
+                readerCategories([]);
+                (<HTMLTextAreaElement>document.getElementById('APjFqa')).value = ''
             };
             group_dom.append(group_label_dom, elemSpaces());
         }
@@ -343,12 +354,13 @@ function readerDomainName() {
 
     const e_title = document.createElement('h2');
     const e_domain_name = document.createElement('span');
-    const e_search = document.createElement('input');
-    e_search.type = 'text';
-    e_search.style.display = 'none';
-    e_search.focus();
-    e_search.onkeydown = () => {
-        // this.readerCategories(i.value);
+    const e_search = document.createElement('textarea');
+    e_search.id = "APjFqa";
+    e_search.className = "searchTextArea";
+    e_search.maxLength = 2048;
+    e_search.rows = 1;
+    e_search.onkeyup = () => {
+        readerCategories(e_search.value.split(' '));
     };
 
     e_domain_name.textContent = `${gs.dn.join(' / ')}`;
@@ -363,6 +375,8 @@ function readerDomainName() {
     e_title.appendChild(elemIcon('fa-pen', 'edit labes', () => vscode.postMessage({ command: 'domain-labels-edit', params: { dn: gs.dn } })));
     e_title.appendChild(elemSpaces());
     e_title.appendChild(elemIcon('fa-rotate-right', 'refresh', () => vscode.postMessage({ command: 'domain-refresh', params: { dn: gs.dn } })));
+    e_title.appendChild(elemSpaces());
+    e_title.appendChild(e_search);
     e_title.appendChild(elemSpaces());
     // e_title.appendChild(
     //     elemIcon('fa-search', () => {
@@ -524,7 +538,7 @@ window.addEventListener('message', (event) => {
             processNotes();
 
             readerLabels();
-            readerCategories();
+            readerCategories([]);
             break;
         case 'post-domain':
             gs.dn = message.data.dn;
@@ -535,7 +549,7 @@ window.addEventListener('message', (event) => {
 
             readerDomainName();
             readerLabels();
-            readerCategories();
+            readerCategories([]);
             break;
         default:
             document.body.innerHTML = '<h1>loading...{message}</h1>';
