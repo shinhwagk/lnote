@@ -13,7 +13,9 @@ const jointMark = '->';
 
 const intersection = (array1: string[], array2: string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
-// const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
+const issubset = (child: string[], father: string[]) => child.filter((e) => father.includes(e)).length === child.length;
+
+const chaji = (child: string[], father: string[]) => child.filter((e) => !father.includes(e));
 
 interface IData {
     dn: string[];
@@ -157,7 +159,7 @@ function readerCategory(fdom: Element, als: string[], filter: string[]) {
     // labelsOfCategory = labelsOfCategory === '' ? '---' : labelsOfCategory;
     let nameOfCategory = arrayLabels2CategoryName(als); //labelsOfCategory.join(', ');
 
-    const _notes = gs.notes.filter(n => intersection(n.als, als).length === als.length);
+    // const _notes = gs.notes.filter(n => intersection(n.als, als).length === als.length);
 
 
     // nameOfCategory = nameOfCategory === '' ? '---' : nameOfCategory;
@@ -200,6 +202,7 @@ function readerCategory(fdom: Element, als: string[], filter: string[]) {
     // d_category_body.id = `category-body-${nameOfCategory.replace(/\s/g, '')}`;
     d_category_body.className = 'grid-category-body';
 
+    const _notes = gs.kkk[als.join("|||")].map(nid => gs.allNotes.get(nid)!)
     for (const n of _notes) {
         if (filter.length >= 1) {
             let pin = false;
@@ -252,7 +255,7 @@ function readerCategories(filter: string[] = []) {
     //         }
     //     }
     // }
-    const issubset = (child:string[], father:string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
+    // const issubset = (child: string[], father: string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
     // const allcategory = Array.from(labelsOfNotes.values())
     // for (const cname of labelsOfNotes.values()) {
     //     for (const ac of allcategory){
@@ -262,18 +265,40 @@ function readerCategories(filter: string[] = []) {
     //         }
     //     }
     // }
-    for (const a1 of Array.from(labelsOfNotes.values())) {
-        let f = true
-        for (const a2 of Array.from(labelsOfNotes.values())) {
-            if (a1 !== a2) {
-                if (issubset(a1.split("|||"), a2.split("|||"))) {
-                    f = false
+    gs.kkk = {}
+
+    const _notesOfLabels = new Map<string, Set<string>>()
+
+    for (const n of gs.notes) {
+        if (labelsOfNotes.has(n.als.join("|||"))) {
+            if (_notesOfLabels.has(n.als.sort().join("|||"))) {
+                _notesOfLabels.get(n.als.sort().join("|||"))?.add(n.id);
+            } else {
+                _notesOfLabels.set(n.als.sort().join("|||"), new Set([n.id]));
+            }
+        }
+    }
+
+    for (const [k, v] of _notesOfLabels.entries()) {
+        gs.kkk[k] = Array.from(v)
+    }
+
+    for (const a1 of Object.keys(gs.kkk).map(f => f.split("|||"))) {
+        for (const a2 of Object.keys(gs.kkk).map(f => f.split("|||"))) {
+            if (a1.join("") !== a2.join("")) {
+                if (issubset(a1, a2)) {
+                    const chaj = chaji(gs.kkk[a1.join("|||")], gs.kkk[a2.join("|||")])
+                    gs.kkk[a1.join("|||")] = chaj
                 }
             }
         }
-        if (f) {
-            readerCategory(localDom, a1.split('|||'), filter);
+        if (gs.kkk[a1.join("|||")].length == 0) {
+            delete gs.kkk[a1.join("|||")]
         }
+    }
+
+    for (const cname of Object.keys(gs.kkk)) {
+        readerCategory(localDom, cname.split('|||'), filter);
     }
 }
 
@@ -433,6 +458,9 @@ class GlobalState {
     // init once
     allGroupLabels = new Map<string, Set<string>>();
     allNotesOfLabels = new Map<string, Set<string>>();
+    allNotes = new Map<string, DataNote>()
+
+    kkk: { [k: string]: string[] } = {}
 
     // domain only
     dals: string[] = []; // domain arraylabels
@@ -519,8 +547,10 @@ function processNotes() {
     gs.allArrayLabels.clear();
     gs.allGroupLabels.clear();
     gs.allNotesOfLabels.clear();
+    gs.allNotes.clear()
 
     for (const n of gs.notes) {
+        gs.allNotes.set(n.id, n)
         n.als.forEach(n => gs.allArrayLabels.add(n));
         for (const label of n.als) {
             const [g] = label.split(jointMark);
@@ -531,40 +561,14 @@ function processNotes() {
             }
         }
 
-        if (gs.allNotesOfLabels.has(n.als.sort().join("|||"))) {
-            gs.allNotesOfLabels.get(n.als.sort().join("|||"))?.add(n.id);
-        } else {
-            gs.allNotesOfLabels.set(n.als.sort().join("|||"), new Set([n.id]));
-        }
 
-        
     }
-    console.log(gs.allNotesOfLabels)
-    const issubset = (child:string[], father:string[]) => child.filter((e) => father.indexOf(e) !== -1).length === child.length;
 
-    const chaji = (child:string[], father:string[]) => child.filter((e) => father.indexOf(e) == -1);
+
+    // child 哪些不在father中的
     // const intersections = (array1:string[], array2:string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
 
-    const kkk:{[k:string]:string[]} = {}
 
-    for (const [k,v ]of gs.allNotesOfLabels.entries()){
-        kkk[k]=Array.from(v)
-    }
-
-    for (const a1 of Object.keys(kkk).map(f => f.split("|||"))) {
-        for (const a2 of Object.keys(kkk).map(f => f.split("|||"))) {
-            if (a1.join("") !== a2.join("")) {
-                if (issubset(a1, a2)) {
-                    const chaj = chaji(kkk[a1.join("|||")], kkk[a2.join("|||")])
-                    kkk[a1.join("|||")] = chaj
-                }
-            }
-        }
-        if (kkk[a1.join("|||")].length == 0) {
-            delete kkk[a1.join("|||")]
-        }
-    }
-    console.log(kkk)
 }
 
 function sendWebReady() {

@@ -2,7 +2,7 @@
     "name": "lnote",
     "displayName": "lnote",
     "description": "A simple note-taking extension.",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "icon": "icon.png",
     "publisher": "shinhwagk",
     "preview": true,
