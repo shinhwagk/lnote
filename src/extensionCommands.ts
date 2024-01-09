@@ -101,8 +101,8 @@ export namespace ExtCmds {
 
     const confirm = await window.showInputBox({
       title: 'Are you absolutely sure?',
-      placeHolder: `Please type '${nd}' to confirm.`,
-      prompt: `Please type '${nd}' to confirm.`
+      placeHolder: `Please type '${domainName}' to confirm.`,
+      prompt: `Please type '${domainName}' to confirm.`
     });
     if (confirm !== domainName) {
       window.showInformationMessage(`Input is not '${domainName}'.`);
