@@ -69,7 +69,7 @@ export class LNote {
     }
 
     public checkFilesExist() {
-        return existsSync(this.filesPath) || readdirSync(this.filesPath).filter(f => f !== this.mainFile).length >= 1;
+        return existsSync(this.filesPath) && readdirSync(this.filesPath).filter(f => f !== this.mainFile).length >= 1;
     }
 
     public createDoc() {
