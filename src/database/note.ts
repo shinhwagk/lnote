@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {
-    existsSync, mkdirpSync, removeSync
+    existsSync, mkdirpSync, readdirSync, removeSync
 } from 'fs-extra';
 
 import { vfs } from '../helper';
@@ -11,8 +11,9 @@ import { nbGroup } from '../constants';
 
 export class LNote {
     filesPath: string;
-    docPath: string;
     docMainFile: string;
+
+    mainFile: string = "main.md";
 
     als: ArrayLabels;
 
@@ -26,8 +27,8 @@ export class LNote {
         public gls: GroupLables,
     ) {
         this.filesPath = path.join(this.dir, "files", this.id);
-        this.docPath = path.join(this.dir, "doc", this.id);
-        this.docMainFile = path.join(this.docPath, 'main.md');
+        // this.docPath = path.join(this.dir, "doc", this.id);
+        this.docMainFile = path.join(this.filesPath, this.mainFile);
 
         this.contents = contents;
         this.cts = cts;
@@ -56,7 +57,7 @@ export class LNote {
     }
 
     public removeDoc() {
-        removeSync(this.docPath);
+        // removeSync(this.docPath);
     }
 
     public removeFiles() {
@@ -68,11 +69,11 @@ export class LNote {
     }
 
     public checkFilesExist() {
-        return existsSync(this.filesPath);
+        return existsSync(this.filesPath) || readdirSync(this.filesPath).filter(f => f !== this.mainFile).length >= 1;
     }
 
     public createDoc() {
-        mkdirpSync(this.docPath);
+        mkdirpSync(this.filesPath);
         vfs.writeFileSync(this.docMainFile, '');
     }
 
