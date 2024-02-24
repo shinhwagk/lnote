@@ -1,6 +1,7 @@
+import * as path from 'path';
+
 import { copyFileSync, existsSync, mkdirpSync } from 'fs-extra';
 import objectPath from 'object-path';
-import * as path from 'path';
 
 import { arrayLabels2GroupLabels, groupLabels2ArrayLabels, tools, vfs } from '../helper';
 import { ArrayLabels, GroupLables } from '../types';
@@ -21,11 +22,15 @@ export class LDomain {
         readonly nb: string,
         readonly dir: string
     ) {
-        this.domainFile = path.join(this.dir, 'domains.json');
-        existsSync(this.domainFile) || this.create([this.nb]);
-
         this.historyDir = path.join(this.dir, 'history');
         existsSync(this.historyDir) || mkdirpSync(this.historyDir);
+
+        this.domainFile = path.join(this.dir, 'domains.json');
+        if (!existsSync(this.domainFile)) {
+            // init empty file
+            vfs.writeJsonSync(this.domainFile, this.domainCache)
+            this.create([nb])
+        }
 
         this.domainCache = vfs.readJsonSync<NBDomainStruct>(this.domainFile);
     }
