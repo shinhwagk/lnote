@@ -552,18 +552,18 @@ function processNotes() {
     for (const n of gs.notes) {
         gs.allNotes.set(n.id, n)
         n.als.forEach(n => gs.allArrayLabels.add(n));
-        for (const label of n.als) {
-            const [g] = label.split(jointMark);
-            if (gs.allGroupLabels.has(g)) {
-                gs.allGroupLabels.get(g)?.add(label);
-            } else {
-                gs.allGroupLabels.set(g, new Set([label]));
-            }
-        }
-
-
     }
 
+    gs.allArrayLabels = new Set([...gs.allArrayLabels].sort())
+
+    for (const label of gs.allArrayLabels) {
+        const [g] = label.split(jointMark);
+        if (gs.allGroupLabels.has(g)) {
+            gs.allGroupLabels.get(g)?.add(label);
+        } else {
+            gs.allGroupLabels.set(g, new Set([label]));
+        }
+    }
 
     // child 哪些不在father中的
     // const intersections = (array1:string[], array2:string[]) => array1.filter((e) => array2.indexOf(e) !== -1);
