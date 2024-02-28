@@ -204,15 +204,18 @@ function readerCategory(fdom: Element, als: string[], filter: string[]) {
 
     const _notes = gs.kkk[als.join("|||")].map(nid => gs.allNotes.get(nid)!)
     for (const n of _notes) {
-        if (filter.length >= 1) {
-            let pin = false;
-            for (const f of filter) {
-                for (const c of n.contents) {
-                    if (c.includes(f)) { pin = true; break; }
-                }
-                if (pin) { break; }
-            }
-            if (!pin) { continue; }
+        // if (filter.length >= 1) {
+        //     let pin = 0;
+        //     for (const f of filter) {
+        //         for (const c of n.contents) {
+        //             if (c.includes(f)) { pin += 1; break; }
+        //         }
+        //     }
+        //     if (pin < filter.length) { continue; }
+        // }
+
+        if (filter.length >= 1 && !filter.every(f => n.contents.some(c => c.includes(f)))) {
+            continue;
         }
         const notesDom = document.createElement('div');
         notesDom.id = `note-${n.id}`;
@@ -404,6 +407,7 @@ function readerDomainName() {
     e_search.maxLength = 2048;
     e_search.rows = 1;
     e_search.onkeyup = () => {
+        console.log(`info: search ${e_search.value}.`)
         readerCategories(e_search.value.split(' '));
     };
 
